@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PrefixTextView">
+        <attr name="prefix" format="string" />
+        <attr name="value" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="TimePrefixTextView">
+        <attr name="prefix"/>
+        <attr name="time" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="TimeTextView">
+        <attr name="time"/>
+    </declare-styleable>
+
+    <declare-styleable name="TransitionView">
+        <attr name="shape" format="enum">
+            <enum name="circle" value="0"/>
+            <enum name="rectangle" value="1"/>
+        </attr>
+    </declare-styleable>
+</resources>

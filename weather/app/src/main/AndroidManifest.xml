@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.pelmenstar.projktSens.weather.app">
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <uses-feature android:name="android.hardware.location" android:required="false"/>
+
+    <application
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/appName"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:allowBackup="true">
+
+        <activity android:name=".ui.settings.SettingsActivity"/>
+        <activity
+            android:name=".ui.StartupActivity"
+            android:theme="@style/AppTheme.Launcher">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ui.home.HomeActivity" />
+        <activity android:name=".ui.sunriseSunset.SunriseSunsetCalendarActivity" />
+        <activity android:name=".ui.moon.MoonCalendarActivity" />
+        <activity android:name="com.pelmenstar.projktSens.shared.android.ui.requestPermissions.RequestPermissionsActivity" />
+        <activity android:name=".ui.report.DayReportActivity" />
+        <activity android:name=".ui.report.WeekReportActivity" />
+        <activity android:name=".ui.report.MonthReportActivity" />
+    </application>
+
+</manifest>

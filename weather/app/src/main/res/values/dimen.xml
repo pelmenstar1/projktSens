@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="reportActivity_chartHeight">240dp</dimen>
+    <dimen name="reportActivity_errorView_retryButtonSize">35dp</dimen>
+    <dimen name="reportActivity_errorView_retryButtonTopMargin">10dp</dimen>
+    <dimen name="reportActivity_transitionViewSize">80dp</dimen>
+    <dimen name="reportActivity_chartViewTextLeftMargin">5dp</dimen>
+    <dimen name="reportActivity_chartViewSideMargin">3dp</dimen>
+    <dimen name="reportActivity_chartViewBlockTopMargin">10dp</dimen>
+
+    <dimen name="weatherView_tempTextSize">24sp</dimen>
+    <dimen name="weatherView_tempUnitTextSize">16sp</dimen>
+    <dimen name="weatherView_humPressTextSize">15sp</dimen>
+    <dimen name="weatherView_moonDiameter">40dp</dimen>
+    <dimen name="weatherView_sunriseSunsetTextSize">16sp</dimen>
+</resources>

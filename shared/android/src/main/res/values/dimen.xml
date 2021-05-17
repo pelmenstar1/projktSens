@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="requestPermissions_actionButtonSideMargin">5dp</dimen>
+
+    <dimen name="initScreen_transitionCircleSize">80dp</dimen>
+    <dimen name="initScreen_retryButtonSize">35dp</dimen>
+    <dimen name="initScreen_retryButton_topMargin">10dp</dimen>
+
+</resources>
