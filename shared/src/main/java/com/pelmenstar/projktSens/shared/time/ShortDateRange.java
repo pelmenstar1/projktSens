@@ -8,15 +8,30 @@ import com.pelmenstar.projktSens.shared.serialization.ValidationException;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Represents a range between date-ints.
+ * Instances of this class can be serialized in format: <br/>
+ * - start | 4 bytes <br/>
+ * - endInclusive | 4 bytes <br/>
+ */
 public final class ShortDateRange {
     public static final int SERIALIZED_OBJECT_SIZE = 8;
 
+    /**
+     * Serializer of {@link ShortDateRange}
+     */
     @NotNull
     public static final ObjectSerializer<ShortDateRange> SERIALIZER;
 
+    /**
+     * Start date, inclusive. Always less than {@link ShortDateRange#endInclusive}
+     */
     @ShortDateInt
     public final int start;
 
+    /**
+     * End date, inclusive. Always equals or greater than {@link ShortDateRange#start}
+     */
     @ShortDateInt
     public final int endInclusive;
 
@@ -25,6 +40,14 @@ public final class ShortDateRange {
         Serializable.registerSerializer(ShortDateRange.class, SERIALIZER);
     }
 
+    /**
+     * Initializes instance of {@link ShortDateRange} using start and end date-ints
+     * @param start start of range, represented in date-int
+     * @param endInclusive end of range, represented in date-int
+     *
+     * @throws ValidationException if start or endInclusive are invalid.
+     * Also if start is greater than endInclusive.
+     */
     public ShortDateRange(@ShortDateInt int start, @ShortDateInt int endInclusive) {
         if (!ShortDate.isValid(start)) {
             throw ValidationException.invalidValue("start", start);
@@ -43,6 +66,9 @@ public final class ShortDateRange {
         this.endInclusive = endInclusive;
     }
 
+    /**
+     * Determines whether range includes specified date-int
+     */
     public boolean contains(@ShortDateInt int date) {
         return date >= start && date <= endInclusive;
     }

@@ -57,7 +57,7 @@ class InitTask(val id: Int, timeout: Int = 10 * 1000, val isRequired: Boolean = 
     override fun hashCode(): Int {
         var result = id
         result = 31 * result + if (isRequired) 1 else 0
-        result = 31 * result + (timeout xor (timeout shl 32)).toInt()
+        result = 31 * result + (timeout xor (timeout shl 32))
         result = 31 * result + runner.hashCode()
 
         return result
@@ -67,9 +67,6 @@ class InitTask(val id: Int, timeout: Int = 10 * 1000, val isRequired: Boolean = 
         return "{id=$id, timeout=$timeout, isRequired=$isRequired}"
     }
 }
-
-
-
 
 /**
  * Represents a context of initialization component

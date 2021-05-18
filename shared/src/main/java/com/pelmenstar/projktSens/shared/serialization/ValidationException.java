@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Signals that argument or some else data was not valid.
+ * Signals that argument or else data was not valid.
  *
  * It had better to use factory methods, but it is still possible to create {@link ValidationException} through constructors
  */

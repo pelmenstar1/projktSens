@@ -5,7 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Modifier;
 
 /**
- * An exception that signals that some class, which can be serializer, does not meet requirements described in {@link ObjectSerializer}
+ * An exception that signals that some class, which can be serializer,
+ * does not meet requirements described in {@link ObjectSerializer}
  */
 public final class SerializerContractException extends RuntimeException {
     public SerializerContractException() {
@@ -19,18 +20,40 @@ public final class SerializerContractException extends RuntimeException {
         super(msg, innerException);
     }
 
+    /**
+     * Creates instance of {@link SerializerContractException} which signals that serializer of specified class
+     * doesn't extend {@link ObjectSerializer}.
+     */
     @NotNull
     public static SerializerContractException serializerDoesntExtendObjectSerializer(@NotNull Class<?> c) {
         return new SerializerContractException("Field 'SERIALIZER' of class " + c.toString() + "does not extend " + ObjectSerializer.class.toString());
     }
 
+    /**
+     * Creates instance of {@link SerializerContractException} which signals that specified class doesn't have
+     * SERIALIZER field
+     */
     @NotNull
     public static SerializerContractException noSerializerField(@NotNull Class<?> c) {
         return new SerializerContractException("Class " + c.toString() + " does not have SERIALIZER field");
     }
 
+    /**
+     * Creates instance of {@link SerializerContractException} which signals that serializer of specified class
+     * is null
+     */
     @NotNull
-    public static SerializerContractException illegalModifiers(int mods, @NotNull Class<?> c) {
+    public static SerializerContractException serializerIsNull(@NotNull Class<?> c) {
+        return new SerializerContractException("Serializer of class" + c.toString() + " is null");
+    }
+
+    /**
+     * Creates instance of {@link SerializerContractException} which signals that serializer of specified class
+     * has illegal field modifiers
+     * @param mods field modifiers of class
+     */
+    @NotNull
+    public static SerializerContractException illegalModifiers(int mods) {
         StringBuilder sb = new StringBuilder();
         sb.append("Field 'SERIALIZER' has not illegal modifiers. Current: '");
         appendModifiers(mods, sb);
@@ -76,8 +99,5 @@ public final class SerializerContractException extends RuntimeException {
         sb.deleteCharAt(sb.length() - 1);
     }
 
-    @NotNull
-    public static SerializerContractException serializerIsNull(@NotNull Class<?> c) {
-        return new SerializerContractException("Serializer of class" + c.toString() + " is null");
-    }
+
 }

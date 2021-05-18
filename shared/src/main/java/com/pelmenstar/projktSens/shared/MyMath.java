@@ -3,6 +3,9 @@ package com.pelmenstar.projktSens.shared;
 public final class MyMath {
     private MyMath() {}
 
+    /**
+     * Rounds particular number for 1 decimal place
+     */
     public static float round(float number) {
         return (int)(number * 10f) / 10f;
     }
@@ -29,6 +32,9 @@ public final class MyMath {
         return r;
     }
 
+    /**
+     * Forces specified value in range represented by min and max
+     */
     public static int clamp(int value, int min, int max) {
         if(value < min) {
             return min;
@@ -39,6 +45,9 @@ public final class MyMath {
         return value;
     }
 
+    /**
+     * Forces specified value in range represented by min and max
+     */
     public static float clamp(float value, float min, float max) {
         if(value < min) {
             return min;

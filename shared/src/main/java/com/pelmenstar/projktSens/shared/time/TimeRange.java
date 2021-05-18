@@ -14,6 +14,9 @@ import org.jetbrains.annotations.NotNull;
 public final class TimeRange {
     public static final int SERIALIZED_OBJECT_SIZE = 8;
 
+    /**
+     * Serializer of {@link TimeRange}
+     */
     @NotNull
     public static final ObjectSerializer<TimeRange> SERIALIZER;
 

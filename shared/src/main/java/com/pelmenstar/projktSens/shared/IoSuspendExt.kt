@@ -20,6 +20,9 @@ private class ClosableCompletionHandler(private val closeable: Closeable): Compl
 }
  */
 
+/**
+ * Suspend version of [Socket.connect]
+ */
 suspend fun Socket.connectSuspend(address: SocketAddress) {
     suspendCancellableCoroutine<Unit> { cont ->
         //cont.invokeOnCancellation(ClosableCompletionHandler(this))
@@ -29,6 +32,9 @@ suspend fun Socket.connectSuspend(address: SocketAddress) {
     }
 }
 
+/**
+ * Suspend version of [Socket.bind]
+ */
 suspend fun ServerSocket.bindSuspend(address: SocketAddress, backlog: Int) {
     suspendCancellableCoroutine<Unit> { cont ->
         //cont.invokeOnCancellation(ClosableCompletionHandler(this))
@@ -38,6 +44,9 @@ suspend fun ServerSocket.bindSuspend(address: SocketAddress, backlog: Int) {
     }
 }
 
+/**
+ * Suspend version of [ServerSocket.accept]
+ */
 suspend fun ServerSocket.acceptSuspend(): Socket {
     return suspendCancellableCoroutine { cont ->
         //cont.invokeOnCancellation(ClosableCompletionHandler(this))
@@ -48,6 +57,9 @@ suspend fun ServerSocket.acceptSuspend(): Socket {
     }
 }
 
+/**
+ * Suspend version of [OutputStream.write]
+ */
 suspend fun OutputStream.writeSuspend(buffer: ByteArray) {
     suspendCoroutine<Unit> { cont ->
         write(buffer, 0, buffer.size)
@@ -55,10 +67,16 @@ suspend fun OutputStream.writeSuspend(buffer: ByteArray) {
     }
 }
 
+/**
+ * Suspend version of [InputStream.read]
+ */
 suspend fun InputStream.readSuspend(buffer: ByteArray): Int {
     return readSuspend(buffer, 0, buffer.size)
 }
 
+/**
+ * Suspend version of [InputStream.read]
+ */
 suspend fun InputStream.readSuspend(buffer: ByteArray, offset: Int, length: Int): Int {
     return suspendCoroutine { cont ->
         val bytesRead = read(buffer, offset, length)
@@ -104,8 +122,7 @@ suspend fun InputStream.readSuspendAndThrowIfNotEnough(buffer: ByteArray, offset
 
 /**
  * Reads data from [InputStream] and writes to internal buffer with specified [size].
- * Internally it calls [readSuspendAndThrowIfNotEnough], but the reason to use exactly this method described below:
- * #
+ * Internally it calls [readSuspendAndThrowIfNotEnough].
  *
  * @throws IOException if the length of data read from [InputStream] `!= [size]`
  */

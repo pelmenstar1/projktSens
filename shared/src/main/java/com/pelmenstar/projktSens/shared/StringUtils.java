@@ -117,6 +117,10 @@ public final class StringUtils {
         return sb.toString();
     }
 
+    /**
+     * Appends number to {@link StringBuilder}, but represented with its sign.
+     * {@link StringBuilder#append(int)} on non-negative numbers appends number without its '+' sign.
+     */
     public static void appendSigned(int number, @NotNull StringBuilder sb) {
         if(number > 0) {
             sb.append('+');
@@ -125,6 +129,10 @@ public final class StringUtils {
         sb.append(number);
     }
 
+    /**
+     * Appends number to {@link StringBuilder}, but represented with its sign.
+     * {@link StringBuilder#append(float)} on non-negative numbers appends number without its '+' sign.
+     */
     public static void appendSigned(float number, @NotNull StringBuilder sb) {
         if(number > 0) {
             sb.append('+');

@@ -5,17 +5,29 @@ import com.pelmenstar.projktSens.shared.Bytes;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Responsible for reading primitive value from byte buffer
+ * Responsible for reading primitive values from byte buffer. Values in read in little-endian
  */
 public final class ValueReader {
     @NotNull
     private final byte[] data;
     private int position;
 
+    /**
+     * Initializes instance of {@link ValueReader} using byte array.
+     * Position of cursor is set to 0
+     *
+     * @param data byte array from which values will be read
+     */
     public ValueReader(@NotNull byte[] data) {
         this.data = data;
     }
 
+    /**
+     * Initializes instance of {@link ValueReader} using byte array and initial position of cursor
+     * @param data byte array from which values will be read
+     * @param offset initial position of cursor
+     * @throws IndexOutOfBoundsException if offset is less than 0 or greater than length of byte array
+     */
     public ValueReader(@NotNull byte[] data, int offset) {
         if(offset < 0 || offset > data.length) {
             throw new IndexOutOfBoundsException("offset");
@@ -25,14 +37,23 @@ public final class ValueReader {
         position = offset;
     }
 
+    /**
+     * Determines whether cursor is in end of the buffer
+     */
     public boolean inEnd() {
         return position == data.length;
     }
 
+    /**
+     * Returns current position of cursor
+     */
     public int position() {
         return position;
     }
 
+    /**
+     * Returns size of internal byte array
+     */
     public int size() {
         return data.length;
     }
@@ -46,6 +67,11 @@ public final class ValueReader {
         return data[position++];
     }
 
+    /**
+     * Reads short from the internal buffer and moves cursor for 2 bytes
+     *
+     * @throws IndexOutOfBoundsException if there are lack of data
+     */
     public short readInt16() {
         short s = Bytes.readShort(data, position);
         position += 2;
@@ -87,9 +113,10 @@ public final class ValueReader {
     }
 
     /**
-     * Reads byte array with specified from the buffer and moves cursor for given size.
+     * Reads byte array with specified size from the internal buffer and moves cursor for size of byte array.
      *
      * @param size size of data to read
+     * @throws IllegalArgumentException if size less or equals to 0
      * @throws IndexOutOfBoundsException if there are lack of data
      */
     @NotNull

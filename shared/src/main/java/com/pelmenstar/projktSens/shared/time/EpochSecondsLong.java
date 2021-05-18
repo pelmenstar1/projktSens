@@ -6,6 +6,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Marks that field, parameter or method returns or contains UNIX epoch
+ */
 @Documented
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.FIELD,ElementType.METHOD, ElementType.PARAMETER })

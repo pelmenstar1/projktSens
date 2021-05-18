@@ -6,7 +6,14 @@ import com.pelmenstar.projktSens.shared.equalsPattern
  * A data class which stores particular location described by latitude and longitude.
  */
 class Geolocation(latitude: Float, longitude: Float) {
+    /**
+     * Latitude. Can be in range of [-90; 90]
+     */
     val latitude: Float
+
+    /**
+     * Longitude. Can be in range of [-180; 180]
+     */
     val longitude: Float
 
     init {

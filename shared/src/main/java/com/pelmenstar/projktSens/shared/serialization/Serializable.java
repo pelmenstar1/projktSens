@@ -65,7 +65,7 @@ public final class Serializable {
 
         int mods = serializerField.getModifiers();
         if((mods & REQUIRED_SERIALIZER_MODS) != REQUIRED_SERIALIZER_MODS) {
-            throw SerializerContractException.illegalModifiers(mods, c);
+            throw SerializerContractException.illegalModifiers(mods);
         }
 
         Object serializerRawValue;
@@ -81,6 +81,7 @@ public final class Serializable {
         }
 
         try {
+            // if serializerRawValue is not instance of ObjectSerializer, ClassCastException will be caught
             //noinspection unchecked
             return (ObjectSerializer<T>)serializerRawValue;
         } catch (ClassCastException e) {

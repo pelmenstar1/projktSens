@@ -12,10 +12,23 @@ public final class ValueWriter {
     private final byte[] data;
     private int position;
 
+    /**
+     * Initializes instance of {@link ValueWriter} using specified byte array
+     *
+     * @param data byte array for reading values
+     */
     public ValueWriter(@NotNull byte[] data) {
         this.data = data;
     }
 
+    /**
+     * Initializes instance of {@link ValueWriter} using byte array and offset
+     *
+     * @param data byte array for reading values
+     * @param offset primary position of cursor
+     *
+     * @throws IndexOutOfBoundsException if offset is less than 0 or greater than size of data
+     */
     public ValueWriter(@NotNull byte[] data, int offset) {
         if(offset < 0 || offset > data.length) {
             throw new IndexOutOfBoundsException("offset");
@@ -25,14 +38,23 @@ public final class ValueWriter {
         this.position = offset;
     }
 
+    /**
+     * Determines whether position of cursor is in end of the buffer
+     */
     public boolean inEnd() {
         return position == data.length;
     }
 
+    /**
+     * Gets position of cursor
+     */
     public int position() {
         return position;
     }
 
+    /**
+     * Returns size of the buffer
+     */
     public int size() {
         return data.length;
     }

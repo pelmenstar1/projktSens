@@ -7,14 +7,31 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
+/**
+ * Static class that responsible for creating, manipulating date-int.
+ */
 public final class ShortDate {
+    /**
+     * Specifies that date-int contains no value.
+     */
     @ShortDateInt
     public static final int NONE = 0;
 
+    /**
+     * Max valid year of date-int
+     */
     public static final int MAX_YEAR = 9999;
 
     private ShortDate() {}
 
+    /**
+     * Creates date-int using year, month and day of month
+     * @param year year, in range of [0; 9999]
+     * @param month month, in range of [1; 12]
+     * @param dayOfMonth day in range of [1; *days in month*]
+     *
+     * @
+     */
     @ShortDateInt
     public static int of(int year, int month, int dayOfMonth) {
         if(!isValid(year, month, dayOfMonth)) {
@@ -29,18 +46,32 @@ public final class ShortDate {
         return (year << 16) | (month << 8) | dayOfMonth;
     }
 
+    /**
+     * Returns year of date-int, in range of [0; 9999]
+     */
     public static int getYear(@ShortDateInt int date) {
         return (date >> 16) & 0xffff;
     }
 
+    /**
+     * Returns month of date-int, in range of [1; 12]
+     */
     public static int getMonth(@ShortDateInt int date) {
         return (date >> 8) & 0xff;
     }
 
+    /**
+     * Returns day of month of date-int, in range of [1; *days in month*]
+     */
     public static int getDayOfMonth(@ShortDateInt int date) {
         return date & 0xff;
     }
 
+    /**
+     * Returns day of year of date-int
+     *
+     * @throws IllegalArgumentException if date is invalid
+     */
     public static int getDayOfYear(@ShortDateInt int date) {
         if(!isValid(date)) {
             throw new IllegalArgumentException("date");
@@ -49,6 +80,11 @@ public final class ShortDate {
         return TimeUtils.getFirstDayOfMonth(getYear(date), getMonth(date)) + getDayOfMonth(date) - 1;
     }
 
+    /**
+     * Returns day of week of date-int
+     *
+     * @throws IllegalArgumentException if date is invalid
+     */
     public static int getDayOfWeek(@ShortDateInt int date) {
         if(!isValid(date)) {
             throw new IllegalArgumentException("date");
@@ -63,6 +99,11 @@ public final class ShortDate {
         return dow0 + 1;
     }
 
+    /**
+     * Returns first day of current week of date-int.
+     *
+     * @throws IllegalArgumentException if date is invalid
+     */
     @ShortDateInt
     public static int firstDayOfWeek(@ShortDateInt int date) {
         if(!isValid(date)) {
@@ -72,6 +113,11 @@ public final class ShortDate {
         return minusDays(date, getDayOfWeekInternal(date) - 1);
     }
 
+    /**
+     * Converts date-int to julian date.
+     *
+     * @throws IllegalArgumentException if date is invalid
+     */
     public static long toJulianDate(@ShortDateInt int date) {
         int year = ShortDate.getYear(date);
         int month = ShortDate.getMonth(date);
@@ -96,6 +142,9 @@ public final class ShortDate {
         return day + (c * 146097L) / 4 + (year * 1461L) / 4 + (month * 153L + 2) / 5 + 1721119L;
     }
 
+    /**
+     * Determines whether date-int is valid
+     */
     public static boolean isValid(@ShortDateInt int date) {
        return isValid(getYear(date), getMonth(date), getDayOfMonth(date));
     }
@@ -112,25 +161,49 @@ public final class ShortDate {
         return day > 0 && day <= TimeUtils.getDaysInMonth(year, month);
     }
 
+    /**
+     * Returns today date-int in current time-zone
+     */
     @ShortDateInt
     public static int now() {
         return ofEpochDay(nowEpochDay());
     }
 
+    /**
+     * Returns today epoch day in current time-zone
+     */
     public static long nowEpochDay() {
         return TimeUtils.currentLocalTimeMillis() / TimeConstants.MILLIS_IN_DAY;
     }
 
+    /**
+     * Returns today date-int and adds specified days.
+     *
+     * @throws IllegalArgumentException if expression {@code nowEpochDay() + days} is negative.
+     * It can happen in very rare cases.
+     */
     @ShortDateInt
     public static int nowAndPlusDays(int days) {
         return ofEpochDay(nowEpochDay() + (long)days);
     }
 
+    /**
+     * Returns today date-int and subtracts specified days.
+     *
+     * @throws IllegalArgumentException if expression {@code nowEpochDay() - days} is negative.
+     * It can happen in very rare cases.
+     */
     @ShortDateInt
     public static int nowAndMinusDays(int days) {
         return ofEpochDay(nowEpochDay() - (long)days);
     }
 
+    /**
+     * Adds specified days to date and returns the last.
+     *
+     * @throws IllegalArgumentException if days is negative and less than epoch day of date.
+     * It can happen in very rare cases.
+     */
     @ShortDateInt
     public static int plusDays(@ShortDateInt int date, int days) {
         if(days == 0) {
@@ -140,6 +213,12 @@ public final class ShortDate {
         return ofEpochDay(toEpochDay(date) + (long)days);
     }
 
+    /**
+     * Subtracts specified days to date and returns the last.
+     *
+     * @throws IllegalArgumentException if days is greater than epoch day of date.
+     * It can happen in very rare cases.
+     */
     @ShortDateInt
     public static int minusDays(@ShortDateInt int date, int days) {
         if(days == 0) {
@@ -149,6 +228,11 @@ public final class ShortDate {
         return ofEpochDay(toEpochDay(date) - (long)days);
     }
 
+    /**
+     * Returns difference in days between particular date-ints
+     *
+     * @throws IllegalArgumentException if startDate is greater than endDate.
+     */
     @ShortDateInt
     public static int diffDays(@ShortDateInt int startDate, @ShortDateInt int endDate) {
         long startEpoch = toEpochDay(startDate);
@@ -161,6 +245,11 @@ public final class ShortDate {
         return ofEpochDay(endEpoch - startEpoch);
     }
 
+    /**
+     * Converts epoch day to date-int
+     *
+     * @throws IllegalArgumentException if epochDay is less than 0
+     */
     @ShortDateInt
     public static int ofEpochDay(long epochDay) {
         if(epochDay < 0) {
@@ -188,6 +277,11 @@ public final class ShortDate {
         return ofInternal((int)yearEst, month, dom);
     }
 
+    /**
+     * Converts specified date-int to epoch days.
+     *
+     * @throws IllegalArgumentException if date is invalid
+     */
     public static long toEpochDay(@ShortDateInt int date) {
         if(!isValid(date)) {
             throw new IllegalArgumentException("date");
@@ -218,6 +312,10 @@ public final class ShortDate {
         return (total - TimeConstants.DAYS_0000_TO_1970);
     }
 
+    /**
+     * Returns random date-int
+     * @param random takes values from this instance of {@link Random}
+     */
     @ShortDateInt
     public static int random(@NotNull Random random) {
         int year = random.nextInt(9999);
@@ -227,6 +325,11 @@ public final class ShortDate {
         return ofInternal(year, month, day);
     }
 
+    /**
+     * Returns string representation of date-int in format 'YYYY:MM:DD'
+     *
+     * @throws IllegalArgumentException if date is invalid
+     */
     @NotNull
     public static String toString(@ShortDateInt int date) {
         char[] buffer = new char[10];
@@ -236,6 +339,13 @@ public final class ShortDate {
         return new String(buffer, 0, 10);
     }
 
+    /**
+     * Writes date-int to char buffer at specified offset.
+     *
+     * @throws IllegalArgumentException if date is invalid
+     * @throws IndexOutOfBoundsException if offset is less than 0 or greater than {@code buffer.length - 8}
+     * @throws NullPointerException if buffer is null
+     */
     public static void writeToCharBuffer(@ShortDateInt int date, @NotNull char[] buffer, int offset) {
         if(!isValid(date)) {
             throw new IllegalArgumentException("date");
@@ -248,6 +358,11 @@ public final class ShortDate {
         StringUtils.writeTwoDigits(buffer, offset + 8, getDayOfMonth(date));
     }
 
+    /**
+     * Appends string representation of date to specified {@link StringBuilder}.
+     *
+     * @throws IllegalArgumentException if date is invalid
+     */
     public static void append(@ShortDateInt int date, @NotNull StringBuilder sb) {
         if(!isValid(date)) {
             throw new IllegalArgumentException("date");

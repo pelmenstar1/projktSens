@@ -3,7 +3,7 @@ package com.pelmenstar.projktSens.shared.time;
 import java.util.TimeZone;
 
 /**
- * Represents a class that helps you to work with date and time
+ * Helper class that make it easier to work with date and time
  */
 public final class TimeUtils {
     private TimeUtils() {}
@@ -49,8 +49,9 @@ public final class TimeUtils {
         // There are described why expression below looks exactly like that.
         // month - 1: month is in range [1;12], but we need [0;11]
         // (month - 1) << 1: every offset is described in 2 bits, so we need to double our shift
-        // (daysInMonthBitTable) >> ((month - 1) << 1): takes day offset of specified month, but
-        //
+        // (daysInMonthBitTable) >> ((month - 1) << 1): takes day offset of specified month
+        // 28 + ((daysInMonthBitTable >> ((month - 1) << 1)) & 0x3): because of primary offset is 28,
+        // we need to add it back.
 
         return 28 + ((daysInMonthBitTable >> ((month - 1) << 1)) & 0x3);
     }
