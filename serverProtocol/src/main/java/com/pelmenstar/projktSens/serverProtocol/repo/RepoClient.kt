@@ -9,7 +9,7 @@ import java.net.InetSocketAddress
 import java.net.Socket
 
 /**
- * Utility class which simplifies work with repo-server
+ * Represents client for repo-server
  */
 class RepoClient(config: ProtoConfig) {
     private val repoContract = config.repoContract

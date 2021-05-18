@@ -3,21 +3,36 @@ package com.pelmenstar.projktSens.serverProtocol.repo;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Contains constant commands for repo-server. Every command behavior is described in server.RepoServer
+ * Contains constant commands for repo-server.
  */
 public final class RepoCommands {
     private RepoCommands() {}
 
+    /**
+     * Makes repo-server to return instance of day report
+     */
     public static final int GEN_DAY_REPORT = 1;
+
+    /**
+     * Makes repo-server to return instance of day range report
+     */
     public static final int GEN_DAY_RANGE_REPORT = 2;
 
+    /**
+     * Makes repo-server to get available date range that contains repository
+     */
     public static final int GET_AVAILABLE_DATE_RANGE = 3;
+
+    /**
+     * Makes repo-server to return last weather in data store
+     */
     public static final int GET_LAST_WEATHER = 4;
 
     /**
      * Returns string representation of command integer
      * @param command command
      * @return string representation of {@code command}
+     *
      * @throws IllegalArgumentException if {@code command} is invalid
      */
     @NotNull

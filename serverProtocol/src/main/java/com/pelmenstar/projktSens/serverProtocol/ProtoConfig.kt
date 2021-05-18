@@ -11,12 +11,34 @@ import kotlin.contracts.contract
  * Contains constant information of servers
  */
 interface ProtoConfig {
+    /**
+     * IP address of server
+     */
     val serverIp: InetAddress
+
+    /**
+     * Port of repo-server
+     */
     val repoServerPort: Int
+
+    /**
+     * Port of weatherChannelInfo server
+     */
     val weatherChannelInfoPort: Int
+
+    /**
+     * Port of server status server
+     */
     val serverStatusPort: Int
 
+    /**
+     * Interval of refreshing weather-info and putting it to data repository
+     */
     val weatherChannelReceiveInterval: Int
+
+    /**
+     * Binary contract of repo-server
+     */
     val repoContract: RepoContract
 }
 

@@ -32,6 +32,10 @@ interface RepoContract {
     suspend fun<T:Any> readResponse(input: InputStream, valueClass: Class<T>): RepoResponse
 }
 
+/**
+ * Reads [RepoResponse] from [input]. Note that generic parameter [T] is marked as reified, so
+ * actual class of [T] should be known in compile-time
+ */
 suspend inline fun<reified T:Any> RepoContract.readResponse(input: InputStream): RepoResponse {
     return readResponse(input, T::class.java)
 }

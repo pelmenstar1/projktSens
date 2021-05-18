@@ -6,7 +6,14 @@ import com.pelmenstar.projktSens.shared.*
  * Contains information to make request to repo-server
  */
 class RepoRequest: AppendableToStringBuilder {
+    /**
+     * Command of request
+     */
     val command: Int
+
+    /**
+     * Optional binary arguments of request
+     */
     val args: ByteArray?
 
     constructor(command: Int) {

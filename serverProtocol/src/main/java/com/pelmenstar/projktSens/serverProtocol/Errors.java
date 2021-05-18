@@ -47,7 +47,6 @@ public final class Errors {
     private Errors() {
     }
 
-
     /**
      * If {@code e} is {@link IOException} returns {@link Errors#IO},
      * if {@code e} is {@link SQLException} returns {@link Errors#INTERNAL_DB_ERROR},

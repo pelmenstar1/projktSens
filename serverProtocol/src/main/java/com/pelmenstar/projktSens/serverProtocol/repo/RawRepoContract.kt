@@ -12,7 +12,26 @@ import java.io.OutputStream
 import kotlin.math.min
 
 /**
- * Writes and reads [RepoRequest], [RepoResponse] in raw non-human readable compact binary form
+ * Writes and reads [RepoRequest], [RepoResponse] in raw non-human readable compact binary form.
+ * ## RepoRequest
+ * Binary format:
+ * - 1 byte | [RepoRequest.command]
+ * - 2 bytes | size of [RepoRequest.args], if args is null, contains 0
+ * - size of args bytes | [RepoRequest.args], if args is not null
+ *
+ * ## RepoResponse
+ * Binary format:
+ * if response is [RepoResponse.Empty]
+ * - 0 (1 byte)
+ *
+ * if response is [RepoResponse.Error]
+ * - 1 (1 byte)
+ * - 4 bytes | [RepoResponse.Error.error]
+ *
+ * if response is [RepoResponse.Ok]
+ * - 2 (1 byte)
+ * - 2 bytes | size of serialized value of response
+ * - various byte | serialized representation of response
  */
 object RawRepoContract: RepoContract {
     internal const val RESPONSE_BUFFER_SIZE = 1024
