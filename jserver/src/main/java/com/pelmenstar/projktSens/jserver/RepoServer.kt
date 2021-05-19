@@ -1,20 +1,17 @@
 package com.pelmenstar.projktSens.jserver
 
-import android.util.Log
-import com.pelmenstar.projktSens.serverProtocol.*
+import com.pelmenstar.projktSens.serverProtocol.Errors
+import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoRequest
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoResponse
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoContract
-import com.pelmenstar.projktSens.shared.*
+import com.pelmenstar.projktSens.serverProtocol.socketAddress
+import com.pelmenstar.projktSens.shared.getInt
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
-import com.pelmenstar.projktSens.weather.models.DayReport
 import com.pelmenstar.projktSens.weather.models.DayRangeReport
+import com.pelmenstar.projktSens.weather.models.DayReport
 import java.net.Socket
-import java.util.concurrent.atomic.AtomicLong
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
 /**
  * Server that connects server weather repository and client.
@@ -36,37 +33,34 @@ import kotlin.contracts.contract
  */
 class RepoServer(config: ProtoConfig) : ServerBase(
     config.socketAddress { repoServerPort },
-    TAG
 ) {
     private val contract = config.repoContract
-    private val lastClientToken = AtomicLong()
 
     override suspend fun processClient(client: Socket) {
         try {
             val input = client.getInputStream()
             val out = client.getOutputStream()
 
-            val token = lastClientToken.getAndIncrement()
             val request = contract.readRequest(input)
-            log(token) {
+            log.info {
                 append("request=")
                 request.append(this)
             }
 
-            val response = processRequest(token, request)
+            val response = processRequest(request)
 
-            log(token) {
+            log.info {
                 append("response=")
                 response.append(this)
             }
 
             contract.writeResponse(response, out)
         } catch (e: Exception) {
-            Log.e(TAG, "while processing client", e)
+            log.error("when processing client", e)
         }
     }
 
-    private suspend fun processRequest(token: Long, request: RepoRequest): RepoResponse {
+    private suspend fun processRequest(request: RepoRequest): RepoResponse {
         return try {
             val repo = serverConfig.sharedRepo
             val args = request.args
@@ -87,7 +81,7 @@ class RepoServer(config: ProtoConfig) : ServerBase(
                         return RepoResponse.error(Errors.INVALID_ARGUMENTS)
                     }
 
-                    log(token) {
+                    log.info {
                         append("date: ")
                         ShortDate.append(date, this)
                     }
@@ -108,7 +102,7 @@ class RepoServer(config: ProtoConfig) : ServerBase(
                         return RepoResponse.error(Errors.INVALID_ARGUMENTS)
                     }
 
-                    log(token) {
+                    log.info {
                         append("startDate: ")
                         ShortDate.append(startDate, this)
                         append("; endDate: ")
@@ -127,34 +121,9 @@ class RepoServer(config: ProtoConfig) : ServerBase(
                 else -> RepoResponse.error(Errors.INVALID_COMMAND)
             }
         } catch (e: Exception) {
-            Log.e(TAG, null, e)
+            log.error("when processing request", e)
 
             RepoResponse.error(e)
-        }
-    }
-
-    companion object {
-        private const val TAG = "RepoServer"
-        private const val LOG = true
-
-        private inline fun log(token: Long, lazyMsg: StringBuilder.() -> Unit) {
-            contract {
-                callsInPlace(lazyMsg, InvocationKind.AT_MOST_ONCE)
-            }
-
-            if(LOG) {
-                val msg = buildString {
-                    append("token ")
-                    append(token)
-                    append(' ')
-                    append('[')
-                    append(' ')
-                    lazyMsg()
-                    append(' ')
-                    append(']')
-                }
-                Log.i(TAG, msg)
-            }
         }
     }
 }

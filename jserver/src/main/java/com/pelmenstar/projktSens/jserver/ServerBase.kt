@@ -1,10 +1,8 @@
 package com.pelmenstar.projktSens.jserver
 
-import android.util.Log
 import com.pelmenstar.projktSens.shared.acceptSuspend
 import com.pelmenstar.projktSens.shared.bindSuspend
 import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.Mutex
 import java.net.InetSocketAddress
 import java.net.ServerSocket
 import java.net.Socket
@@ -13,15 +11,17 @@ import java.net.Socket
  * Represents a common implementation of TCP server.
  *
  * @param address address of server
- * @param tag Android Log tag
  */
-abstract class ServerBase protected constructor(private val address: InetSocketAddress, private val tag: String) {
+abstract class ServerBase protected constructor(
+    private val address: InetSocketAddress,
+) {
     @Volatile
     private var serverSocket: ServerSocket? = null
 
     @Volatile
     private var job: Job? = null
 
+    protected val log: Logger = Logger(javaClass.simpleName, serverConfig.loggerConfig)
 
     /**
      * Starts server in another thread.
@@ -31,7 +31,7 @@ abstract class ServerBase protected constructor(private val address: InetSocketA
      */
     fun start() {
         if (job != null) {
-            Log.i(tag, "server is not stopped")
+            log.error("server is not stopped")
             return
         }
 
@@ -39,7 +39,7 @@ abstract class ServerBase protected constructor(private val address: InetSocketA
             try {
                 ServerSocket().use { server ->
                     server.bindSuspend(address, 5)
-                    Log.i(tag, "server started")
+                    log.info("server started")
 
                     serverSocket = server
 
@@ -52,13 +52,13 @@ abstract class ServerBase protected constructor(private val address: InetSocketA
                                     processClient(client)
                                 }
                             } catch (e: Throwable) {
-                                Log.e(tag, "while processing client", e)
+                                log.error("when processing client", e)
                             }
                         }
                     }
                 }
             } catch (e: Throwable) {
-                Log.e(tag, "while binding server", e)
+                log.error("when binding server", e)
             }
         }
     }
@@ -74,7 +74,7 @@ abstract class ServerBase protected constructor(private val address: InetSocketA
             serverSocket?.close()
             serverSocket = null
         } catch (e: Exception) {
-            Log.e(tag, "when stopping server", e)
+            log.error("when stopping server", e)
         }
     }
 

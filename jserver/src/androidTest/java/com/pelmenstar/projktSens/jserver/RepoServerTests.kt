@@ -257,5 +257,9 @@ class RepoServerTests {
 
         override val sharedRepo: WeatherRepository = DbServerWeatherRepository.inMemory(context)
         override val weatherProvider: WeatherInfoProvider = SensorWeatherProvider(protoConfig)
+        override val loggerConfig = LoggerConfig(
+            AndroidLogDelegate,
+            LogLevel.DEBUG
+        )
     }
 }
