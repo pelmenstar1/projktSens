@@ -86,7 +86,7 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
             for(i in 0 until count) {
                 c.moveToPosition(i)
 
-                timeValues[i] = (c.getLong(0) % 1000).toInt()
+                timeValues[i] = (c.getLong(0) % TimeConstants.SECONDS_IN_DAY).toInt()
                 tempValues[i] = c.getFloat(1)
                 humValues[i] = c.getFloat(2)
                 pressValues[i] = c.getFloat(3)
