@@ -2,6 +2,9 @@ package com.pelmenstar.projktSens.jserver
 
 import android.util.Log
 
+/**
+ * Implementation of [LogDelegate] which prints message using [Log]
+ */
 object AndroidLogDelegate: LogDelegate {
     override fun print(level: LogLevel, message: String) {
         val aPriority: Int = when(level) {
