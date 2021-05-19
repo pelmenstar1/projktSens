@@ -9,9 +9,7 @@ import java.net.Socket
 
 class WeatherChannelInfoServer(config: ProtoConfig): ServerBase(
    config.socketAddress { weatherChannelInfoPort },
-    "WeatherChannelInfoServer"
 ) {
-
     override suspend fun processClient(client: Socket) {
         val output = client.getOutputStream()
         val nextTime = WeatherMonitor.getNextWeatherRequestTime()

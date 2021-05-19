@@ -15,7 +15,6 @@ import java.net.Socket
  */
 class StatusServer(config: ProtoConfig): ServerBase(
     config.socketAddress(config.serverStatusPort),
-    "StatusServer"
 ) {
     override suspend fun processClient(client: Socket) {
         val input = client.getInputStream()
