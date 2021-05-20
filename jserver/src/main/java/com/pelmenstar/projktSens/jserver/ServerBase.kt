@@ -59,13 +59,13 @@ abstract class ServerBase protected constructor(
                                     processClient(client)
                                 }
                             } catch (e: Throwable) {
-                                log.error("when processing client", e)
+                                log.error(e)
                             }
                         }
                     }
                 }
             } catch (e: Throwable) {
-                log.error("when binding server", e)
+                log.error(e)
             }
         }
     }
@@ -81,7 +81,7 @@ abstract class ServerBase protected constructor(
             serverSocket?.close()
             serverSocket = null
         } catch (e: Exception) {
-            log.error("when stopping server", e)
+            log.error(e)
         }
     }
 

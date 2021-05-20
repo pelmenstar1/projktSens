@@ -63,7 +63,7 @@ class RepoServer : ServerBase({ repoServerPort }) {
 
             contract.writeResponse(response, out)
         } catch (e: Exception) {
-            log.error("when processing client", e)
+            log.error( e)
         }
     }
 
@@ -127,7 +127,7 @@ class RepoServer : ServerBase({ repoServerPort }) {
                 else -> RepoResponse.error(Errors.INVALID_COMMAND)
             }
         } catch (e: Exception) {
-            log.error("when processing request", e)
+            log.error(e)
 
             RepoResponse.error(e)
         }
