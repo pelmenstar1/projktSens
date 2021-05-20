@@ -1,6 +1,7 @@
 package com.pelmenstar.projktSens.jserver
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.pelmenstar.projktSens.serverProtocol.DefaultProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.ServerStatus
 import kotlinx.coroutines.runBlocking
@@ -12,6 +13,8 @@ import org.junit.runner.RunWith
 class ServerStatusTests {
     @Test
     fun must_return_available_status_when_status_server_is_running() {
+        serverConfig = TestConfig(InstrumentationRegistry.getInstrumentation().context)
+
         val statusServer = StatusServer()
         statusServer.start()
         Thread.sleep(5000)
