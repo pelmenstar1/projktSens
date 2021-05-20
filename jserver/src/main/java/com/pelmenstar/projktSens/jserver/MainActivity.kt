@@ -24,11 +24,10 @@ class MainActivity : AppCompatActivity() {
         val cfg = MainConfig(this)
         serverConfig = cfg
         val shared = cfg.sharedRepo
-        val protoConfig = cfg.protoConfig
 
-        val repoServer = RepoServer(protoConfig)
-        val checkAvailabilityServer = StatusServer(protoConfig)
-        val weatherChannelInfoServer = WeatherChannelInfoServer(protoConfig)
+        val repoServer = RepoServer()
+        val checkAvailabilityServer = StatusServer()
+        val weatherChannelInfoServer = WeatherChannelInfoServer()
 
         content {
             LinearLayout(this) {

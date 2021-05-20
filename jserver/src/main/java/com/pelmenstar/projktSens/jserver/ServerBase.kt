@@ -1,5 +1,6 @@
 package com.pelmenstar.projktSens.jserver
 
+import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.shared.acceptSuspend
 import com.pelmenstar.projktSens.shared.bindSuspend
 import kotlinx.coroutines.*
@@ -9,11 +10,9 @@ import java.net.Socket
 
 /**
  * Represents a common implementation of TCP server.
- *
- * @param address address of server
  */
 abstract class ServerBase protected constructor(
-    private val address: InetSocketAddress,
+    port: ProtoConfig.() -> Int,
 ) {
     @Volatile
     private var serverSocket: ServerSocket? = null
@@ -21,7 +20,15 @@ abstract class ServerBase protected constructor(
     @Volatile
     private var job: Job? = null
 
+    private val address: InetSocketAddress
+
     protected val log: Logger = Logger(javaClass.simpleName, serverConfig.loggerConfig)
+
+    init {
+        val protoConfig = serverConfig.protoConfig
+
+        address = InetSocketAddress(protoConfig.serverIp, port(protoConfig))
+    }
 
     /**
      * Starts server in another thread.

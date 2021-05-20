@@ -1,7 +1,5 @@
 package com.pelmenstar.projktSens.jserver
 
-import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
-import com.pelmenstar.projktSens.serverProtocol.socketAddress
 import com.pelmenstar.projktSens.shared.readNSuspend
 import com.pelmenstar.projktSens.shared.writeSuspend
 import java.io.IOException
@@ -13,9 +11,7 @@ import java.net.Socket
  * To retrieve status of server, you have to send `1`.
  * If all servers are available, it will return `1`, otherwise it will return nothing or `0` byte
  */
-class StatusServer(config: ProtoConfig): ServerBase(
-    config.socketAddress(config.serverStatusPort),
-) {
+class StatusServer: ServerBase({ serverStatusPort }) {
     override suspend fun processClient(client: Socket) {
         val input = client.getInputStream()
 

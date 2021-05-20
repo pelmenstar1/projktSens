@@ -1,16 +1,16 @@
 package com.pelmenstar.projktSens.jserver
 
 import com.pelmenstar.projktSens.serverProtocol.Errors
-import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
+import com.pelmenstar.projktSens.serverProtocol.repo.RepoContract
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoRequest
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoResponse
-import com.pelmenstar.projktSens.serverProtocol.socketAddress
 import com.pelmenstar.projktSens.shared.getInt
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.weather.models.DayRangeReport
 import com.pelmenstar.projktSens.weather.models.DayReport
+import com.pelmenstar.projktSens.weather.models.WeatherRepository
 import java.net.Socket
 
 /**
@@ -31,10 +31,17 @@ import java.net.Socket
  *  - [RepoCommands.GET_LAST_WEATHER]. No arguments is required.
  *  Last added weather will be returned.
  */
-class RepoServer(config: ProtoConfig) : ServerBase(
-    config.socketAddress { repoServerPort },
-) {
-    private val contract = config.repoContract
+class RepoServer : ServerBase({ repoServerPort }) {
+    private val contract: RepoContract
+    private val repo: WeatherRepository
+
+    init {
+        val serverConfig = serverConfig
+        val protoConfig = serverConfig.protoConfig
+
+        contract = protoConfig.repoContract
+        repo = serverConfig.sharedRepo
+    }
 
     override suspend fun processClient(client: Socket) {
         try {
@@ -62,7 +69,6 @@ class RepoServer(config: ProtoConfig) : ServerBase(
 
     private suspend fun processRequest(request: RepoRequest): RepoResponse {
         return try {
-            val repo = serverConfig.sharedRepo
             val args = request.args
 
             when (request.command) {
