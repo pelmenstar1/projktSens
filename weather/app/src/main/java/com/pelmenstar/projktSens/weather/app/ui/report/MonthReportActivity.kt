@@ -82,19 +82,19 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
         for (i in 0 until entriesSize) {
             val reportEntry = monthEntries[i]
             val minTemp =
-                UnitValue.getValue(reportEntry.minTemperature, tempUnit, prefTempUnit).toFloat()
+                UnitValue.getValue(reportEntry.minTemperature, tempUnit, prefTempUnit)
             val maxTemp =
-                UnitValue.getValue(reportEntry.maxTemperature, tempUnit, prefTempUnit).toFloat()
+                UnitValue.getValue(reportEntry.maxTemperature, tempUnit, prefTempUnit)
             val minPress =
-                UnitValue.getValue(reportEntry.minPressure, pressUnit, prefPressUnit).toFloat()
+                UnitValue.getValue(reportEntry.minPressure, pressUnit, prefPressUnit)
             val maxPress =
-                UnitValue.getValue(reportEntry.maxPressure, pressUnit, prefPressUnit).toFloat()
+                UnitValue.getValue(reportEntry.maxPressure, pressUnit, prefPressUnit)
             val x = ShortDate.getDayOfMonth(reportEntry.date).toFloat()
 
             minTempEntries[i] = Entry.of(x, minTemp)
             maxTempEntries[i] = Entry.of(x, maxTemp)
-            minHumEntries[i] = Entry.of(x, reportEntry.minHumidity.toFloat())
-            maxHumEntries[i] = Entry.of(x, reportEntry.maxHumidity.toFloat())
+            minHumEntries[i] = Entry.of(x, reportEntry.minHumidity)
+            maxHumEntries[i] = Entry.of(x, reportEntry.maxHumidity)
             minPressEntries[i] = Entry.of(x, minPress)
             maxPressEntries[i] = Entry.of(x, maxPress)
         }
@@ -103,36 +103,12 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
         val humFormatter = UnitChartValueFormatter(unitFormatter, ValueUnit.HUMIDITY)
         val pressFormatter = UnitChartValueFormatter(unitFormatter, prefPressUnit)
 
-        val minTempDataSet = DataSet(minTempEntries, tempFormatter)
-        val maxTempDataSet = DataSet(maxTempEntries, tempFormatter)
-        val minHumDataSet = DataSet(minHumEntries, humFormatter)
-        val maxHumDataSet = DataSet(maxHumEntries, humFormatter)
-        val minPressDataSet = DataSet(minPressEntries, pressFormatter)
-        val maxPressDataSet = DataSet(maxPressEntries, pressFormatter)
-
-        minTempDataSet.color = minColor
-        minTempDataSet.circleColor = minColor
-        minTempDataSet.setDrawValues(false)
-
-        maxTempDataSet.color = maxColor
-        maxTempDataSet.circleColor = maxColor
-        maxTempDataSet.setDrawValues(false)
-
-        minHumDataSet.color = minColor
-        minHumDataSet.circleColor = minColor
-        minHumDataSet.setDrawValues(false)
-
-        maxHumDataSet.color = maxColor
-        maxHumDataSet.circleColor = maxColor
-        maxHumDataSet.setDrawValues(false)
-
-        minPressDataSet.color = minColor
-        minPressDataSet.circleColor = minColor
-        minPressDataSet.setDrawValues(false)
-
-        maxPressDataSet.color = maxColor
-        maxPressDataSet.circleColor = maxColor
-        maxPressDataSet.setDrawValues(false)
+        val minTempDataSet = DataSet(minTempEntries, tempFormatter).customizeOptions(minColor)
+        val maxTempDataSet = DataSet(maxTempEntries, tempFormatter).customizeOptions(maxColor)
+        val minHumDataSet = DataSet(minHumEntries, humFormatter).customizeOptions(minColor)
+        val maxHumDataSet = DataSet(maxHumEntries, humFormatter).customizeOptions(maxColor)
+        val minPressDataSet = DataSet(minPressEntries, pressFormatter).customizeOptions(minColor)
+        val maxPressDataSet = DataSet(maxPressEntries, pressFormatter).customizeOptions(maxColor)
 
         val tempData = ChartData(minTempDataSet, maxTempDataSet)
         val humData = ChartData(minHumDataSet, maxHumDataSet)
@@ -148,6 +124,14 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
 
             chart.yAxis.granularity = 1f
         }
+    }
+
+    private fun DataSet.customizeOptions(color: Int): DataSet {
+        this.color = color
+        circleColor = color
+        setDrawValues(false)
+
+        return this
     }
 
     companion object {

@@ -6,18 +6,103 @@ package com.pelmenstar.projktSens.weather.app.ui.report
 import android.content.Context
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.annotation.StringRes
 import com.pelmenstar.projktSens.chartLite.LineChart
 import com.pelmenstar.projktSens.chartLite.data.ChartData
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.weather.app.PreferredUnits
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
+import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
 import com.pelmenstar.projktSens.weather.app.ui.MaterialChart
-import com.pelmenstar.projktSens.weather.models.ReportStats
-import com.pelmenstar.projktSens.weather.models.UnitValue
-import com.pelmenstar.projktSens.weather.models.ValueUnit
-import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
+import com.pelmenstar.projktSens.weather.models.*
+
+private class ParameterStatsPrefixStrings(
+    val min: String,
+    val max: String,
+    val avg: String,
+    val median: String,
+    val stdDev: String,
+    val stdErr: String,
+)
+
+private class ChartViewCreationContext(
+    val textLeftMargin: Int, val chartSideMargin: Int, val blockTopMargin: Int,
+    val chartHeight: Int,
+    val headline4: TextAppearance, val body1: TextAppearance,
+    val unitFormatter: UnitFormatter,
+    val strings: ParameterStatsPrefixStrings,
+    val chartOptions: (LineChart) -> Unit
+)
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun ViewGroup.ValueParamView(
+    prefix: String, value: Float,
+    statsUnit: Int, prefUnit: Int,
+    unitFormatter: UnitFormatter,
+    textLeftMargin: Int,
+    textAppearance: TextAppearance
+) {
+    PrefixTextView {
+        linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
+            leftMargin = textLeftMargin
+        }
+
+        this.prefix = prefix
+        this.value = unitFormatter.formatValue(
+            UnitValue.getValue(value, statsUnit, prefUnit),
+            prefUnit
+        )
+
+        applyTextAppearance(textAppearance)
+    }
+}
+
+private fun ViewGroup.ParamStatsBlock(
+    paramStats: ParameterStats,
+    statsUnit: Int, prefUnit: Int,
+    @StringRes headerRes: Int,
+    data: ChartData,
+    creationContext: ChartViewCreationContext
+) {
+    val unitFormatter = creationContext.unitFormatter
+    val strings = creationContext.strings
+
+    val body1 = creationContext.body1
+
+    val textLeftMargin = creationContext.textLeftMargin
+
+    TextView {
+        linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
+            gravity = Gravity.CENTER_HORIZONTAL
+            topMargin = creationContext.blockTopMargin
+        }
+
+        text = context.resources.getText(headerRes)
+        applyTextAppearance(creationContext.headline4)
+    }
+
+    ValueParamView(strings.min, paramStats.min, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
+    ValueParamView(strings.max, paramStats.max, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
+    ValueParamView(strings.avg, paramStats.avg, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
+    ValueParamView(strings.median, paramStats.median, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
+    ValueParamView(strings.stdDev, paramStats.stdDev, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
+    ValueParamView(strings.stdErr, paramStats.stdErr, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
+
+    MaterialChart {
+        val chartSideMargin = creationContext.chartSideMargin
+
+        linearLayoutParams(MATCH_PARENT, creationContext.chartHeight) {
+            leftMargin = chartSideMargin
+            rightMargin = chartSideMargin
+        }
+
+        creationContext.chartOptions(this)
+        this.data = data
+    }
+}
 
 fun createChartView(
     context: Context,
@@ -30,9 +115,9 @@ fun createChartView(
     val component = DaggerAppComponent.create()
     val unitFormatter = component.unitFormatter()
 
-    val headerDefUnits = stats.units
-    val headerTempUnit = ValueUnitsPacked.getTemperatureUnit(headerDefUnits)
-    val headerPressUnit = ValueUnitsPacked.getPressureUnit(headerDefUnits)
+    val statsUnits = stats.units
+    val statsTempUnit = ValueUnitsPacked.getTemperatureUnit(statsUnits)
+    val statsPressUnit = ValueUnitsPacked.getPressureUnit(statsUnits)
 
     val prefUnits = PreferredUnits.getUnits()
     val prefTempUnit = ValueUnitsPacked.getTemperatureUnit(prefUnits)
@@ -48,9 +133,23 @@ fun createChartView(
     val headline4 = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline4)
     val body1 = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
 
-    val minStr = res.getString(R.string.min)
-    val maxStr = res.getString(R.string.max)
-    val avgStr = res.getString(R.string.avg)
+    val strings = ParameterStatsPrefixStrings(
+        res.getString(R.string.min),
+        res.getString(R.string.max),
+        res.getString(R.string.avg),
+        res.getString(R.string.median),
+        res.getString(R.string.stdDev),
+        res.getString(R.string.stdErr),
+    )
+
+    val creationContext = ChartViewCreationContext(
+        textLeftMargin, chartSideMargin, blockTopMargin,
+        chartHeight,
+        headline4, body1,
+        unitFormatter,
+        strings,
+        chartOptions
+    )
 
     return ScrollView(context) {
         LinearLayout {
@@ -58,198 +157,26 @@ fun createChartView(
 
             orientation = LinearLayout.VERTICAL
 
-            // temperature
-            TextView {
-                linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                    gravity = Gravity.CENTER_HORIZONTAL
-                }
+            ParamStatsBlock(
+                stats.temperature,
+                statsTempUnit, prefTempUnit,
+                R.string.temperature, temperatureData,
+                creationContext
+            )
 
-                text = res.getText(R.string.temperature)
-                applyTextAppearance(headline4)
-            }
+            ParamStatsBlock(
+                stats.humidity,
+                ValueUnit.HUMIDITY, ValueUnit.HUMIDITY,
+                R.string.humidity, humidityData,
+                creationContext
+            )
 
-            PrefixTextView {
-                linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = textLeftMargin
-                }
-
-                prefix = minStr
-                value = unitFormatter.formatValue(
-                    UnitValue.getValue(
-                        stats.temperature.min,
-                        headerTempUnit, prefTempUnit
-                    ),
-                    prefTempUnit
-                )
-
-                applyTextAppearance(body1)
-            }
-
-            PrefixTextView {
-                linearLayoutParams (WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = textLeftMargin
-                }
-
-                prefix = maxStr
-                value = unitFormatter.formatValue(
-                    UnitValue.getValue(stats.temperature.max,
-                        headerTempUnit,
-                        prefTempUnit
-                    ),
-                    prefTempUnit
-                )
-
-                applyTextAppearance(body1)
-            }
-
-            PrefixTextView {
-                linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = textLeftMargin
-                }
-
-                prefix = avgStr
-                value = unitFormatter.formatValue(
-                    UnitValue.getValue(stats.temperature.avg, headerTempUnit, prefTempUnit),
-                    prefTempUnit
-                )
-
-                applyTextAppearance(body1)
-            }
-
-            MaterialChart {
-                linearLayoutParams(MATCH_PARENT, chartHeight) {
-                    leftMargin = chartSideMargin
-                    rightMargin = chartSideMargin
-                }
-
-                chartOptions(this)
-                data = temperatureData
-            }
-
-            // humidity
-            TextView {
-                linearLayoutParams (WRAP_CONTENT, WRAP_CONTENT) {
-                    gravity = Gravity.CENTER_HORIZONTAL
-                    topMargin = blockTopMargin
-                }
-
-                text = res.getText(R.string.humidity)
-
-                applyTextAppearance(headline4)
-            }
-
-            PrefixTextView {
-                linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = textLeftMargin
-                }
-
-                prefix = minStr
-                value = unitFormatter.formatValue(stats.humidity.min, ValueUnit.HUMIDITY)
-
-                applyTextAppearance(body1)
-            }
-
-            PrefixTextView {
-                linearLayoutParams (WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = textLeftMargin
-                }
-
-                prefix = maxStr
-                value = unitFormatter.formatValue(stats.humidity.max, ValueUnit.HUMIDITY)
-
-                applyTextAppearance(body1)
-            }
-
-            PrefixTextView {
-                linearLayoutParams (WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = textLeftMargin
-                }
-
-                prefix = avgStr
-                value = unitFormatter.formatValue(stats.humidity.avg, ValueUnit.HUMIDITY)
-
-                applyTextAppearance(body1)
-            }
-
-            MaterialChart {
-                linearLayoutParams (MATCH_PARENT, chartHeight) {
-                    leftMargin = chartSideMargin
-                    rightMargin = chartSideMargin
-                }
-
-                chartOptions(this)
-                data = humidityData
-            }
-
-            // pressure
-            TextView {
-                linearLayoutParams (WRAP_CONTENT, WRAP_CONTENT) {
-                    gravity = Gravity.CENTER_HORIZONTAL
-                    topMargin = blockTopMargin
-                }
-
-                text = res.getText(R.string.pressure)
-                applyTextAppearance(headline4)
-            }
-
-            PrefixTextView {
-                linearLayoutParams (WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = textLeftMargin
-                }
-
-                prefix = minStr
-                value = unitFormatter.formatValue(
-                    UnitValue.getValue(
-                        stats.pressure.min,
-                        headerPressUnit, prefPressUnit
-                    ),
-                    prefPressUnit
-                )
-
-                applyTextAppearance(body1)
-            }
-
-            PrefixTextView {
-                linearLayoutParams (WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = textLeftMargin
-                }
-
-                prefix = maxStr
-                value = unitFormatter.formatValue(
-                    UnitValue.getValue(
-                        stats.pressure.max,
-                        headerPressUnit, prefPressUnit
-                    ),
-                    prefPressUnit
-                )
-
-                applyTextAppearance(body1)
-            }
-
-            PrefixTextView {
-                linearLayoutParams (WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = textLeftMargin
-                }
-
-                prefix = avgStr
-                value = unitFormatter.formatValue(
-                    UnitValue.getValue(stats.pressure.avg, headerPressUnit, prefPressUnit),
-                    prefPressUnit
-                )
-
-                applyTextAppearance(body1)
-            }
-
-            MaterialChart {
-                linearLayoutParams (MATCH_PARENT, chartHeight) {
-                    leftMargin = chartSideMargin
-                    rightMargin = chartSideMargin
-                    bottomMargin = textLeftMargin
-                }
-
-                chartOptions(this)
-                data = pressureData
-            }
+            ParamStatsBlock(
+                stats.pressure,
+                statsPressUnit, prefPressUnit,
+                R.string.pressure, pressureData,
+                creationContext
+            )
         }
     }
 }

@@ -57,6 +57,10 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
         val prefTempUnit = ValueUnitsPacked.getTemperatureUnit(prefUnits)
         val prefPressUnit = ValueUnitsPacked.getPressureUnit(prefUnits)
 
+        val tempChartValueFormatter = UnitChartValueFormatter(unitFormatter, prefTempUnit)
+        val humChartValueFormatter = UnitChartValueFormatter(unitFormatter, ValueUnit.HUMIDITY)
+        val pressChartValueFormatter = UnitChartValueFormatter(unitFormatter, prefPressUnit)
+
         val units = report.stats.units
         val tempUnit = ValueUnitsPacked.getTemperatureUnit(units)
         val pressUnit = ValueUnitsPacked.getPressureUnit(units)
@@ -71,44 +75,39 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
             val dayEntry = dayEntries[i]
 
             val time = dayEntry.time
-            val temp = UnitValue.getValue(dayEntry.temperature, tempUnit, prefTempUnit).toFloat()
-            val press = UnitValue.getValue(dayEntry.pressure, pressUnit, prefPressUnit).toFloat()
+            val temp = UnitValue.getValue(dayEntry.temperature, tempUnit, prefTempUnit)
+            val press = UnitValue.getValue(dayEntry.pressure, pressUnit, prefPressUnit)
             val x = time.toFloat()
 
             tempEntries[i] = Entry.of(x, temp)
-            humEntries[i] = Entry.of(x, dayEntry.humidity.toFloat())
+            humEntries[i] = Entry.of(x, dayEntry.humidity)
             pressEntries[i] = Entry.of(x, press)
         }
 
-        val tempDataSet = DataSet(tempEntries, UnitChartValueFormatter(unitFormatter, prefTempUnit)).apply {
-            circleColor = colorPrimary
-            color = colorPrimary
+        val tempDataSet = DataSet(tempEntries, tempChartValueFormatter).
+            customizeOptions(colorPrimary, minColor, maxColor)
 
-            yMinColor = minColor
-            yMaxColor = maxColor
-        }
+        val humDataSet = DataSet(humEntries, humChartValueFormatter).
+            customizeOptions(colorPrimary, minColor, maxColor)
 
-        val humDataSet = DataSet(humEntries, UnitChartValueFormatter(unitFormatter, ValueUnit.HUMIDITY)).apply {
-            circleColor = colorPrimary
-            color = colorPrimary
-
-            yMinColor = minColor
-            yMaxColor = maxColor
-        }
-
-        val pressDataSet = DataSet(pressEntries, UnitChartValueFormatter(unitFormatter, prefPressUnit)).apply {
-            circleColor = colorPrimary
-            color = colorPrimary
-
-            yMinColor = minColor
-            yMaxColor = maxColor
-        }
+        val pressDataSet = DataSet(pressEntries, pressChartValueFormatter).
+            customizeOptions(colorPrimary, minColor, maxColor)
 
         val tempData = ChartData(tempDataSet)
         val humData = ChartData(humDataSet)
         val pressData = ChartData(pressDataSet)
 
         return createChartView(this, report.stats, tempData, humData, pressData, CHART_OPTIONS)
+    }
+
+    private fun DataSet.customizeOptions(colorPrimary: Int, minColor: Int, maxColor: Int): DataSet {
+        circleColor = colorPrimary
+        color = colorPrimary
+
+        yMinColor = minColor
+        yMaxColor = maxColor
+
+        return this
     }
 
     companion object {

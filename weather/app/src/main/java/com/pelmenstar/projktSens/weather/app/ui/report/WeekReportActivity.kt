@@ -97,13 +97,13 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
             val reportEntry = monthEntries[i]
             val date = reportEntry.date
             val minTemp =
-                UnitValue.getValue(reportEntry.minTemperature, tempUnit, prefTempUnit).toFloat()
+                UnitValue.getValue(reportEntry.minTemperature, tempUnit, prefTempUnit)
             val maxTemp =
-                UnitValue.getValue(reportEntry.maxTemperature, tempUnit, prefTempUnit).toFloat()
+                UnitValue.getValue(reportEntry.maxTemperature, tempUnit, prefTempUnit)
             val minPress =
-                UnitValue.getValue(reportEntry.minPressure, pressUnit, prefPressUnit).toFloat()
+                UnitValue.getValue(reportEntry.minPressure, pressUnit, prefPressUnit)
             val maxPress =
-                UnitValue.getValue(reportEntry.maxPressure, pressUnit, prefPressUnit).toFloat()
+                UnitValue.getValue(reportEntry.maxPressure, pressUnit, prefPressUnit)
 
             val x = when (formatKind) {
                 FORMAT_KIND_DATE -> ShortDate.toEpochDay(date).toFloat()
@@ -113,8 +113,8 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
 
             minTempEntries[i] = Entry.of(x, minTemp)
             maxTempEntries[i] = Entry.of(x, maxTemp)
-            minHumEntries[i] = Entry.of(x, reportEntry.minHumidity.toFloat())
-            maxHumEntries[i] = Entry.of(x, reportEntry.maxHumidity.toFloat())
+            minHumEntries[i] = Entry.of(x, reportEntry.minHumidity)
+            maxHumEntries[i] = Entry.of(x, reportEntry.maxHumidity)
             minPressEntries[i] = Entry.of(x, minPress)
             maxPressEntries[i] = Entry.of(x, maxPress)
         }
@@ -123,30 +123,12 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
         val humFormatter = UnitChartValueFormatter(unitFormatter, ValueUnit.HUMIDITY)
         val pressFormatter = UnitChartValueFormatter(unitFormatter, prefPressUnit)
 
-        val minTempDataSet = DataSet(minTempEntries, tempFormatter).apply {
-            color = minColor
-            circleColor = minColor
-        }
-        val maxTempDataSet = DataSet(maxTempEntries, tempFormatter).apply {
-            color = maxColor
-            circleColor = maxColor
-        }
-        val minHumDataSet = DataSet(minHumEntries, humFormatter).apply {
-            color = minColor
-            circleColor = minColor
-        }
-        val maxHumDataSet = DataSet(maxHumEntries, humFormatter).apply {
-            color = maxColor
-            circleColor = maxColor
-        }
-        val minPressDataSet = DataSet(minPressEntries, pressFormatter).apply {
-            color = minColor
-            circleColor = minColor
-        }
-        val maxPressDataSet = DataSet(maxPressEntries, pressFormatter).apply {
-            color = maxColor
-            circleColor = maxColor
-        }
+        val minTempDataSet = DataSet(minTempEntries, tempFormatter).customizeOptions(minColor)
+        val maxTempDataSet = DataSet(maxTempEntries, tempFormatter).customizeOptions(maxColor)
+        val minHumDataSet = DataSet(minHumEntries, humFormatter).customizeOptions(minColor)
+        val maxHumDataSet = DataSet(maxHumEntries, humFormatter).customizeOptions(maxColor)
+        val minPressDataSet = DataSet(minPressEntries, pressFormatter).customizeOptions(minColor)
+        val maxPressDataSet = DataSet(maxPressEntries, pressFormatter).customizeOptions(maxColor)
 
         val tempData = ChartData(minTempDataSet, maxTempDataSet)
         val humData = ChartData(minHumDataSet, maxHumDataSet)
@@ -167,6 +149,13 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
                 granularity = 1f
             }
         }
+    }
+
+    private fun DataSet.customizeOptions(color: Int): DataSet {
+        this.color = color
+        circleColor = color
+
+        return this
     }
 
     private object DayChartFormatter : ValueFormatter {
