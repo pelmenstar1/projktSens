@@ -1,15 +1,11 @@
 package com.pelmenstar.projktSens.jserver
 
-import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.pelmenstar.projktSens.jserver.repo.DbServerWeatherRepository
 import com.pelmenstar.projktSens.serverProtocol.DefaultProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.Errors
-import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoClient
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoRequest
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoResponse
 import com.pelmenstar.projktSens.shared.buildByteArray
 import com.pelmenstar.projktSens.shared.time.ShortDate
@@ -239,7 +235,7 @@ class RepoServerTests {
         fun before() {
             serverConfig = TestConfig(context)
             repo = serverConfig.sharedRepo
-            repoServer = RepoServer(DefaultProtoConfig).also {
+            repoServer = RepoServer().also {
                 it.start()
             }
         }
@@ -249,17 +245,5 @@ class RepoServerTests {
         fun after() {
             repoServer.stop()
         }
-    }
-
-    class TestConfig(context: Context): Config() {
-        override val protoConfig: ProtoConfig
-            get() = DefaultProtoConfig
-
-        override val sharedRepo: WeatherRepository = DbServerWeatherRepository.inMemory(context)
-        override val weatherProvider: WeatherInfoProvider = SensorWeatherProvider(protoConfig)
-        override val loggerConfig = LoggerConfig(
-            AndroidLogDelegate,
-            LogLevel.DEBUG
-        )
     }
 }

@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 class ServerStatusTests {
     @Test
     fun must_return_available_status_when_status_server_is_running() {
-        val statusServer = StatusServer(DefaultProtoConfig)
+        val statusServer = StatusServer()
         statusServer.start()
         Thread.sleep(5000)
 
