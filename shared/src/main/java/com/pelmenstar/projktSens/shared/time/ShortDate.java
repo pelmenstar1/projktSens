@@ -4,6 +4,7 @@ import com.pelmenstar.projktSens.shared.MyMath;
 import com.pelmenstar.projktSens.shared.StringUtils;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 
 import java.util.Random;
 
@@ -29,8 +30,6 @@ public final class ShortDate {
      * @param year year, in range of [0; 9999]
      * @param month month, in range of [1; 12]
      * @param dayOfMonth day in range of [1; *days in month*]
-     *
-     * @
      */
     @ShortDateInt
     public static int of(int year, int month, int dayOfMonth) {
@@ -42,7 +41,8 @@ public final class ShortDate {
     }
 
     @ShortDateInt
-    private static int ofInternal(int year, int month, int dayOfMonth) {
+    @TestOnly
+    public static int ofInternal(int year, int month, int dayOfMonth) {
         return (year << 16) | (month << 8) | dayOfMonth;
     }
 

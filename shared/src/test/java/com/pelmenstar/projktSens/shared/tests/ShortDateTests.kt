@@ -2,15 +2,15 @@ package com.pelmenstar.projktSens.shared.tests
 
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.TimeUtils
-import org.junit.Assert
 import org.junit.Test
 import java.time.LocalDate
 import kotlin.random.Random
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 
 class ShortDateTests {
     @Test
-    fun create() {
+    fun of() {
         val random = Random(0)
 
         repeat(10) {
@@ -27,7 +27,33 @@ class ShortDateTests {
     }
 
     @Test
-    fun getEpochDay() {
+    fun of_fails_on_invalid_args() {
+        fun assertOfFails(year: Int, month: Int, day: Int) {
+            assertFails {
+                ShortDate.of(year, month, day)
+            }
+        }
+
+        // year
+        assertOfFails(-1, 1, 1)
+        assertOfFails(ShortDate.MAX_YEAR + 1, 1, 1)
+
+        // month
+        assertOfFails(2021, 0, 1)
+        assertOfFails(2021, 13, 1)
+
+        // day
+        assertOfFails(2021, 1, 0)
+        assertOfFails(2021, 1, 32)
+        assertOfFails(
+            2021,
+            1,
+            TimeUtils.getDaysInMonth(2021, 1) + 1
+        )
+    }
+
+    @Test
+    fun toEpochDay() {
         val random = Random(0)
 
         repeat(100) {
@@ -39,6 +65,11 @@ class ShortDateTests {
 
             assertEquals(expected, actual)
         }
+    }
+
+    @Test
+    fun toEpochDay_fails_on_invalid_date() {
+        assertDateInputMethodFails(ShortDate::toEpochDay)
     }
 
     @Test
@@ -61,6 +92,11 @@ class ShortDateTests {
     }
 
     @Test
+    fun ofEpochDay_fails_on_negative_epoch_day() {
+        assertFails { ShortDate.ofEpochDay(-1) }
+    }
+
+    @Test
     fun getDayOfYear() {
         val random = Random(0)
 
@@ -76,6 +112,11 @@ class ShortDateTests {
     }
 
     @Test
+    fun getDayOfYear_fails_on_invalid_date() {
+        assertDateInputMethodFails(ShortDate::getDayOfYear)
+    }
+
+    @Test
     fun getDayOfWeek() {
         val random = Random(0)
 
@@ -87,6 +128,28 @@ class ShortDateTests {
 
             assertEquals(expected, actual)
         }
+    }
+
+    @Test
+    fun getDayOfWeek_fails_on_invalid_date() {
+        assertDateInputMethodFails(ShortDate::getDayOfWeek)
+    }
+
+    private fun assertDateInputMethodFails(method: (Int) -> Any) {
+        fun assertMethodFails(year: Int, month: Int, day: Int) {
+            assertFails("year: $year, month: $month, day: $day") {
+                method(ShortDate.ofInternal(year, month, day))
+            }
+        }
+
+        assertMethodFails(-1, 1, 1)
+        assertMethodFails(ShortDate.MAX_YEAR + 1, 1, 1)
+
+        assertMethodFails(2021, 0, 1)
+        assertMethodFails(2021, 13, 1)
+
+        assertMethodFails(2021, 1, 0)
+        assertMethodFails(2021, 1, 32)
     }
 
     private fun randomLocalDate(random: Random): LocalDate {

@@ -1,11 +1,9 @@
 package com.pelmenstar.projktSens.shared.tests
 
 import com.pelmenstar.projktSens.shared.time.TimeUtils
-import org.junit.Assert
 import org.junit.Test
 import java.time.chrono.IsoChronology
 import kotlin.test.assertEquals
-import kotlin.test.junit.JUnitAsserter
 
 const val UNTIL_9999_YEAR = 253402214399
 const val UNTIL_9999_YEAR_DAY: Long = 2932895
@@ -15,7 +13,11 @@ class TimeUtilsTests  {
     fun getDaysInMonth() {
         assertEquals(29, TimeUtils.getDaysInMonth(2004, 2)) // leap, february
         for(month in 1..12) {
-            assertEquals(daysInMonthTable[month], TimeUtils.getDaysInMonth(2005, month)) // non-leap year
+            // non-leap year
+            assertEquals(
+                daysInMonthTable[month],
+                TimeUtils.getDaysInMonth(2005, month)
+            )
         }
     }
 
@@ -38,10 +40,8 @@ class TimeUtilsTests  {
                 28,
                 31,
                 30,
-
                 31,
                 30,
-
                 31,
                 31,
                 30,
