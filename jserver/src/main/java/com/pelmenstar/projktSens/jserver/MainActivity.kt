@@ -8,10 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.pelmenstar.projktSens.shared.android.ui.Button
 import com.pelmenstar.projktSens.shared.android.ui.LinearLayout
 import com.pelmenstar.projktSens.shared.android.ui.content
-import com.pelmenstar.projktSens.shared.time.ShortDate
-import com.pelmenstar.projktSens.weather.models.debugGenDb
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 @SuppressLint("SetTextI18n")
 class MainActivity : AppCompatActivity() {
@@ -21,13 +17,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val cfg = MainConfig(this)
-        serverConfig = cfg
-        val shared = cfg.sharedRepo
-
-        val repoServer = RepoServer()
-        val checkAvailabilityServer = StatusServer()
-        val weatherChannelInfoServer = WeatherChannelInfoServer()
+        val controller = Controller(MainConfig(this))
 
         content {
             LinearLayout(this) {
@@ -41,10 +31,7 @@ class MainActivity : AppCompatActivity() {
                         isEnabled = false
                         stopButton.isEnabled = true
 
-                        WeatherMonitor.start()
-                        repoServer.start()
-                        checkAvailabilityServer.start()
-                        weatherChannelInfoServer.start()
+                        controller.startAll()
                     }
                 }
 
@@ -57,10 +44,7 @@ class MainActivity : AppCompatActivity() {
                         isEnabled = false
                         startButton.isEnabled = true
 
-                        WeatherMonitor.stop()
-                        repoServer.stop()
-                        checkAvailabilityServer.stop()
-                        weatherChannelInfoServer.stop()
+                        controller.stopAll()
                     }
                 }
 
@@ -68,24 +52,13 @@ class MainActivity : AppCompatActivity() {
                     Button {
                         text = "Clear db"
 
-                        setOnClickListener {
-                            GlobalScope.launch { shared.clear() }
-                        }
+                        setOnClickListener { controller.clearRepository() }
                     }
 
                     Button {
                         text = "Gen db"
 
-                        setOnClickListener {
-                            GlobalScope.launch {
-                                val startDate = ShortDate.minusDays(ShortDate.now(), 31)
-
-                                shared.debugGenDb(
-                                    startDate,
-                                    89280
-                                )
-                            }
-                        }
+                        setOnClickListener { controller.debugGenDb() }
                     }
                 }
             }
