@@ -35,8 +35,8 @@ object TestData {
         val combs = IntArray(ValueUnit.TEMPERATURE_UNITS.size * ValueUnit.PRESSURE_UNITS.size)
         var i = 0
 
-        for(tempUnit in ValueUnit.TEMPERATURE_UNITS) {
-            for(pressUnit in ValueUnit.PRESSURE_UNITS) {
+        for (tempUnit in ValueUnit.TEMPERATURE_UNITS) {
+            for (pressUnit in ValueUnit.PRESSURE_UNITS) {
                 combs[i++] = ValueUnitsPacked.create(tempUnit, pressUnit)
             }
         }
@@ -45,7 +45,7 @@ object TestData {
     }
 
     fun value(unit: Int): Float {
-        return when(unit) {
+        return when (unit) {
             ValueUnit.CELSIUS -> random.nextDouble(-30.0, 30.0).toFloat()
             ValueUnit.FAHRENHEIT -> random.nextDouble(-140.0, 200.0).toFloat()
             ValueUnit.KELVIN -> random.nextDouble(173.0, 373.0).toFloat()
@@ -62,7 +62,14 @@ object TestData {
     }
 
     fun paramStats(unit: Int): ParameterStats {
-        return ParameterStats(value(unit), value(unit), value(unit), value(unit), value(unit), value(unit))
+        return ParameterStats(
+            value(unit),
+            value(unit),
+            value(unit),
+            value(unit),
+            value(unit),
+            value(unit)
+        )
     }
 
     fun reportHeader(units: Int): ReportStats {

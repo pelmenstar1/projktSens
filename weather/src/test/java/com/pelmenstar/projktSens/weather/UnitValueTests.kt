@@ -2,8 +2,8 @@ package com.pelmenstar.projktSens.weather
 
 import com.pelmenstar.projktSens.weather.models.UnitValue
 import com.pelmenstar.projktSens.weather.models.ValueUnit
-import org.junit.Assert
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class UnitValueTests {
     @Test
@@ -13,8 +13,8 @@ class UnitValueTests {
                 val value = TestData.value(unit)
                 val unitValue = UnitValue.of(value, unit)
 
-                Assert.assertEquals(UnitValue.getUnit(unitValue), unit)
-                Assert.assertEquals(UnitValue.getAbsoluteValue(unitValue), value)
+                assertEquals(UnitValue.getUnit(unitValue), unit)
+                assertEquals(UnitValue.getAbsoluteValue(unitValue), value)
             }
         }
 
