@@ -2,7 +2,7 @@ package com.pelmenstar.projktSens.shared.android
 
 import android.os.Parcel
 import android.os.Parcelable
-import org.junit.Assert
+import kotlin.test.assertEquals
 
 object ParcelTestUtils {
     fun<T:Parcelable> read_write(value: T, creator: Parcelable.Creator<T>) {
@@ -12,6 +12,6 @@ object ParcelTestUtils {
 
         val readFromParcel = creator.createFromParcel(parcel)
 
-        Assert.assertEquals(value, readFromParcel)
+        assertEquals(value, readFromParcel)
     }
 }

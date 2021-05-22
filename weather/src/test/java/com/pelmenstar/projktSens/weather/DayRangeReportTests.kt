@@ -6,7 +6,6 @@ import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
 import org.junit.Test
 
 class DayRangeReportTests {
-
     @Test
     fun serializer_readWrite() {
         TestData.use {

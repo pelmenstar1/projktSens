@@ -150,15 +150,9 @@ public final class ShortDate {
     }
 
     private static boolean isValid(int year, int month, int day) {
-        if(year < 0 || year > MAX_YEAR) {
-            return false;
-        }
-
-        if(month < 0 || month > 12) {
-            return false;
-        }
-
-        return day > 0 && day <= TimeUtils.getDaysInMonth(year, month);
+        return (year >= 0 && year <= MAX_YEAR) &&
+                (month > 0 && month <= 12) &&
+                (day > 0 && day <= TimeUtils.getDaysInMonth(year, month));
     }
 
     /**

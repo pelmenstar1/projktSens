@@ -6,7 +6,6 @@ import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
 import org.junit.Test
 
 class DayReportTests {
-
     @Test
     fun serializer_readWrite() {
         TestData.use {
@@ -22,7 +21,6 @@ class DayReportTests {
             }
         }
     }
-
 
     private fun randomEntry(tempUnit: Int, pressUnit: Int): DayReport.Entry {
         return DayReport.Entry(
