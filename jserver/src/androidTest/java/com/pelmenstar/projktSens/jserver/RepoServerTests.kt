@@ -14,10 +14,12 @@ import com.pelmenstar.projktSens.shared.writeInt
 import com.pelmenstar.projktSens.weather.models.*
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
-import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 // Tests only the server request-response logic, not exactly repository logic
 @RunWith(AndroidJUnit4::class)
@@ -31,7 +33,7 @@ class RepoServerTests {
             repo.clear()
             val response = client.requestRawResponse<Any>(RepoCommands.GET_AVAILABLE_DATE_RANGE)
 
-            Assert.assertTrue(response.isEmpty())
+            assertTrue(response.isEmpty())
         }
     }
 
@@ -40,21 +42,21 @@ class RepoServerTests {
         runBlocking {
             repo.debugGenDb(ShortDate.now(), 48)
 
-            client.request<ShortDateRange>(RepoCommands.GET_AVAILABLE_DATE_RANGE) ?: throw RuntimeException("Empty response")
+            val range = client.request<ShortDateRange>(RepoCommands.GET_AVAILABLE_DATE_RANGE)
+            assertNotNull(range)
         }
     }
 
     //
     // genDayReport
     //
-
     @Test
     fun genDayReport_returns_invalid_args_error_if_no_arguments_were_given() {
         runBlocking {
             val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_REPORT)
             val error = (response as RepoResponse.Error).error
 
-            Assert.assertEquals(Errors.INVALID_ARGUMENTS, error)
+            assertEquals(Errors.INVALID_ARGUMENTS, error)
         }
     }
 
@@ -64,7 +66,7 @@ class RepoServerTests {
             val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_REPORT, byteArrayOf(1))
             val error = (response as RepoResponse.Error).error
 
-            Assert.assertEquals(Errors.INVALID_ARGUMENTS, error)
+            assertEquals(Errors.INVALID_ARGUMENTS, error)
         }
     }
 
@@ -76,7 +78,7 @@ class RepoServerTests {
             })
             val error = (response as RepoResponse.Error).error
 
-            Assert.assertEquals(Errors.INVALID_ARGUMENTS, error)
+            assertEquals(Errors.INVALID_ARGUMENTS, error)
         }
     }
 
@@ -86,9 +88,10 @@ class RepoServerTests {
             val nowDate = ShortDate.now()
             repo.debugGenDb(nowDate, 48)
 
-            client.request<DayReport>(RepoCommands.GEN_DAY_REPORT, buildByteArray(4) {
+            val report = client.request<DayReport>(RepoCommands.GEN_DAY_REPORT, buildByteArray(4) {
                 writeInt(0, nowDate)
             })
+            assertNotNull(report)
         }
     }
 
@@ -102,7 +105,7 @@ class RepoServerTests {
                 writeInt(0, nowDate)
             })
 
-            Assert.assertTrue(response.isEmpty())
+            assertTrue(response.isEmpty())
         }
     }
 
@@ -115,7 +118,7 @@ class RepoServerTests {
                 writeInt(0, ShortDate.minusDays(nowDate, 3))
             })
 
-            Assert.assertTrue(response.isEmpty())
+            assertTrue(response.isEmpty())
         }
     }
 
@@ -128,7 +131,7 @@ class RepoServerTests {
             val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_RANGE_REPORT)
             val error = (response as RepoResponse.Error).error
 
-            Assert.assertEquals(Errors.INVALID_ARGUMENTS, error)
+            assertEquals(Errors.INVALID_ARGUMENTS, error)
         }
     }
 
@@ -138,7 +141,7 @@ class RepoServerTests {
             val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_RANGE_REPORT, byteArrayOf(1))
             val error = (response as RepoResponse.Error).error
 
-            Assert.assertEquals(Errors.INVALID_ARGUMENTS, error)
+            assertEquals(Errors.INVALID_ARGUMENTS, error)
         }
     }
 
@@ -152,7 +155,7 @@ class RepoServerTests {
 
             val error = (response as RepoResponse.Error).error
 
-            Assert.assertEquals(Errors.INVALID_ARGUMENTS, error)
+            assertEquals(Errors.INVALID_ARGUMENTS, error)
         }
     }
 
@@ -167,7 +170,7 @@ class RepoServerTests {
                 writeInt(4, ShortDate.plusDays(nowDate, 1))
             })
 
-            Assert.assertNotNull(report)
+            assertNotNull(report)
         }
     }
 
@@ -182,7 +185,7 @@ class RepoServerTests {
                 writeInt(4, ShortDate.plusDays(nowDate, 1))
             })
 
-            Assert.assertTrue(response.isEmpty())
+            assertTrue(response.isEmpty())
         }
     }
 
@@ -197,7 +200,7 @@ class RepoServerTests {
                 writeInt(4, ShortDate.minusDays(nowDate, 2))
             })
 
-            Assert.assertTrue(response.isEmpty())
+            assertTrue(response.isEmpty())
         }
     }
 
@@ -211,7 +214,7 @@ class RepoServerTests {
 
             val response = client.requestRawResponse<Any>(RepoCommands.GET_LAST_WEATHER)
 
-            Assert.assertTrue(response.isEmpty())
+            assertTrue(response.isEmpty())
         }
     }
 
@@ -220,7 +223,7 @@ class RepoServerTests {
         runBlocking {
             repo.debugGenDb(ShortDate.now(), 48)
 
-            Assert.assertNotNull(client.request<WeatherInfo>(RepoCommands.GET_LAST_WEATHER))
+            assertNotNull(client.request<WeatherInfo>(RepoCommands.GET_LAST_WEATHER))
         }
     }
 

@@ -5,9 +5,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.pelmenstar.projktSens.serverProtocol.DefaultProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.ServerStatus
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.test.assertEquals
 
 @RunWith(AndroidJUnit4::class)
 class ServerStatusTests {
@@ -25,7 +25,7 @@ class ServerStatusTests {
             status = ServerAvailabilityProvider(DefaultProtoConfig).getStatus()
         }
 
-        Assert.assertEquals(ServerStatus.AVAILABLE, status)
+        assertEquals(ServerStatus.AVAILABLE, status)
         statusServer.stop()
     }
 
@@ -37,6 +37,6 @@ class ServerStatusTests {
             status = ServerAvailabilityProvider(DefaultProtoConfig).getStatus()
         }
 
-        Assert.assertEquals(ServerStatus.NOT_AVAILABLE, status)
+        assertEquals(ServerStatus.NOT_AVAILABLE, status)
     }
 }
