@@ -2,3 +2,16 @@
 /.gradle/
 /.idea/
 local.properties
+
+# Build directories
+build/
+chartLite/build/
+jserver/build/
+serverProtocol/build/
+
+shared/build/
+shared/android/build/
+
+weather/build/
+weather/app/build
+
