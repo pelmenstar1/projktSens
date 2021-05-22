@@ -4,15 +4,15 @@ import com.pelmenstar.projktSens.serverProtocol.repo.RawRepoContract
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoRequest
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoResponse
 import com.pelmenstar.projktSens.shared.equalsPattern
+import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
 import com.pelmenstar.projktSens.shared.serialization.ValueReader
 import com.pelmenstar.projktSens.shared.serialization.ValueWriter
-import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import kotlin.random.Random
+import kotlin.test.assertEquals
 
 class RawRepoContractTests {
     @Test
@@ -82,7 +82,7 @@ class RawRepoContractTests {
             val input = ByteArrayInputStream(output.toByteArray())
             val readFromInput = RawRepoContract.readRequest(input)
 
-            Assert.assertEquals(request, readFromInput)
+            assertEquals(request, readFromInput)
         }
     }
 
@@ -94,7 +94,7 @@ class RawRepoContractTests {
             val input = ByteArrayInputStream(output.toByteArray())
             val readFromInput = RawRepoContract.readResponse(input, T::class.java)
 
-            Assert.assertEquals(response, readFromInput)
+            assertEquals(response, readFromInput)
         }
     }
 
