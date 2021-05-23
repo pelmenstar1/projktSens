@@ -1,9 +1,8 @@
 package com.pelmenstar.projktSens.weather.app
 
 import com.pelmenstar.projktSens.serverProtocol.AvailabilityProvider
-import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
+import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.ServerStatus
-import com.pelmenstar.projktSens.serverProtocol.socketAddress
 import com.pelmenstar.projktSens.shared.connectSuspend
 import com.pelmenstar.projktSens.shared.readNSuspend
 import com.pelmenstar.projktSens.shared.writeSuspend
@@ -11,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.Socket
 
-class ServerAvailabilityProvider(config: ProtoConfig): AvailabilityProvider {
+class ServerAvailabilityProvider(config: HostedProtoConfig): AvailabilityProvider {
     private val address = config.socketAddress { serverStatusPort }
     private val getStatusMsg = byteArrayOf(1)
 

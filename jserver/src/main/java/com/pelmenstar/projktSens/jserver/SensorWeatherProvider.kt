@@ -1,17 +1,20 @@
 package com.pelmenstar.projktSens.jserver
 
-import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
-import com.pelmenstar.projktSens.serverProtocol.socketAddress
-import com.pelmenstar.projktSens.shared.*
+import com.pelmenstar.projktSens.shared.connectSuspend
+import com.pelmenstar.projktSens.shared.getFloat
+import com.pelmenstar.projktSens.shared.readNSuspend
 import com.pelmenstar.projktSens.shared.time.ShortDateTime
+import com.pelmenstar.projktSens.shared.writeSuspend
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
 import com.pelmenstar.projktSens.weather.models.WeatherInfoProvider
 import java.io.IOException
+import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.net.Socket
 
-class SensorWeatherProvider(config: ProtoConfig): WeatherInfoProvider {
-    private val address = config.socketAddress(10004)
+class SensorWeatherProvider: WeatherInfoProvider {
+    private val address = InetSocketAddress(InetAddress.getLoopbackAddress(), 10001)
 
     override suspend fun getWeather(): WeatherInfo {
         try {
