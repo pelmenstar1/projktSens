@@ -13,7 +13,6 @@ import android.graphics.Region;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -24,10 +23,10 @@ import com.pelmenstar.projktSens.shared.android.CanvasUtils;
 import com.pelmenstar.projktSens.shared.time.ShortTime;
 import com.pelmenstar.projktSens.shared.time.TimeConstants;
 import com.pelmenstar.projktSens.shared.time.TimeInt;
-import com.pelmenstar.projktSens.shared.time.TimeRange;
 import com.pelmenstar.projktSens.weather.app.PreferredUnits;
 import com.pelmenstar.projktSens.weather.app.R;
 import com.pelmenstar.projktSens.weather.app.di.AppComponent;
+import com.pelmenstar.projktSens.weather.app.di.AppModule;
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent;
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter;
 import com.pelmenstar.projktSens.weather.models.UnitValue;
@@ -118,7 +117,10 @@ public final class ComplexWeatherView extends View {
     public ComplexWeatherView(@NotNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        AppComponent component = DaggerAppComponent.create();
+        AppComponent component = DaggerAppComponent
+                .builder()
+                .appModule(new AppModule(context))
+                .build();
         unitFormatter = component.unitFormatter();
 
         Resources res = context.getResources();

@@ -3,17 +3,15 @@ package com.pelmenstar.projktSens.weather.app.di;
 import android.content.Context;
 import android.content.res.Resources;
 
-import com.pelmenstar.projktSens.serverProtocol.AvailabilityProvider;
 import com.pelmenstar.projktSens.serverProtocol.DefaultProtoConfig;
 import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig;
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig;
 import com.pelmenstar.projktSens.shared.geo.ConstGeolocationProvider;
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider;
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter;
-import com.pelmenstar.projktSens.weather.app.LocalHostProtoHostResolver;
 import com.pelmenstar.projktSens.weather.app.NetworkDataSource;
 import com.pelmenstar.projktSens.weather.app.NetworkWeatherChannelInfoProvider;
-import com.pelmenstar.projktSens.weather.app.ProtoHostResolver;
+import com.pelmenstar.projktSens.weather.app.Preferences;
 import com.pelmenstar.projktSens.weather.app.R;
 import com.pelmenstar.projktSens.weather.app.ServerAvailabilityProvider;
 import com.pelmenstar.projktSens.weather.app.formatters.MoonPhaseFormatter;
@@ -34,94 +32,80 @@ import com.pelmenstar.projktSens.weather.models.astro.SunInfoProvider;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.net.InetAddress;
-
 import dagger.Module;
 import dagger.Provides;
 
 @Module
 public final class AppModule {
-    private static WeatherDataSource dataSource;
-    private static final SunInfoProvider sunInfoProvider = new AstroSunInfoProvider();
-    private static final MoonInfoProvider moonInfoProvider = new AstroMoonInfoProvider();
+    private final Context context;
 
-    // 50.58561 26.31601
-    private static final GeolocationProvider geoProvider = new ConstGeolocationProvider(50.585661f, 26.31601f);
-    private static WeatherChannelInfoProvider weatherChannelInfoProvider;
-    private static AvailabilityProvider serverAvailabilityProvider;
+    private final UnitFormatter unitFormatter;
+    private final MoonPhaseFormatter moonPhaseFormatter;
 
-    private static PrettyDateFormatter prettyDateFormatter;
-    private static UnitFormatter unitFormatter;
-    private static MoonPhaseFormatter moonPhaseFormatter;
+    public AppModule(@NotNull Context context) {
+        this.context = context;
 
-    public static void initContext(@NotNull Context appContext) {
-        Resources resources = appContext.getResources();
+        Resources res = context.getResources();
 
-        prettyDateFormatter = new ResourcesPrettyDateFormatter(resources);
-        unitFormatter = new UnitFormatter(resources.getStringArray(R.array.units), prettyDateFormatter);
-        moonPhaseFormatter = new MoonPhaseFormatter(resources.getStringArray(R.array.moonPhases));
+        String[] moonPhases = res.getStringArray(R.array.moonPhases);
+        moonPhaseFormatter = new MoonPhaseFormatter(moonPhases);
 
-        ProtoHostResolver hostResolver = LocalHostProtoHostResolver.INSTANCE;
-        InetAddress host = hostResolver.getHost();
-        HostedProtoConfig hostedProtoConfig = new HostedProtoConfig(host, DefaultProtoConfig.INSTANCE);
-
-        dataSource = new NetworkDataSource(hostedProtoConfig);
-        weatherChannelInfoProvider = new NetworkWeatherChannelInfoProvider(hostedProtoConfig);
-        serverAvailabilityProvider = new ServerAvailabilityProvider(hostedProtoConfig);
+        String[] units = res.getStringArray(R.array.units);
+        unitFormatter = new UnitFormatter(units, prettyDateFormatter());
     }
 
     @Provides
     @NotNull
     public MoonInfoProvider moonInfoProvider() {
-        return moonInfoProvider;
+        return new AstroMoonInfoProvider();
     }
 
     @Provides
     @NotNull
     public MoonCalendarContract.Presenter moonCalendarPresenter() {
-        return new MoonCalendarPresenter(moonInfoProvider);
+        return new MoonCalendarPresenter(moonInfoProvider());
     }
 
     @Provides
     @NotNull
     public HomeContract.Presenter homePresenter() {
         return new HomePresenter(
-                sunInfoProvider,
-                moonInfoProvider,
-                geoProvider,
-                dataSource,
-                weatherChannelInfoProvider,
-                serverAvailabilityProvider);
+                sunInfoProvider(),
+                moonInfoProvider(),
+                geolocationProvider(),
+                dataSource(),
+                weatherChannelInfoProvider(),
+                new ServerAvailabilityProvider(hostedProtoConfig()));
     }
 
     @Provides
     @NotNull
     public SunriseSunsetCalendarContract.Presenter sunriseSunsetCalendarPresenter() {
-        return new SunriseSunsetCalendarPresenter(sunInfoProvider);
+        return new SunriseSunsetCalendarPresenter(sunInfoProvider());
     }
 
     @Provides
     @NotNull
     public WeatherDataSource dataSource() {
-        return dataSource;
+        return new NetworkDataSource(hostedProtoConfig());
     }
 
     @Provides
     @NotNull
     public SunInfoProvider sunInfoProvider() {
-        return sunInfoProvider;
+        return new AstroSunInfoProvider();
     }
 
     @Provides
     @NotNull
     public GeolocationProvider geolocationProvider() {
-        return geoProvider;
+        return new ConstGeolocationProvider(50.585661f, 26.31601f);
     }
 
     @Provides
     @NotNull
     public PrettyDateFormatter prettyDateFormatter() {
-        return prettyDateFormatter;
+        return new ResourcesPrettyDateFormatter(context.getResources());
     }
 
     @Provides
@@ -139,7 +123,7 @@ public final class AppModule {
     @Provides
     @NotNull
     public WeatherChannelInfoProvider weatherChannelInfoProvider() {
-        return weatherChannelInfoProvider;
+        return new NetworkWeatherChannelInfoProvider(hostedProtoConfig());
     }
 
     @Provides
@@ -148,9 +132,10 @@ public final class AppModule {
         return DefaultProtoConfig.INSTANCE;
     }
 
-    @Provides
     @NotNull
-    public ProtoHostResolver protoHostResolver() {
-        return LocalHostProtoHostResolver.INSTANCE;
+    private HostedProtoConfig hostedProtoConfig() {
+        Preferences prefs = Preferences.of(context);
+
+        return new HostedProtoConfig(prefs.getServerHost(), protoConfig());
     }
 }

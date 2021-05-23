@@ -17,6 +17,8 @@ import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.shared.time.TimeUtils
 import com.pelmenstar.projktSens.weather.app.PreferredUnits
 import com.pelmenstar.projktSens.weather.app.R
+import com.pelmenstar.projktSens.weather.app.di.AppComponent
+import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.formatters.UnitChartValueFormatter
 import com.pelmenstar.projktSens.weather.models.*
@@ -28,6 +30,8 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
     private var startDate = 0
     private var endDate = 0
 
+    private lateinit var appComponent: AppComponent
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val intent = requireIntent()
 
@@ -38,9 +42,13 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
         startDate = ShortDate.of(year, month, 1)
         endDate = ShortDate.of(year, month, TimeUtils.getDaysInMonth(year, month))
 
+        appComponent = DaggerAppComponent
+            .builder()
+            .appModule(AppModule(this))
+            .build()
+
         actionBar {
-            val component = DaggerAppComponent.create()
-            val dateFormatter = component.prettyDateFormatter()
+            val dateFormatter = appComponent.prettyDateFormatter()
 
             setDisplayHomeAsUpEnabled(true)
             title = dateFormatter.prettyFormat(year, month)
@@ -59,7 +67,7 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
 
         val minColor = ResourcesCompat.getColor(res, R.color.chartMinColor, theme)
         val maxColor = ResourcesCompat.getColor(res, R.color.chartMaxColor, theme)
-        val unitFormatter = DaggerAppComponent.create().unitFormatter()
+        val unitFormatter = appComponent.unitFormatter()
 
         val prefUnits = PreferredUnits.getUnits()
         val prefTempUnit = ValueUnitsPacked.getTemperatureUnit(prefUnits)

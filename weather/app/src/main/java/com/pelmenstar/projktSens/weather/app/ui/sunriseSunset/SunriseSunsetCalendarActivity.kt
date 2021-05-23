@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.weather.app.R
+import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 
 class SunriseSunsetCalendarActivity: HomeButtonSupportActivity(), SunriseSunsetCalendarContract.View {
@@ -32,7 +33,10 @@ class SunriseSunsetCalendarActivity: HomeButtonSupportActivity(), SunriseSunsetC
             setDisplayHomeAsUpEnabled(true)
         }
 
-        val component = DaggerAppComponent.create()
+        val component = DaggerAppComponent
+            .builder()
+            .appModule(AppModule(this))
+            .build()
 
         content {
             val body1 = TextAppearance(this, R.style.TextAppearance_MaterialComponents_Body1)
@@ -84,7 +88,6 @@ class SunriseSunsetCalendarActivity: HomeButtonSupportActivity(), SunriseSunsetC
                         presenter?.onDaySelected(ShortDate.getDayOfYear(date))
                     }
                 }
-
             }
         }
 
@@ -126,6 +129,5 @@ class SunriseSunsetCalendarActivity: HomeButtonSupportActivity(), SunriseSunsetC
         fun intent(context: Context): Intent {
             return Intent(context, SunriseSunsetCalendarActivity::class.java)
         }
-
     }
 }

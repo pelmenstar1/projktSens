@@ -13,6 +13,7 @@ import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
 import com.pelmenstar.projktSens.shared.serialization.Serializable
 import com.pelmenstar.projktSens.weather.app.R
+import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.models.WeatherDataSource
 import kotlinx.coroutines.*
@@ -81,7 +82,11 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         setContentView(createAnimationView())
 
         loadReportJob = GlobalScope.launch(Dispatchers.Default) {
-            val component = DaggerAppComponent.create()
+            val component = DaggerAppComponent
+                .builder()
+                .appModule(AppModule(this@ReportActivityBase))
+                .build()
+
             val dataSource = component.dataSource()
 
             var view: View

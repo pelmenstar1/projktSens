@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.weather.app.R
+import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.formatters.MoonPhaseFormatter
 import com.pelmenstar.projktSens.weather.app.ui.MoonView
@@ -74,7 +75,10 @@ class MoonCalendarActivity: HomeButtonSupportActivity(), MoonCalendarContract.Vi
             }
         }
 
-        val component = DaggerAppComponent.create()
+        val component = DaggerAppComponent
+            .builder()
+            .appModule(AppModule(this))
+            .build()
 
         moonPhaseFormatter = component.moonPhaseFormatter()
         presenter = component.moonCalendarPresenter().also {

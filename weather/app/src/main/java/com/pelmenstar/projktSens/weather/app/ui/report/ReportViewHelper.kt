@@ -14,6 +14,7 @@ import com.pelmenstar.projktSens.chartLite.data.ChartData
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.weather.app.PreferredUnits
 import com.pelmenstar.projktSens.weather.app.R
+import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
 import com.pelmenstar.projktSens.weather.app.ui.MaterialChart
@@ -112,7 +113,11 @@ fun createChartView(
     pressureData: ChartData,
     chartOptions: (LineChart) -> Unit
 ): View {
-    val component = DaggerAppComponent.create()
+    val component = DaggerAppComponent
+        .builder()
+        .appModule(AppModule(context))
+        .build()
+
     val unitFormatter = component.unitFormatter()
 
     val statsUnits = stats.units

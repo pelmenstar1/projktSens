@@ -5,7 +5,6 @@ import android.content.res.Resources;
 
 import com.pelmenstar.projktSens.shared.android.ui.LinearColorTransition;
 import com.pelmenstar.projktSens.shared.android.ui.TransitionView;
-import com.pelmenstar.projktSens.weather.app.di.AppModule;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -33,8 +32,6 @@ public final class Startup {
         int[] transitionColors = res.getIntArray(R.array.defaultTransitionColors);
 
         TransitionView.setDefaultTransition(LinearColorTransition.multiple(transitionColors));
-
-        AppModule.initContext(context);
 
         Preferences prefs = Preferences.of(context);
         PreferredUnits.setUnits(prefs.getUnits());

@@ -13,9 +13,9 @@ import com.pelmenstar.projktSens.shared.android.obtainStyledAttributes
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter
 import com.pelmenstar.projktSens.shared.time.ShortDate
-import com.pelmenstar.projktSens.shared.time.TimeRange
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppComponent
+import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
 import com.pelmenstar.projktSens.weather.app.ui.ComplexWeatherView
@@ -67,7 +67,10 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
         initRes()
 
-        val component: AppComponent = DaggerAppComponent.create()
+        val component: AppComponent = DaggerAppComponent
+            .builder()
+            .appModule(AppModule(this))
+            .build()
 
         prettyDateFormatter = component.prettyDateFormatter()
         unitFormatter = component.unitFormatter()

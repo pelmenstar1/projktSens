@@ -3,7 +3,6 @@ package com.pelmenstar.projktSens.weather.app.di
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter
-import com.pelmenstar.projktSens.weather.app.ProtoHostResolver
 import com.pelmenstar.projktSens.weather.app.formatters.MoonPhaseFormatter
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
 import com.pelmenstar.projktSens.weather.app.ui.home.HomeContract
@@ -17,7 +16,6 @@ import dagger.Component
 
 @Component(modules = [AppModule::class])
 interface AppComponent {
-    fun protoHostResolver(): ProtoHostResolver
     fun homePresenter(): HomeContract.Presenter
     fun sunriseSunsetCalendarPresenter(): SunriseSunsetCalendarContract.Presenter
     fun moonCalendarPresenter(): MoonCalendarContract.Presenter

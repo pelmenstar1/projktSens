@@ -17,6 +17,8 @@ import com.pelmenstar.projktSens.shared.time.ShortDateInt
 import com.pelmenstar.projktSens.shared.time.TimeConstants
 import com.pelmenstar.projktSens.weather.app.PreferredUnits
 import com.pelmenstar.projktSens.weather.app.R
+import com.pelmenstar.projktSens.weather.app.di.AppComponent
+import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.formatters.UnitChartValueFormatter
 import com.pelmenstar.projktSens.weather.models.*
@@ -25,15 +27,20 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
     @ShortDateInt
     private var date = 0
 
+    private lateinit var appComponent: AppComponent
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val intent = requireIntent()
         date = intent.getIntExtra(EXTRA_DATE, 0)
 
-        actionBar {
-            val component = DaggerAppComponent.create()
+        appComponent = DaggerAppComponent
+            .builder()
+            .appModule(AppModule(this))
+            .build()
 
+        actionBar {
             setDisplayHomeAsUpEnabled(true)
-            title = component.prettyDateFormatter().prettyFormat(date)
+            title = appComponent.prettyDateFormatter().prettyFormat(date)
         }
 
         super.onCreate(savedInstanceState)
@@ -51,7 +58,7 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
         val minColor = ResourcesCompat.getColor(res, R.color.chartMinColor, theme)
         val maxColor = ResourcesCompat.getColor(res, R.color.chartMaxColor, theme)
 
-        val unitFormatter = DaggerAppComponent.create().unitFormatter()
+        val unitFormatter = appComponent.unitFormatter()
 
         val prefUnits = PreferredUnits.getUnits()
         val prefTempUnit = ValueUnitsPacked.getTemperatureUnit(prefUnits)
