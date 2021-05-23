@@ -1,6 +1,8 @@
 package com.pelmenstar.projktSens.serverProtocol.repo
 
-import com.pelmenstar.projktSens.serverProtocol.*
+import com.pelmenstar.projktSens.serverProtocol.Errors
+import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig
+import com.pelmenstar.projktSens.serverProtocol.ServerException
 import com.pelmenstar.projktSens.shared.connectSuspend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -11,7 +13,7 @@ import java.net.Socket
 /**
  * Represents client for repo-server
  */
-class RepoClient(config: ProtoConfig) {
+class RepoClient(config: HostedProtoConfig) {
     private val repoContract = config.repoContract
     private val repoAddress: InetSocketAddress = config.socketAddress { repoServerPort }
 

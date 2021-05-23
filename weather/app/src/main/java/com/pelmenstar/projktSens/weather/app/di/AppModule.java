@@ -3,14 +3,17 @@ package com.pelmenstar.projktSens.weather.app.di;
 import android.content.Context;
 import android.content.res.Resources;
 
-import com.pelmenstar.projktSens.serverProtocol.DefaultProtoConfig;
-import com.pelmenstar.projktSens.serverProtocol.ProtoConfig;
 import com.pelmenstar.projktSens.serverProtocol.AvailabilityProvider;
+import com.pelmenstar.projktSens.serverProtocol.DefaultProtoConfig;
+import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig;
+import com.pelmenstar.projktSens.serverProtocol.ProtoConfig;
 import com.pelmenstar.projktSens.shared.geo.ConstGeolocationProvider;
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider;
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter;
+import com.pelmenstar.projktSens.weather.app.LocalHostProtoHostResolver;
 import com.pelmenstar.projktSens.weather.app.NetworkDataSource;
 import com.pelmenstar.projktSens.weather.app.NetworkWeatherChannelInfoProvider;
+import com.pelmenstar.projktSens.weather.app.ProtoHostResolver;
 import com.pelmenstar.projktSens.weather.app.R;
 import com.pelmenstar.projktSens.weather.app.ServerAvailabilityProvider;
 import com.pelmenstar.projktSens.weather.app.formatters.MoonPhaseFormatter;
@@ -30,6 +33,8 @@ import com.pelmenstar.projktSens.weather.models.astro.MoonInfoProvider;
 import com.pelmenstar.projktSens.weather.models.astro.SunInfoProvider;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.net.InetAddress;
 
 import dagger.Module;
 import dagger.Provides;
@@ -55,10 +60,14 @@ public final class AppModule {
         prettyDateFormatter = new ResourcesPrettyDateFormatter(resources);
         unitFormatter = new UnitFormatter(resources.getStringArray(R.array.units), prettyDateFormatter);
         moonPhaseFormatter = new MoonPhaseFormatter(resources.getStringArray(R.array.moonPhases));
-        dataSource = new NetworkDataSource(DefaultProtoConfig.INSTANCE);
-        weatherChannelInfoProvider = new NetworkWeatherChannelInfoProvider(DefaultProtoConfig.INSTANCE);
-        serverAvailabilityProvider = new ServerAvailabilityProvider(DefaultProtoConfig.INSTANCE);
-        //geoProvider = new DeviceGeolocationProvider(appContext);
+
+        ProtoHostResolver hostResolver = LocalHostProtoHostResolver.INSTANCE;
+        InetAddress host = hostResolver.getHost();
+        HostedProtoConfig hostedProtoConfig = new HostedProtoConfig(host, DefaultProtoConfig.INSTANCE);
+
+        dataSource = new NetworkDataSource(hostedProtoConfig);
+        weatherChannelInfoProvider = new NetworkWeatherChannelInfoProvider(hostedProtoConfig);
+        serverAvailabilityProvider = new ServerAvailabilityProvider(hostedProtoConfig);
     }
 
     @Provides
@@ -137,5 +146,11 @@ public final class AppModule {
     @NotNull
     public ProtoConfig protoConfig() {
         return DefaultProtoConfig.INSTANCE;
+    }
+
+    @Provides
+    @NotNull
+    public ProtoHostResolver protoHostResolver() {
+        return LocalHostProtoHostResolver.INSTANCE;
     }
 }

@@ -22,12 +22,14 @@ abstract class ServerBase protected constructor(
 
     private val address: InetSocketAddress
 
-    protected val log: Logger = Logger(javaClass.simpleName, serverConfig.loggerConfig)
+    protected val log: Logger
 
     init {
+        val serverConfig = serverConfig
         val protoConfig = serverConfig.protoConfig
 
-        address = InetSocketAddress(protoConfig.serverIp, port(protoConfig))
+        log = Logger(javaClass.simpleName, serverConfig.loggerConfig)
+        address = InetSocketAddress(serverConfig.host, port(protoConfig))
     }
 
     /**

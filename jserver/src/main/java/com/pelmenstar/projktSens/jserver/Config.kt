@@ -6,6 +6,7 @@ import com.pelmenstar.projktSens.serverProtocol.DefaultProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.weather.models.WeatherInfoProvider
 import com.pelmenstar.projktSens.weather.models.WeatherRepository
+import java.net.InetAddress
 
 private var _serverConfig: Config? = null
 var serverConfig: Config
@@ -15,6 +16,7 @@ var serverConfig: Config
     }
 
 abstract class Config {
+    abstract val host: InetAddress
     abstract val protoConfig: ProtoConfig
     abstract val sharedRepo: WeatherRepository
     abstract val weatherProvider: WeatherInfoProvider
@@ -22,13 +24,17 @@ abstract class Config {
 }
 
 class MainConfig(context: Context): Config() {
+    override val host: InetAddress = InetUtils.getInetAddress(context)
+        ?: throw RuntimeException("Device is not connected to internet")
+
     override val protoConfig
         get() = DefaultProtoConfig
 
     override val sharedRepo = DbServerWeatherRepository.file(context)
-    override val weatherProvider = SensorWeatherProvider(protoConfig)
+    override val weatherProvider = SensorWeatherProvider()
     override val loggerConfig = LoggerConfig(
         AndroidLogDelegate,
         LogLevel.DEBUG
     )
+
 }
