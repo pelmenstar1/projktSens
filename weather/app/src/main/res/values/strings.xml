@@ -37,6 +37,9 @@
     <string name="settings">Налаштування</string>
     <string name="save_settings">Зберегти</string>
 
+    <string name="serverHost">Сервер</string>
+    <string name="serverIsNotAvailable_settings">Неправильна адреса</string>
+
     <string-array name="months">
         <item>Січень</item>
         <item>Лютий</item>

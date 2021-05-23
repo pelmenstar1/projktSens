@@ -2,16 +2,20 @@ package com.pelmenstar.projktSens.weather.app.ui.settings
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import androidx.annotation.ArrayRes
 import androidx.appcompat.widget.AppCompatSpinner
+import androidx.core.widget.addTextChangedListener
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
+import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.weather.app.Preferences
 import com.pelmenstar.projktSens.weather.app.PreferredUnits
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.models.ValueUnit
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
+import java.net.InetAddress
 
 abstract class Setting<TState : Any> {
     private var _state: TState? = null
@@ -131,6 +135,57 @@ class PressureSetting: Setting<ValueUnitState>() {
 
         state = ValueUnitState(ValueUnitsPacked.getPressureUnit(units))
     }
+}
+
+data class ServerHostState(var hostString: String, var host: InetAddress)
+
+class ServerHostSetting: Setting<ServerHostState>() {
+    override fun getName(context: Context): String {
+        return context.resources.getString(R.string.serverHost)
+    }
+
+    override fun createView(context: Context): View {
+        val invalidAddressStr = context.resources.getString(R.string.serverIsNotAvailable_settings)
+
+        return LinearLayout(context) {
+            layoutParams = ViewGroup.LayoutParams(
+                MATCH_PARENT,
+                WRAP_CONTENT
+            )
+            orientation = android.widget.LinearLayout.HORIZONTAL
+
+            EditText {
+                linearLayoutParams(300, WRAP_CONTENT)
+
+                setText(state.hostString)
+                addTextChangedListener {
+                    val text = text?.toString() ?: ""
+                    var address: InetAddress? = null
+
+                    try {
+                        address = InetAddress.getByName(text)
+                    } catch (e: Exception) {
+                    }
+
+                    if(address != null) {
+                        state.host = address
+                        state.hostString = text
+                    } else {
+                        error = invalidAddressStr
+                    }
+                }
+            }
+        }
+    }
+
+    override fun saveState(prefs: Preferences) {
+        prefs.setServerHost(state.host, state.hostString)
+    }
+
+    override fun loadState(prefs: Preferences) {
+        state = ServerHostState(prefs.serverHostString, prefs.serverHost)
+    }
+
 }
 
 private fun simpleArrayAdapter(context: Context, @ArrayRes resId: Int): ReadonlyArrayAdapter<String> {

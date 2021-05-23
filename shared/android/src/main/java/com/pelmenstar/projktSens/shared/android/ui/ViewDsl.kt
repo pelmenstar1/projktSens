@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
@@ -166,6 +167,14 @@ inline fun ViewGroup.TransitionView(block: TransitionView.() -> Unit) {
     }
 
     addApply(TransitionView(context), block)
+}
+
+inline fun ViewGroup.EditText(block: AppCompatEditText.() -> Unit) {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
+    addApply(AppCompatEditText(context), block)
 }
 
 inline fun LinearLayout(context: Context, block: LinearLayout.() -> Unit): LinearLayout {

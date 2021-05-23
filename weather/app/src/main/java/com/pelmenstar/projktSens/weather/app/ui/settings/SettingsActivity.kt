@@ -18,7 +18,8 @@ import com.pelmenstar.projktSens.weather.app.R
 class SettingsActivity : HomeButtonSupportActivity() {
     private val settings: Array<Setting<*>> = arrayOf(
         TemperatureSetting(),
-        PressureSetting()
+        PressureSetting(),
+        ServerHostSetting()
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
