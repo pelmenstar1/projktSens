@@ -35,6 +35,7 @@
     <string name="initCalendar_errorMsg">Не вдалося інітіалізувати календар</string>
 
     <string name="settings">Налаштування</string>
+    <string name="save_settings">Зберегти</string>
 
     <string-array name="months">
         <item>Січень</item>

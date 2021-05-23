@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.ArrayAdapter
 import androidx.annotation.ArrayRes
 import androidx.appcompat.widget.AppCompatSpinner
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
@@ -14,27 +13,34 @@ import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.models.ValueUnit
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
 
-interface Setting {
-    fun getName(context: Context): String
+abstract class Setting<TState : Any> {
+    private var _state: TState? = null
+    protected var state: TState
+        get() = _state ?: throw RuntimeException("State is not loaded")
+        set(value) {
+            _state = value
+        }
 
-    fun createView(context: Context): View
+    abstract fun getName(context: Context): String
+    abstract fun createView(context: Context): View
+
+    abstract fun loadState(prefs: Preferences)
+    abstract fun saveState(prefs: Preferences)
 }
 
-object TemperatureSetting: Setting {
+data class ValueUnitState(var unit: Int)
+
+class TemperatureSetting: Setting<ValueUnitState>() {
     override fun getName(context: Context): String {
         return context.resources.getString(R.string.temperature)
     }
 
     override fun createView(context: Context): View {
-        val prefs = Preferences.of(context)
-        val prefUnits = prefs.units
-        val pressUnit = ValueUnitsPacked.getPressureUnit(prefUnits)
-
         return AppCompatSpinner(context).apply {
             adapter = simpleArrayAdapter(context, R.array.temperatureUnits)
 
             setSelection(
-                when (ValueUnitsPacked.getTemperatureUnit(prefs.units)) {
+                when (state.unit) {
                     ValueUnit.CELSIUS -> 0
                     ValueUnit.KELVIN -> 1
                     ValueUnit.FAHRENHEIT -> 2
@@ -49,39 +55,44 @@ object TemperatureSetting: Setting {
                     position: Int,
                     id: Long
                 ) {
-                    val tempUnit = when (position) {
+                    state.unit = when (position) {
                         0 -> ValueUnit.CELSIUS
                         1 -> ValueUnit.KELVIN
                         2 -> ValueUnit.FAHRENHEIT
 
                         else -> return
                     }
-
-                    val units = ValueUnitsPacked.create(tempUnit, pressUnit)
-                    prefs.units = units
-                    PreferredUnits.setUnits(units)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
         }
     }
+
+    override fun saveState(prefs: Preferences) {
+        val pressUnit = ValueUnitsPacked.getPressureUnit(PreferredUnits.getUnits())
+        val newUnits = ValueUnitsPacked.create(state.unit, pressUnit)
+
+        PreferredUnits.setUnits(newUnits)
+        prefs.units = newUnits
+    }
+
+    override fun loadState(prefs: Preferences) {
+        val units = prefs.units
+        state = ValueUnitState(ValueUnitsPacked.getTemperatureUnit(units))
+    }
 }
 
-object PressureSetting: Setting {
+class PressureSetting: Setting<ValueUnitState>() {
     override fun getName(context: Context): String {
         return context.resources.getString(R.string.pressure)
     }
 
     override fun createView(context: Context): View {
-        val prefs = Preferences.of(context)
-        val prefUnits = prefs.units
-        val tempUnit = ValueUnitsPacked.getTemperatureUnit(prefUnits)
-
         return AppCompatSpinner(context).apply {
             adapter = simpleArrayAdapter(context, R.array.pressureUnits)
 
-            setSelection(when(ValueUnitsPacked.getPressureUnit(prefUnits)) {
+            setSelection(when(state.unit) {
                 ValueUnit.MM_OF_MERCURY -> 0
                 ValueUnit.PASCAL -> 1
                 else -> throw IllegalStateException("Illegal prefs")
@@ -94,22 +105,31 @@ object PressureSetting: Setting {
                     position: Int,
                     id: Long
                 ) {
-                    val pressUnit = when (position) {
+                    state.unit = when (position) {
                         0 -> ValueUnit.MM_OF_MERCURY
                         1 -> ValueUnit.PASCAL
 
                         else -> return
                     }
-
-                    val units = ValueUnitsPacked.create(tempUnit, pressUnit)
-
-                    prefs.units = units
-                    PreferredUnits.setUnits(units)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
         }
+    }
+
+    override fun saveState(prefs: Preferences) {
+        val tempUnit = ValueUnitsPacked.getTemperatureUnit(PreferredUnits.getUnits())
+        val newUnits = ValueUnitsPacked.create(tempUnit, state.unit)
+
+        PreferredUnits.setUnits(newUnits)
+        prefs.units = newUnits
+    }
+
+    override fun loadState(prefs: Preferences) {
+        val units = prefs.units
+
+        state = ValueUnitState(ValueUnitsPacked.getPressureUnit(units))
     }
 }
 

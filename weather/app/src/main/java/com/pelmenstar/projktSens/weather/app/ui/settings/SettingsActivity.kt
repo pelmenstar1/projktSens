@@ -12,9 +12,15 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import androidx.core.content.res.ResourcesCompat
 import com.pelmenstar.projktSens.shared.android.ui.*
+import com.pelmenstar.projktSens.weather.app.Preferences
 import com.pelmenstar.projktSens.weather.app.R
 
 class SettingsActivity : HomeButtonSupportActivity() {
+    private val settings: Array<Setting<*>> = arrayOf(
+        TemperatureSetting(),
+        PressureSetting()
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val res = resources
@@ -23,6 +29,9 @@ class SettingsActivity : HomeButtonSupportActivity() {
             title = res.getText(R.string.settings)
             setDisplayHomeAsUpEnabled(true)
         }
+
+        val prefs = Preferences.of(this)
+        settings.forEach { it.loadState(prefs) }
 
         content {
             val dp5 = (5 * res.displayMetrics.density).toInt()
@@ -61,6 +70,22 @@ class SettingsActivity : HomeButtonSupportActivity() {
                     }
                 }
 
+                Button {
+                    frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
+                        gravity = Gravity.BOTTOM or Gravity.END
+                        rightMargin = dp5
+                        bottomMargin = dp5
+                    }
+                    text = res.getText(R.string.save_settings)
+
+                    setOnClickListener {
+                        settings.forEach {
+                            it.saveState(prefs)
+                        }
+                        finish()
+                    }
+                }
+
                 TextView {
                     frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
                         gravity = Gravity.BOTTOM or Gravity.START
@@ -83,11 +108,6 @@ class SettingsActivity : HomeButtonSupportActivity() {
     }
 
     companion object {
-        private val settings = arrayOf(
-            TemperatureSetting,
-            PressureSetting
-        )
-
         @JvmStatic
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)
