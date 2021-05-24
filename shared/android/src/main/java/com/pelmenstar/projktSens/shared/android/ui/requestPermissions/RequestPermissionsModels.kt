@@ -6,6 +6,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.pelmenstar.projktSens.shared.add
 import com.pelmenstar.projktSens.shared.android.readNonNullString
+import com.pelmenstar.projktSens.shared.appendArray
 import com.pelmenstar.projktSens.shared.equalsPattern
 
 class ModePermissionArray : Parcelable {
@@ -43,6 +44,22 @@ class ModePermissionArray : Parcelable {
         var result = mode
         result = 31 * result + androidPermissions.contentHashCode()
         return result
+    }
+
+    override fun toString(): String {
+        return buildString {
+            append("{mode=")
+            append(when(mode) {
+                MODE_ANY -> "ANY"
+                MODE_EVERY -> "EVERY"
+
+                else -> ""
+            })
+
+            append(", androidPermissions=")
+            appendArray(androidPermissions)
+            append('}')
+        }
     }
 
     companion object {
@@ -93,6 +110,10 @@ class RequestPermissionInfo : Parcelable {
         return result
     }
 
+    override fun toString(): String {
+        return "{userDescription=$userDescription, modePermissions=$modePermissions}"
+    }
+
     companion object {
         @JvmField
         val CREATOR = object : Parcelable.Creator<RequestPermissionInfo> {
@@ -128,6 +149,12 @@ class RequestPermissionsContext: Parcelable {
 
     override fun hashCode(): Int {
         return permissions.contentHashCode()
+    }
+
+    override fun toString(): String {
+        return buildString {
+            appendArray(permissions)
+        }
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
