@@ -72,8 +72,21 @@ class ModePermissionArray : Parcelable {
             override fun newArray(size: Int) = arrayOfNulls<ModePermissionArray>(size)
         }
 
-        fun anyOf(vararg androidPermissions: String) = ModePermissionArray(MODE_ANY, androidPermissions)
-        fun everyOf(vararg androidPermissions: String) = ModePermissionArray(MODE_EVERY, androidPermissions)
+        fun anyOf(vararg androidPermissions: String): ModePermissionArray {
+            return ModePermissionArray(MODE_ANY, androidPermissions)
+        }
+
+        fun everyOf(vararg androidPermissions: String): ModePermissionArray {
+            return ModePermissionArray(MODE_EVERY, androidPermissions)
+        }
+
+        fun anyOfArray(androidPermissions: Array<out String>): ModePermissionArray {
+            return ModePermissionArray(MODE_ANY, androidPermissions)
+        }
+
+        fun everyOfArray(androidPermissions: Array<out String>): ModePermissionArray {
+            return ModePermissionArray(MODE_EVERY, androidPermissions)
+        }
     }
 }
 
@@ -178,8 +191,12 @@ class RequestPermissionsContext: Parcelable {
 
 class RequestPermissionsContextBuilder {
     object PermissionArrayModeSelect {
-        fun anyOf(vararg permissions: String) = ModePermissionArray(ModePermissionArray.MODE_ANY, permissions)
-        fun everyOf(vararg permissions: String) = ModePermissionArray(ModePermissionArray.MODE_EVERY, permissions)
+        fun anyOf(vararg permissions: String): ModePermissionArray {
+            return ModePermissionArray.anyOfArray(permissions)
+        }
+        fun everyOf(vararg permissions: String): ModePermissionArray {
+            return ModePermissionArray.everyOfArray(permissions)
+        }
     }
 
     @JvmField
