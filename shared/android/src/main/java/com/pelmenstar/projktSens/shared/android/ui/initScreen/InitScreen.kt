@@ -22,7 +22,6 @@ import com.pelmenstar.projktSens.shared.android.TransparentDrawable
 import com.pelmenstar.projktSens.shared.android.ui.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
-import java.lang.Runnable
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.system.exitProcess
 
@@ -278,7 +277,7 @@ open class InitScreen(private val initContext: InitContext) : DialogFragment() {
                 try {
                     val result: InitTask.Result
 
-                    withTimeout(task.timeout.toLong()) {
+                    withTimeout(task.timeout) {
                         result = task.runner()
                     }
 

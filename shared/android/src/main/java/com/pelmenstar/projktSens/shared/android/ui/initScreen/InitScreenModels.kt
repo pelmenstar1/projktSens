@@ -19,11 +19,11 @@ typealias InitTaskRunner = suspend () -> InitTask.Result
  * @param isRequired `true`, if it is necessary for task to be executed, `false`, if not
  * @param runner block of code to run
  */
-class InitTask(val id: Int, timeout: Int = 10 * 1000, val isRequired: Boolean = false, val runner: InitTaskRunner) {
+class InitTask(val id: Int, timeout: Long = 10 * 1000, val isRequired: Boolean = false, val runner: InitTaskRunner) {
     /**
      * Timeout
      */
-    val timeout: Int
+    val timeout: Long
 
     init {
         if(timeout <= 0) {
@@ -57,7 +57,7 @@ class InitTask(val id: Int, timeout: Int = 10 * 1000, val isRequired: Boolean = 
     override fun hashCode(): Int {
         var result = id
         result = 31 * result + if (isRequired) 1 else 0
-        result = 31 * result + (timeout xor (timeout shl 32))
+        result = 31 * result + (timeout xor (timeout shl 32)).toInt()
         result = 31 * result + runner.hashCode()
 
         return result
@@ -96,11 +96,16 @@ class InitContextBuilder {
 
     inline fun InitTask(
         id: Int,
-        timeout: Int = 10 * 1000,
+        timeout: Long = 10 * 1000,
         required: Boolean = false,
         noinline runner: InitTaskRunner
     ) {
-        val task = com.pelmenstar.projktSens.shared.android.ui.initScreen.InitTask(id, timeout, required, runner)
+        val task = com.pelmenstar.projktSens.shared.android.ui.initScreen.InitTask(
+            id,
+            timeout,
+            required,
+            runner
+        )
 
         _tasks = _tasks.add(task)
     }
