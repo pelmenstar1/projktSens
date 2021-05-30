@@ -3,7 +3,7 @@ buildscript {
     ext.min_sdk_version = 21
     ext.build_tools_version = '30.0.2'
     ext.compile_sdk_version = 30
-    ext.kotlin_version = '1.5.0'
+    ext.kotlin_version = '1.5.10'
 
     repositories {
         google()
