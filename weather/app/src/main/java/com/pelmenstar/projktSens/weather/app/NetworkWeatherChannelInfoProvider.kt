@@ -8,7 +8,7 @@ import com.pelmenstar.projktSens.weather.models.WeatherChannelInfoProvider
 import java.net.Socket
 
 class NetworkWeatherChannelInfoProvider(config: HostedProtoConfig) : WeatherChannelInfoProvider {
-    private val address = config.socketAddress { serverStatusPort }
+    private val address = config.socketAddress { weatherChannelInfoPort }
     override val receiveInterval: Long = config.weatherChannelReceiveInterval.toLong()
 
     override suspend fun getWaitTimeForNextWeather(): Long {

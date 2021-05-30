@@ -8,11 +8,10 @@ object DefaultProtoConfig: ProtoConfig {
         get() = 10001
     override val weatherChannelInfoPort: Int
         get() = 10002
-    override val serverStatusPort: Int
-        get() = 10003
 
     override val weatherChannelReceiveInterval: Int
         get() = 10000
+
     override val repoContract: RepoContract
         get() = RawRepoContract
 }
