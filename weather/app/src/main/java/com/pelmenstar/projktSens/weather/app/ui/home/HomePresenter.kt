@@ -4,8 +4,6 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
-import com.pelmenstar.projktSens.serverProtocol.AvailabilityProvider
-import com.pelmenstar.projktSens.serverProtocol.ServerStatus
 import com.pelmenstar.projktSens.shared.android.Message
 import com.pelmenstar.projktSens.shared.android.mvp.BasePresenter
 import com.pelmenstar.projktSens.shared.android.ui.initScreen.InitContext
@@ -30,15 +28,13 @@ class HomePresenter(
     private val moonInfoProvider: MoonInfoProvider,
     private val geoProvider: GeolocationProvider,
     private val dataSource: WeatherDataSource,
-    private val weatherChannelInfoProvider: WeatherChannelInfoProvider,
-    private val availabilityProvider: AvailabilityProvider
+    private val weatherChannelInfoProvider: WeatherChannelInfoProvider
 ) : BasePresenter<HomeContract.View>(), HomeContract.Presenter {
     private val mainThread = MainThreadHandler(this)
     private val scope = CoroutineScope(Dispatchers.Default)
 
     private var refreshAstroJob: Job? = null
     private var weatherChannelJob: Job? = null
-    private var checkServerAvailability: Job? = null
 
     @Volatile
     private var isInUnavailableState = false
@@ -74,7 +70,6 @@ class HomePresenter(
 
     override fun onInitEnded() {
         connectToWeatherChannel()
-        startCheckingServerAvailability()
         startRefreshingAstro()
     }
 
@@ -137,24 +132,6 @@ class HomePresenter(
             arg1 = sunrise
             arg2 = sunset
         })
-    }
-
-    private fun startCheckingServerAvailability() {
-        checkServerAvailability = scope.launch(Dispatchers.IO) {
-            while (isActive) {
-                val status = availabilityProvider.getStatus()
-
-                if (status == ServerStatus.AVAILABLE) {
-                    if (isInUnavailableState) {
-                        postOnServerAvailable()
-                    }
-                } else {
-                    postOnServerUnavailable()
-                }
-
-                delay(5000)
-            }
-        }
     }
 
     override fun connectToWeatherChannel() {

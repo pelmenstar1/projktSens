@@ -8,28 +8,24 @@ import kotlinx.coroutines.launch
 class Controller(private val config: Config) {
     private val repoServer: RepoServer
     private val weatherChannelInfoServer: WeatherChannelInfoServer
-    private val statusServer: StatusServer
 
     init {
         serverConfig = config
 
         repoServer = RepoServer()
         weatherChannelInfoServer = WeatherChannelInfoServer()
-        statusServer = StatusServer()
     }
 
     fun startAll() {
         WeatherMonitor.start()
         repoServer.start()
         weatherChannelInfoServer.start()
-        statusServer.start()
     }
 
     fun stopAll() {
         WeatherMonitor.stop()
         repoServer.stop()
         weatherChannelInfoServer.stop()
-        statusServer.stop()
     }
 
     fun clearRepository() {

@@ -17,11 +17,6 @@ interface ProtoConfig {
     val weatherChannelInfoPort: Int
 
     /**
-     * Port of server status server
-     */
-    val serverStatusPort: Int
-
-    /**
      * Interval of refreshing weather-info and putting it to data repository
      */
     val weatherChannelReceiveInterval: Int
