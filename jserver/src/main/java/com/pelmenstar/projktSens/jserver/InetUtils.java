@@ -14,7 +14,12 @@ public final class InetUtils {
 
     @Nullable
     public static InetAddress getInetAddress(@NotNull Context context) {
-        WifiManager manager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        Context appContext = context.getApplicationContext();
+        if(appContext == null) {
+            appContext = context;
+        }
+
+        WifiManager manager = (WifiManager) appContext.getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = manager.getConnectionInfo();
         if (info != null) {
             int i = info.getIpAddress();

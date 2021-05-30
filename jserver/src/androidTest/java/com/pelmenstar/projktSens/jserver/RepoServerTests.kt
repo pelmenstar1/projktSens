@@ -2,8 +2,8 @@ package com.pelmenstar.projktSens.jserver
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.pelmenstar.projktSens.serverProtocol.DefaultProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.Errors
+import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoClient
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoResponse
@@ -229,14 +229,17 @@ class RepoServerTests {
 
     companion object {
         private val context = InstrumentationRegistry.getInstrumentation().context
-        private val client = RepoClient(DefaultProtoConfig)
+        private lateinit var client: RepoClient
         private lateinit var repo: WeatherRepository
         private lateinit var repoServer: RepoServer
 
         @BeforeClass
         @JvmStatic
         fun before() {
-            serverConfig = TestConfig(context)
+            val config = TestConfig(context)
+            serverConfig = config
+            client = RepoClient(HostedProtoConfig(config.host, config.protoConfig))
+
             repo = serverConfig.sharedRepo
             repoServer = RepoServer().also {
                 it.start()
