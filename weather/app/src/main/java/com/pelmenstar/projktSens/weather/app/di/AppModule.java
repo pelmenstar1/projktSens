@@ -13,7 +13,6 @@ import com.pelmenstar.projktSens.weather.app.NetworkDataSource;
 import com.pelmenstar.projktSens.weather.app.NetworkWeatherChannelInfoProvider;
 import com.pelmenstar.projktSens.weather.app.Preferences;
 import com.pelmenstar.projktSens.weather.app.R;
-import com.pelmenstar.projktSens.weather.app.ServerAvailabilityProvider;
 import com.pelmenstar.projktSens.weather.app.formatters.MoonPhaseFormatter;
 import com.pelmenstar.projktSens.weather.app.formatters.ResourcesPrettyDateFormatter;
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter;
@@ -74,8 +73,7 @@ public final class AppModule {
                 moonInfoProvider(),
                 geolocationProvider(),
                 dataSource(),
-                weatherChannelInfoProvider(),
-                new ServerAvailabilityProvider(hostedProtoConfig()));
+                weatherChannelInfoProvider());
     }
 
     @Provides
