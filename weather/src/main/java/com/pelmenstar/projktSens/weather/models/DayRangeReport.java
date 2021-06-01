@@ -3,14 +3,13 @@ package com.pelmenstar.projktSens.weather.models;
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
 import com.pelmenstar.projktSens.shared.MyMath;
 import com.pelmenstar.projktSens.shared.StringUtils;
-import com.pelmenstar.projktSens.shared.serialization.ValueReader;
-import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer;
 import com.pelmenstar.projktSens.shared.serialization.Serializable;
 import com.pelmenstar.projktSens.shared.serialization.ValidationException;
+import com.pelmenstar.projktSens.shared.serialization.ValueReader;
+import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 import com.pelmenstar.projktSens.shared.time.ShortDate;
 import com.pelmenstar.projktSens.shared.time.ShortDateInt;
-import com.pelmenstar.projktSens.shared.time.ShortDateTime;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -289,36 +288,9 @@ public final class DayRangeReport extends AppendableToStringBuilder {
             medianPress = pressValues[mid];
         }
 
-        float tempSumSqDiff = 0;
-        float humSumSqDiff = 0;
-        float pressSumSqDiff = 0;
-
-        for(int i = 0; i < length; i++) {
-            float temp = tempValues[i];
-            float hum = humValues[i];
-            float press = pressValues[i];
-
-            float tempDiff = Math.abs(temp - avgTemp);
-            float humDiff = Math.abs(hum - avgHum);
-            float pressDiff = Math.abs(press - avgPress);
-
-            tempSumSqDiff += tempDiff * tempDiff;
-            humSumSqDiff += humDiff * humDiff;
-            pressSumSqDiff += pressDiff * pressDiff;
-        }
-
-        float tempStdDev = (float)Math.sqrt(tempSumSqDiff * invLength);
-        float humStdDev = (float)Math.sqrt(humSumSqDiff * invLength);
-        float pressStdDev = (float)Math.sqrt(pressSumSqDiff * invLength);
-
-        float invSqrtLength = (float)Math.sqrt(invLength);
-        float tempStdErr = tempStdDev * invSqrtLength;
-        float humStdErr = humStdDev * invSqrtLength;
-        float pressStdErr = pressStdDev * invSqrtLength;
-
-        ParameterStats tempStats = new ParameterStats(minTemp, maxTemp, avgTemp, medianTemp, tempStdDev, tempStdErr);
-        ParameterStats humStats = new ParameterStats(minHum, maxHum, avgHum, medianHum, humStdDev, humStdErr);
-        ParameterStats pressStats = new ParameterStats(minPress, maxPress, avgPress, medianPress, pressStdDev, pressStdErr);
+        ParameterStats tempStats = new ParameterStats(minTemp, maxTemp, avgTemp, medianTemp);
+        ParameterStats humStats = new ParameterStats(minHum, maxHum, avgHum, medianHum);
+        ParameterStats pressStats = new ParameterStats(minPress, maxPress, avgPress, medianPress);
 
         ReportStats stats = new ReportStats(
                 ValueUnitsPacked.CELSIUS_MM_OF_MERCURY,

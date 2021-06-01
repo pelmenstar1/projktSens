@@ -66,8 +66,6 @@ object TestData {
             value(unit),
             value(unit),
             value(unit),
-            value(unit),
-            value(unit),
             value(unit)
         )
     }
