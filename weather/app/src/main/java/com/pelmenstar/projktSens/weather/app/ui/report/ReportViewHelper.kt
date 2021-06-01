@@ -24,9 +24,7 @@ private class ParameterStatsPrefixStrings(
     val min: String,
     val max: String,
     val avg: String,
-    val median: String,
-    val stdDev: String,
-    val stdErr: String,
+    val median: String
 )
 
 private class ChartViewCreationContext(
@@ -89,8 +87,6 @@ private fun ViewGroup.ParamStatsBlock(
     ValueParamView(strings.max, paramStats.max, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
     ValueParamView(strings.avg, paramStats.avg, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
     ValueParamView(strings.median, paramStats.median, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
-    ValueParamView(strings.stdDev, paramStats.stdDev, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
-    ValueParamView(strings.stdErr, paramStats.stdErr, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
 
     MaterialChart {
         val chartSideMargin = creationContext.chartSideMargin
@@ -142,9 +138,7 @@ fun createChartView(
         res.getString(R.string.min),
         res.getString(R.string.max),
         res.getString(R.string.avg),
-        res.getString(R.string.median),
-        res.getString(R.string.stdDev),
-        res.getString(R.string.stdErr),
+        res.getString(R.string.median)
     )
 
     val creationContext = ChartViewCreationContext(

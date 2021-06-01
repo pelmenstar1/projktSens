@@ -22,8 +22,6 @@
     <string name="max">Максимум</string>
     <string name="avg">Середнє значення</string>
     <string name="median">Медіана</string>
-    <string name="stdDev">Станд. відх.</string>
-    <string name="stdErr">Станд. помилка</string>
 
     <string name="noData">Ммм… Так пусто</string>
     <string name="errorOccurred">Упс… Помилка</string>
