@@ -1,8 +1,8 @@
 package com.pelmenstar.projktSens.serverProtocol.repo
 
 import com.pelmenstar.projktSens.serverProtocol.Errors
-import com.pelmenstar.projktSens.shared.*
-import java.lang.StringBuilder
+import com.pelmenstar.projktSens.shared.AppendableToStringBuilder
+import com.pelmenstar.projktSens.shared.equalsPattern
 
 /**
  * Represents all possible types of response returned by repo-server
@@ -51,26 +51,21 @@ sealed class RepoResponse: AppendableToStringBuilder() {
      * Response with value paired with its class.
      * This class has private constructor, so static methods [Companion.ok] should be used
      */
-    class Ok<T:Any> internal constructor(val value: T, val valueClass: Class<T>): RepoResponse() {
+    class Ok<T:Any> internal constructor(val value: T): RepoResponse() {
         override fun append(sb: StringBuilder) {
             sb.append("{ Value=")
             sb.append(value)
-            sb.append("; ValueClass=")
-            sb.append(valueClass)
             sb.append('}')
         }
 
         override fun equals(other: Any?): Boolean {
             return equalsPattern(other) { o ->
-                value == o.value && valueClass == o.valueClass
+                value == o.value
             }
         }
 
         override fun hashCode(): Int {
-            var result = value.hashCode()
-            result = 31 * result + valueClass.hashCode()
-
-            return result
+            return value.hashCode()
         }
     }
 
@@ -98,24 +93,12 @@ sealed class RepoResponse: AppendableToStringBuilder() {
         }
 
         /**
-         * Creates response with value and its class
-         *
-         * @param value value of response
-         * @param valueClass class of [value]
-         */
-        fun<T:Any> ok(value: T, valueClass: Class<T>): Ok<T> {
-            return Ok(value, valueClass)
-        }
-
-        /**
-         * Creates response with value and its class.
-         * Note that generic parameter of this method is marked as reified,
-         * so type of [value] should be known in compile-time
+         * Creates OK response
          *
          * @param value value of response
          */
-        inline fun<reified T:Any> ok(value: T): Ok<T> {
-            return ok(value, T::class.java)
+        fun<T:Any> ok(value: T): Ok<T> {
+            return Ok(value)
         }
 
         /**
@@ -123,7 +106,7 @@ sealed class RepoResponse: AppendableToStringBuilder() {
          * Note that generic parameter of this method is marked as reified,
          * so type of [value] should be known in compile-time
          */
-        inline fun<reified T:Any> okOrEmpty(value: T?): RepoResponse {
+        fun<T:Any> okOrEmpty(value: T?): RepoResponse {
             return if(value != null) ok(value) else Empty
         }
     }

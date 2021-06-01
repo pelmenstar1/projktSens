@@ -1,9 +1,9 @@
 package com.pelmenstar.projktSens.serverProtocol.repo
 
 import com.pelmenstar.projktSens.shared.*
-import com.pelmenstar.projktSens.shared.serialization.ValueWriter
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
 import com.pelmenstar.projktSens.shared.serialization.Serializable
+import com.pelmenstar.projktSens.shared.serialization.ValueWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -99,13 +99,14 @@ object RawRepoContract: RepoContract {
             }
 
             is RepoResponse.Ok<*> -> {
-                val serializer = Serializable.getSerializer(response.valueClass) as ObjectSerializer<Any>
+                val value = response.value
+                val serializer = Serializable.getSerializer(value.javaClass) as ObjectSerializer<Any>
                 val objectSize = serializer.getSerializedObjectSize(response.value)
 
                 output.writeSuspend(buildByteArray(objectSize + 3) {
                     this[0] = STATUS_OK
                     writeShort(1, objectSize.toShort())
-                    serializer.writeObject(response.value,
+                    serializer.writeObject(value,
                         ValueWriter(
                             this,
                             3
@@ -148,7 +149,7 @@ object RawRepoContract: RepoContract {
                 val serializer = Serializable.getSerializer(valueClass)
                 val value = Serializable.ofByteArray(data, serializer)
 
-                RepoResponse.ok(value, valueClass)
+                RepoResponse.ok(value)
             }
             else -> throw IOException("Illegal state of response. $state")
         }
