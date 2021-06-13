@@ -106,7 +106,7 @@ public final class Serializable {
      * @param serializer serializer that will be used to parse data
      */
     @NotNull
-    public static<T> T ofByteArray(@NotNull byte[] data, @NotNull ObjectSerializer<T> serializer) {
+    public static<T> T ofByteArray(byte @NotNull [] data, @NotNull ObjectSerializer<T> serializer) {
         ValueReader reader = new ValueReader(data);
 
         return serializer.readObject(reader);
@@ -117,8 +117,7 @@ public final class Serializable {
      * @param obj some object
      * @param c class of specified object
      */
-    @NotNull
-    public static<T> byte[] toByteArray(@NotNull T obj, @NotNull Class<T> c) {
+    public static<T> byte @NotNull [] toByteArray(@NotNull T obj, @NotNull Class<T> c) {
         return toByteArray(obj, getSerializer(c));
     }
 
@@ -127,8 +126,7 @@ public final class Serializable {
      * @param obj some object
      * @param serializer serializer that will be used to serialize given value
      */
-    @NotNull
-    public static<T> byte[] toByteArray(@NotNull T obj, @NotNull ObjectSerializer<T> serializer) {
+    public static<T> byte @NotNull [] toByteArray(@NotNull T obj, @NotNull ObjectSerializer<T> serializer) {
         byte[] buffer = new byte[serializer.getSerializedObjectSize(obj)];
         ValueWriter writer = new ValueWriter(buffer);
 

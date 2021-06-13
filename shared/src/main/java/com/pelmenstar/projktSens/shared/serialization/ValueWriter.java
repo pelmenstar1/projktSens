@@ -8,8 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * Responsible for writing primitive value to byte buffer
  */
 public final class ValueWriter {
-    @NotNull
-    private final byte[] data;
+    private final byte @NotNull [] data;
     private int position;
 
     /**
@@ -17,7 +16,7 @@ public final class ValueWriter {
      *
      * @param data byte array for reading values
      */
-    public ValueWriter(@NotNull byte[] data) {
+    public ValueWriter(byte @NotNull [] data) {
         this.data = data;
     }
 
@@ -29,7 +28,7 @@ public final class ValueWriter {
      *
      * @throws IndexOutOfBoundsException if offset is less than 0 or greater than size of data
      */
-    public ValueWriter(@NotNull byte[] data, int offset) {
+    public ValueWriter(byte @NotNull [] data, int offset) {
         if(offset < 0 || offset > data.length) {
             throw new IndexOutOfBoundsException("offset");
         }
@@ -112,7 +111,7 @@ public final class ValueWriter {
      *
      *  @throws IndexOutOfBoundsException if cursor is in {@code size() - array.valuesLength - 1} position or further
      */
-    public void emitByteArray(byte[] array) {
+    public void emitByteArray(byte @NotNull [] array) {
         System.arraycopy(array, 0, data, position, array.length);
         position += array.length;
     }

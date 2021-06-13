@@ -194,7 +194,7 @@ public final class ShortDateTime {
      * @throws IllegalArgumentException if datetime-long isn't valid
      * @throws IndexOutOfBoundsException if offset is less than 0 or greater than {@code buffer.length - 20}.
      */
-    public static void writeToString(@ShortDateTimeLong long dateTime, @NotNull char[] buffer, int offset) {
+    public static void writeToString(@ShortDateTimeLong long dateTime, char @NotNull [] buffer, int offset) {
         if(!isValid(dateTime)) {
             throw new IllegalArgumentException("dateTime");
         }

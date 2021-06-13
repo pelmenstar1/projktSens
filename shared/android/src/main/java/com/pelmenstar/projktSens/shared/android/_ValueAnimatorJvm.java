@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public final class _ValueAnimatorJvm {
     private _ValueAnimatorJvm() {}
 
-    public static void setFloatValues(@NotNull ValueAnimator animator, @NotNull float[] values) {
+    public static void setFloatValues(@NotNull ValueAnimator animator, float @NotNull [] values) {
         animator.setFloatValues(values);
     }
 }

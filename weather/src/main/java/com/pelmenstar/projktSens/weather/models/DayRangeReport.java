@@ -113,8 +113,7 @@ public final class DayRangeReport extends AppendableToStringBuilder {
     @NotNull
     public static final ObjectSerializer<DayRangeReport> SERIALIZER;
 
-    @NotNull
-    public final Entry[] entries;
+    public final @NotNull Entry @NotNull [] entries;
 
     @NotNull
     public final ReportStats stats;
@@ -126,7 +125,7 @@ public final class DayRangeReport extends AppendableToStringBuilder {
         Serializable.registerSerializer(DayRangeReport.class, SERIALIZER);
     }
 
-    public DayRangeReport(@NotNull Entry[] entries, @NotNull ReportStats stats) {
+    public DayRangeReport(@NotNull Entry @NotNull [] entries, @NotNull ReportStats stats) {
         this.entries = entries;
         this.stats = stats;
     }
@@ -159,10 +158,10 @@ public final class DayRangeReport extends AppendableToStringBuilder {
 
     @NotNull
     public static DayRangeReport create(int units,
-                                        @NotNull int[] dateValues,
-                                        @NotNull float[] tempValues,
-                                        @NotNull float[] humValues,
-                                        @NotNull float[] pressValues) {
+                                        int @NotNull [] dateValues,
+                                        float @NotNull [] tempValues,
+                                        float @NotNull [] humValues,
+                                        float @NotNull [] pressValues) {
         int length = tempValues.length;
         if(length == 0) {
             throw new IllegalArgumentException("Data is empty");

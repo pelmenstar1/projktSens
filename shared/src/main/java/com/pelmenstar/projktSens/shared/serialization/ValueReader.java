@@ -8,8 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * Responsible for reading primitive values from byte buffer. Values in read in little-endian
  */
 public final class ValueReader {
-    @NotNull
-    private final byte[] data;
+    private final byte @NotNull [] data;
     private int position;
 
     /**
@@ -18,7 +17,7 @@ public final class ValueReader {
      *
      * @param data byte array from which values will be read
      */
-    public ValueReader(@NotNull byte[] data) {
+    public ValueReader(byte @NotNull [] data) {
         this.data = data;
     }
 
@@ -28,7 +27,7 @@ public final class ValueReader {
      * @param offset initial position of cursor
      * @throws IndexOutOfBoundsException if offset is less than 0 or greater than length of byte array
      */
-    public ValueReader(@NotNull byte[] data, int offset) {
+    public ValueReader(byte @NotNull [] data, int offset) {
         if(offset < 0 || offset > data.length) {
             throw new IndexOutOfBoundsException("offset");
         }
@@ -119,8 +118,7 @@ public final class ValueReader {
      * @throws IllegalArgumentException if size less or equals to 0
      * @throws IndexOutOfBoundsException if there are lack of data
      */
-    @NotNull
-    public byte[] readByteArray(int size) {
+    public byte @NotNull [] readByteArray(int size) {
         if(size <= 0) {
             throw new IllegalArgumentException("size=" + size);
         }

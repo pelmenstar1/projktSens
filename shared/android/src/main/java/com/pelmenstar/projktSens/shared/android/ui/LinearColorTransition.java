@@ -22,7 +22,7 @@ public final class LinearColorTransition {
     private int index = 0;
     private boolean forward = true;
 
-    private LinearColorTransition(@NotNull int[] transColors) {
+    private LinearColorTransition(int @NotNull [] transColors) {
         this.transColors = transColors;
     }
 
@@ -80,7 +80,7 @@ public final class LinearColorTransition {
      * The transition is still linear.
      */
     @NotNull
-    public static LinearColorTransition multiple(@NotNull int[] colors) {
+    public static LinearColorTransition multiple(int @NotNull [] colors) {
         if(colors.length <= 1) {
             throw new IllegalArgumentException("Colors valuesLength must be > 1");
         }

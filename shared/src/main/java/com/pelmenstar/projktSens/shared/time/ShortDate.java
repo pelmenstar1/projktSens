@@ -340,7 +340,7 @@ public final class ShortDate {
      * @throws IndexOutOfBoundsException if offset is less than 0 or greater than {@code buffer.length - 8}
      * @throws NullPointerException if buffer is null
      */
-    public static void writeToCharBuffer(@ShortDateInt int date, @NotNull char[] buffer, int offset) {
+    public static void writeToCharBuffer(@ShortDateInt int date, char @NotNull [] buffer, int offset) {
         if(!isValid(date)) {
             throw new IllegalArgumentException("date");
         }

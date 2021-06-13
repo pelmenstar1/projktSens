@@ -16,7 +16,7 @@ public final class StringUtils {
      * @param array array to append to {@link StringBuilder}
      * @param sb receiver
      */
-    public static void appendArray(@Nullable Object[] array, @NotNull StringBuilder sb) {
+    public static void appendArray(@Nullable Object @Nullable [] array, @NotNull StringBuilder sb) {
         if(array == null) {
             appendNull(sb);
         } else {
@@ -42,7 +42,7 @@ public final class StringUtils {
      * @param array array to append to {@link StringBuilder}
      * @param sb receiver
      */
-    public static void appendArray(@Nullable AppendableToStringBuilder[] array, @NotNull StringBuilder sb) {
+    public static void appendArray(@Nullable AppendableToStringBuilder @Nullable [] array, @NotNull StringBuilder sb) {
         if(array == null) {
             appendNull(sb);
         } else {
@@ -51,11 +51,22 @@ public final class StringUtils {
                 int endIdx = array.length - 1;
 
                 for (int i = 0; i < endIdx; i++) {
-                    array[i].append(sb);
+                    AppendableToStringBuilder element = array[i];
+                    if(element == null) {
+                        appendNull(sb);
+                    } else {
+                        element.append(sb);
+                    }
+
                     sb.append(',');
                 }
 
-                array[endIdx].append(sb);
+                AppendableToStringBuilder last = array[endIdx];
+                if(last == null) {
+                    appendNull(sb);
+                } else {
+                    last.append(sb);
+                }
             }
             sb.append(']');
         }
@@ -68,7 +79,7 @@ public final class StringUtils {
      * @param array array to append to {@link StringBuilder}
      * @param sb receiver
      */
-    public static void appendArray(@Nullable byte[] array, @NotNull StringBuilder sb) {
+    public static void appendArray(byte @Nullable [] array, @NotNull StringBuilder sb) {
         if(array == null) {
             appendNull(sb);
         } else {
@@ -166,7 +177,7 @@ public final class StringUtils {
         }
     }
 
-    public static void writeTwoDigits(@NotNull char[] buffer, int offset, int number) {
+    public static void writeTwoDigits(char @NotNull [] buffer, int offset, int number) {
         if(number < 0 || number > 99) {
             throw new IllegalArgumentException("number=" + number + ". Number must to be in range [0; 99]");
         }
@@ -237,7 +248,7 @@ public final class StringUtils {
         }
     }
 
-    public static void writeFourDigits(@NotNull char[] buffer, int offset, int number) {
+    public static void writeFourDigits(char @NotNull [] buffer, int offset, int number) {
         if(number < 0 || number > 9999) {
             throw new IllegalArgumentException("number=" + number + ". Number must be in range [0; 9999]");
         }

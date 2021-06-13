@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 
-
 import androidx.annotation.AttrRes;
 import androidx.annotation.StyleRes;
 
@@ -27,7 +26,6 @@ public final class TimePrefixTextView extends MaterialTextView {
     @TimeInt
     private int time;
 
-    @NotNull
     private char[] textCache = EmptyArray.CHAR;
 
     public TimePrefixTextView(@NotNull Context context) {

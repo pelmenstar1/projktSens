@@ -86,8 +86,7 @@ public final class DayReport extends AppendableToStringBuilder {
     @NotNull
     public static final ObjectSerializer<DayReport> SERIALIZER;
 
-    @NotNull
-    public final Entry[] entries;
+    public final @NotNull Entry @NotNull [] entries;
 
     @NotNull
     public final ReportStats stats;
@@ -99,7 +98,7 @@ public final class DayReport extends AppendableToStringBuilder {
         Serializable.registerSerializer(DayReport.class, SERIALIZER);
     }
 
-    public DayReport(@NotNull Entry[] entries, @NotNull ReportStats stats) {
+    public DayReport(@NotNull Entry @NotNull [] entries, @NotNull ReportStats stats) {
         this.entries = entries;
         this.stats = stats;
     }
@@ -133,10 +132,10 @@ public final class DayReport extends AppendableToStringBuilder {
 
     @NotNull
     public static DayReport create(int units,
-                                   @NotNull int[] timeValues,
-                                   @NotNull float[] tempValues,
-                                   @NotNull float[] humValues,
-                                   @NotNull float[] pressValues) {
+                                   int @NotNull [] timeValues,
+                                   float @NotNull [] tempValues,
+                                   float @NotNull [] humValues,
+                                   float @NotNull [] pressValues) {
         int length = tempValues.length;
 
         if(length == 0) {

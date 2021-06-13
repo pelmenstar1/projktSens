@@ -11,7 +11,7 @@ public final class Bytes {
     /**
      * Writes int64 to buffer at specified offset
      */
-    public static void writeLong(long value, @NotNull byte[] buffer, int offset) {
+    public static void writeLong(long value, byte @NotNull [] buffer, int offset) {
         buffer[offset] = (byte)value;
         buffer[offset + 1] = (byte)(value >> 8);
         buffer[offset + 2] = (byte)(value >> 16);
@@ -25,7 +25,7 @@ public final class Bytes {
     /**
      * Writes int32 to buffer at specified offset
      */
-    public static void writeInt(int value, @NotNull byte[] buffer, int offset) {
+    public static void writeInt(int value, byte @NotNull [] buffer, int offset) {
         buffer[offset] = (byte)value;
         buffer[offset + 1] = (byte)(value >> 8);
         buffer[offset + 2] = (byte)(value >> 16);
@@ -35,14 +35,14 @@ public final class Bytes {
     /**
      * Writes float32 to buffer at specified offset
      */
-    public static void writeFloat(float value, @NotNull byte[] buffer, int offset) {
+    public static void writeFloat(float value, byte  @NotNull [] buffer, int offset) {
         writeInt(Float.floatToIntBits(value), buffer, offset);
     }
 
     /**
      * Writes int16 to buffer at specified offset
      */
-    public static void writeShort(short value, @NotNull byte[] buffer, int offset) {
+    public static void writeShort(short value, byte @NotNull [] buffer, int offset) {
         buffer[offset] = (byte)value;
         buffer[offset + 1] = (byte)(value >> 8);
     }
@@ -50,7 +50,7 @@ public final class Bytes {
     /**
      * Returns int64 value from buffer at specified offset
      */
-    public static long readLong(@NotNull byte[] buffer, int offset) {
+    public static long readLong(byte @NotNull [] buffer, int offset) {
         return ((buffer[offset] & 0xffL)) |
                 ((buffer[offset + 1] & 0xffL) << 8 ) |
                 ((buffer[offset + 2] & 0xffL) << 16) |
@@ -64,7 +64,7 @@ public final class Bytes {
     /**
      * Returns int32 value from buffer at specified offset
      */
-    public static int readInt(@NotNull byte[] buffer, int offset) {
+    public static int readInt(byte @NotNull [] buffer, int offset) {
         return (buffer[offset] & 0xFF) |
                 ((buffer[offset + 1] & 0xFF) << 8 ) |
                 ((buffer[offset + 2] & 0xFF) << 16) |
@@ -74,14 +74,14 @@ public final class Bytes {
     /**
      * Returns float32 value from buffer at specified offset
      */
-    public static float readFloat(@NotNull byte[] buffer, int offset) {
+    public static float readFloat(byte @NotNull [] buffer, int offset) {
         return Float.intBitsToFloat(readInt(buffer, offset));
     }
 
     /**
      * Returns int16 value from buffer at specified offset
      */
-    public static short readShort(@NotNull byte[] buffer, int offset) {
+    public static short readShort(byte @NotNull [] buffer, int offset) {
         return (short)((buffer[offset] & 0xFF) | ((buffer[offset + 1] & 0xFF) << 8));
     }
 }

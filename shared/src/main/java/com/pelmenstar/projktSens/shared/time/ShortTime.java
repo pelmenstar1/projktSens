@@ -74,7 +74,7 @@ public final class ShortTime {
      *
      * @throws IllegalArgumentException if time is invalid
      */
-    public static void writeToCharBuffer(@TimeInt int time, @NotNull char[] buffer, int offset) {
+    public static void writeToCharBuffer(@TimeInt int time, char @NotNull [] buffer, int offset) {
         if(!isValid(time)) {
             throw new IllegalArgumentException("time");
         }

@@ -19,14 +19,15 @@ public final class ReadonlyArrayAdapter<T> extends BaseAdapter implements Themed
     private final Context context;
     private final int resource;
     private int dropDownResource;
-    private final T[] objects;
+
+    private final @NotNull T @NotNull [] objects;
 
     private final LayoutInflater inflater;
 
     @Nullable
     private LayoutInflater dropDownInflater;
 
-    public ReadonlyArrayAdapter(@NotNull Context context, @LayoutRes int resource, @NotNull T[] objects) {
+    public ReadonlyArrayAdapter(@NotNull Context context, @LayoutRes int resource, @NotNull T @NotNull [] objects) {
         this.context = context;
         this.resource = resource;
         this.objects = objects;
