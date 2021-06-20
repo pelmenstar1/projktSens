@@ -1,93 +1,93 @@
 <resources>
-    <string name="offCompanyName">pelmenstar inc. (2020–2021)</string>
+    <string name="offCompanyName" translatable="false">pelmenstar inc. (2020–2021)</string>
 
-    <string name="serverUnavailable">Проблеми з сервером</string>
-    <string name="appName">Погода</string>
+    <string name="serverUnavailable">Server is unavailable</string>
+    <string name="appName">Weather</string>
 
-    <string name="needToRequestGps">Нада GPS</string>
+    <string name="needToRequestGps">Need GPS to work</string>
 
-    <string name="sunsetSunriseActionBarTitle">Схід-Захід</string>
+    <string name="sunsetSunriseActionBarTitle">Sunrise-sunset</string>
 
-    <string name="weather">Погода</string>
+    <string name="weather">Weather</string>
 
-    <string name="temperature">Температура</string>
-    <string name="humidity">Вологість повітря</string>
-    <string name="pressure">Атм. тиск</string>
+    <string name="temperature">Temperature</string>
+    <string name="humidity">Humidity</string>
+    <string name="pressure">Pressure</string>
 
-    <string name="sunrise">Схід</string>
-    <string name="sunset">Захід</string>
-    <string name="dayLength">Довжина дня</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="dayLength">Length of day</string>
 
-    <string name="min">Мінімум</string>
-    <string name="max">Максимум</string>
-    <string name="avg">Середнє значення</string>
-    <string name="median">Медіана</string>
+    <string name="min">Minimum</string>
+    <string name="max">Maximum</string>
+    <string name="avg">Average</string>
+    <string name="median">Median</string>
 
-    <string name="noData">Ммм… Так пусто</string>
-    <string name="errorOccurred">Упс… Помилка</string>
+    <string name="noData">So empty…</string>
+    <string name="errorOccurred">Owwp… Error</string>
 
-    <string name="initLocation_stageName">Місцезнаходження…</string>
-    <string name="initCalendar_stageName">Календар…</string>
+    <string name="initLocation_stageName">Location…</string>
+    <string name="initCalendar_stageName">Calendar…</string>
 
-    <string name="initLocation_errorMsg">Не вдалося дізнатися місцезнаходження</string>
-    <string name="initCalendar_errorMsg">Не вдалося інітіалізувати календар</string>
+    <string name="initLocation_errorMsg">Couldn\'t get your location</string>
+    <string name="initCalendar_errorMsg">Coludn\'t initialize calendar</string>
 
-    <string name="settings">Налаштування</string>
-    <string name="save_settings">Зберегти</string>
+    <string name="settings">Settings</string>
+    <string name="save_settings">Save</string>
 
-    <string name="serverHost">Сервер</string>
-    <string name="serverIsNotAvailable_settings">Неправильна адреса</string>
+    <string name="serverHost">Server</string>
+    <string name="serverIsNotAvailable_settings">Invalid address</string>
 
     <string-array name="months">
-        <item>Січень</item>
-        <item>Лютий</item>
-        <item>Березень</item>
-        <item>Квітень</item>
-        <item>Травень</item>
-        <item>Червень</item>
-        <item>Липень</item>
-        <item>Серпень</item>
-        <item>Вересень</item>
-        <item>Жовтень</item>
-        <item>Листопад</item>
-        <item>Грудень</item>
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>September</item>
+        <item>August</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
     </string-array>
 
     <string-array name="monthsWithDay">
-        <item>Січня</item>
-        <item>Лютого</item>
-        <item>Березня</item>
-        <item>Квітня</item>
-        <item>Травня</item>
-        <item>Червня</item>
-        <item>Липня</item>
-        <item>Серпня</item>
-        <item>Вересня</item>
-        <item>Жовтня</item>
-        <item>Листопада</item>
-        <item>Грудня</item>
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>September</item>
+        <item>August</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
     </string-array>
 
-    <string name="today">Сьогодні</string>
-    <string name="yesterday">Вчора</string>
-    <string name="thisWeek">Цей тиждень</string>
-    <string name="prevWeek">Попередній тиждень</string>
-    <string name="thisMonth">Цей місяць</string>
-    <string name="prevMonth">Попередній місяць</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="thisWeek">This week</string>
+    <string name="prevWeek">Previous week</string>
+    <string name="thisMonth">This month</string>
+    <string name="prevMonth">Previous month</string>
 
-    <string name="sunCalendar">Сонячний календар</string>
+    <string name="sunCalendar">Sun calendar</string>
 
-    <string name="moonCalendar">Місячний календар</string>
-    <string name="moonPhase">Фаза місяця</string>
+    <string name="moonCalendar">Moon calendar</string>
+    <string name="moonPhase">Moon phase</string>
     <string-array name="moonPhases">
-        <item>Новий місяць</item>
-        <item>Молодий місяць</item>
-        <item>Перша чверть</item>
-        <item>Прибуваючий місяць</item>
-        <item>Повний місяць</item>
-        <item>Спадаючий місяць</item>
-        <item>Остання чверть</item>
-        <item>Старий місяць</item>
+        <item>New moon</item>
+        <item>Waxing crescent</item>
+        <item>First quarter</item>
+        <item>Waxing gibbous</item>
+        <item>Full moon</item>
+        <item>Waning gibbous</item>
+        <item>Third quarter</item>
+        <item>Waning crescent</item>
     </string-array>
 
     <string-array name="units">
@@ -95,8 +95,8 @@
         <item>K</item>
         <item>°F</item>
         <item>%</item>
-        <item>" мм"</item>
-        <item>" Па"</item>
+        <item>" mm"</item>
+        <item>" P"</item>
     </string-array>
 
     <string-array name="temperatureUnits">
@@ -106,7 +106,7 @@
     </string-array>
 
     <string-array name="pressureUnits">
-        <item>мм</item>
-        <item>Па</item>
+        <item>mm</item>
+        <item>" P"</item>
     </string-array>
 </resources>

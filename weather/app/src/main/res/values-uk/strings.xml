@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="serverUnavailable">Проблеми з сервером</string>
+    <string name="appName">Погода</string>
+
+    <string name="needToRequestGps">Нада GPS</string>
+
+    <string name="sunsetSunriseActionBarTitle">Схід-Захід</string>
+
+    <string name="weather">Погода</string>
+
+    <string name="temperature">Температура</string>
+    <string name="humidity">Вологість повітря</string>
+    <string name="pressure">Атм. тиск</string>
+
+    <string name="sunrise">Схід</string>
+    <string name="sunset">Захід</string>
+    <string name="dayLength">Довжина дня</string>
+
+    <string name="min">Мінімум</string>
+    <string name="max">Максимум</string>
+    <string name="avg">Середнє значення</string>
+    <string name="median">Медіана</string>
+
+    <string name="noData">Ммм… Так пусто</string>
+    <string name="errorOccurred">Упс… Помилка</string>
+
+    <string name="initLocation_stageName">Місцезнаходження…</string>
+    <string name="initCalendar_stageName">Календар…</string>
+
+    <string name="initLocation_errorMsg">Не вдалося дізнатися місцезнаходження</string>
+    <string name="initCalendar_errorMsg">Не вдалося інітіалізувати календар</string>
+
+    <string name="settings">Налаштування</string>
+    <string name="save_settings">Зберегти</string>
+
+    <string name="serverHost">Сервер</string>
+    <string name="serverIsNotAvailable_settings">Неправильна адреса</string>
+
+    <string-array name="months">
+        <item>Січень</item>
+        <item>Лютий</item>
+        <item>Березень</item>
+        <item>Квітень</item>
+        <item>Травень</item>
+        <item>Червень</item>
+        <item>Липень</item>
+        <item>Серпень</item>
+        <item>Вересень</item>
+        <item>Жовтень</item>
+        <item>Листопад</item>
+        <item>Грудень</item>
+    </string-array>
+
+    <string-array name="monthsWithDay">
+        <item>Січня</item>
+        <item>Лютого</item>
+        <item>Березня</item>
+        <item>Квітня</item>
+        <item>Травня</item>
+        <item>Червня</item>
+        <item>Липня</item>
+        <item>Серпня</item>
+        <item>Вересня</item>
+        <item>Жовтня</item>
+        <item>Листопада</item>
+        <item>Грудня</item>
+    </string-array>
+
+    <string name="today">Сьогодні</string>
+    <string name="yesterday">Вчора</string>
+    <string name="thisWeek">Цей тиждень</string>
+    <string name="prevWeek">Попередній тиждень</string>
+    <string name="thisMonth">Цей місяць</string>
+    <string name="prevMonth">Попередній місяць</string>
+
+    <string name="sunCalendar">Сонячний календар</string>
+
+    <string name="moonCalendar">Місячний календар</string>
+    <string name="moonPhase">Фаза місяця</string>
+    <string-array name="moonPhases">
+        <item>Новий місяць</item>
+        <item>Молодий місяць</item>
+        <item>Перша чверть</item>
+        <item>Прибуваючий місяць</item>
+        <item>Повний місяць</item>
+        <item>Спадаючий місяць</item>
+        <item>Остання чверть</item>
+        <item>Старий місяць</item>
+    </string-array>
+
+    <string-array name="units">
+        <item>°C</item>
+        <item>K</item>
+        <item>°F</item>
+        <item>%</item>
+        <item>" мм"</item>
+        <item>" Па"</item>
+    </string-array>
+
+    <string-array name="temperatureUnits">
+        <item>°C</item>
+        <item>K</item>
+        <item>°F</item>
+    </string-array>
+
+    <string-array name="pressureUnits">
+        <item>мм</item>
+        <item>Па</item>
+    </string-array>
+</resources>

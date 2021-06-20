@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="serverUnavailable">Проблемы с сервером</string>
+    <string name="appName">Погода</string>
+
+    <string name="needToRequestGps">Нужен GPS</string>
+
+    <string name="sunsetSunriseActionBarTitle">Восход-Закат</string>
+
+    <string name="weather">Погода</string>
+
+    <string name="temperature">Температура</string>
+    <string name="humidity">Влажность воздуха</string>
+    <string name="pressure">Атм. давление</string>
+
+    <string name="sunrise">Восход</string>
+    <string name="sunset">Закат</string>
+    <string name="dayLength">Длина дня</string>
+
+    <string name="min">Минимум</string>
+    <string name="max">Максимум</string>
+    <string name="avg">Среднее значение</string>
+    <string name="median">Медиана</string>
+
+    <string name="noData">Ммм… Так пусто</string>
+    <string name="errorOccurred">Упс… Ошибка</string>
+
+    <string name="initLocation_stageName">Ищу где вы…</string>
+    <string name="initCalendar_stageName">Календар…</string>
+
+    <string name="initLocation_errorMsg">Не удалось узнать где вы</string>
+    <string name="initCalendar_errorMsg">Не вдалося создать календарь</string>
+
+    <string name="settings">Настройки</string>
+    <string name="save_settings">Сохранить</string>
+
+    <string name="serverHost">Сервер</string>
+    <string name="serverIsNotAvailable_settings">Неправильный адресс</string>
+
+    <string-array name="months">
+        <item>Январь</item>
+        <item>Февраль</item>
+        <item>Март</item>
+        <item>Апрель</item>
+        <item>Май</item>
+        <item>Июнь</item>
+        <item>Июль</item>
+        <item>Август</item>
+        <item>Сентябрь</item>
+        <item>Остябрь</item>
+        <item>Ноярбрь</item>
+        <item>Декабрь</item>
+    </string-array>
+
+    <string-array name="monthsWithDay">
+        <item>Января</item>
+        <item>Февраля</item>
+        <item>Марта</item>
+        <item>Апреля</item>
+        <item>Мая</item>
+        <item>Июня</item>
+        <item>Июля</item>
+        <item>Августа</item>
+        <item>Сентября</item>
+        <item>Октября</item>
+        <item>Ноября</item>
+        <item>Декабря</item>
+    </string-array>
+
+    <string name="today">Сегодня</string>
+    <string name="yesterday">Вчера</string>
+    <string name="thisWeek">Эта неделя</string>
+    <string name="prevWeek">Предыдущая неделя</string>
+    <string name="thisMonth">Этот месяц</string>
+    <string name="prevMonth">Предыдущий месяц</string>
+
+    <string name="sunCalendar">Солнечный календар</string>
+
+    <string name="moonCalendar">Лунный календар</string>
+    <string name="moonPhase">Фаза луны</string>
+    <string-array name="moonPhases">
+        <item>Новая луна</item>
+        <item>Молодая луна</item>
+        <item>Первая чверть</item>
+        <item>прибывающая луна</item>
+        <item>Полнолуние</item>
+        <item>Убывающая луна</item>
+        <item>Последняя четверть</item>
+        <item>Старая луна</item>
+    </string-array>
+
+    <string-array name="units">
+        <item>°C</item>
+        <item>K</item>
+        <item>°F</item>
+        <item>%</item>
+        <item>" мм"</item>
+        <item>" Па"</item>
+    </string-array>
+
+    <string-array name="temperatureUnits">
+        <item>°C</item>
+        <item>K</item>
+        <item>°F</item>
+    </string-array>
+
+    <string-array name="pressureUnits">
+        <item>мм</item>
+        <item>Па</item>
+    </string-array>
+</resources>
