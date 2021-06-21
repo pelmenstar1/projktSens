@@ -32,7 +32,7 @@ class RawRepoContractTests {
 
         repeat(10) {
             val args = random.nextBytes(64)
-            val request = RepoRequest(random.nextInt(255), args)
+            val request = RepoRequest(random.nextInt(255), TestObject(args))
 
             repoRequestReadWrite(request)
         }

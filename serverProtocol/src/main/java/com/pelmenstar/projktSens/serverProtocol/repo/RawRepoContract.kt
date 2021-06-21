@@ -3,6 +3,7 @@ package com.pelmenstar.projktSens.serverProtocol.repo
 import com.pelmenstar.projktSens.shared.*
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
 import com.pelmenstar.projktSens.shared.serialization.Serializable
+import com.pelmenstar.projktSens.shared.serialization.ValueReader
 import com.pelmenstar.projktSens.shared.serialization.ValueWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -44,22 +45,27 @@ object RawRepoContract: RepoContract {
     override suspend fun writeRequest(request: RepoRequest, output: OutputStream) {
         withContext(Dispatchers.IO) {
             val command = request.command.toByte()
-            val args = request.args
+            val arg = request.argument
 
-            if (args == null) {
-                val header = ByteArray(3)
-                header[0] = command
-
-                output.writeSuspend(header)
+            val buffer: ByteArray
+            if (arg == null) {
+                buffer = ByteArray(3)
+                buffer[0] = command
             } else {
-                val buffer = buildByteArray(args.size + 3) {
-                    this[0] = command
-                    writeShort(1, args.size.toShort())
-                    System.arraycopy(args, 0, this, 3, args.size)
-                }
+                val argClass = arg.javaClass
+                val serializer = Serializable.getSerializer(argClass)
+                val objectSize = serializer.getSerializedObjectSize(arg)
+                val argClassNameBytes = argClass.name.toByteArray(Charsets.UTF_8)
 
-                output.writeSuspend(buffer)
+                buffer = buildByteArray(objectSize + argClassNameBytes.size + 5) {
+                    this[0] = command
+                    writeShort(1, objectSize.toShort())
+                    serializer.writeObject(arg, ValueWriter(this, 3))
+                    writeShort(objectSize + 3, argClassNameBytes.size.toShort())
+                    System.arraycopy(argClassNameBytes, 0, this, objectSize + 5, argClassNameBytes.size)
+                }
             }
+            output.writeSuspend(buffer)
         }
     }
 
@@ -68,19 +74,27 @@ object RawRepoContract: RepoContract {
             val header = input.readNSuspend(3)
 
             val command = header[0].toInt() and 0xff
-            val argsSize = header.getShort(1).toInt()
+            val argBytesLength = header.getShort(1).toInt()
+            val argBytes: ByteArray
 
             when {
-                argsSize == 0 -> {
-                    RepoRequest(command)
+                argBytesLength == 0 -> {
+                    return@withContext RepoRequest(command)
                 }
-                argsSize > 0 -> {
-                    val args = input.readNSuspend(argsSize)
-
-                    RepoRequest(command, args)
+                argBytesLength > 0 -> {
+                    argBytes = input.readNSuspend(argBytesLength)
                 }
                 else -> throw IOException()
             }
+
+            val argClassNameLengthBuffer = input.readNSuspend(2)
+            val argClassNameLength = argClassNameLengthBuffer.getShort(0).toInt()
+            val argClassNameBytes = input.readNSuspend(argClassNameLength)
+            val argClassName = String(argClassNameBytes, Charsets.UTF_8)
+            val serializer = Serializable.getSerializer(Class.forName(argClassName))
+            val arg = serializer.readObject(ValueReader(argBytes))
+
+            RepoRequest(command, arg)
         }
     }
 

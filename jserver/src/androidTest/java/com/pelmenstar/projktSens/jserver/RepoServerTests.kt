@@ -7,10 +7,8 @@ import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoClient
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoResponse
-import com.pelmenstar.projktSens.shared.buildByteArray
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
-import com.pelmenstar.projktSens.shared.writeInt
 import com.pelmenstar.projktSens.weather.models.*
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -61,21 +59,9 @@ class RepoServerTests {
     }
 
     @Test
-    fun genDayReport_returns_invalid_args_error_if_arguments_had_invalid_size() {
-        runBlocking {
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_REPORT, byteArrayOf(1))
-            val error = (response as RepoResponse.Error).error
-
-            assertEquals(Errors.INVALID_ARGUMENTS, error)
-        }
-    }
-
-    @Test
     fun genDayReport_returns_invalid_args_error_if_date_was_invalid() {
         runBlocking {
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_REPORT, buildByteArray(4) {
-                writeInt(0, ShortDate.NONE)
-            })
+            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_REPORT, ShortDate.NONE)
             val error = (response as RepoResponse.Error).error
 
             assertEquals(Errors.INVALID_ARGUMENTS, error)
@@ -88,9 +74,7 @@ class RepoServerTests {
             val nowDate = ShortDate.now()
             repo.debugGenDb(nowDate, 48)
 
-            val report = client.request<DayReport>(RepoCommands.GEN_DAY_REPORT, buildByteArray(4) {
-                writeInt(0, nowDate)
-            })
+            val report = client.request<DayReport>(RepoCommands.GEN_DAY_REPORT, nowDate)
             assertNotNull(report)
         }
     }
@@ -101,9 +85,7 @@ class RepoServerTests {
             val nowDate = ShortDate.now()
             repo.clear()
 
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_REPORT, buildByteArray(4) {
-                writeInt(0, nowDate)
-            })
+            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_REPORT, nowDate)
 
             assertTrue(response.isEmpty())
         }
@@ -114,9 +96,10 @@ class RepoServerTests {
         runBlocking {
             val nowDate = ShortDate.now()
 
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_REPORT, buildByteArray(4) {
-                writeInt(0, ShortDate.minusDays(nowDate, 3))
-            })
+            val response = client.requestRawResponse<Any>(
+                RepoCommands.GEN_DAY_REPORT,
+                ShortDate.minusDays(nowDate, 3)
+            )
 
             assertTrue(response.isEmpty())
         }
@@ -136,39 +119,15 @@ class RepoServerTests {
     }
 
     @Test
-    fun genDayRangeReport_returns_invalid_args_error_if_arguments_had_invalid_size() {
-        runBlocking {
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_RANGE_REPORT, byteArrayOf(1))
-            val error = (response as RepoResponse.Error).error
-
-            assertEquals(Errors.INVALID_ARGUMENTS, error)
-        }
-    }
-
-    @Test
-    fun genDayRangeReport_returns_invalid_args_error_if_date_range_was_invalid() {
-        runBlocking {
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_RANGE_REPORT, buildByteArray(8) {
-                writeInt(0, ShortDate.NONE)
-                writeInt(4, ShortDate.NONE)
-            })
-
-            val error = (response as RepoResponse.Error).error
-
-            assertEquals(Errors.INVALID_ARGUMENTS, error)
-        }
-    }
-
-    @Test
     fun genDayRangeReport_returns_valid_report() {
         runBlocking {
             val nowDate = ShortDate.now()
             repo.debugGenDb(nowDate, 24 * 4)
 
-            val report = client.request<DayRangeReport>(RepoCommands.GEN_DAY_RANGE_REPORT, buildByteArray(8) {
-                writeInt(0, nowDate)
-                writeInt(4, ShortDate.plusDays(nowDate, 1))
-            })
+            val report = client.request<DayRangeReport>(
+                RepoCommands.GEN_DAY_RANGE_REPORT,
+                ShortDateRange(nowDate, ShortDate.plusDays(nowDate, 1))
+            )
 
             assertNotNull(report)
         }
@@ -180,10 +139,10 @@ class RepoServerTests {
             val nowDate = ShortDate.now()
             repo.clear()
 
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_RANGE_REPORT, buildByteArray(8) {
-                writeInt(0, nowDate)
-                writeInt(4, ShortDate.plusDays(nowDate, 1))
-            })
+            val response = client.requestRawResponse<Any>(
+                RepoCommands.GEN_DAY_RANGE_REPORT,
+                ShortDateRange(nowDate, ShortDate.plusDays(nowDate, 1))
+            )
 
             assertTrue(response.isEmpty())
         }
@@ -195,10 +154,10 @@ class RepoServerTests {
             val nowDate = ShortDate.now()
             repo.debugGenDb(nowDate, 48)
 
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_RANGE_REPORT, buildByteArray(8) {
-                writeInt(0, ShortDate.minusDays(nowDate, 3))
-                writeInt(4, ShortDate.minusDays(nowDate, 2))
-            })
+            val response = client.requestRawResponse<Any>(
+                RepoCommands.GEN_DAY_RANGE_REPORT,
+                ShortDateRange(ShortDate.minusDays(nowDate, 3), ShortDate.minusDays(nowDate, 2))
+            )
 
             assertTrue(response.isEmpty())
         }

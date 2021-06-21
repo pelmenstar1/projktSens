@@ -21,16 +21,16 @@ class RepoClient(config: HostedProtoConfig) {
         return request(RepoRequest(command), responseValueClass)
     }
 
-    suspend inline fun<T:Any> request(command: Int, args: ByteArray, responseValueClass: Class<T>): T? {
-        return request(RepoRequest(command, args), responseValueClass)
+    suspend inline fun<T:Any> request(command: Int, arg: Any, responseValueClass: Class<T>): T? {
+        return request(RepoRequest(command, arg), responseValueClass)
     }
 
     suspend inline fun<reified T:Any> request(command: Int): T? {
         return request(command, T::class.java)
     }
 
-    suspend inline fun<reified T:Any> request(command: Int, args: ByteArray): T? {
-        return request(command, args, T::class.java)
+    suspend inline fun<reified T:Any> request(command: Int, arg: Any): T? {
+        return request(command, arg, T::class.java)
     }
 
     /**
@@ -68,16 +68,16 @@ class RepoClient(config: HostedProtoConfig) {
         return requestRawResponse(command, T::class.java)
     }
 
-    suspend inline fun<reified T:Any> requestRawResponse(command: Int, args: ByteArray): RepoResponse {
-        return requestRawResponse(command, args, T::class.java)
+    suspend inline fun<reified T:Any> requestRawResponse(command: Int, arg: Any): RepoResponse {
+        return requestRawResponse(command, arg, T::class.java)
     }
 
     suspend inline fun<T:Any> requestRawResponse(command: Int, responseValueClass: Class<T>): RepoResponse {
         return requestRawResponse(RepoRequest(command), responseValueClass)
     }
 
-    suspend inline fun<T:Any> requestRawResponse(command: Int, args: ByteArray, responseValueClass: Class<T>): RepoResponse {
-        return requestRawResponse(RepoRequest(command, args), responseValueClass)
+    suspend inline fun<T:Any> requestRawResponse(command: Int, arg: Any, responseValueClass: Class<T>): RepoResponse {
+        return requestRawResponse(RepoRequest(command, arg), responseValueClass)
     }
 
     /**

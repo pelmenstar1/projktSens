@@ -1,6 +1,7 @@
 package com.pelmenstar.projktSens.serverProtocol.repo
 
-import com.pelmenstar.projktSens.shared.*
+import com.pelmenstar.projktSens.shared.AppendableToStringBuilder
+import com.pelmenstar.projktSens.shared.equalsPattern
 
 /**
  * Contains information to make request to repo-server
@@ -14,27 +15,27 @@ class RepoRequest: AppendableToStringBuilder {
     /**
      * Optional binary arguments of request
      */
-    val args: ByteArray?
+    val argument: Any?
 
     constructor(command: Int) {
         this.command = command
-        this.args = null
+        this.argument = null
     }
 
-    constructor(command: Int, args: ByteArray?) {
+    constructor(command: Int, arg: Any?) {
         this.command = command
-        this.args = args
+        this.argument = arg
     }
 
     override fun equals(other: Any?): Boolean {
         return equalsPattern(other) { o ->
-            command == o.command && args contentEquals o.args
+            command == o.command && argument == o.argument
         }
     }
 
     override fun hashCode(): Int {
         var result = command
-        result = 31 * result + args.contentHashCode()
+        result = 31 * result + argument.hashCode()
 
         return result
     }
@@ -43,8 +44,8 @@ class RepoRequest: AppendableToStringBuilder {
         builder.run {
             append("{command=")
             append(RepoCommands.toString(command))
-            append("; args=")
-            appendArray(args)
+            append("; argument=")
+            append(argument)
             append('}')
         }
     }

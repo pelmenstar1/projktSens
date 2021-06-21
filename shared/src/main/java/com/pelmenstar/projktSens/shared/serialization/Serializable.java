@@ -16,6 +16,11 @@ public final class Serializable {
 
     private Serializable() {}
 
+    static {
+        // common serializers
+        cachedSerializers.put(Integer.class, new IntegerSerializer());
+    }
+
     /**
      * Gets a serializer for specified {@link Class}. Requirements for class is described in {@link ObjectSerializer}
      *

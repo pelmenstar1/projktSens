@@ -5,7 +5,6 @@ import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoContract
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoRequest
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoResponse
-import com.pelmenstar.projktSens.shared.getInt
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.weather.models.DayRangeReport
@@ -63,13 +62,13 @@ class RepoServer : ServerBase({ repoServerPort }) {
 
             contract.writeResponse(response, out)
         } catch (e: Exception) {
-            log.error( e)
+            log.error(e)
         }
     }
 
     private suspend fun processRequest(request: RepoRequest): RepoResponse {
         return try {
-            val args = request.args
+            val arg = request.argument
 
             when (request.command) {
                 RepoCommands.GET_AVAILABLE_DATE_RANGE -> {
@@ -78,11 +77,12 @@ class RepoServer : ServerBase({ repoServerPort }) {
                     RepoResponse.okOrEmpty(range)
                 }
                 RepoCommands.GEN_DAY_REPORT -> {
-                    if (args == null || args.size != 4) {
+                    if(arg == null) {
                         return RepoResponse.error(Errors.INVALID_ARGUMENTS)
                     }
 
-                    val date = args.getInt(0)
+                    val date = arg as Int
+
                     if(!ShortDate.isValid(date)) {
                         return RepoResponse.error(Errors.INVALID_ARGUMENTS)
                     }
@@ -97,25 +97,18 @@ class RepoServer : ServerBase({ repoServerPort }) {
                     RepoResponse.okOrEmpty(report)
                 }
                 RepoCommands.GEN_DAY_RANGE_REPORT -> {
-                    if (args == null || args.size != 8) {
+                    if(arg == null) {
                         return RepoResponse.error(Errors.INVALID_ARGUMENTS)
                     }
 
-                    val startDate = args.getInt(0)
-                    val endDate = args.getInt(4)
-
-                    if(!ShortDate.isValid(startDate) || !ShortDate.isValid(endDate)) {
-                        return RepoResponse.error(Errors.INVALID_ARGUMENTS)
-                    }
+                    val range = arg as ShortDateRange
 
                     log.info {
-                        append("startDate: ")
-                        ShortDate.append(startDate, this)
-                        append("; endDate: ")
-                        ShortDate.append(endDate, this)
+                        append("range=")
+                        append(range)
                     }
 
-                    val report = repo.getDayRangeReport(ShortDateRange(startDate, endDate))
+                    val report = repo.getDayRangeReport(range)
 
                     RepoResponse.okOrEmpty(report)
                 }

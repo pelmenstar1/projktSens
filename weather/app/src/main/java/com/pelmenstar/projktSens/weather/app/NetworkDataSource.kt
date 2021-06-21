@@ -5,11 +5,9 @@ package com.pelmenstar.projktSens.weather.app
 import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoClient
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
-import com.pelmenstar.projktSens.shared.buildByteArray
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
-import com.pelmenstar.projktSens.shared.writeInt
 import com.pelmenstar.projktSens.weather.models.*
 
 class NetworkDataSource(config: HostedProtoConfig) : WeatherDataSource {
@@ -18,20 +16,11 @@ class NetworkDataSource(config: HostedProtoConfig) : WeatherDataSource {
     override suspend fun getDayReport(@ShortDateInt date: Int): DayReport? {
         require(ShortDate.isValid(date)) { "date" }
 
-        val args = buildByteArray(4) {
-            writeInt(0, date)
-        }
-
-        return useClient { request(RepoCommands.GEN_DAY_REPORT, args) }
+        return useClient { request(RepoCommands.GEN_DAY_REPORT, date) }
     }
 
     override suspend fun getDayRangeReport(range: ShortDateRange): DayRangeReport? {
-        val args = buildByteArray(8) {
-            writeInt(0, range.start)
-            writeInt(4, range.endInclusive)
-        }
-
-        return useClient { request(RepoCommands.GEN_DAY_RANGE_REPORT, args) }
+        return useClient { request(RepoCommands.GEN_DAY_RANGE_REPORT, range) }
     }
 
     override suspend fun getAvailableDateRange(): ShortDateRange? {
