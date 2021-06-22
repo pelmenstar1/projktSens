@@ -1,19 +1,19 @@
 package com.pelmenstar.projktSens.serverProtocol
 
-import com.pelmenstar.projktSens.serverProtocol.repo.RawRepoContract
+import com.pelmenstar.projktSens.serverProtocol.repo.JsonRepoContract
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoRequest
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoResponse
 import org.junit.Test
 import kotlin.random.Random
 
-class RawRepoContractTests {
+class JsonRepoContractTests {
     @Test
     fun repoRequest_no_args() {
         fun testCase(command: Int) {
             val request = RepoRequest(command)
 
-            RepoContractTestUtils.test(RawRepoContract, request)
+            RepoContractTestUtils.test(JsonRepoContract, request)
         }
 
         testCase(RepoCommands.GEN_DAY_REPORT)
@@ -28,7 +28,7 @@ class RawRepoContractTests {
             val argsBytes = Random(0).nextBytes(64)
             val request = RepoRequest(command, TestObject(argsBytes))
 
-            RepoContractTestUtils.test(RawRepoContract, request)
+            RepoContractTestUtils.test(JsonRepoContract, request)
         }
 
         testCase(RepoCommands.GEN_DAY_REPORT)
@@ -39,7 +39,7 @@ class RawRepoContractTests {
 
     @Test
     fun repoResponse_empty() {
-        RepoContractTestUtils.test<Any>(RawRepoContract, RepoResponse.Empty)
+        RepoContractTestUtils.test<Any>(JsonRepoContract, RepoResponse.Empty)
     }
 
     @Test
@@ -47,7 +47,7 @@ class RawRepoContractTests {
         fun testCase(errorId: Int) {
             val response = RepoResponse.error(errorId)
 
-            RepoContractTestUtils.test<Any>(RawRepoContract, response)
+            RepoContractTestUtils.test<Any>(JsonRepoContract, response)
         }
 
         testCase(Errors.NONE)
@@ -63,19 +63,19 @@ class RawRepoContractTests {
     fun repoResponse_ok_lessThanBufferSize() {
         val random = Random(0)
 
-        val obj = TestObject(random.nextBytes(RawRepoContract.RESPONSE_BUFFER_SIZE / 2))
+        val obj = TestObject(random.nextBytes(500))
         val response = RepoResponse.ok(obj)
 
-        RepoContractTestUtils.test<TestObject>(RawRepoContract, response)
+        RepoContractTestUtils.test<TestObject>(JsonRepoContract, response)
     }
 
     @Test
     fun repoResponse_ok_greaterThanBufferSize() {
         val random = Random(0)
 
-        val obj = TestObject(random.nextBytes(RawRepoContract.RESPONSE_BUFFER_SIZE * 2))
+        val obj = TestObject(random.nextBytes(2000))
         val response = RepoResponse.ok(obj)
 
-        RepoContractTestUtils.test<TestObject>(RawRepoContract, response)
+        RepoContractTestUtils.test<TestObject>(JsonRepoContract, response)
     }
 }

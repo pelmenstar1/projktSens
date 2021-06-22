@@ -7,7 +7,9 @@ import java.io.OutputStream
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketAddress
+import java.nio.charset.Charset
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.min
 
 /*
 private class ClosableCompletionHandler(private val closeable: Closeable): CompletionHandler {
@@ -131,4 +133,32 @@ suspend fun InputStream.readNSuspend(size: Int): ByteArray {
     readSuspendAndThrowIfNotEnough(buffer, 0, size)
 
     return buffer
+}
+
+suspend fun OutputStream.writeString(str: String, charset: Charset) {
+    val bytes = str.toByteArray(charset)
+
+    writeSuspend(buildByteArray(4) {
+        writeInt(0, bytes.size)
+    })
+    writeSuspend(bytes)
+}
+
+suspend fun InputStream.readString(charset: Charset, bufferSize: Int = 1024): String {
+    val byteLengthBuffer = readNSuspend(4)
+    val byteLength = byteLengthBuffer.getInt(0)
+    val bytes = ByteArray(byteLength)
+
+    if(byteLength < bufferSize) {
+        readSuspend(bytes)
+    } else {
+        var offset = 0
+        while(offset < byteLength) {
+            val expectedToRead = min(byteLength - offset, bufferSize)
+            readSuspendAndThrowIfNotEnough(bytes, offset, expectedToRead)
+            offset += expectedToRead
+        }
+    }
+
+    return String(bytes, charset)
 }

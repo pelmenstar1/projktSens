@@ -63,6 +63,24 @@ public final class Errors {
         }
     }
 
+    public static int fromString(@NotNull String name) {
+        if(name.equalsIgnoreCase("INVALID_ARGUMENTS")) {
+            return INVALID_ARGUMENTS;
+        } else if(name.equalsIgnoreCase("INVALID_COMMAND")) {
+            return INVALID_COMMAND;
+        } else if(name.equalsIgnoreCase("INVALID_RESPONSE")) {
+            return INVALID_RESPONSE;
+        } else if(name.equalsIgnoreCase("INTERNAL_DB_ERROR")) {
+            return INTERNAL_DB_ERROR;
+        } else if(name.equalsIgnoreCase("IO")) {
+            return IO;
+        } else if(name.equalsIgnoreCase("NONE")){
+            return NONE;
+        } else {
+            return UNKNOWN;
+        }
+    }
+
     /**
      * Returns string representation of {@code error}
      * @param error error integer
@@ -76,6 +94,8 @@ public final class Errors {
                 return "INVALID_COMMAND";
             case INTERNAL_DB_ERROR:
                 return "INTERNAL_DB_ERROR";
+            case INVALID_RESPONSE:
+                return "INVALID_RESPONSE";
             case IO:
                 return "IO";
             case UNKNOWN:

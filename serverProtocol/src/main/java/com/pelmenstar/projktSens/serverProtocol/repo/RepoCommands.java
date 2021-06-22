@@ -28,6 +28,19 @@ public final class RepoCommands {
      */
     public static final int GET_LAST_WEATHER = 4;
 
+    public static int fromString(@NotNull String commandName) {
+        if(commandName.equalsIgnoreCase("GEN_DAY_REPORT")) {
+            return GEN_DAY_REPORT;
+        } else if(commandName.equalsIgnoreCase("GEN_DAY_RANGE_REPORT")) {
+            return GEN_DAY_RANGE_REPORT;
+        } else if(commandName.equalsIgnoreCase("GET_AVAILABLE_DATE_RANGE")) {
+            return GET_AVAILABLE_DATE_RANGE;
+        } else if(commandName.equalsIgnoreCase("GET_LAST_WEATHER")) {
+            return GET_LAST_WEATHER;
+        }
+        throw new IllegalArgumentException("Invalid command name '" + commandName + "'");
+    }
+
     /**
      * Returns string representation of command integer
      * @param command command
