@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="serverUnavailable">Проблемы с сервером</string>
+    <string name="serverUnavailable">Сервер не доступен</string>
     <string name="appName">Погода</string>
 
     <string name="needToRequestGps">Нужен GPS</string>
@@ -22,14 +22,14 @@
     <string name="avg">Среднее значение</string>
     <string name="median">Медиана</string>
 
-    <string name="noData">Ммм… Так пусто</string>
+    <string name="noData">Ммм… Ничего</string>
     <string name="errorOccurred">Упс… Ошибка</string>
 
-    <string name="initLocation_stageName">Ищу где вы…</string>
+    <string name="initLocation_stageName">Ищу где Вы…</string>
     <string name="initCalendar_stageName">Календар…</string>
 
-    <string name="initLocation_errorMsg">Не удалось узнать где вы</string>
-    <string name="initCalendar_errorMsg">Не вдалося создать календарь</string>
+    <string name="initLocation_errorMsg">Не удалось узнать где Вы</string>
+    <string name="initCalendar_errorMsg">Не удалось создать календарь</string>
 
     <string name="settings">Настройки</string>
     <string name="save_settings">Сохранить</string>

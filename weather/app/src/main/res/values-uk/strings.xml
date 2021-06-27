@@ -3,7 +3,7 @@
     <string name="serverUnavailable">Проблеми з сервером</string>
     <string name="appName">Погода</string>
 
-    <string name="needToRequestGps">Нада GPS</string>
+    <string name="needToRequestGps">Треба GPS</string>
 
     <string name="sunsetSunriseActionBarTitle">Схід-Захід</string>
 
@@ -25,7 +25,7 @@
     <string name="noData">Ммм… Так пусто</string>
     <string name="errorOccurred">Упс… Помилка</string>
 
-    <string name="initLocation_stageName">Місцезнаходження…</string>
+    <string name="initLocation_stageName">Шукаю де Ви…</string>
     <string name="initCalendar_stageName">Календар…</string>
 
     <string name="initLocation_errorMsg">Не вдалося дізнатися місцезнаходження</string>
