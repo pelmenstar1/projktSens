@@ -29,6 +29,10 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     private lateinit var saveButton: Button
 
+    // here could be int, I'd like reduce collisions as possible
+    // but in other way, don't reduce performance
+    private lateinit var initialStateHashes: IntArray
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val res = resources
@@ -48,6 +52,20 @@ class SettingsActivity : HomeButtonSupportActivity() {
                 }
             } else {
                 it.loadStateFromPrefs(prefs)
+            }
+        }
+
+        initialStateHashes = if(savedInstanceState != null) {
+            val hashes = savedInstanceState.getIntArray(STATE_INITIAL_STATE_HASHES) ?: throw NullPointerException("STATE_INITIAL_STATE_HASHES is null")
+
+            if(hashes.size != settings.size) {
+                throw RuntimeException("Hashes loaded from savedInstanceState has size that differ from settings.size")
+            }
+
+            hashes
+        } else {
+            IntArray(settings.size) { i ->
+                settings[i].state.hashCode()
             }
         }
 
@@ -130,9 +148,26 @@ class SettingsActivity : HomeButtonSupportActivity() {
                     text = res.getText(R.string.save_settings)
 
                     setOnClickListener {
-                        settings.forEach {
-                            it.saveStateToPrefs(prefs)
+                        var changed = false
+                        for(i in settings.indices) {
+                            val initialHash = initialStateHashes[i]
+                            val currentHash = settings[i].state.hashCode()
+
+                            if(initialHash != currentHash) {
+                                changed = true
+                                break
+                            }
                         }
+
+                        if(changed) {
+                            settings.forEach {
+                                it.saveStateToPrefs(prefs)
+                            }
+                        }
+
+                        setResult(RESULT_OK, Intent().apply {
+                            putExtra(RETURN_DATA_STATE_CHANGED, changed)
+                        })
                         finish()
                     }
                 }
@@ -158,6 +193,21 @@ class SettingsActivity : HomeButtonSupportActivity() {
         settings.forEach {
             it.saveStateToBundle(outState)
         }
+
+        // Why to save hashes, if we can re-compute it?
+        // Saving here is VERY important.
+        // The problem:
+        //
+        // When an user taps the save button, we compare hashes to determine whether
+        // settings are actually changed.
+        // But let's imagine such case:
+        // An user changed something in settings, then rotated a screen, new activity was created and
+        // states were loaded from savedInstanceState, hashes were computed from THAT version of states
+        // Then the user changed nothing, taped the save button, we compared hashes and they were equal.
+        // And why to save settings to preferences if they were not changed, right?
+        // So user changed settings, but they were not saved.
+        // To avoid that, we compute hashes only once on activity start.
+        outState.putIntArray(STATE_INITIAL_STATE_HASHES, initialStateHashes)
     }
 
     private fun loadNotosansFont(): Typeface {
@@ -167,6 +217,10 @@ class SettingsActivity : HomeButtonSupportActivity() {
     }
 
     companion object {
+        private const val STATE_INITIAL_STATE_HASHES = "SettingsActivity.state.initialStateHashes"
+
+        const val RETURN_DATA_STATE_CHANGED = "SettingsActivity.returnData.stateChanged"
+
         @JvmStatic
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

@@ -7,6 +7,7 @@ import android.view.*
 import android.widget.Button
 import android.widget.CalendarView
 import android.widget.LinearLayout
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.button.MaterialButton
 import com.pelmenstar.projktSens.shared.android.obtainStyledAttributes
@@ -52,6 +53,16 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
     private var presenter: HomeContract.Presenter? = null
     private var firstStart: Boolean = true
+
+    private val startSettingActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        val data = it.data
+        if(data == null || data.getBooleanExtra(SettingsActivity.RETURN_DATA_STATE_CHANGED, true)) {
+            val intent = intent
+            finish()
+            overridePendingTransition(0, 0)
+            startActivity(intent)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -325,7 +336,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                 showsAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
                 iconRes = R.drawable.ic_settings
             ) {
-                startActivity(SettingsActivity.intent(context))
+                startSettingActivity.launch(SettingsActivity.intent(context))
                 true
             }
             item(

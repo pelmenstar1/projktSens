@@ -13,6 +13,7 @@ import androidx.core.widget.addTextChangedListener
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
 import com.pelmenstar.projktSens.shared.android.ui.EditText
+import com.pelmenstar.projktSens.shared.equalsPattern
 import com.pelmenstar.projktSens.weather.app.Preferences
 import com.pelmenstar.projktSens.weather.app.PreferredUnits
 import com.pelmenstar.projktSens.weather.app.R
@@ -273,6 +274,16 @@ class ServerHostState: Setting.IncompleteState {
         _hostString = hostString
         _host = host
     }
+
+    override fun equals(other: Any?): Boolean {
+        return equalsPattern(other) { o ->
+            _hostString == o._hostString
+        }
+    }
+
+    override fun hashCode(): Int {
+        return _hostString.hashCode()
+    }
 }
 
 class ServerHostSetting: Setting<ServerHostState>() {
@@ -411,6 +422,16 @@ abstract class PortSettingBase: Setting<PortSettingBase.State>() {
             // Custom setter won't be called, that's not OK
             this.port = port
         }
+
+        override fun equals(other: Any?): Boolean {
+            return equalsPattern(other) { o ->
+                port == o.port
+            }
+        }
+
+        override fun hashCode(): Int {
+            return port
+        }
     }
 
     override fun createView(context: Context): View {
@@ -543,6 +564,16 @@ class WeatherReceiveIntervalSetting: Setting<WeatherReceiveIntervalSetting.State
             // var interval: Int = interval
             // Custom setter won't be called, that's not OK
             this.interval = interval
+        }
+
+        override fun equals(other: Any?): Boolean {
+            return equalsPattern(other) { o ->
+                interval == o.interval
+            }
+        }
+
+        override fun hashCode(): Int {
+            return interval
         }
     }
 
