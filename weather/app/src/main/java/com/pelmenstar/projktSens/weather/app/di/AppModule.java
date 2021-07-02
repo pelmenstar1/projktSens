@@ -3,9 +3,10 @@ package com.pelmenstar.projktSens.weather.app.di;
 import android.content.Context;
 import android.content.res.Resources;
 
-import com.pelmenstar.projktSens.serverProtocol.DefaultProtoConfig;
 import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig;
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig;
+import com.pelmenstar.projktSens.serverProtocol.ProtoConfigImpl;
+import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType;
 import com.pelmenstar.projktSens.shared.geo.ConstGeolocationProvider;
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider;
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter;
@@ -127,7 +128,14 @@ public final class AppModule {
     @Provides
     @NotNull
     public ProtoConfig protoConfig() {
-        return DefaultProtoConfig.INSTANCE;
+        Preferences prefs = Preferences.of(context);
+        int contractType = prefs.getContractType();
+        return new ProtoConfigImpl(
+                prefs.getRepoPort(),
+                prefs.getWciPort(),
+                prefs.getWeatherReceiveInterval(),
+                RepoContractType.get(contractType)
+        );
     }
 
     @NotNull

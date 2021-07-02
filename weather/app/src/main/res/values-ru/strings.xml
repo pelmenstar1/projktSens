@@ -36,6 +36,17 @@
 
     <string name="serverHost">Сервер</string>
     <string name="serverIsNotAvailable_settings">Неправильный адресс</string>
+    <string name="serverContract">Протокол</string>
+
+    <string name="invalidNumberFormat">Не число</string>
+    <string name="settings_portReservedError_less">Только больше 1024</string>
+    <string name="settings_portReservedError_greater">Больше чем 49151</string>
+
+    <string name="settings_repoPortName">\'Repo\' порт</string>
+    <string name="settings_weatherChannelInfoPortName">\'WCI\' порт</string>
+    <!-- TODO: Придумать понятный перевод -->
+    <string name="settings_weatherRcvInterval_name">Receive interval (ms)</string>
+    <string name="settings_weatherRcvInterval_lessOrEqZero">Меньше или равно 0</string>
 
     <string-array name="months">
         <item>Январь</item>

@@ -8,6 +8,7 @@ import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.appcompat.app.ActionBar
@@ -64,6 +65,18 @@ inline fun View.coordinatorLayoutParams(width: Int, height: Int, block: Coordina
 
     layoutParams = CoordinatorLayout.LayoutParams(width, height).apply(block)
 }
+
+inline fun View.gridLayoutParams(rowSpec: GridLayout.Spec, columnSpec: GridLayout.Spec) {
+    layoutParams = GridLayout.LayoutParams(rowSpec, columnSpec)
+}
+
+inline fun View.gridLayoutParams(
+    rowSpec: GridLayout.Spec,
+    columnSpec: GridLayout.Spec,
+    block: GridLayout.LayoutParams.() -> Unit) {
+    layoutParams = GridLayout.LayoutParams(rowSpec, columnSpec).apply(block)
+}
+
 
 inline fun ViewGroup.View(block: View.() -> Unit) {
     contract {
@@ -145,6 +158,14 @@ inline fun ViewGroup.LinearLayout(block: LinearLayout.() -> Unit) {
     addApply(LinearLayout(context), block)
 }
 
+inline fun ViewGroup.GridLayout(block: GridLayout.() -> Unit) {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
+    addApply(GridLayout(context), block)
+}
+
 inline fun ViewGroup.TextView(block: MaterialTextView.() -> Unit) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
@@ -199,6 +220,14 @@ inline fun ScrollView(context: Context, block: ScrollView.() -> Unit): ScrollVie
     }
 
     return ScrollView(context).apply(block)
+}
+
+inline fun EditText(context: Context, block: AppCompatEditText.() -> Unit): AppCompatEditText {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return AppCompatEditText(context).apply(block)
 }
 
 inline fun<TView:View> ViewGroup.addApply(view: TView, block: TView.() -> Unit) {
