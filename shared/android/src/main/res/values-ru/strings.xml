@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="continueWithoutThisTask">Продолжить</string>
+
+    <string name="dontRequestPermission">Не нужно</string>
+    <string name="requestPermission">Давай</string>
+</resources>
