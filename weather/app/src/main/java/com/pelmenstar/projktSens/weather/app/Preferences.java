@@ -13,21 +13,11 @@ import java.net.UnknownHostException;
 
 public final class Preferences {
     private static final Preferences INSTANCE = new Preferences();
-    private static final InetAddress DEFAULT_SERVER_ADDRESS;
     private static final String DEFAULT_SEVER_ADDRESS_STRING = "192.168.17.21";
-
-    static {
-        try {
-            DEFAULT_SERVER_ADDRESS = InetAddress.getByAddress(new byte[] {
-                    (byte)192,
-                    (byte)168,
-                    17,
-                    21
-            });
-        } catch (UnknownHostException ignored) {
-            throw new RuntimeException();
-        }
-    }
+    private static final int DEFAULT_REPO_SERVER_PORT = 10001;
+    private static final int DEFAULT_WCI_SERVER_PORT = 10002;
+    private static final int DEFAULT_WEATHER_RECEIVE_INTERVAL = 10 * 1000;
+    private static final int DEFAULT_REPO_CONTRACT_TYPE = RepoContractType.CONTRACT_RAW;
 
     // should not be changed
     private static final String KEY_UNITS = "units";
@@ -38,15 +28,6 @@ public final class Preferences {
     private static final String KEY_WEATHER_RECEIVE_INTERVAL = "weatherRcvInterval";
 
     private static SharedPreferences prefs;
-
-    private static volatile int units;
-    private static volatile int contractType;
-    private static volatile int repoPort;
-    private static volatile int wciPort;
-    private static volatile int weatherReceiveInterval;
-
-    private static String serverHostStr;
-    private static InetAddress serverHost;
 
     private static volatile boolean isInitialized = false;
     private static final Object lock = new Object();
@@ -68,24 +49,26 @@ public final class Preferences {
                 isInitialized = true;
 
                 prefs = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
-                units = prefs.getInt(KEY_UNITS, ValueUnitsPacked.NONE);
-                contractType = prefs.getInt(KEY_CONTRACT, -1);
-                repoPort = prefs.getInt(KEY_REPO_PORT, -1);
-                wciPort = prefs.getInt(KEY_WCI_PORT, -1);
-                weatherReceiveInterval = prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, -1);
 
-                serverHostStr = prefs.getString(KEY_SERVER_HOST, "");
-                try {
-                    serverHost = InetAddress.getByName(serverHostStr);
-                } catch (Exception ignored) {
+                int units = prefs.getInt(KEY_UNITS, ValueUnitsPacked.NONE);
+                int contractType = prefs.getInt(KEY_CONTRACT, -1);
+                int repoPort = prefs.getInt(KEY_REPO_PORT, -1);
+                int wciPort = prefs.getInt(KEY_WCI_PORT, -1);
+                int weatherReceiveInterval = prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, -1);
+
+                String serverHostStr = prefs.getString(KEY_SERVER_HOST, null);
+                InetAddress serverHost = null;
+
+                if(serverHostStr != null) {
+                    try {
+                        serverHost = InetAddress.getByName(serverHostStr);
+                    } catch (Exception ignored) {
+                    }
                 }
 
                 if (!ValueUnitsPacked.isValid(units) ||
                         serverHost == null ||
-                        contractType == -1 ||
-                        repoPort == -1 ||
-                        wciPort == -1 ||
-                        weatherReceiveInterval == -1) {
+                        (contractType | repoPort | wciPort | weatherReceiveInterval) < 0) {
                     writeDefault();
                 }
             }
@@ -96,21 +79,13 @@ public final class Preferences {
 
     // writes default preferences
     private static void writeDefault() {
-        units = ValueUnitsPacked.CELSIUS_MM_OF_MERCURY;
-        serverHost = DEFAULT_SERVER_ADDRESS;
-        serverHostStr = DEFAULT_SEVER_ADDRESS_STRING;
-        contractType = RepoContractType.CONTRACT_RAW;
-        repoPort = 10001;
-        wciPort = 10002;
-        weatherReceiveInterval = 10 * 1000;
-
         prefs.edit()
                 .putInt(KEY_UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY)
-                .putString(KEY_SERVER_HOST, serverHostStr)
-                .putInt(KEY_CONTRACT, contractType)
-                .putInt(KEY_REPO_PORT, repoPort)
-                .putInt(KEY_WCI_PORT, wciPort)
-                .putInt(KEY_WEATHER_RECEIVE_INTERVAL, weatherReceiveInterval)
+                .putString(KEY_SERVER_HOST, DEFAULT_SEVER_ADDRESS_STRING)
+                .putInt(KEY_CONTRACT, RepoContractType.CONTRACT_RAW)
+                .putInt(KEY_REPO_PORT, DEFAULT_REPO_SERVER_PORT)
+                .putInt(KEY_WCI_PORT, DEFAULT_WCI_SERVER_PORT)
+                .putInt(KEY_WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL)
                 .apply();
     }
 
@@ -118,7 +93,7 @@ public final class Preferences {
      * Gets packed units which was saved in {@link SharedPreferences}
      */
     public int getUnits() {
-        return units;
+        return prefs.getInt(KEY_UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY);
     }
 
     /**
@@ -132,29 +107,29 @@ public final class Preferences {
             throw new IllegalArgumentException("units");
         }
 
-        Preferences.units = units;
         prefs.edit().putInt(KEY_UNITS, units).apply();
     }
 
     @NotNull
     public InetAddress getServerHost() {
-        return serverHost;
+        try {
+            return InetAddress.getByName(getServerHostString());
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @NotNull
     public String getServerHostString() {
-        return serverHostStr;
+        return prefs.getString(KEY_SERVER_HOST, DEFAULT_SEVER_ADDRESS_STRING);
     }
 
-    public void setServerHost(@NotNull InetAddress host, @NotNull String hostString) {
-        serverHost = host;
-        serverHostStr = hostString;
-
+    public void setServerHostString(@NotNull String hostString) {
         prefs.edit().putString(KEY_SERVER_HOST, hostString).apply();
     }
 
     public int getContractType() {
-        return contractType;
+        return prefs.getInt(KEY_CONTRACT, DEFAULT_REPO_CONTRACT_TYPE);
     }
 
     public void setContractType(int contractType) {
@@ -162,34 +137,30 @@ public final class Preferences {
             throw new IllegalArgumentException("contractType");
         }
 
-        Preferences.contractType = contractType;
         prefs.edit().putInt(KEY_CONTRACT, contractType).apply();
     }
 
     public int getRepoPort() {
-        return repoPort;
+        return prefs.getInt(KEY_REPO_PORT, DEFAULT_REPO_SERVER_PORT);
     }
 
     public void setRepoPort(int port) {
-        repoPort = port;
         prefs.edit().putInt(KEY_REPO_PORT, port).apply();
     }
 
     public int getWciPort() {
-        return wciPort;
+        return prefs.getInt(KEY_WCI_PORT, DEFAULT_WCI_SERVER_PORT);
     }
 
     public void setWciPort(int port) {
-        wciPort = port;
         prefs.edit().putInt(KEY_WCI_PORT, port).apply();
     }
 
     public int getWeatherReceiveInterval() {
-        return weatherReceiveInterval;
+        return prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL);
     }
 
     public void setWeatherReceiveInterval(int interval) {
-        weatherReceiveInterval = interval;
         prefs.edit().putInt(KEY_WEATHER_RECEIVE_INTERVAL, interval).apply();
     }
 }

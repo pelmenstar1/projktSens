@@ -253,26 +253,20 @@ class ServerHostState: Setting.IncompleteState {
         set(value) {
             _hostString = value
 
-            try {
-                _host = InetAddress.getByName(value)
-                isValid = true
+            isValid = try {
+                InetAddress.getByName(value)
+                true
             } catch (e: Exception) {
-                _host = null
-                isValid = false
+                false
             }
         }
-
-    private var _host: InetAddress? = null
-    val host: InetAddress?
-        get() = _host
 
     constructor(hostString: String) {
         this.hostString = hostString
     }
 
-    constructor(hostString: String, host: InetAddress) {
+    constructor(hostString: String, notParseHostMarker: Boolean) {
         _hostString = hostString
-        _host = host
     }
 
     override fun equals(other: Any?): Boolean {
@@ -314,9 +308,7 @@ class ServerHostSetting: Setting<ServerHostState>() {
     }
 
     override fun saveStateToPrefs(prefs: Preferences) {
-        val host = state.host ?: throw IllegalStateException("Saving invalid state to prefs")
-
-        prefs.setServerHost(host, state.hostString)
+        prefs.serverHostString = state.hostString
     }
 
     override fun saveStateToBundle(outState: Bundle) {
@@ -324,7 +316,7 @@ class ServerHostSetting: Setting<ServerHostState>() {
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
-        state = ServerHostState(prefs.serverHostString, prefs.serverHost)
+        state = ServerHostState(prefs.serverHostString, false)
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
