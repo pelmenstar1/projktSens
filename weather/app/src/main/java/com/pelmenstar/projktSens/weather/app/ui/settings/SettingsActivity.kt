@@ -210,6 +210,14 @@ class SettingsActivity : HomeButtonSupportActivity() {
         outState.putIntArray(STATE_INITIAL_STATE_HASHES, initialStateHashes)
     }
 
+    override fun onBackPressed() {
+        setResult(RESULT_OK, Intent().apply {
+            putExtra(RETURN_DATA_STATE_CHANGED, false)
+        })
+
+        super.onBackPressed()
+    }
+
     private fun loadNotosansFont(): Typeface {
         val notosans = ResourcesCompat.getFont(this, R.font.notosans_medium)
 
