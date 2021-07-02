@@ -277,8 +277,8 @@ open class InitScreen(private val initContext: InitContext) : DialogFragment() {
                 try {
                     val result: InitTask.Result
 
-                    withTimeout(task.timeout) {
-                        result = task.runner()
+                    withTimeout(task.timeout.toLong()) {
+                        result = task.run()
                     }
 
                     if(result == InitTask.Result.Ok) {

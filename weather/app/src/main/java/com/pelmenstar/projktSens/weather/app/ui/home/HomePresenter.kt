@@ -47,24 +47,29 @@ class HomePresenter(
         get() {
             val mapper = HomeInitMessageMapper(context.resources)
 
-            return InitContext(mapper) {
-                InitTask(TASK_CALENDAR, timeout = 7 * 1000) {
-                    val range = dataSource.getAvailableDateRange()
+            return InitContext(mapper, 2) {
+                add(object: InitTask(TASK_CALENDAR, 7 * 1000) {
+                    override suspend fun run(): Result {
+                        val range = dataSource.getAvailableDateRange()
 
-                    if (range == null) {
-                        InitTask.Result.Error
-                    } else {
-                        postSetCalendarMinMaxDay(range)
-                        InitTask.Result.Ok
+                        return if (range == null) {
+                            Result.Error
+                        } else {
+                            postSetCalendarMinMaxDay(range)
+                            Result.Ok
+                        }
                     }
-                }
+                })
 
-                InitTask(TASK_GEOLOCATION, timeout = 10 * 1000, required = true) {
-                    lastGeolocation = geoProvider.getLastLocation()
-                    GeolocationCache.set(lastGeolocation)
+                add(object: InitTask(TASK_GEOLOCATION, 10 * 1000, true) {
+                    override suspend fun run(): Result {
+                        lastGeolocation = geoProvider.getLastLocation()
+                        GeolocationCache.set(lastGeolocation)
 
-                    InitTask.Result.Ok
-                }
+                        return Result.Ok
+                    }
+
+                })
             }
         }
 

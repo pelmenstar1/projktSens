@@ -7,8 +7,6 @@ import com.pelmenstar.projktSens.shared.equalsPattern
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-typealias InitTaskRunner = suspend () -> InitTask.Result
-
 /**
  * Contains appropriate information for task which initializes some component of application
  *
@@ -17,13 +15,16 @@ typealias InitTaskRunner = suspend () -> InitTask.Result
  * @param timeout timeout, should be > 0
  *
  * @param isRequired `true`, if it is necessary for task to be executed, `false`, if not
- * @param runner block of code to run
  */
-class InitTask(val id: Int, timeout: Long = 10 * 1000, val isRequired: Boolean = false, val runner: InitTaskRunner) {
+abstract class InitTask(
+    val id: Int,
+    timeout: Int = 10 * 1000,
+    val isRequired: Boolean = false
+) {
     /**
      * Timeout
      */
-    val timeout: Long
+    val timeout: Int
 
     init {
         if(timeout <= 0) {
@@ -50,15 +51,14 @@ class InitTask(val id: Int, timeout: Long = 10 * 1000, val isRequired: Boolean =
 
     override fun equals(other: Any?): Boolean {
         return equalsPattern(other) { o ->
-            id == o.id && timeout == o.timeout && isRequired == o.isRequired && runner === o.runner
+            id == o.id && timeout == o.timeout && isRequired == o.isRequired
         }
     }
 
     override fun hashCode(): Int {
         var result = id
         result = 31 * result + if (isRequired) 1 else 0
-        result = 31 * result + (timeout xor (timeout shl 32)).toInt()
-        result = 31 * result + runner.hashCode()
+        result = 31 * result + timeout
 
         return result
     }
@@ -66,6 +66,8 @@ class InitTask(val id: Int, timeout: Long = 10 * 1000, val isRequired: Boolean =
     override fun toString(): String {
         return "{id=$id, timeout=$timeout, isRequired=$isRequired}"
     }
+
+    abstract suspend fun run(): Result
 }
 
 /**
@@ -90,24 +92,19 @@ class InitContext(val messageMapper: MessageMapper, val tasks: Array<out InitTas
 /**
  * Builder for [InitContext]. Don't use this directly
  */
-class InitContextBuilder {
+class InitContextBuilder(initialSize: Int = 1) {
     @JvmField
-    var _tasks = emptyArray<InitTask>()
+    var _tasks = arrayOfNulls<InitTask>(initialSize)
 
-    inline fun InitTask(
-        id: Int,
-        timeout: Long = 10 * 1000,
-        required: Boolean = false,
-        noinline runner: InitTaskRunner
-    ) {
-        val task = com.pelmenstar.projktSens.shared.android.ui.initScreen.InitTask(
-            id,
-            timeout,
-            required,
-            runner
-        )
+    @JvmField
+    var _tasksActualLength = 0
 
-        _tasks = _tasks.add(task)
+    fun add(task: InitTask) {
+        if(_tasks.size == _tasksActualLength) {
+            _tasks = _tasks.add(task)
+        } else {
+            _tasks[_tasksActualLength++] = task
+        }
     }
 }
 
@@ -116,14 +113,23 @@ class InitContextBuilder {
  *
  * @param messageMapper message mapper of [InitContext]
  */
-inline fun InitContext(messageMapper: MessageMapper, block: InitContextBuilder.() -> Unit): InitContext {
+@Suppress("UNCHECKED_CAST")
+inline fun InitContext(messageMapper: MessageMapper, initialSize: Int = 1, block: InitContextBuilder.() -> Unit): InitContext {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    val builder = InitContextBuilder()
+    val builder = InitContextBuilder(initialSize)
     builder.block()
 
-    return InitContext(messageMapper, builder._tasks)
+    var tasks = builder._tasks
+    if(tasks.size != builder._tasksActualLength) {
+        val newTasks = arrayOfNulls<InitTask>(builder._tasksActualLength)
+        System.arraycopy(tasks, 0, newTasks, 0, newTasks.size)
+
+        tasks = newTasks
+    }
+
+    return InitContext(messageMapper, tasks as Array<out InitTask>)
 }
 
