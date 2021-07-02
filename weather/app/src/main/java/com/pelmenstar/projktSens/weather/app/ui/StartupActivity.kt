@@ -43,7 +43,7 @@ class StartupActivity : Activity() {
         overridePendingTransition(0, 0)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         startHomeActivityAndFinish()
     }
 }
