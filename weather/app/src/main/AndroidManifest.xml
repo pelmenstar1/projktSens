@@ -20,7 +20,9 @@
         android:fullBackupContent="@xml/backup_descriptor"
         android:allowBackup="true">
 
-        <activity android:name=".ui.settings.SettingsActivity"/>
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:configChanges="orientation|screenSize"/>
         <activity
             android:name=".ui.StartupActivity"
             android:theme="@style/AppTheme.Launcher">
@@ -31,13 +33,27 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.home.HomeActivity" />
-        <activity android:name=".ui.sunriseSunset.SunriseSunsetCalendarActivity" />
-        <activity android:name=".ui.moon.MoonCalendarActivity" />
-        <activity android:name="com.pelmenstar.projktSens.shared.android.ui.requestPermissions.RequestPermissionsActivity" />
-        <activity android:name=".ui.report.DayReportActivity" />
-        <activity android:name=".ui.report.WeekReportActivity" />
-        <activity android:name=".ui.report.MonthReportActivity" />
+        <activity
+            android:name=".ui.home.HomeActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".ui.sunriseSunset.SunriseSunsetCalendarActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".ui.moon.MoonCalendarActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="com.pelmenstar.projktSens.shared.android.ui.requestPermissions.RequestPermissionsActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".ui.report.DayReportActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".ui.report.WeekReportActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".ui.report.MonthReportActivity"
+            android:configChanges="orientation|screenSize"/>
     </application>
 
 </manifest>
