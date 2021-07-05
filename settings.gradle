@@ -1,5 +1,4 @@
 include ':jserver'
-include ':benchmark'
 include ':chartLite'
 include ':shared:android'
 include ':serverProtocol'
