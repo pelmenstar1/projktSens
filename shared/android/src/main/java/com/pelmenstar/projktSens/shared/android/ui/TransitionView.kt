@@ -34,7 +34,7 @@ class TransitionView @JvmOverloads constructor(
      * Sets or gets current [LinearColorTransition]. If animation has been already started, stop and start to notice visual changes
      */
     @Volatile
-    var transition: LinearColorTransition = defaultTransition.copy()
+    var transition: LinearColorTransition = LinearColorTransition.empty()
 
     private fun determineShape(
         context: Context,
@@ -114,12 +114,5 @@ class TransitionView @JvmOverloads constructor(
          * Rectangle
          */
         const val SHAPE_RECT = 1
-
-        /**
-         * Sets or gets default [LinearColorTransition]. When [TransitionView] creates, its transition sets to default
-         */
-        @JvmStatic
-        @Volatile
-        var defaultTransition = LinearColorTransition.empty()
     }
 }

@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.ArrayRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.button.MaterialButton
@@ -28,7 +29,7 @@ import kotlin.system.exitProcess
 /**
  * [DialogFragment] which is responsible for long-term initializing some components of application
  */
-open class InitScreen(private val initContext: InitContext) : DialogFragment() {
+open class InitScreen: DialogFragment {
     private lateinit var errorView: MaterialTextView
     private lateinit var errorMnemonicView: MaterialTextView
     private lateinit var taskNameView: MaterialTextView
@@ -42,12 +43,31 @@ open class InitScreen(private val initContext: InitContext) : DialogFragment() {
 
     private val pauseMutex = Mutex()
 
+    private val initContext: InitContext
+    private val transitionColorsId: Int
+    private var transitionColors: IntArray? = null
+
     /**
      * Calls when initializing ends
      */
     var onInitEnded: Runnable? = null
 
     private val mainThread: MainThreadHandler = MainThreadHandler(this)
+
+    constructor(initContext: InitContext, @ArrayRes transColorsId: Int) {
+        this.initContext = initContext
+        transitionColorsId = transColorsId
+    }
+
+    constructor(initContext: InitContext, transColors: IntArray) {
+        if(transColors.isEmpty()) {
+            throw IllegalArgumentException("transColors is empty")
+        }
+
+        this.initContext = initContext
+        transitionColors = transColors
+        transitionColorsId = 0
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,6 +104,12 @@ open class InitScreen(private val initContext: InitContext) : DialogFragment() {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
 
+                val transColors = transitionColors
+                transition = if(transColors != null) {
+                    LinearColorTransition.multiple(transColors)
+                } else {
+                    LinearColorTransition.fromArrayRes(context, transitionColorsId)
+                }
                 startAnimation()
                 circleView = this
             }
@@ -321,5 +347,4 @@ open class InitScreen(private val initContext: InitContext) : DialogFragment() {
         private const val VS_ERROR_NO_CONTINUE = 1
         private const val VS_ERROR_WITH_CONTINUE = 2
     }
-
 }

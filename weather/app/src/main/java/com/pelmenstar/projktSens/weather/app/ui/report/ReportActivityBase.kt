@@ -185,13 +185,15 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
 
     private fun createAnimationView(): View {
         val size = resources.getDimensionPixelSize(R.dimen.reportActivity_transitionViewSize)
+        val context = this
 
-        return FrameLayout(this) {
+        return FrameLayout(context) {
             TransitionView {
                 frameLayoutParams(size, size) {
                     gravity = Gravity.CENTER
                 }
 
+                transition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
                 startAnimation()
             }
         }
