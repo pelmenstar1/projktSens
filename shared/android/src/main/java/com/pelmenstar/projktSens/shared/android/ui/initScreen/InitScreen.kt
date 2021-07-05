@@ -177,6 +177,7 @@ open class InitScreen: DialogFragment {
 
     private fun resumeTaskRunnerThread() {
         if(pauseMutex.isLocked) {
+            Log.i(TAG, "task runner resumes")
             pauseMutex.unlock()
         }
     }
@@ -296,6 +297,7 @@ open class InitScreen: DialogFragment {
                 val task = tasks[index]
                 val taskId = task.id
                 currentTask = task
+                Log.i(TAG, "task $taskId started")
 
                 postSetTaskName(msgMapper.getTaskName(taskId))
 
@@ -308,6 +310,7 @@ open class InitScreen: DialogFragment {
                     }
 
                     if(result == InitTask.Result.Ok) {
+                        Log.i(TAG, "task $taskId succeed")
                         taskIndex.incrementAndGet()
                         continue
                     }
