@@ -10,9 +10,10 @@ import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType;
 import com.pelmenstar.projktSens.shared.geo.ConstGeolocationProvider;
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider;
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter;
+import com.pelmenstar.projktSens.weather.app.AppPreferences;
+import com.pelmenstar.projktSens.weather.app.AppPreferencesImpl;
 import com.pelmenstar.projktSens.weather.app.NetworkDataSource;
 import com.pelmenstar.projktSens.weather.app.NetworkWeatherChannelInfoProvider;
-import com.pelmenstar.projktSens.weather.app.Preferences;
 import com.pelmenstar.projktSens.weather.app.R;
 import com.pelmenstar.projktSens.weather.app.formatters.MoonPhaseFormatter;
 import com.pelmenstar.projktSens.weather.app.formatters.ResourcesPrettyDateFormatter;
@@ -125,10 +126,16 @@ public final class AppModule {
         return new NetworkWeatherChannelInfoProvider(hostedProtoConfig());
     }
 
+    @NotNull
+    @Provides
+    public AppPreferences preferences() {
+        return AppPreferencesImpl.of(context);
+    }
+
     @Provides
     @NotNull
     public ProtoConfig protoConfig() {
-        Preferences prefs = Preferences.of(context);
+        AppPreferences prefs = preferences();
         int contractType = prefs.getContractType();
         return new ProtoConfigImpl(
                 prefs.getRepoPort(),
@@ -140,7 +147,7 @@ public final class AppModule {
 
     @NotNull
     private HostedProtoConfig hostedProtoConfig() {
-        Preferences prefs = Preferences.of(context);
+        AppPreferences prefs = preferences();
 
         return new HostedProtoConfig(prefs.getServerHost(), protoConfig());
     }

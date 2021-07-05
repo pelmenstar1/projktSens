@@ -11,8 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public final class Preferences {
-    private static final Preferences INSTANCE = new Preferences();
+public class AppPreferencesImpl implements AppPreferences {
+    public static final AppPreferencesImpl INSTANCE = new AppPreferencesImpl();
     private static final String DEFAULT_SEVER_ADDRESS_STRING = "192.168.17.21";
     private static final int DEFAULT_REPO_SERVER_PORT = 10001;
     private static final int DEFAULT_WCI_SERVER_PORT = 10002;
@@ -32,18 +32,24 @@ public final class Preferences {
     private static volatile boolean isInitialized = false;
     private static final Object lock = new Object();
 
-    private Preferences() {
+    private AppPreferencesImpl() {
     }
 
     /**
-     * Obtains instance of {@link Preferences}
+     * Obtains instance of {@link AppPreferences}
      *
-     * @implNote {@link Preferences} is singleton.
+     * @implNote {@link AppPreferences} is singleton.
      * This method just obtains instance of {@link SharedPreferences} from given context and saves it to static variable.
      * This method is here just for code readability
      */
     @NotNull
-    public static Preferences of(@NotNull Context context) {
+    public static AppPreferencesImpl of(@NotNull Context context) {
+        INSTANCE.initialize(context);
+        return INSTANCE;
+    }
+
+    @Override
+    public void initialize(@NotNull Context context) {
         synchronized (lock) {
             if(!isInitialized) {
                 isInitialized = true;
@@ -73,8 +79,6 @@ public final class Preferences {
                 }
             }
         }
-
-        return INSTANCE;
     }
 
     // writes default preferences
@@ -89,6 +93,98 @@ public final class Preferences {
                 .apply();
     }
 
+    @Override
+    @NotNull
+    public Object get(int id) {
+        switch (id) {
+            case UNITS:
+                return getUnits();
+            case SERVER_HOST:
+                return getServerHostString();
+            case CONTRACT:
+                return getContractType();
+            case REPO_PORT:
+                return getRepoPort();
+            case WCI_PORT:
+                return getWciPort();
+            case WEATHER_RECEIVE_INTERVAL:
+                return getWeatherReceiveInterval();
+            default:
+                throw new IllegalArgumentException("No option found with id " + id);
+        }
+    }
+
+    @Override
+    public int getInt(int id) {
+        switch (id) {
+            case UNITS:
+                return getUnits();
+            case SERVER_HOST:
+                throw new IllegalArgumentException("SERVER_HOST isn't int");
+            case CONTRACT:
+                return getContractType();
+            case REPO_PORT:
+                return getRepoPort();
+            case WCI_PORT:
+                return getWciPort();
+            case WEATHER_RECEIVE_INTERVAL:
+                return getWeatherReceiveInterval();
+            default:
+                throw new IllegalArgumentException("No option found with id " + id);
+        }
+    }
+
+    @Override
+    public void set(int id, @NotNull Object value) {
+        switch (id) {
+            case UNITS:
+                setUnits((Integer) value);
+                break;
+            case SERVER_HOST:
+                setServerHostString((String) value);
+                break;
+            case CONTRACT:
+                setContractType((Integer) value);
+                break;
+            case REPO_PORT:
+                setRepoPort((Integer) value);
+                break;
+            case WCI_PORT:
+                setWciPort((Integer) value);
+                break;
+            case WEATHER_RECEIVE_INTERVAL:
+                setWeatherReceiveInterval((Integer) value);
+                break;
+            default:
+                throw new IllegalArgumentException("No option found with id " + id);
+        }
+    }
+
+    @Override
+    public void setInt(int id, int value) {
+        switch (id) {
+            case UNITS:
+                setUnits(value);
+                break;
+            case SERVER_HOST:
+                throw new IllegalArgumentException("SERVER_HOST isn't int");
+            case CONTRACT:
+                setContractType(value);
+                break;
+            case REPO_PORT:
+                setRepoPort(value);
+                break;
+            case WCI_PORT:
+                setWciPort(value);
+                break;
+            case WEATHER_RECEIVE_INTERVAL:
+                setWeatherReceiveInterval(value);
+                break;
+            default:
+                throw new IllegalArgumentException("No option found with id " + id);
+        }
+    }
+
     /**
      * Gets packed units which was saved in {@link SharedPreferences}
      */
@@ -96,12 +192,6 @@ public final class Preferences {
         return prefs.getInt(KEY_UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY);
     }
 
-    /**
-     * Sets packed units to memory and disk.
-     * On the next start, {@link Preferences#getUnits()} will return the same packed units
-     *
-     * @throws IllegalArgumentException if given units is invalid
-     */
     public void setUnits(int units) {
         if(!ValueUnitsPacked.isValid(units)) {
             throw new IllegalArgumentException("units");

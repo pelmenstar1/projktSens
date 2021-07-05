@@ -24,7 +24,7 @@ public final class Startup {
             return;
         }
 
-        Preferences prefs = Preferences.of(context);
+        AppPreferences prefs = AppPreferencesImpl.of(context);
         PreferredUnits.setUnits(prefs.getUnits());
     }
 }

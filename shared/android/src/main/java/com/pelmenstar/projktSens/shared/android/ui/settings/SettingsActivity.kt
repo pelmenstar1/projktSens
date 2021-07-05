@@ -1,31 +1,24 @@
 @file:Suppress("FunctionName", "NOTHING_TO_INLINE")
 @file:SuppressLint("SetTextI18n")
 
-package com.pelmenstar.projktSens.weather.app.ui.settings
+package com.pelmenstar.projktSens.shared.android.ui.settings
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
-import androidx.core.content.res.ResourcesCompat
+import com.pelmenstar.projktSens.shared.ReflectionUtils
+import com.pelmenstar.projktSens.shared.android.Intent
+import com.pelmenstar.projktSens.shared.android.Preferences
+import com.pelmenstar.projktSens.shared.android.R
 import com.pelmenstar.projktSens.shared.android.ui.*
-import com.pelmenstar.projktSens.weather.app.Preferences
-import com.pelmenstar.projktSens.weather.app.R
 
 class SettingsActivity : HomeButtonSupportActivity() {
-    private val settings: Array<Setting<*>> = arrayOf(
-        TemperatureSetting(),
-        PressureSetting(),
-        ServerHostSetting(),
-        ServerContractSetting(),
-        RepoPortSetting(),
-        WciPortSetting(),
-        WeatherReceiveIntervalSetting()
-    )
+    private lateinit var settingsContext: SettingsContext
+    private lateinit var prefs: Preferences
 
     private lateinit var saveButton: Button
 
@@ -35,16 +28,31 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val res = resources
 
         actionBar {
-            title = res.getText(R.string.settings)
+            title = resources.getText(R.string.settings_title)
             setDisplayHomeAsUpEnabled(true)
         }
 
-        val prefs = Preferences.of(this)
+        initFromIntentExtra()
+        loadStates(savedInstanceState)
+        computeHashes(savedInstanceState)
 
-        settings.forEach {
+        setContentView(createContent())
+
+        disableSaveButtonIfSettingsInvalid()
+    }
+
+    private fun initFromIntentExtra() {
+        val intent = requireIntent()
+        settingsContext = intent.getParcelableExtra(EXTRA_SETTINGS_CONTEXT)!!
+        val prefsName = intent.getStringExtra(EXTRA_PREFERENCES)!!
+        prefs = ReflectionUtils.createFromEmptyConstructorOrInstance(prefsName)
+        prefs.initialize(this)
+    }
+
+    private fun loadStates(savedInstanceState: Bundle?) {
+        settingsContext.data.forEach {
             if(savedInstanceState != null) {
                 val success = it.loadStateFromBundle(savedInstanceState)
                 if(!success) {
@@ -54,7 +62,10 @@ class SettingsActivity : HomeButtonSupportActivity() {
                 it.loadStateFromPrefs(prefs)
             }
         }
+    }
 
+    private fun computeHashes(savedInstanceState: Bundle?) {
+        val settings = settingsContext.data
         initialStateHashes = if(savedInstanceState != null) {
             val hashes = savedInstanceState.getIntArray(STATE_INITIAL_STATE_HASHES) ?: throw NullPointerException("STATE_INITIAL_STATE_HASHES is null")
 
@@ -68,14 +79,14 @@ class SettingsActivity : HomeButtonSupportActivity() {
                 settings[i].state.hashCode()
             }
         }
+    }
 
-        setContentView(createContent())
-
+    private fun disableSaveButtonIfSettingsInvalid() {
         val onValidChangedListener = Setting.IncompleteState.OnValidChanged { isValid ->
             saveButton.isEnabled = isValid
         }
 
-        settings.forEach {
+        settingsContext.data.forEach {
             // after state is loaded
             val state = it.state
 
@@ -90,13 +101,13 @@ class SettingsActivity : HomeButtonSupportActivity() {
     }
 
     private fun createContent(): View {
-        val prefs = Preferences.of(this)
+        val prefs = prefs
+        val settings = settingsContext.data
 
         val res = resources
         val dp5 = (5 * res.displayMetrics.density).toInt()
         val context = this
 
-        val caption = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Caption)
         val body1 = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
 
         return FrameLayout(this) {
@@ -145,7 +156,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
                         bottomMargin = dp5
                     }
                     saveButton = this
-                    text = res.getText(R.string.save_settings)
+                    text = res.getText(R.string.settings_save)
 
                     setOnClickListener {
                         var changed = false
@@ -171,24 +182,13 @@ class SettingsActivity : HomeButtonSupportActivity() {
                         finish()
                     }
                 }
-
-                TextView {
-                    frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                        gravity = Gravity.BOTTOM or Gravity.START
-                        leftMargin = dp5
-                        bottomMargin = dp5
-                    }
-
-                    applyTextAppearance(caption)
-                    typeface = loadNotosansFont()
-                    text = res.getText(R.string.offCompanyName)
-                }
             }
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        val settings = settingsContext.data
 
         settings.forEach {
             it.saveStateToBundle(outState)
@@ -218,20 +218,23 @@ class SettingsActivity : HomeButtonSupportActivity() {
         super.onBackPressed()
     }
 
-    private fun loadNotosansFont(): Typeface {
-        val notosans = ResourcesCompat.getFont(this, R.font.notosans_medium)
-
-        return notosans ?: Typeface.SERIF
-    }
-
     companion object {
         private const val STATE_INITIAL_STATE_HASHES = "SettingsActivity.state.initialStateHashes"
+        private const val EXTRA_SETTINGS_CONTEXT = "SettingsActivity.intent.settingsContext"
+        private const val EXTRA_PREFERENCES = "SettingsActivity.intent.preferences"
 
         const val RETURN_DATA_STATE_CHANGED = "SettingsActivity.returnData.stateChanged"
 
         @JvmStatic
-        fun intent(context: Context): Intent {
-            return Intent(context, SettingsActivity::class.java)
+        fun<TPrefs: Preferences> intent(
+            context: Context,
+            settingsContext: SettingsContext,
+            prefsClass: Class<TPrefs>
+        ): Intent {
+            return Intent(context, SettingsActivity::class.java) {
+                putExtra(EXTRA_SETTINGS_CONTEXT, settingsContext)
+                putExtra(EXTRA_PREFERENCES, prefsClass.name)
+            }
         }
     }
 }

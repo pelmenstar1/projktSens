@@ -4,4 +4,7 @@
 
     <string name="dontRequestPermission">Не нужно</string>
     <string name="requestPermission">Давай</string>
+
+    <string name="settings_title">Настройки</string>
+    <string name="settings_save">Сохранить</string>
 </resources>

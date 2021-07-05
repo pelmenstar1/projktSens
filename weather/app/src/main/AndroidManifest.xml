@@ -21,7 +21,7 @@
         android:allowBackup="true">
 
         <activity
-            android:name=".ui.settings.SettingsActivity"
+            android:name="com.pelmenstar.projktSens.shared.android.ui.settings.SettingsActivity"
             android:configChanges="orientation|screenSize"/>
         <activity
             android:name=".ui.StartupActivity"

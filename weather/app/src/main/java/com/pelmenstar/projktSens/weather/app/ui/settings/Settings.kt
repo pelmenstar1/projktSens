@@ -7,103 +7,30 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import androidx.annotation.ArrayRes
-import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType
+import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
 import com.pelmenstar.projktSens.shared.android.ui.EditText
+import com.pelmenstar.projktSens.shared.android.ui.settings.Setting
 import com.pelmenstar.projktSens.shared.equalsPattern
-import com.pelmenstar.projktSens.weather.app.Preferences
+import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.PreferredUnits
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.models.ValueUnit
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
 import java.net.InetAddress
 
-/**
- * Describes the required information to create setting, save and load state of it
- */
-abstract class Setting<TState : Any> {
-    /**
-     * Special type of state which allows the state to incomplete (invalid).
-     * When [IncompleteState.isValid] is false, it cannot be saved to preferences.
-     * Though, it can be saved and loaded back from bundle, as temporary state usually saved to bundle
-     * and it may be incomplete.
-     */
-    open class IncompleteState {
-        fun interface OnValidChanged {
-            fun onChanged(newValue: Boolean)
-        }
-
-        /**
-         * [OnValidChanged.onChanged] called when [isValid] is changed
-         */
-        var onValidChanged: OnValidChanged? = null
-
-        /**
-         * Determines whether state is valid
-         */
-        var isValid: Boolean = true
-            set(value) {
-                val oldValue = field
-                field = value
-
-                if(value != oldValue) {
-                    onValidChanged?.onChanged(value)
-                }
-            }
-    }
-
-    private var _state: TState? = null
-
-    /**
-     * State of [Setting]
-     *
-     * @throws RuntimeException if state isn't loaded
-     */
-    var state: TState
-        get() = _state ?: throw RuntimeException("State is not loaded")
-        protected set(value) {
-            _state = value
-        }
-
-    /**
-     * Returns resource ID of string which describes the setting for user
-     */
-    @StringRes
-    abstract fun getNameId(): Int
-
-    /**
-     * Creates some [View] in order to give user a possibility to change setting
-     */
-    abstract fun createView(context: Context): View
-
-    /**
-     * Loads state from given [Preferences]
-     */
-    abstract fun loadStateFromPrefs(prefs: Preferences)
-
-    /**
-     * Loads state from given [Bundle].
-     * Note that if [TState] is derived from [IncompleteState],
-     * it is allowed to bundle to contain incomplete (invalid) values
-     * but values have to be loaded anyway
-     */
-    abstract fun loadStateFromBundle(bundle: Bundle): Boolean
-
-    /**
-     * Saves current state of setting to [Preferences]
-     */
-    abstract fun saveStateToPrefs(prefs: Preferences)
-
-    /**
-     * Saves current state of setting to [Bundle].
-     * Note that if [TState] is derived from [IncompleteState],
-     * state have to be saved even if values are invalid.
-     */
-    abstract fun saveStateToBundle(outState: Bundle)
-}
+val SETTINGS: Array<out Setting<*>> = arrayOf(
+    TemperatureSetting(),
+    PressureSetting(),
+    ServerHostSetting(),
+    ServerContractSetting(),
+    RepoPortSetting(),
+    WciPortSetting(),
+    WeatherReceiveIntervalSetting()
+)
 
 data class ValueUnitState(@JvmField var unit: Int)
 
@@ -151,7 +78,7 @@ class TemperatureSetting: Setting<ValueUnitState>() {
         val newUnits = ValueUnitsPacked.create(state.unit, pressUnit)
 
         PreferredUnits.setUnits(newUnits)
-        prefs.units = newUnits
+        prefs.setInt(AppPreferences.UNITS, newUnits)
     }
 
     override fun saveStateToBundle(outState: Bundle) {
@@ -159,7 +86,7 @@ class TemperatureSetting: Setting<ValueUnitState>() {
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
-        val units = prefs.units
+        val units = prefs.getInt(AppPreferences.UNITS)
         state = ValueUnitState(ValueUnitsPacked.getTemperatureUnit(units))
     }
 
@@ -218,7 +145,7 @@ class PressureSetting: Setting<ValueUnitState>() {
         val newUnits = ValueUnitsPacked.create(tempUnit, state.unit)
 
         PreferredUnits.setUnits(newUnits)
-        prefs.units = newUnits
+        prefs.setInt(AppPreferences.UNITS, newUnits)
     }
 
     override fun saveStateToBundle(outState: Bundle) {
@@ -226,7 +153,7 @@ class PressureSetting: Setting<ValueUnitState>() {
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
-        val units = prefs.units
+        val units = prefs.getInt(AppPreferences.UNITS)
 
         state = ValueUnitState(ValueUnitsPacked.getPressureUnit(units))
     }
@@ -246,41 +173,41 @@ class PressureSetting: Setting<ValueUnitState>() {
     }
 }
 
-class ServerHostState: Setting.IncompleteState {
-    private var _hostString: String = ""
-    var hostString: String
-        get() = _hostString
-        set(value) {
-            _hostString = value
+class ServerHostSetting: Setting<ServerHostSetting.State>() {
+    class State: IncompleteState {
+        private var _hostString: String = ""
+        var hostString: String
+            get() = _hostString
+            set(value) {
+                _hostString = value
 
-            isValid = try {
-                InetAddress.getByName(value)
-                true
-            } catch (e: Exception) {
-                false
+                isValid = try {
+                    InetAddress.getByName(value)
+                    true
+                } catch (e: Exception) {
+                    false
+                }
+            }
+
+        constructor(hostString: String) {
+            this.hostString = hostString
+        }
+
+        constructor(hostString: String, notParseHostMarker: Boolean) {
+            _hostString = hostString
+        }
+
+        override fun equals(other: Any?): Boolean {
+            return equalsPattern(other) { o ->
+                _hostString == o._hostString
             }
         }
 
-    constructor(hostString: String) {
-        this.hostString = hostString
-    }
-
-    constructor(hostString: String, notParseHostMarker: Boolean) {
-        _hostString = hostString
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return equalsPattern(other) { o ->
-            _hostString == o._hostString
+        override fun hashCode(): Int {
+            return _hostString.hashCode()
         }
     }
 
-    override fun hashCode(): Int {
-        return _hostString.hashCode()
-    }
-}
-
-class ServerHostSetting: Setting<ServerHostState>() {
     override fun getNameId(): Int {
         return R.string.serverHost
     }
@@ -308,7 +235,7 @@ class ServerHostSetting: Setting<ServerHostState>() {
     }
 
     override fun saveStateToPrefs(prefs: Preferences) {
-        prefs.serverHostString = state.hostString
+        prefs[AppPreferences.SERVER_HOST] = state.hostString
     }
 
     override fun saveStateToBundle(outState: Bundle) {
@@ -316,13 +243,13 @@ class ServerHostSetting: Setting<ServerHostState>() {
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
-        state = ServerHostState(prefs.serverHostString, false)
+        state = State(prefs[AppPreferences.SERVER_HOST] as String, false)
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
         val hostString = bundle.getString(BUNDLE_STATE_HOST)
         return if(hostString != null) {
-            state = ServerHostState(hostString)
+            state = State(hostString)
 
             true
         } else {
@@ -373,7 +300,7 @@ class ServerContractSetting: Setting<ServerContractSetting.State>() {
     }
 
     override fun saveStateToPrefs(prefs: Preferences) {
-        prefs.contractType = state.contractType
+        prefs.setInt(AppPreferences.CONTRACT, state.contractType)
     }
 
     override fun saveStateToBundle(outState: Bundle) {
@@ -381,7 +308,7 @@ class ServerContractSetting: Setting<ServerContractSetting.State>() {
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
-       state = State(prefs.contractType)
+        state = State(prefs.getInt(AppPreferences.CONTRACT))
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
@@ -469,7 +396,7 @@ abstract class PortSettingBase: Setting<PortSettingBase.State>() {
     }
 
     override fun saveStateToPrefs(prefs: Preferences) {
-        setPort(prefs, state.port)
+        prefs.setInt(getPreferencesKey(), state.port)
     }
 
     override fun saveStateToBundle(outState: Bundle) {
@@ -477,7 +404,8 @@ abstract class PortSettingBase: Setting<PortSettingBase.State>() {
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
-        state = State(getPort(prefs))
+        val port = prefs.getInt(getPreferencesKey())
+        state = State(port)
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
@@ -493,8 +421,7 @@ abstract class PortSettingBase: Setting<PortSettingBase.State>() {
     }
 
     protected abstract fun getBundleStatePortKey(): String
-    protected abstract fun getPort(prefs: Preferences): Int
-    protected abstract fun setPort(prefs: Preferences, port: Int)
+    protected abstract fun getPreferencesKey(): Int
 
     companion object {
         private const val PORT_MIN = 1024
@@ -516,13 +443,7 @@ class RepoPortSetting: PortSettingBase() {
         return "RepoPortSetting.State.port"
     }
 
-    override fun getPort(prefs: Preferences): Int {
-        return prefs.repoPort
-    }
-
-    override fun setPort(prefs: Preferences, port: Int) {
-        prefs.repoPort = port
-    }
+    override fun getPreferencesKey(): Int = AppPreferences.REPO_PORT
 }
 
 class WciPortSetting: PortSettingBase() {
@@ -534,13 +455,7 @@ class WciPortSetting: PortSettingBase() {
         return "WciPortSetting.State.port"
     }
 
-    override fun getPort(prefs: Preferences): Int {
-        return prefs.wciPort
-    }
-
-    override fun setPort(prefs: Preferences, port: Int) {
-        prefs.wciPort = port
-    }
+    override fun getPreferencesKey(): Int = AppPreferences.WCI_PORT
 }
 
 class WeatherReceiveIntervalSetting: Setting<WeatherReceiveIntervalSetting.State>() {
@@ -608,7 +523,7 @@ class WeatherReceiveIntervalSetting: Setting<WeatherReceiveIntervalSetting.State
     }
 
     override fun saveStateToPrefs(prefs: Preferences) {
-        prefs.weatherReceiveInterval = state.interval
+        prefs.setInt(AppPreferences.WEATHER_RECEIVE_INTERVAL, state.interval)
     }
 
     override fun saveStateToBundle(outState: Bundle) {
@@ -616,7 +531,7 @@ class WeatherReceiveIntervalSetting: Setting<WeatherReceiveIntervalSetting.State
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
-        state = State(prefs.weatherReceiveInterval)
+        state = State(prefs.getInt(AppPreferences.WEATHER_RECEIVE_INTERVAL))
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {

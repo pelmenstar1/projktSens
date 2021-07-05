@@ -12,6 +12,8 @@ import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.button.MaterialButton
 import com.pelmenstar.projktSens.shared.android.obtainStyledAttributes
 import com.pelmenstar.projktSens.shared.android.ui.*
+import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsActivity
+import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsContext
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.weather.app.R
@@ -22,7 +24,7 @@ import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
 import com.pelmenstar.projktSens.weather.app.ui.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.WeatherInitScreen
 import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarActivity
-import com.pelmenstar.projktSens.weather.app.ui.settings.SettingsActivity
+import com.pelmenstar.projktSens.weather.app.ui.settings.SETTINGS
 import com.pelmenstar.projktSens.weather.app.ui.sunriseSunset.SunriseSunsetCalendarActivity
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
 
@@ -329,6 +331,9 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val context = this
+        val component = DaggerAppComponent.builder().appModule(AppModule(context)).build()
+        val prefsClass = component.preferences().javaClass
+        val settingsContext = SettingsContext(*SETTINGS)
 
         menu.add {
             item(
@@ -336,7 +341,12 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                 showsAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
                 iconRes = R.drawable.ic_settings
             ) {
-                startSettingActivity.launch(SettingsActivity.intent(context))
+                val intent = SettingsActivity.intent(
+                    context,
+                    settingsContext,
+                    prefsClass
+                )
+                startSettingActivity.launch(intent)
                 true
             }
             item(

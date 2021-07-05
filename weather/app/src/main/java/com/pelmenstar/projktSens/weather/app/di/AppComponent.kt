@@ -3,6 +3,7 @@ package com.pelmenstar.projktSens.weather.app.di
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter
+import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.formatters.MoonPhaseFormatter
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
 import com.pelmenstar.projktSens.weather.app.ui.home.HomeContract
@@ -33,4 +34,5 @@ interface AppComponent {
 
     fun weatherChannelInfoProvider(): WeatherChannelInfoProvider
     fun protoConfig(): ProtoConfig
+    fun preferences(): AppPreferences
 }

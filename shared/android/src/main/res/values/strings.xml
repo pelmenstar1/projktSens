@@ -4,4 +4,7 @@
 
     <string name="dontRequestPermission">Don\'t request</string>
     <string name="requestPermission">Request</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_save">Save</string>
 </resources>
