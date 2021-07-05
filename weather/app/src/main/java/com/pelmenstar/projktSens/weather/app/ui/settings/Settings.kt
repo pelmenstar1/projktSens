@@ -10,6 +10,7 @@ import androidx.annotation.ArrayRes
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType
+import com.pelmenstar.projktSens.shared.InetAddressUtils
 import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
 import com.pelmenstar.projktSens.shared.android.ui.EditText
@@ -20,7 +21,6 @@ import com.pelmenstar.projktSens.weather.app.PreferredUnits
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.models.ValueUnit
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
-import java.net.InetAddress
 
 val SETTINGS: Array<out Setting<*>> = arrayOf(
     TemperatureSetting(),
@@ -181,12 +181,7 @@ class ServerHostSetting: Setting<ServerHostSetting.State>() {
             set(value) {
                 _hostString = value
 
-                isValid = try {
-                    InetAddress.getByName(value)
-                    true
-                } catch (e: Exception) {
-                    false
-                }
+                isValid = InetAddressUtils.isValidNumericalIpv4(value)
             }
 
         constructor(hostString: String) {

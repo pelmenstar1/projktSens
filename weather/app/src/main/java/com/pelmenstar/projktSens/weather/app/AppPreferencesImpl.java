@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType;
+import com.pelmenstar.projktSens.shared.InetAddressUtils;
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 public class AppPreferencesImpl implements AppPreferences {
     public static final AppPreferencesImpl INSTANCE = new AppPreferencesImpl();
@@ -63,17 +63,13 @@ public class AppPreferencesImpl implements AppPreferences {
                 int weatherReceiveInterval = prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, -1);
 
                 String serverHostStr = prefs.getString(KEY_SERVER_HOST, null);
-                InetAddress serverHost = null;
-
+                boolean isValidHost = false;
                 if(serverHostStr != null) {
-                    try {
-                        serverHost = InetAddress.getByName(serverHostStr);
-                    } catch (Exception ignored) {
-                    }
+                    isValidHost = InetAddressUtils.isValidNumericalIpv4(serverHostStr);
                 }
 
                 if (!ValueUnitsPacked.isValid(units) ||
-                        serverHost == null ||
+                        isValidHost ||
                         (contractType | repoPort | wciPort | weatherReceiveInterval) < 0) {
                     writeDefault();
                 }
@@ -202,11 +198,7 @@ public class AppPreferencesImpl implements AppPreferences {
 
     @NotNull
     public InetAddress getServerHost() {
-        try {
-            return InetAddress.getByName(getServerHostString());
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
+        return InetAddressUtils.parseNumericalIpv4OrThrow(getServerHostString());
     }
 
     @NotNull
