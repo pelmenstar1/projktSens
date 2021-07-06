@@ -3,7 +3,7 @@ buildscript {
     ext.min_sdk_version = 21
     ext.build_tools_version = '30.0.2'
     ext.compile_sdk_version = 30
-    ext.kotlin_version = '1.5.10'
+    ext.kotlin_version = '1.5.20'
 
     repositories {
         google()
@@ -11,7 +11,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.1'
+        classpath 'com.android.tools.build:gradle:4.2.2'
 
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'androidx.benchmark:benchmark-gradle-plugin:1.0.0'
