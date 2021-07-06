@@ -75,7 +75,9 @@ public final class ReflectionUtils {
     /**
      * Tries to create instance of class invoking public constructor with no parameters.
      * If there are no such constructors, tries to take instance of class from INSTANCE field.
-     * If any of choices succeed, throw {@link RuntimeException}.
+     * Field INSTANCE is required to be the same type with top class (argument)
+     * If any of choices succeed, it throws {@link RuntimeException}.
+     *
      * @param name name of class
      * @param <T> result type
      */
@@ -89,7 +91,9 @@ public final class ReflectionUtils {
     /**
      * Tries to create instance of class invoking public constructor with no parameters.
      * If there are no such constructors, tries to take instance of class from INSTANCE field.
-     * If any of choices succeed, throw {@link RuntimeException}.
+     * Field INSTANCE is required to be the same type with top class (argument)
+     * If any of choices succeed, it throws {@link RuntimeException}.
+     *
      * @param name name of class
      * @param initialize determines whether class should be initialized after lookup
      * @param classLoader {@link ClassLoader} to load class from
@@ -109,7 +113,9 @@ public final class ReflectionUtils {
     /**
      * Tries to create instance of class invoking public constructor with no parameters.
      * If there are no such constructors, tries to take instance of class from INSTANCE field.
-     * If any of choices succeed, throw {@link RuntimeException}
+     * Field INSTANCE is required to be the same type with top class (argument).
+     * If any of choices succeed, it throws {@link RuntimeException}.
+     *
      * @param c class of instance which will be returned
      * @param <T> result type
      */
@@ -117,26 +123,30 @@ public final class ReflectionUtils {
     @NotNull
     public static<T> T createFromEmptyConstructorOrInstance(@NotNull Class<T> c) {
         int classMods = c.getModifiers();
-        boolean isAbstract = (classMods & Modifier.ABSTRACT) != 0;
 
-        // no need to find constructor if class is abstract.
-        if(!isAbstract) {
-            // searches for only public constructors
-            Constructor<?>[] constructors = c.getConstructors();
+        // No need to find constructor and lookup INSTANCE field if class is abstract.
+        // Even when abstract class has INSTANCE field,
+        // INSTANCE is required to be the same type with top class.
+        // So it's impossible 'cause we can't instantiate abstract class
+        if ((classMods & Modifier.ABSTRACT) != 0) {
+            throw new RuntimeException("Class is abstract");
+        }
 
-            for (Constructor<?> constructor : constructors) {
-                Class<?>[] params = constructor.getParameterTypes();
-                if (params.length == 0) {
-                    try {
-                        Object instance = constructor.newInstance(EmptyArray.OBJECT);
-                        return (T) instance;
-                    } catch (InstantiationException e) {
-                        throw new RuntimeException("Constructor threw exception", e);
-                    } catch (IllegalAccessException e) {
-                        // will never happen. we checked length of parameters
-                    } catch (InvocationTargetException e) {
-                        // will never happen. we checked whether class is abstract
-                    }
+        // searches for only public constructors
+        Constructor<?>[] constructors = c.getConstructors();
+
+        for (Constructor<?> constructor : constructors) {
+            Class<?>[] params = constructor.getParameterTypes();
+            if (params.length == 0) {
+                try {
+                    Object instance = constructor.newInstance(EmptyArray.OBJECT);
+                    return (T) instance;
+                } catch (InstantiationException e) {
+                    throw new RuntimeException("Constructor threw exception", e);
+                } catch (IllegalAccessException e) {
+                    // will never happen. we checked length of parameters
+                } catch (InvocationTargetException e) {
+                    // will never happen. we checked whether class is abstract
                 }
             }
         }
@@ -145,34 +155,26 @@ public final class ReflectionUtils {
         try {
             instanceField = c.getField("INSTANCE");
         } catch (NoSuchFieldException e) {
-            String msg;
-
-            if(isAbstract) {
-                msg = "Class is abstract and has no INSTANCE field";
-            } else {
-                msg = "Class has no public constructors with no parameters and no public INSTANCE field";
-            }
-
-            throw new RuntimeException(msg);
+            throw new RuntimeException("Class has no public constructors with no parameters and no public INSTANCE field");
         }
         int fieldMods = instanceField.getModifiers();
 
-        if((fieldMods & Modifier.STATIC) == 0) {
+        if ((fieldMods & Modifier.STATIC) == 0) {
             throw new RuntimeException("Field INSTANCE should be static");
         }
 
         T instance;
         try {
-            instance = (T)instanceField.get(null);
+            instance = (T) instanceField.get(null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        if(instance == null) {
+        if (instance == null) {
             throw new NullPointerException("Field INSTANCE is null");
         }
 
-        if(instance.getClass() != c) {
+        if (instance.getClass() != c) {
             throw new NullPointerException("Base class and class of INSTANCE differs");
         }
 
