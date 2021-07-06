@@ -2,12 +2,14 @@ package com.pelmenstar.projktSens.jserver
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.pelmenstar.projktSens.shared.android.ui.Button
-import com.pelmenstar.projktSens.shared.android.ui.LinearLayout
-import com.pelmenstar.projktSens.shared.android.ui.content
+import com.pelmenstar.projktSens.shared.android.ui.*
+import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsActivity
+import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsContext
 
 @SuppressLint("SetTextI18n")
 class MainActivity : AppCompatActivity() {
@@ -63,5 +65,22 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val settingsContext = SettingsContext(*SETTINGS)
+        val context = this
+
+        menu.add {
+            item(
+                titleRes = R.string.main_menu_settings,
+                showsAsAction = MenuItem.SHOW_AS_ACTION_IF_ROOM,
+                iconRes = R.drawable.ic_settings) {
+                val intent = SettingsActivity.intent(context, settingsContext, AppPreferences::class.java)
+                context.startActivity(intent)
+                true
+            }
+        }
+        return true
     }
 }
