@@ -2,6 +2,7 @@ package com.pelmenstar.projktSens.jserver
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.pelmenstar.projktSens.jserver.servers.RepoServer
 import com.pelmenstar.projktSens.serverProtocol.Errors
 import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoClient

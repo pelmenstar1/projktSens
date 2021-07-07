@@ -1,4 +1,7 @@
-package com.pelmenstar.projktSens.jserver
+package com.pelmenstar.projktSens.jserver.logging
+
+import com.pelmenstar.projktSens.jserver.LogDelegate
+import com.pelmenstar.projktSens.jserver.LogLevel
 
 class CombinedLogDelegate(
     private val delegates: Array<LogDelegate>

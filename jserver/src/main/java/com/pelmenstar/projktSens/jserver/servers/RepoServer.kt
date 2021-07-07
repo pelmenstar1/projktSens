@@ -1,5 +1,6 @@
-package com.pelmenstar.projktSens.jserver
+package com.pelmenstar.projktSens.jserver.servers
 
+import com.pelmenstar.projktSens.jserver.serverConfig
 import com.pelmenstar.projktSens.serverProtocol.Errors
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoContract

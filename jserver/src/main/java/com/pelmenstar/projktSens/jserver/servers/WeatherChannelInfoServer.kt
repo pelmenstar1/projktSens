@@ -1,5 +1,6 @@
-package com.pelmenstar.projktSens.jserver
+package com.pelmenstar.projktSens.jserver.servers
 
+import com.pelmenstar.projktSens.jserver.WeatherMonitor
 import com.pelmenstar.projktSens.shared.buildByteArray
 import com.pelmenstar.projktSens.shared.writeLong
 import com.pelmenstar.projktSens.shared.writeSuspend

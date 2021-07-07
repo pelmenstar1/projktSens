@@ -1,6 +1,8 @@
-package com.pelmenstar.projktSens.jserver
+package com.pelmenstar.projktSens.jserver.logging
 
 import android.util.Log
+import com.pelmenstar.projktSens.jserver.LogDelegate
+import com.pelmenstar.projktSens.jserver.LogLevel
 
 /**
  * Implementation of [LogDelegate] which prints message using [Log]

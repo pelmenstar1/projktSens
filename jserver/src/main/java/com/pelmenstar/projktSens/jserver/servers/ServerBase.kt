@@ -1,5 +1,7 @@
-package com.pelmenstar.projktSens.jserver
+package com.pelmenstar.projktSens.jserver.servers
 
+import com.pelmenstar.projktSens.jserver.Logger
+import com.pelmenstar.projktSens.jserver.serverConfig
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.shared.acceptSuspend
 import com.pelmenstar.projktSens.shared.bindSuspend

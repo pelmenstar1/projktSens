@@ -1,7 +1,5 @@
 package com.pelmenstar.projktSens.jserver
 
-import kotlin.text.StringBuilder
-
 /**
  * Represents various level of logging. When message is logger, it's possible to specify its priority using
  * these levels ([LogLevel.DEBUG] has the lowest priority, [LogLevel.ERROR] has the highest one)
