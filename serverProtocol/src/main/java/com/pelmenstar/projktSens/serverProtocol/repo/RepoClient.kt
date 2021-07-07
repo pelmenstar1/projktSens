@@ -88,7 +88,7 @@ class RepoClient(config: HostedProtoConfig) {
     suspend fun<T:Any> requestRawResponse(request: RepoRequest, responseValueClass: Class<T>): RepoResponse {
         return withContext(Dispatchers.IO) {
             Socket().use { socket ->
-                socket.soTimeout = 70000
+                socket.soTimeout = 5000
                 socket.connectSuspend(repoAddress)
 
                 repoContract.writeRequest(request, socket.getOutputStream())
