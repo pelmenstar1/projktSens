@@ -69,7 +69,7 @@ public class AppPreferencesImpl implements AppPreferences {
                 }
 
                 if (!ValueUnitsPacked.isValid(units) ||
-                        isValidHost ||
+                        !isValidHost ||
                         (contractType | repoPort | wciPort | weatherReceiveInterval) < 0) {
                     writeDefault();
                 }
