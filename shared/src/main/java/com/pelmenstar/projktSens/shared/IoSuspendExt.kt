@@ -34,6 +34,13 @@ suspend fun Socket.connectSuspend(address: SocketAddress) {
     }
 }
 
+suspend fun Socket.connectSuspend(address: SocketAddress, timeout: Int) {
+    suspendCoroutine<Unit> { cont ->
+        connect(address, timeout)
+        cont.resumeWith(UnitResult.SUCCESS)
+    }
+}
+
 /**
  * Suspend version of [Socket.bind]
  */

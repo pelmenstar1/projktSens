@@ -89,7 +89,7 @@ class RepoClient(config: HostedProtoConfig) {
         return withContext(Dispatchers.IO) {
             Socket().use { socket ->
                 socket.soTimeout = 5000
-                socket.connectSuspend(repoAddress)
+                socket.connectSuspend(repoAddress, 5000)
 
                 repoContract.writeRequest(request, socket.getOutputStream())
                 repoContract.readResponse(socket.getInputStream(), responseValueClass)

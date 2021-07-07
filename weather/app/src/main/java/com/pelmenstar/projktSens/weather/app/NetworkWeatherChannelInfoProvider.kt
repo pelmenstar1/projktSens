@@ -13,7 +13,7 @@ class NetworkWeatherChannelInfoProvider(config: HostedProtoConfig) : WeatherChan
 
     override suspend fun getWaitTimeForNextWeather(): Long {
         return Socket().use { socket ->
-            socket.connectSuspend(address)
+            socket.connectSuspend(address, 5000)
             socket.soTimeout = 5000
 
             val input = socket.getInputStream()
