@@ -1,6 +1,5 @@
 package com.pelmenstar.projktSens.jserver
 
-import android.util.Log
 import com.pelmenstar.projktSens.weather.models.WeatherInfoProvider
 import com.pelmenstar.projktSens.weather.models.WeatherRepository
 import kotlinx.coroutines.*
@@ -18,11 +17,18 @@ object WeatherMonitor {
     private var job: Job? = null
     private val nextWeatherRequestTime = AtomicLong()
 
+    private val log: Logger
+
+    init {
+        val config = serverConfig
+        log = Logger("WeatherMonitor", config.loggerConfig)
+    }
+
     /**
      * Returns epoch millis when next weather will be requested
      */
     fun getNextWeatherRequestTime(): Long {
-        if(job == null) {
+        if (job == null) {
             throw IllegalStateException("Monitor is not started")
         }
 
@@ -33,8 +39,8 @@ object WeatherMonitor {
      * Starts monitoring weather. Monitor will not be started if monitor is already running
      */
     fun start() {
-        if(job != null) {
-            Log.e(TAG, "monitor is already running")
+        if (job != null) {
+            log.error("monitor is already running")
             return
         }
 
@@ -49,13 +55,19 @@ object WeatherMonitor {
                 try {
                     nextWeatherRequestTime.set(System.currentTimeMillis() + interval)
 
-                    if(!BuildConfig.DEBUG) {
-                        repo.put(dataProvider.getWeather())
+                    if (!BuildConfig.DEBUG) {
+                        // additional try-block 'cause if exception occurs here,
+                        // coroutine won't be delayed
+                        try {
+                            repo.put(dataProvider.getWeather())
+                        } catch (e: Exception) {
+                            log.error(e)
+                        }
                     }
 
                     delay(interval)
                 } catch (e: Exception) {
-                    Log.e(TAG, null, e)
+                    log.error(e)
                 }
             }
         }
