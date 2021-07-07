@@ -3,13 +3,17 @@ plugins {
     id 'kotlin-android'
 }
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     signingConfigs {
         release {
-            storeFile file('D:\\android_projects\\android-sign.jks')
-            storePassword 'pelmenI_'
-            keyPassword 'pelmenI_'
-            keyAlias 'release'
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
         }
     }
     compileSdkVersion compile_sdk_version
@@ -22,7 +26,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        //consumerProguardFiles "consumer-rules.pro"
+        consumerProguardFiles "consumer-rules.pro"
         signingConfig signingConfigs.release
     }
 
@@ -34,7 +38,7 @@ android {
 
         release {
             minifyEnabled true
-            //proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
