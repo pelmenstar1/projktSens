@@ -10,6 +10,8 @@ import java.util.concurrent.atomic.AtomicLong
  * Requests weather in [WeatherInfoProvider] and puts it to default [WeatherRepository]
  */
 object WeatherMonitor {
+    private val scope = CoroutineScope(Dispatchers.Default)
+
     private const val TAG = "WeatherMonitor"
 
     @JvmStatic
@@ -36,15 +38,20 @@ object WeatherMonitor {
             return
         }
 
-        job = GlobalScope.launch {
+        job = scope.launch {
             val config = serverConfig
             val protoConfig = config.protoConfig
             val dataProvider = config.weatherProvider
+            val repo = config.sharedRepo
             val interval = protoConfig.weatherChannelReceiveInterval.toLong()
 
             while (isActive) {
                 try {
                     nextWeatherRequestTime.set(System.currentTimeMillis() + interval)
+
+                    if(!BuildConfig.DEBUG) {
+                        repo.put(dataProvider.getWeather())
+                    }
 
                     delay(interval)
                 } catch (e: Exception) {
