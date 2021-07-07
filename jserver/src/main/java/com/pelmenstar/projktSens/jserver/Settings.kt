@@ -19,7 +19,8 @@ import com.pelmenstar.projktSens.shared.equalsPattern
 val SETTINGS: Array<out Setting<*>> = arrayOf(
     RepoPortSetting(),
     WciPortSetting(),
-    ServerContractSetting()
+    ServerContractSetting(),
+    WeatherSendIntervalSetting()
 )
 
 abstract class PortSettingBase: Setting<PortSettingBase.State>() {
