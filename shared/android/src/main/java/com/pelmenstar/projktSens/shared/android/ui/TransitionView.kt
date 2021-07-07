@@ -67,7 +67,7 @@ class TransitionView @JvmOverloads constructor(
             Log.e(TAG, "Animation is already running")
         }
 
-        animationJob = GlobalScope.launch(Dispatchers.Default) {
+        animationJob = scope.launch {
             val trans = transition
 
             while (isActive) {
@@ -102,6 +102,8 @@ class TransitionView @JvmOverloads constructor(
     }
 
     companion object {
+        private val scope = CoroutineScope(Dispatchers.Default)
+
         private val random = Random(0)
         private const val TAG = "TransitionCircleView"
 

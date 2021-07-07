@@ -14,6 +14,8 @@ import java.net.Socket
 abstract class ServerBase protected constructor(
     port: ProtoConfig.() -> Int,
 ) {
+    private val scope = CoroutineScope(Dispatchers.IO)
+
     @Volatile
     private var serverSocket: ServerSocket? = null
 
@@ -44,7 +46,7 @@ abstract class ServerBase protected constructor(
             return
         }
 
-        job = GlobalScope.launch(Dispatchers.IO) {
+        job = scope.launch {
             try {
                 ServerSocket().use { server ->
                     server.bindSuspend(address, 5)
@@ -55,7 +57,7 @@ abstract class ServerBase protected constructor(
                     while (isActive) {
                         val client = server.acceptSuspend()
 
-                        GlobalScope.launch(Dispatchers.IO) {
+                        launch {
                             try {
                                 client.use {
                                     processClient(client)
@@ -86,7 +88,6 @@ abstract class ServerBase protected constructor(
             log.error(e)
         }
     }
-
 
     /**
      * This method processes messages from the incoming client.

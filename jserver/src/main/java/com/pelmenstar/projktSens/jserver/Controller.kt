@@ -2,10 +2,12 @@ package com.pelmenstar.projktSens.jserver
 
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.weather.models.debugGenDb
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class Controller(private val config: Config) {
+    private val scope = CoroutineScope(Dispatchers.Default)
     private val repoServer: RepoServer
     private val weatherChannelInfoServer: WeatherChannelInfoServer
 
@@ -29,13 +31,13 @@ class Controller(private val config: Config) {
     }
 
     fun clearRepository() {
-        GlobalScope.launch {
+        scope.launch {
             config.sharedRepo.clear()
         }
     }
 
     fun debugGenDb() {
-        GlobalScope.launch {
+        scope.launch {
             val startDate = ShortDate.minusDays(ShortDate.now(), 31)
 
             config.sharedRepo.debugGenDb(
