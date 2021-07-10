@@ -48,6 +48,9 @@
     <string name="settings_weatherRcvInterval_name">Receive interval (ms)</string>
     <string name="settings_weatherRcvInterval_lessOrEqZero">Менше або дорівнює 0</string>
 
+    <string name="lazyLoadingCalendar_failedToLoad">Не вдалось загрузити календар</string>
+    <string name="failedToGetLocation">Не вдалось дізнатись де Ви</string>
+
     <string-array name="months">
         <item>Січень</item>
         <item>Лютий</item>

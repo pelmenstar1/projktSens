@@ -26,4 +26,12 @@ public final class PointL {
     public static float getY(long p) {
         return FloatPair.getSecond(p);
     }
+
+    public static long withX(long p, float x) {
+        return FloatPair.withFirst(p, x);
+    }
+
+    public static long withY(long p, float y) {
+        return FloatPair.withSecond(p, y);
+    }
 }

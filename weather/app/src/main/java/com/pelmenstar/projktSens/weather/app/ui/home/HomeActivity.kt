@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.Button
-import android.widget.CalendarView
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
@@ -22,7 +21,6 @@ import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
 import com.pelmenstar.projktSens.weather.app.ui.ComplexWeatherView
-import com.pelmenstar.projktSens.weather.app.ui.WeatherInitScreen
 import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarActivity
 import com.pelmenstar.projktSens.weather.app.ui.settings.SETTINGS
 import com.pelmenstar.projktSens.weather.app.ui.sunriseSunset.SunriseSunsetCalendarActivity
@@ -32,7 +30,6 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
     override val context: Context
         get() = this
 
-    private lateinit var mainContent: View
     private lateinit var serverUnavailableView: View
 
     private lateinit var weatherView: ComplexWeatherView
@@ -44,7 +41,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
     private lateinit var gotoThisMonthReportButton: Button
     private lateinit var gotoPrevMonthReportButton: Button
 
-    private lateinit var calendarView: CalendarView
+    private lateinit var calendarView: LazyLoadingCalendarView
 
     private lateinit var prettyDateFormatter: PrettyDateFormatter
     private lateinit var unitFormatter: UnitFormatter
@@ -54,7 +51,6 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
     private var zeroColor: Int = 0
 
     private var presenter: HomeContract.Presenter? = null
-    private var firstStart: Boolean = true
 
     private val startSettingActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         val data = it.data
@@ -75,8 +71,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
             title = getText(R.string.weather)
         }
 
-        mainContent = createContent()
-        content { View(this) }
+        setContentView(createContent())
 
         initRes()
 
@@ -94,7 +89,11 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
             if (savedInstanceState != null) {
                 it.restoreState(savedInstanceState)
             }
+
+            calendarView.loadMinMaxHandler = it.getLoadMinMaxCalendarHandler()
+            weatherView.onRetryGetLocationListener = it.getOnRetryGetLocationListener()
         }
+
     }
 
     private fun initRes() {
@@ -257,7 +256,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                         gotoPrevMonthReportButton = this
                     }
 
-                    ScrollableCalendarView {
+                    addApply(LazyLoadingCalendarView(context)) {
                         linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                             topMargin = dp20
                         }
@@ -287,11 +286,6 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
     override fun onStart() {
         super.onStart()
 
-        if(firstStart) {
-            firstStart = false
-            startPresenterInit()
-        }
-
         presenter?.connectToWeatherChannel()
     }
 
@@ -299,21 +293,6 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
         super.onStop()
 
         presenter?.disconnectFromWeatherChannel()
-    }
-
-    private fun onInitEnded() {
-        setContentView(mainContent)
-        presenter?.onInitEnded()
-    }
-
-    private fun startPresenterInit() {
-        val presenter = presenter ?: return
-
-        WeatherInitScreen(presenter.initContext).run {
-            onInitEnded = Runnable { onInitEnded() }
-
-            showNow(supportFragmentManager, null)
-        }
     }
 
     override fun onDestroy() {
@@ -370,6 +349,10 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
         return true
     }
 
+    override fun setLocationLoaded(value: Boolean) {
+        weatherView.isLocationLoaded = value
+    }
+
     override fun setCurrentTime(time: Int) {
         weatherView.setTime(time)
     }
@@ -412,13 +395,5 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
         gotoPrevMonthReportButton.isEnabled = true
 
         serverUnavailableView.visibility = View.GONE
-    }
-
-    override fun setCalendarMinDate(millis: Long) {
-        calendarView.minDate = millis
-    }
-
-    override fun setCalendarMaxDate(millis: Long) {
-        calendarView.maxDate = millis
     }
 }

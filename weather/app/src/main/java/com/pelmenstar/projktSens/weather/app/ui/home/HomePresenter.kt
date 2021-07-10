@@ -6,12 +6,12 @@ import android.os.Message
 import android.util.Log
 import com.pelmenstar.projktSens.shared.android.Message
 import com.pelmenstar.projktSens.shared.android.mvp.BasePresenter
-import com.pelmenstar.projktSens.shared.android.ui.initScreen.InitContext
-import com.pelmenstar.projktSens.shared.android.ui.initScreen.InitTask
 import com.pelmenstar.projktSens.shared.geo.Geolocation
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider
 import com.pelmenstar.projktSens.shared.intBitsToFloat
-import com.pelmenstar.projktSens.shared.time.*
+import com.pelmenstar.projktSens.shared.time.ShortDate
+import com.pelmenstar.projktSens.shared.time.ShortDateInt
+import com.pelmenstar.projktSens.shared.time.ShortDateTime
 import com.pelmenstar.projktSens.weather.app.GeolocationCache
 import com.pelmenstar.projktSens.weather.app.ui.report.DayReportActivity
 import com.pelmenstar.projktSens.weather.app.ui.report.MonthReportActivity
@@ -43,39 +43,23 @@ class HomePresenter(
 
     private var lastGeolocation: Geolocation? = null
 
-    override val initContext: InitContext
-        get() {
-            val mapper = HomeInitMessageMapper(context.resources)
-
-            return InitContext(mapper, 2) {
-                add(object: InitTask(TASK_CALENDAR, 7 * 1000) {
-                    override suspend fun run(): Result {
-                        val range = dataSource.getAvailableDateRange()
-
-                        return if (range == null) {
-                            Result.Error
-                        } else {
-                            postSetCalendarMinMaxDay(range)
-                            Result.Ok
-                        }
-                    }
-                })
-
-                add(object: InitTask(TASK_GEOLOCATION, 10 * 1000, true) {
-                    override suspend fun run(): Result {
-                        lastGeolocation = geoProvider.getLastLocation()
-                        GeolocationCache.set(lastGeolocation)
-
-                        return Result.Ok
-                    }
-
-                })
-            }
+    override fun getLoadMinMaxCalendarHandler(): LazyLoadingCalendarView.LoadMinMaxHandler {
+        return LazyLoadingCalendarView.LoadMinMaxHandler {
+            dataSource.getAvailableDateRange()
         }
+    }
 
-    override fun onInitEnded() {
+    override fun getOnRetryGetLocationListener(): ComplexWeatherView.OnRetryGetLocationListener {
+        return ComplexWeatherView.OnRetryGetLocationListener {
+            startLoadingLocation()
+        }
+    }
+
+    override fun attach(view: HomeContract.View) {
+        super.attach(view)
+
         connectToWeatherChannel()
-        startRefreshingAstro()
+        startLoadingLocation()
     }
 
     override fun detach() {
@@ -87,7 +71,36 @@ class HomePresenter(
         scope.cancel()
     }
 
+    private fun startLoadingLocation() {
+        scope.launch {
+            try {
+                val location = geoProvider.getLastLocation()
+                lastGeolocation = location
+                GeolocationCache.set(location)
+
+                postSetLocationLoaded(true)
+                startRefreshingAstro()
+            } catch (e: Exception) {
+                Log.e(TAG, null, e)
+
+                postSetLocationLoaded(false)
+            }
+        }
+    }
+
+    private fun postSetLocationLoaded(state: Boolean) {
+        mainThread.sendMessage(Message {
+            what = MSG_SET_LOCATION_LOADED
+            arg1 = if(state) 1 else 0
+        })
+    }
+
     private fun startRefreshingAstro() {
+        if(refreshAstroJob != null) {
+            Log.w(TAG, "refreshAstro is already started")
+            return
+        }
+
         val location = lastGeolocation ?: throw NullPointerException("lastGeolocation")
 
         refreshAstroJob = scope.launch {
@@ -241,23 +254,6 @@ class HomePresenter(
         })
     }
 
-    private fun postSetCalendarMinMaxDay(range: ShortDateRange) {
-        mainThread.sendMessage(Message {
-            what = MSG_SET_CALENDAR_MIN_MAX_DAY
-            obj = range
-        })
-    }
-
-    private fun setCalendarMinMaxDay(range: ShortDateRange) {
-        val startEpochDay = ShortDate.toEpochDay(range.start)
-        val endEpochDay = ShortDate.toEpochDay(range.endInclusive)
-
-        view.run {
-            setCalendarMinDate(startEpochDay * TimeConstants.MILLIS_IN_DAY)
-            setCalendarMaxDate(endEpochDay * TimeConstants.MILLIS_IN_DAY)
-        }
-    }
-
     private fun postOnServerUnavailable() {
         mainThread.sendMessage(Message { what = MSG_ON_SERVER_UNAVAILABLE })
     }
@@ -298,9 +294,6 @@ class HomePresenter(
                 MSG_ON_WEATHER_RECEIVED -> {
                     p.view.setWeather(msg.obj as WeatherInfo)
                 }
-                MSG_SET_CALENDAR_MIN_MAX_DAY -> {
-                    p.setCalendarMinMaxDay(msg.obj as ShortDateRange)
-                }
                 MSG_SET_CURRENT_TIME -> {
                     p.view.setCurrentTime(msg.arg1)
                 }
@@ -309,6 +302,9 @@ class HomePresenter(
                 }
                 MSG_SET_MOON_PHASE -> {
                     p.view.setMoonPhase(msg.arg1.intBitsToFloat())
+                }
+                MSG_SET_LOCATION_LOADED -> {
+                    p.view.setLocationLoaded( msg.arg1 == 1)
                 }
             }
         }
@@ -320,10 +316,10 @@ class HomePresenter(
         private const val MSG_ON_SERVER_UNAVAILABLE = 0
         private const val MSG_ON_SERVER_AVAILABLE = 1
         private const val MSG_ON_WEATHER_RECEIVED = 2
-        private const val MSG_SET_CALENDAR_MIN_MAX_DAY = 3
         private const val MSG_SET_SUNRISE_SUNSET = 4
         private const val MSG_SET_MOON_PHASE = 5
         private const val MSG_SET_CURRENT_TIME = 6
+        private const val MSG_SET_LOCATION_LOADED = 7
 
         const val TASK_GEOLOCATION = 0
         const val TASK_CALENDAR = 1

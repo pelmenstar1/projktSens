@@ -14,9 +14,7 @@ class SunriseSunsetCalendarPresenter(
     private var selectedDayOfYear: Int = -1
     private var location: Geolocation? = null
 
-    override fun attach(view: SunriseSunsetCalendarContract.View) {
-        super.attach(view)
-
+    override fun onLocationPresent() {
         location = GeolocationCache.get()
         if(location == null) {
             throw IllegalStateException("GeolocationCache.get() is null")

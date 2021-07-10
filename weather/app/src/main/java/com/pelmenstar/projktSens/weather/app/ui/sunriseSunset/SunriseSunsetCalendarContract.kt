@@ -6,6 +6,7 @@ import com.pelmenstar.projktSens.shared.time.TimeInt
 interface SunriseSunsetCalendarContract {
     interface Presenter: DefaultContract.Presenter<View> {
         fun onDaySelected(dayOfYear: Int)
+        fun onLocationPresent()
     }
 
     interface View: DefaultContract.View {

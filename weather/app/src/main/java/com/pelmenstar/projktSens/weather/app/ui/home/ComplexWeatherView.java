@@ -13,6 +13,7 @@ import android.graphics.Region;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -38,6 +39,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class ComplexWeatherView extends View {
+    @FunctionalInterface
+    public interface OnRetryGetLocationListener {
+        void onRetry();
+    }
+
     private static final String TAG = "ComplexWeatherView";
 
     private static final float TEMP_UNIT_MARGIN_L_DP = 4;
@@ -45,6 +51,9 @@ public final class ComplexWeatherView extends View {
     private static final float WEATHER_BLOCK_MARGIN_L_DP = 5;
     private static final float WEATHER_BLOCK_TEXT_MARGIN_T_DP = 5;
     private static final float SUNRISE_SUNSET_SIDE_MARGIN_DP = 5;
+
+    private static final float FAILED_GET_LOCATION_MARGIN_T_DP = 3;
+    private static final float FAILED_GET_LOCATION_MARGIN_R_DP = 7;
 
     private static final float MOON_RATIO_X = 0.438095f;
     private static final float MOON_RATIO_Y = 0.0434782f;
@@ -58,6 +67,8 @@ public final class ComplexWeatherView extends View {
 
     @NotNull
     private final Drawable nightDrawable;
+
+    private final Drawable retryDrawable;
 
     private final Bitmap moon;
     private final Canvas moonCanvas;
@@ -76,22 +87,28 @@ public final class ComplexWeatherView extends View {
     private String humStr = "";
     private String pressStr = "";
 
+    private final String failedGetLocationStr;
+    private final float failedGetLocationWidth;
+
     private long tempStrPos;
     private long humStrPos;
     private long pressStrPos;
     private long tempUnitStrPos;
+    private long failedGetLocationPos;
 
     private final float weatherBlockMarginTop;
     private final float weatherBlockMarginLeft;
     private final float weatherBlockTextMarginTop;
     private final float tempUnitMarginLeft;
     private final float sunriseSunsetSideMargin;
+    private final float failedGetLocationMarginRight;
 
     private final Paint moonVisiblePartPaint;
     private final Paint tempPaint;
     private final Paint tempUnitPaint;
     private final Paint humPressPaint;
     private final Paint sunriseSunsetPaint;
+    private final Paint failedGetLocationPaint;
 
     private final UnitFormatter unitFormatter;
 
@@ -99,6 +116,10 @@ public final class ComplexWeatherView extends View {
     private final int nightTextColor;
 
     private int state;
+
+    private OnRetryGetLocationListener onRetryGetLocationListener;
+    private final int retrySize;
+    private boolean isLocationLoaded;
 
     private final Rect textSizeBuffer = new Rect();
 
@@ -127,16 +148,20 @@ public final class ComplexWeatherView extends View {
         Resources.Theme theme = context.getTheme();
         float density = res.getDisplayMetrics().density;
 
+        failedGetLocationStr = res.getString(R.string.failedToGetLocation);
+
         weatherBlockMarginTop = WEATHER_BLOCK_MARGIN_T_DP * density;
         tempUnitMarginLeft = TEMP_UNIT_MARGIN_L_DP * density;
         weatherBlockTextMarginTop = WEATHER_BLOCK_TEXT_MARGIN_T_DP * density;
         sunriseSunsetSideMargin = SUNRISE_SUNSET_SIDE_MARGIN_DP * density;
         weatherBlockMarginLeft = WEATHER_BLOCK_MARGIN_L_DP * density;
+        failedGetLocationMarginRight = FAILED_GET_LOCATION_MARGIN_R_DP * density;
 
         float tempTextSize = res.getDimensionPixelSize(R.dimen.weatherView_tempTextSize);
         float tempUnitTextSize = res.getDimensionPixelSize(R.dimen.weatherView_tempUnitTextSize);
         float humPressTextSize = res.getDimensionPixelSize(R.dimen.weatherView_humPressTextSize);
         float sunriseSunsetTextSize = res.getDimensionPixelSize(R.dimen.weatherView_sunriseSunsetTextSize);
+        float failedGetLocationTextSize = res.getDimensionPixelSize(R.dimen.weatherView_failedGetLocationTextSize);
 
         Drawable dayDr = ResourcesCompat.getDrawable(res, R.drawable.ic_weather_view_day, theme);
         Drawable nightDr = ResourcesCompat.getDrawable(res, R.drawable.ic_weather_view_night, theme);
@@ -147,6 +172,12 @@ public final class ComplexWeatherView extends View {
 
         dayDrawable = dayDr;
         nightDrawable = nightDr;
+
+        retrySize = res.getDimensionPixelSize(R.dimen.weatherView_retrySize);
+        retryDrawable = ResourcesCompat.getDrawable(res, R.drawable.ic_retry, theme);
+        if(retryDrawable == null) {
+            throw new NullPointerException();
+        }
 
         int moonDiameter = res.getDimensionPixelSize(R.dimen.weatherView_moonDiameter);
         this.moonDiameter = (float)moonDiameter;
@@ -187,6 +218,22 @@ public final class ComplexWeatherView extends View {
         sunriseSunsetPaint.setTypeface(textTypeface);
         sunriseSunsetPaint.setColor(dayTextColor);
         sunriseSunsetPaint.setTextSize(sunriseSunsetTextSize);
+
+        failedGetLocationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        failedGetLocationPaint.setTypeface(textTypeface);
+        failedGetLocationPaint.setColor(dayTextColor);
+        failedGetLocationPaint.setTextSize(failedGetLocationTextSize);
+
+        failedGetLocationPaint.getTextBounds(
+                failedGetLocationStr,
+                0,
+                failedGetLocationStr.length(),
+                textSizeBuffer
+        );
+        failedGetLocationWidth = textSizeBuffer.width();
+        float fgPosY = FAILED_GET_LOCATION_MARGIN_T_DP * density + textSizeBuffer.height();
+
+        failedGetLocationPos = PointL.of(0, fgPosY);
     }
 
     private void setState(int state) {
@@ -199,12 +246,14 @@ public final class ComplexWeatherView extends View {
                     tempUnitPaint.setColor(dayTextColor);
                     humPressPaint.setColor(dayTextColor);
                     sunriseSunsetPaint.setColor(dayTextColor);
+                    failedGetLocationPaint.setColor(dayTextColor);
                 }
                 case STATE_NIGHT: {
                     tempPaint.setColor(nightTextColor);
                     tempUnitPaint.setColor(nightTextColor);
                     humPressPaint.setColor(nightTextColor);
                     sunriseSunsetPaint.setColor(nightTextColor);
+                    failedGetLocationPaint.setColor(nightTextColor);
                 }
             }
 
@@ -247,6 +296,24 @@ public final class ComplexWeatherView extends View {
 
         computeSunriseSunsetPositions();
         invalidate();
+    }
+
+    public boolean isLocationLoaded() {
+        return isLocationLoaded;
+    }
+
+    public void setLocationLoaded(boolean value) {
+        isLocationLoaded = value;
+        invalidate();
+    }
+
+    @Nullable
+    public OnRetryGetLocationListener getOnRetryGetLocationListener() {
+        return onRetryGetLocationListener;
+    }
+
+    public void setOnRetryGetLocationListener(@Nullable OnRetryGetLocationListener listener) {
+        onRetryGetLocationListener = listener;
     }
 
     private void computeSunriseSunsetPositions() {
@@ -327,6 +394,15 @@ public final class ComplexWeatherView extends View {
 
         dayDrawable.setBounds(0, 0, w, h);
         nightDrawable.setBounds(0, 0, w, h);
+
+        float retryX = w - retrySize;
+
+        // top left border
+        retryDrawable.setBounds(w - retrySize, 0, w, retrySize);
+
+        float fgLocX = retryX - failedGetLocationWidth - failedGetLocationMarginRight;
+
+        failedGetLocationPos = PointL.withX(failedGetLocationPos, fgLocX);
     }
 
     @Override
@@ -360,6 +436,31 @@ public final class ComplexWeatherView extends View {
         }
 
         renderWeatherBlock(c);
+
+        if(!isLocationLoaded) {
+            CanvasUtils.drawText(c, failedGetLocationStr, failedGetLocationPos, failedGetLocationPaint);
+            retryDrawable.draw(c);
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(@NotNull MotionEvent event) {
+        int action = event.getActionMasked();
+
+        if (action == MotionEvent.ACTION_DOWN) {
+            float x = event.getX();
+            float y = event.getY();
+
+            float retryX = getWidth() - retrySize;
+            if(!isLocationLoaded && (x >= retryX && y <= retrySize)) {
+                OnRetryGetLocationListener listener = onRetryGetLocationListener;
+                if(listener != null) {
+                    listener.onRetry();
+                }
+            }
+        }
+
+        return true;
     }
 
     private void renderWeatherBlock(@NotNull Canvas c) {

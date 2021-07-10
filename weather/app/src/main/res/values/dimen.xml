@@ -13,4 +13,8 @@
     <dimen name="weatherView_humPressTextSize">15sp</dimen>
     <dimen name="weatherView_moonDiameter">40dp</dimen>
     <dimen name="weatherView_sunriseSunsetTextSize">16sp</dimen>
+    <dimen name="weatherView_retrySize">30dp</dimen>
+    <dimen name="weatherView_failedGetLocationTextSize">16sp</dimen>
+
+    <dimen name="locationDependentActivity_errorTextSize">16sp</dimen>
 </resources>
