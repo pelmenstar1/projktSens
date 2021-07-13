@@ -143,7 +143,7 @@ class HomePresenter(
                     val dayOfYear = ShortDate.getDayOfYear(nowDate)
 
                     val sunrise = sunInfoProvider.getSunriseTime(dayOfYear, location)
-                    val sunset = sunInfoProvider.getSunriseTime(dayOfYear, location)
+                    val sunset = sunInfoProvider.getSunsetTime(dayOfYear, location)
                     val moonPhase = moonInfoProvider.getMoonPhase(nowDate)
 
                     postSetMoonPhase(moonPhase)
