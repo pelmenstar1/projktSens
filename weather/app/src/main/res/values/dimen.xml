@@ -15,6 +15,9 @@
     <dimen name="weatherView_sunriseSunsetTextSize">16sp</dimen>
     <dimen name="weatherView_retrySize">30dp</dimen>
     <dimen name="weatherView_failedGetLocationTextSize">16sp</dimen>
+    <dimen name="weatherView_requestGpsSize">30dp</dimen>
 
+    <dimen name="requestLocPerm_contentPadding">20dp</dimen>
+    <dimen name="requestLocPerm_actionTopMargin">10dp</dimen>
     <dimen name="locationDependentActivity_errorTextSize">16sp</dimen>
 </resources>

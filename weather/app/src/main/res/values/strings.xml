@@ -4,7 +4,12 @@
     <string name="serverUnavailable">Server is unavailable</string>
     <string name="appName">Weather</string>
 
-    <string name="needToRequestGps">Need GPS to work</string>
+    <string name="permissionGps_userDescription">Need GPS to work</string>
+    <string name="permissionGps_whyText">
+        App needs GPS to determine where you are.
+        Your location will be used to determine time of sunrise, sunset in your location.
+        Without location we won\'t be able to provide you such information.
+    </string>
 
     <string name="sunsetSunriseActionBarTitle">Sunrise-sunset</string>
 
@@ -49,6 +54,14 @@
 
     <string name="lazyLoadingCalendar_failedToLoad">Failed to load calendar</string>
     <string name="failedToGetLocation">Failed to get your location</string>
+
+    <string name="gpsIsNotGranted">GPS permission isn\'t granted</string>
+    <string name="allowGps">Allow</string>
+    <string name="locDependentActivity_requestLocPerm_gpsNeverShowAgain">
+        You\'ve checked \'Never show again\'. \n
+        To use this feature, you have to go to the settings.
+    </string>
+    <string name="goToSettings">Go to the settings</string>
 
     <string-array name="serverContracts" translatable="false">
         <item>Raw</item>

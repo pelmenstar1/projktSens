@@ -7,18 +7,33 @@ import android.os.Bundle
 import android.view.View
 import com.pelmenstar.projktSens.shared.android.ui.requestPermissions.RequestPermissionsActivity
 import com.pelmenstar.projktSens.shared.android.ui.requestPermissions.RequestPermissionsContext
+import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.Startup
+import com.pelmenstar.projktSens.weather.app.di.AppModule
+import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.ui.home.HomeActivity
 
 class StartupActivity : Activity() {
+    private lateinit var prefs: AppPreferences
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val res = resources
+
+        val component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
+        prefs = component.preferences()
 
         val permContext = RequestPermissionsContext {
-            permission(userDescription =  res.getString(R.string.needToRequestGps)) {
-                anyOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+            if(!prefs.isGpsPermissionDenied) {
+                permission(
+                    userDescriptionId = R.string.permissionGps_userDescription,
+                    whyTextId = R.string.permissionGps_whyText
+                ) {
+                    anyOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                }
             }
         }
         
@@ -44,6 +59,13 @@ class StartupActivity : Activity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(data != null && !prefs.isGpsPermissionDenied) {
+            val deniedPermissions = data.getIntArrayExtra(RequestPermissionsActivity.RETURN_DATA_DENIED_PERMISSION_INDICES)
+            if(deniedPermissions != null && deniedPermissions.contains(0)) {
+                prefs.isGpsPermissionDenied = true
+            }
+        }
+
         startHomeActivityAndFinish()
     }
 }

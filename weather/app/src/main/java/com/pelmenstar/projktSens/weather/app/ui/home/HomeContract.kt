@@ -8,6 +8,7 @@ interface HomeContract {
     interface Presenter : DefaultContract.Presenter<View> {
         fun getLoadMinMaxCalendarHandler(): LazyLoadingCalendarView.LoadMinMaxHandler
         fun getOnRetryGetLocationListener(): ComplexWeatherView.OnRetryGetLocationListener
+        fun getRequestLocationPermissionHandler(): ComplexWeatherView.RequestLocationPermissionHandler
 
         fun startTodayReportView()
         fun startYesterdayReportView()
@@ -30,6 +31,7 @@ interface HomeContract {
         fun setMoonPhase(phase: Float)
         fun setWeather(value: WeatherInfo)
         fun setLocationLoaded(value: Boolean)
+        fun setCanLoadLocation(value: Boolean)
 
         fun onServerAvailable()
         fun onServerUnavailable()

@@ -1,9 +1,11 @@
 package com.pelmenstar.projktSens.weather.app.ui.home
 
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import com.pelmenstar.projktSens.shared.android.Message
 import com.pelmenstar.projktSens.shared.android.mvp.BasePresenter
 import com.pelmenstar.projktSens.shared.geo.Geolocation
@@ -13,6 +15,8 @@ import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
 import com.pelmenstar.projktSens.shared.time.ShortDateTime
 import com.pelmenstar.projktSens.weather.app.GeolocationCache
+import com.pelmenstar.projktSens.weather.app.PermissionUtils
+import com.pelmenstar.projktSens.weather.app.ui.RequestLocationPermissionDialog
 import com.pelmenstar.projktSens.weather.app.ui.report.DayReportActivity
 import com.pelmenstar.projktSens.weather.app.ui.report.MonthReportActivity
 import com.pelmenstar.projktSens.weather.app.ui.report.WeekReportActivity
@@ -55,11 +59,33 @@ class HomePresenter(
         }
     }
 
+    override fun getRequestLocationPermissionHandler(): ComplexWeatherView.RequestLocationPermissionHandler {
+        return ComplexWeatherView.RequestLocationPermissionHandler {
+            if(Build.VERSION.SDK_INT < 23) {
+                return@RequestLocationPermissionHandler
+            }
+
+            val dialog = RequestLocationPermissionDialog()
+            dialog.onDismissCallback = {
+                if(dialog.isLocationPermissionGranted) {
+                    view.setCanLoadLocation(true)
+                    startLoadingLocation()
+                }
+            }
+            dialog.show((context as FragmentActivity).supportFragmentManager, null)
+        }
+    }
+
     override fun attach(view: HomeContract.View) {
         super.attach(view)
 
         connectToWeatherChannel()
-        startLoadingLocation()
+
+        if(Build.VERSION.SDK_INT < 23 || PermissionUtils.isLocationGranted(view.context)) {
+            startLoadingLocation()
+        } else {
+            view.setCanLoadLocation(false)
+        }
     }
 
     override fun detach() {
@@ -320,8 +346,5 @@ class HomePresenter(
         private const val MSG_SET_MOON_PHASE = 5
         private const val MSG_SET_CURRENT_TIME = 6
         private const val MSG_SET_LOCATION_LOADED = 7
-
-        const val TASK_GEOLOCATION = 0
-        const val TASK_CALENDAR = 1
     }
 }

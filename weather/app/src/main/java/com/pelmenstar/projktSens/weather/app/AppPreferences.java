@@ -13,6 +13,7 @@ public interface AppPreferences extends Preferences {
     int REPO_PORT = 3;
     int WCI_PORT = 4;
     int WEATHER_RECEIVE_INTERVAL = 5;
+    int IS_GPS_PERMISSION_DENIED = 6;
 
     int getUnits();
     void setUnits(int units);
@@ -35,4 +36,7 @@ public interface AppPreferences extends Preferences {
 
     int getWeatherReceiveInterval();
     void setWeatherReceiveInterval(int interval);
+
+    boolean isGpsPermissionDenied();
+    void setGpsPermissionDenied(boolean value);
 }

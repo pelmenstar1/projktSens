@@ -44,6 +44,11 @@ public final class ComplexWeatherView extends View {
         void onRetry();
     }
 
+    @FunctionalInterface
+    public interface RequestLocationPermissionHandler {
+        void request();
+    }
+
     private static final String TAG = "ComplexWeatherView";
 
     private static final float TEMP_UNIT_MARGIN_L_DP = 4;
@@ -69,6 +74,7 @@ public final class ComplexWeatherView extends View {
     private final Drawable nightDrawable;
 
     private final Drawable retryDrawable;
+    private final Drawable requestLocationDrawable;
 
     private final Bitmap moon;
     private final Canvas moonCanvas;
@@ -119,7 +125,12 @@ public final class ComplexWeatherView extends View {
 
     private OnRetryGetLocationListener onRetryGetLocationListener;
     private final int retrySize;
+
+    private RequestLocationPermissionHandler requestLocationPermissionHandler;
+    private final int requestGpsSize;
+
     private boolean isLocationLoaded;
+    private boolean canLoadLocation = true;
 
     private final Rect textSizeBuffer = new Rect();
 
@@ -176,6 +187,12 @@ public final class ComplexWeatherView extends View {
         retrySize = res.getDimensionPixelSize(R.dimen.weatherView_retrySize);
         retryDrawable = ResourcesCompat.getDrawable(res, R.drawable.ic_retry, theme);
         if(retryDrawable == null) {
+            throw new NullPointerException();
+        }
+
+        requestGpsSize = res.getDimensionPixelSize(R.dimen.weatherView_retrySize);
+        requestLocationDrawable = ResourcesCompat.getDrawable(res, R.drawable.ic_error, theme);
+        if(requestLocationDrawable == null) {
             throw new NullPointerException();
         }
 
@@ -307,6 +324,15 @@ public final class ComplexWeatherView extends View {
         invalidate();
     }
 
+    public boolean canLoadLocation() {
+        return canLoadLocation;
+    }
+
+    public void setCanLoadLocation(boolean value) {
+        canLoadLocation = value;
+        invalidate();
+    }
+
     @Nullable
     public OnRetryGetLocationListener getOnRetryGetLocationListener() {
         return onRetryGetLocationListener;
@@ -314,6 +340,15 @@ public final class ComplexWeatherView extends View {
 
     public void setOnRetryGetLocationListener(@Nullable OnRetryGetLocationListener listener) {
         onRetryGetLocationListener = listener;
+    }
+
+    @Nullable
+    public RequestLocationPermissionHandler getRequestLocationPermissionHandler() {
+        return requestLocationPermissionHandler;
+    }
+
+    public void setRequestLocationPermissionHandler(@Nullable RequestLocationPermissionHandler handler) {
+        this.requestLocationPermissionHandler = handler;
     }
 
     private void computeSunriseSunsetPositions() {
@@ -395,14 +430,16 @@ public final class ComplexWeatherView extends View {
         dayDrawable.setBounds(0, 0, w, h);
         nightDrawable.setBounds(0, 0, w, h);
 
-        float retryX = w - retrySize;
+        int retryX = w - retrySize;
 
         // top left border
-        retryDrawable.setBounds(w - retrySize, 0, w, retrySize);
+        retryDrawable.setBounds(retryX, 0, w, retrySize);
 
         float fgLocX = retryX - failedGetLocationWidth - failedGetLocationMarginRight;
-
         failedGetLocationPos = PointL.withX(failedGetLocationPos, fgLocX);
+
+        // top left border
+        requestLocationDrawable.setBounds( w - requestGpsSize, 0, w, requestGpsSize);
     }
 
     @Override
@@ -437,9 +474,13 @@ public final class ComplexWeatherView extends View {
 
         renderWeatherBlock(c);
 
-        if(!isLocationLoaded) {
-            CanvasUtils.drawText(c, failedGetLocationStr, failedGetLocationPos, failedGetLocationPaint);
-            retryDrawable.draw(c);
+        if(canLoadLocation) {
+            if(!isLocationLoaded) {
+                CanvasUtils.drawText(c, failedGetLocationStr, failedGetLocationPos, failedGetLocationPaint);
+                retryDrawable.draw(c);
+            }
+        } else {
+            requestLocationDrawable.draw(c);
         }
     }
 
@@ -452,10 +493,20 @@ public final class ComplexWeatherView extends View {
             float y = event.getY();
 
             float retryX = getWidth() - retrySize;
-            if(!isLocationLoaded && (x >= retryX && y <= retrySize)) {
-                OnRetryGetLocationListener listener = onRetryGetLocationListener;
-                if(listener != null) {
-                    listener.onRetry();
+
+            if(x >= retryX && y <= retrySize) {
+                if(canLoadLocation) {
+                    if(!isLocationLoaded) {
+                        OnRetryGetLocationListener listener = onRetryGetLocationListener;
+                        if(listener != null) {
+                            listener.onRetry();
+                        }
+                    }
+                } else {
+                    RequestLocationPermissionHandler handler = requestLocationPermissionHandler;
+                    if(handler != null) {
+                        handler.request();
+                    }
                 }
             }
         }

@@ -102,6 +102,11 @@ public final class AppPreferences implements Preferences {
     }
 
     @Override
+    public boolean getBoolean(int id) {
+        throw new IllegalArgumentException("Option " + id + " isn't boolean");
+    }
+
+    @Override
     public void set(int id, @NotNull Object value) {
         switch (id) {
             case REPO_PORT:
@@ -139,6 +144,11 @@ public final class AppPreferences implements Preferences {
             default:
                 throw new IllegalArgumentException("No option found with id " + id);
         }
+    }
+
+    @Override
+    public void setBoolean(int id, boolean value) {
+        throw new IllegalArgumentException("Option " + id + " isn't boolean");
     }
 
     public int getRepoPort() {

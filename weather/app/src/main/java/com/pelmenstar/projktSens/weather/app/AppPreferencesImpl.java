@@ -26,6 +26,7 @@ public class AppPreferencesImpl implements AppPreferences {
     private static final String KEY_REPO_PORT = "repoPort";
     private static final String KEY_WCI_PORT = "wciPort";
     private static final String KEY_WEATHER_RECEIVE_INTERVAL = "weatherRcvInterval";
+    private static final String KEY_IS_GPS_PERMISSION_DENIED = "isGpsDenied";
 
     private static SharedPreferences prefs;
 
@@ -67,9 +68,11 @@ public class AppPreferencesImpl implements AppPreferences {
                 if(serverHostStr != null) {
                     isValidHost = InetAddressUtils.isValidNumericalIpv4(serverHostStr);
                 }
+                boolean isGpsDeniedExists = prefs.contains(KEY_IS_GPS_PERMISSION_DENIED);
 
                 if (!ValueUnitsPacked.isValid(units) ||
                         !isValidHost ||
+                        !isGpsDeniedExists ||
                         (contractType | repoPort | wciPort | weatherReceiveInterval) < 0) {
                     writeDefault();
                 }
@@ -86,6 +89,7 @@ public class AppPreferencesImpl implements AppPreferences {
                 .putInt(KEY_REPO_PORT, DEFAULT_REPO_SERVER_PORT)
                 .putInt(KEY_WCI_PORT, DEFAULT_WCI_SERVER_PORT)
                 .putInt(KEY_WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL)
+                .putBoolean(KEY_IS_GPS_PERMISSION_DENIED, false)
                 .apply();
     }
 
@@ -128,6 +132,15 @@ public class AppPreferencesImpl implements AppPreferences {
             default:
                 throw new IllegalArgumentException("No option found with id " + id);
         }
+    }
+
+    @Override
+    public boolean getBoolean(int id) {
+        if(id == IS_GPS_PERMISSION_DENIED) {
+            return isGpsPermissionDenied();
+        }
+
+        throw new IllegalArgumentException("Option " + id + " isn't boolean");
     }
 
     @Override
@@ -179,6 +192,15 @@ public class AppPreferencesImpl implements AppPreferences {
             default:
                 throw new IllegalArgumentException("No option found with id " + id);
         }
+    }
+
+    @Override
+    public void setBoolean(int id, boolean value) {
+        if(id == IS_GPS_PERMISSION_DENIED) {
+            setGpsPermissionDenied(value);
+        }
+
+        throw new IllegalArgumentException("Option " + id + " isn't boolean");
     }
 
     /**
@@ -244,5 +266,15 @@ public class AppPreferencesImpl implements AppPreferences {
 
     public void setWeatherReceiveInterval(int interval) {
         prefs.edit().putInt(KEY_WEATHER_RECEIVE_INTERVAL, interval).apply();
+    }
+
+    @Override
+    public boolean isGpsPermissionDenied() {
+        return prefs.getBoolean(KEY_IS_GPS_PERMISSION_DENIED, false);
+    }
+
+    @Override
+    public void setGpsPermissionDenied(boolean value) {
+        prefs.edit().putBoolean(KEY_IS_GPS_PERMISSION_DENIED, value).apply();
     }
 }

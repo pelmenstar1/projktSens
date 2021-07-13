@@ -31,5 +31,10 @@ public final class EmptyArray {
      */
     public static final long @NotNull [] LONG = new long[0];
 
+    /**
+     * Empty int array
+     */
+    public static final int @NotNull [] INT = new int[0];
+
     private EmptyArray() {}
 }

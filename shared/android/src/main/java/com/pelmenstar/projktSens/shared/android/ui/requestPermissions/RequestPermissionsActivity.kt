@@ -7,20 +7,25 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import android.util.Log
-import android.view.Gravity
-import android.view.ViewGroup
+import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.pelmenstar.projktSens.shared.EmptyArray
+import com.pelmenstar.projktSens.shared.add
 import com.pelmenstar.projktSens.shared.android.Intent
 import com.pelmenstar.projktSens.shared.android.R
-import com.pelmenstar.projktSens.shared.android.ui.*
 
-class RequestPermissionsActivity : AppCompatActivity() {
+class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_permissions) {
     private lateinit var permContext: RequestPermissionsContext
     private lateinit var currentPermission: RequestPermissionInfo
+
     private lateinit var descriptionView: TextView
+    private lateinit var whyTextView: TextView
 
     private var currentPermissionIndex = 0
+    private var grantedPermissionIndices = EmptyArray.INT
+    private var deniedPermissionIndices = EmptyArray.INT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (Build.VERSION.SDK_INT < 23) {
@@ -29,23 +34,52 @@ class RequestPermissionsActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
+        initViews()
+
         val intent = intent ?: throw IllegalStateException("Intent is null")
         val permContext = intent.getParcelableExtra<RequestPermissionsContext>(EXTRA_PERM_CONTEXT) ?: throw NullPointerException("$EXTRA_PERM_CONTEXT in intent is null")
         this.permContext = permContext
 
         if (savedInstanceState != null) {
             currentPermissionIndex = savedInstanceState.getInt(STATE_PERMISSION_INDEX, 0)
+            grantedPermissionIndices = savedInstanceState.getIntArray(STATE_GRANTED_PERMISSION_INDICES)!!
+            deniedPermissionIndices = savedInstanceState.getIntArray(STATE_DENIED_PERMISSION_INDICES)!!
         }
-
-        setContentView(createContent())
 
         currentPermission = permContext[currentPermissionIndex]
         showPermission(currentPermission)
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt(STATE_PERMISSION_INDEX, currentPermissionIndex)
+    private fun initViews() {
+        descriptionView = findViewById(R.id.requestPermissions_userDescription)
+        whyTextView = findViewById(R.id.requestPermissions_whyText)
+
+        findViewById<Button>(R.id.requestPermissions_request).setOnClickListener {
+            requestCurrentPermission()
+        }
+        findViewById<Button>(R.id.requestPermissions_dontRequest).setOnClickListener {
+            doNotRequestCurrentPermission()
+        }
+        findViewById<Button>(R.id.requestPermissions_whyButton).setOnClickListener {
+            showWhyTextForCurrentPermission()
+        }
+    }
+
+    private fun showWhyTextForCurrentPermission() {
+        val context = this
+        whyTextView.apply {
+            text = currentPermission.whyText.getValue(context)
+            visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideWhyText() {
+        whyTextView.visibility = View.GONE
+    }
+
+    private fun doNotRequestCurrentPermission() {
+        deniedPermissionIndices = deniedPermissionIndices.add(currentPermissionIndex)
+        nextPermission()
     }
 
     private fun requestCurrentPermission() {
@@ -60,11 +94,12 @@ class RequestPermissionsActivity : AppCompatActivity() {
         val pr = permContext
 
         if (currentPermissionIndex >= pr.count - 1) {
-            setResult(RESULT_OK, null)
-            finish()
+            finishRequestingPermissions()
         } else {
             val perm = pr[currentPermissionIndex++]
             currentPermission = perm
+
+            hideWhyText()
 
             if (!shouldRequestPermission(this, perm)) {
                 nextPermission()
@@ -75,7 +110,24 @@ class RequestPermissionsActivity : AppCompatActivity() {
     }
 
     private fun showPermission(requestPermissionInfo: RequestPermissionInfo) {
-        descriptionView.text = requestPermissionInfo.userDescription
+        descriptionView.text = requestPermissionInfo.userDescription.getValue(this)
+    }
+
+    private fun finishRequestingPermissions() {
+        val data = Intent().apply {
+            putExtra(RETURN_DATA_GRANTED_PERMISSION_INDICES, grantedPermissionIndices)
+            putExtra(RETURN_DATA_DENIED_PERMISSION_INDICES, deniedPermissionIndices)
+        }
+        setResult(RESULT_OK, data)
+        finish()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putInt(STATE_PERMISSION_INDEX, currentPermissionIndex)
+        outState.putIntArray(STATE_GRANTED_PERMISSION_INDICES, grantedPermissionIndices)
+        outState.putIntArray(STATE_DENIED_PERMISSION_INDICES, deniedPermissionIndices)
     }
 
     override fun onRequestPermissionsResult(
@@ -85,50 +137,34 @@ class RequestPermissionsActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        nextPermission()
-    }
+        val permInfo = permContext[currentPermissionIndex]
+        val modePermissions = permInfo.modePermissions
 
-    private fun createContent(): ViewGroup {
-        val res = resources
-        val headline5 = TextAppearance(this, R.style.TextAppearance_MaterialComponents_Headline5)
-        val actionButtonSideMargin = res.getDimensionPixelOffset(R.dimen.requestPermissions_actionButtonSideMargin)
-
-        return FrameLayout(this) {
-            TextView {
-                frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                    gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-                }
-
-                applyTextAppearance(headline5)
-                descriptionView = this
-            }
-
-            Button {
-                frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                    gravity = Gravity.START or Gravity.BOTTOM
-                    leftMargin = actionButtonSideMargin
-                }
-
-                text = res.getText(R.string.requestPermission)
-                setOnClickListener { requestCurrentPermission() }
-            }
-
-            Button {
-                frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                    gravity = Gravity.END or Gravity.BOTTOM
-                    rightMargin = actionButtonSideMargin
-                }
-
-                text = res.getText(R.string.dontRequestPermission)
-                setOnClickListener { nextPermission() }
-            }
+        val actuallyGranted = if (modePermissions.mode == ModePermissionArray.MODE_ANY) {
+            grantResults.any { it == PackageManager.PERMISSION_GRANTED }
+        } else {
+            grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         }
+
+        if (actuallyGranted) {
+            grantedPermissionIndices = grantedPermissionIndices.add(currentPermissionIndex)
+        } else {
+            deniedPermissionIndices = deniedPermissionIndices.add(currentPermissionIndex)
+        }
+
+        nextPermission()
     }
 
     companion object {
         private const val TAG = "RequestPermsActivity"
         private const val EXTRA_PERM_CONTEXT = "RequestPermissionsActivity:permContext"
+
+        const val RETURN_DATA_GRANTED_PERMISSION_INDICES = "RequestPermissionsActivity.returnData.grantedPermissions"
+        const val RETURN_DATA_DENIED_PERMISSION_INDICES = "RequestPermissionsActivity.returnData.deniedPermissions"
+
         private const val STATE_PERMISSION_INDEX = "RequestPermissionsActivity:state_permission_index"
+        private const val STATE_GRANTED_PERMISSION_INDICES = "RequestPermissionsActivity:state_grantedPermissionIndices"
+        private const val STATE_DENIED_PERMISSION_INDICES = "RequestPermissionsActivity:state_deniedPermissionIndices"
 
         private const val PERMISSION_REQUEST_CODE = 2
 

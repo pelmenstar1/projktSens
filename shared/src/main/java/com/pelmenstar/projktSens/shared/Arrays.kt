@@ -22,3 +22,11 @@ inline fun<reified T> Array<T>.add(value: T): Array<T> {
     @Suppress("UNCHECKED_CAST")
     return newArray as Array<T>
 }
+
+fun IntArray.add(value: Int): IntArray {
+    val newArray = IntArray(size + 1)
+    System.arraycopy(this, 0, newArray, 0, size)
+    newArray[size] = value
+
+    return newArray
+}

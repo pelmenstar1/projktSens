@@ -91,7 +91,10 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
             }
 
             calendarView.loadMinMaxHandler = it.getLoadMinMaxCalendarHandler()
-            weatherView.onRetryGetLocationListener = it.getOnRetryGetLocationListener()
+            weatherView.run {
+                onRetryGetLocationListener = it.getOnRetryGetLocationListener()
+                requestLocationPermissionHandler = it.getRequestLocationPermissionHandler()
+            }
         }
 
     }
@@ -351,6 +354,10 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
     override fun setLocationLoaded(value: Boolean) {
         weatherView.isLocationLoaded = value
+    }
+
+    override fun setCanLoadLocation(value: Boolean) {
+        weatherView.setCanLoadLocation(value)
     }
 
     override fun setCurrentTime(time: Int) {

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="requestPermissions_actionButtonSideMargin">5dp</dimen>
+    <dimen name="requestPermissions_actionButtonMargin">5dp</dimen>
+    <dimen name="requestPermissions_userDescriptionTopMargin">10dp</dimen>
+    <dimen name="requestPermissions_whyButton_size">40dp</dimen>
+    <dimen name="requestPermissions_whyButton_topMargin">10dp</dimen>
+    <dimen name="requestPermissions_whyText_sidePadding">10dp</dimen>
+    <dimen name="requestPermissions_whyText_topMargin">10dp</dimen>
 
     <dimen name="initScreen_transitionCircleSize">80dp</dimen>
     <dimen name="initScreen_retryButtonSize">35dp</dimen>

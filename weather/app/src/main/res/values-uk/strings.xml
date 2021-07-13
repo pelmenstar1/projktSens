@@ -3,7 +3,12 @@
     <string name="serverUnavailable">Проблеми з сервером</string>
     <string name="appName">Погода</string>
 
-    <string name="needToRequestGps">Треба GPS</string>
+    <string name="permissionGps_userDescription">Треба GPS</string>
+    <string name="permissionGps_whyText">
+        Застосунок викрористовую GPS, щоб дізнатися де Ви.
+        Ваше місцезнаходженя буде використано, щоб визначить час сходу та заходу Сонця.
+        Без GPS, застосунок не зможе давати вам цю інформацію.
+    </string>
 
     <string name="sunsetSunriseActionBarTitle">Схід-Захід</string>
 
@@ -50,6 +55,14 @@
 
     <string name="lazyLoadingCalendar_failedToLoad">Не вдалось загрузити календар</string>
     <string name="failedToGetLocation">Не вдалось дізнатись де Ви</string>
+
+    <string name="gpsIsNotGranted">Застосунок не може використовувати GPS</string>
+    <string name="allowGps">Дозволити</string>
+    <string name="locDependentActivity_requestLocPerm_gpsNeverShowAgain">
+        You\'ve checked \'Never show again\'. \n
+        To continue you have to go to the settings.
+    </string>
+    <string name="goToSettings">Go to the settings</string>
 
     <string-array name="months">
         <item>Січень</item>
