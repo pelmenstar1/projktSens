@@ -31,12 +31,6 @@
     <string name="noData">So empty…</string>
     <string name="errorOccurred">Owwp… Error</string>
 
-    <string name="initLocation_stageName">Location…</string>
-    <string name="initCalendar_stageName">Calendar…</string>
-
-    <string name="initLocation_errorMsg">Couldn\'t get your location</string>
-    <string name="initCalendar_errorMsg">Coludn\'t initialize calendar</string>
-
     <string name="settings">Settings</string>
     <string name="save_settings">Save</string>
 

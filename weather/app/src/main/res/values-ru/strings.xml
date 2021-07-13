@@ -30,12 +30,6 @@
     <string name="noData">Ммм… Ничего</string>
     <string name="errorOccurred">Упс… Ошибка</string>
 
-    <string name="initLocation_stageName">Ищу где Вы…</string>
-    <string name="initCalendar_stageName">Календар…</string>
-
-    <string name="initLocation_errorMsg">Не удалось узнать где Вы</string>
-    <string name="initCalendar_errorMsg">Не удалось создать календарь</string>
-
     <string name="settings">Настройки</string>
     <string name="save_settings">Сохранить</string>
 
