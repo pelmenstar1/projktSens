@@ -2,7 +2,6 @@ package com.pelmenstar.projktSens.weather.models.astro;
 
 import com.pelmenstar.projktSens.shared.geo.Geolocation;
 import com.pelmenstar.projktSens.shared.time.TimeInt;
-import com.pelmenstar.projktSens.shared.time.TimeRange;
 
 import org.jetbrains.annotations.NotNull;
 
