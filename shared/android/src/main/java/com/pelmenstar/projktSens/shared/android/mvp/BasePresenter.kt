@@ -2,31 +2,26 @@ package com.pelmenstar.projktSens.shared.android.mvp
 
 import android.content.Context
 import android.os.Bundle
+import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Incomplete implementation of [DefaultContract.Presenter]
+ * Incomplete implementation of [DefaultContract.Presenter].
+ * No code should be executed before [BasePresenter.attach], or after [BasePresenter.detach]
  */
 abstract class BasePresenter<TView : DefaultContract.View> : DefaultContract.Presenter<TView> {
-    @Volatile
-    private var _view: TView? = null
+    private val _viewRef = AtomicReference<TView?>()
 
     protected val view: TView
-        get() = synchronized(this) {
-            return _view ?: throw RuntimeException("Presenter is not attached to any view")
-        }
+        get() = _viewRef.get() ?: throw RuntimeException("Presenter is not attached to any view")
 
     override fun attach(view: TView) {
-        synchronized(this) {
-            if(_view != null) {
-                throw IllegalStateException("Presenter already has attached view")
-            }
-
-            _view = view
+        if(!_viewRef.compareAndSet(null, view)) {
+            throw IllegalStateException("Presenter already has attached view")
         }
     }
 
     override fun detach() {
-        _view = null
+        _viewRef.set(null)
     }
 
     val context: Context
