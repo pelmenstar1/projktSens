@@ -1,7 +1,6 @@
 package com.pelmenstar.projktSens.weather.app.di;
 
 import android.content.Context;
-import android.content.res.Resources;
 
 import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig;
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig;
@@ -40,19 +39,11 @@ import dagger.Provides;
 public final class AppModule {
     private final Context context;
 
-    private final UnitFormatter unitFormatter;
-    private final MoonPhaseFormatter moonPhaseFormatter;
+    private UnitFormatter unitFormatter;
+    private MoonPhaseFormatter moonPhaseFormatter;
 
     public AppModule(@NotNull Context context) {
         this.context = context;
-
-        Resources res = context.getResources();
-
-        String[] moonPhases = res.getStringArray(R.array.moonPhases);
-        moonPhaseFormatter = new MoonPhaseFormatter(moonPhases);
-
-        String[] units = res.getStringArray(R.array.units);
-        unitFormatter = new UnitFormatter(units, prettyDateFormatter());
     }
 
     @Provides
@@ -111,12 +102,22 @@ public final class AppModule {
     @Provides
     @NotNull
     public UnitFormatter unitFormatter() {
+        if(unitFormatter == null) {
+            String[] units = context.getResources().getStringArray(R.array.units);
+            unitFormatter = new UnitFormatter(units, prettyDateFormatter());
+        }
+
         return unitFormatter;
     }
 
     @Provides
     @NotNull
     public MoonPhaseFormatter moonPhaseFormatter() {
+        if(moonPhaseFormatter == null) {
+            String[] moonPhases = context.getResources().getStringArray(R.array.moonPhases);
+            moonPhaseFormatter = new MoonPhaseFormatter(moonPhases);
+        }
+
         return moonPhaseFormatter;
     }
 
