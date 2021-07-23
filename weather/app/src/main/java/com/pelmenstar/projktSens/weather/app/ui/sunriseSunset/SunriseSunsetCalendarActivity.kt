@@ -47,48 +47,48 @@ class SunriseSunsetCalendarActivity: LocationDependentActivity(), SunriseSunsetC
     }
 
     override fun createMainContent(): View {
+        val res = resources
         val body1 = TextAppearance(this, R.style.TextAppearance_MaterialComponents_Body1)
-        val dp5 = (5 * resources.displayMetrics.density).toInt()
+        val boundsMargin = res.getDimensionPixelOffset(R.dimen.sunriseSunsetCalendar_boundsMargin)
 
         return LinearLayout(this) {
             orientation = LinearLayout.VERTICAL
 
+            val textViewLayoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                leftMargin = boundsMargin
+            }
+
             TimePrefixTextView {
-                linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = dp5
-                }
+                layoutParams = textViewLayoutParams
 
                 sunriseTimeView = this
-                prefix = resources.getString(R.string.sunrise)
+                prefix = res.getString(R.string.sunrise)
 
                 applyTextAppearance(body1)
             }
 
             TimePrefixTextView {
-                linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = dp5
-                }
+                layoutParams = textViewLayoutParams
 
                 sunsetTimeView = this
-                prefix = resources.getString(R.string.sunset)
+                prefix = res.getString(R.string.sunset)
 
                 applyTextAppearance(body1)
             }
 
             TimePrefixTextView {
-                linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                    leftMargin = dp5
-                    bottomMargin = dp5
-                }
+                layoutParams = textViewLayoutParams
 
                 dayLengthView = this
-                prefix = resources.getString(R.string.dayLength)
+                prefix = res.getString(R.string.dayLength)
 
                 applyTextAppearance(body1)
             }
 
             ScrollableCalendarView {
-                linearLayoutParams(MATCH_PARENT, WRAP_CONTENT)
+                linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
+                    topMargin = res.getDimensionPixelOffset(R.dimen.sunriseSunsetCalendar_calendarTopMargin)
+                }
 
                 setOnDateChangeListener { _, year, month, dayOfMonth ->
                     val date = ShortDate.of(year, month + 1, dayOfMonth)

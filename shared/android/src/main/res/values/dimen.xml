@@ -6,4 +6,5 @@
     <dimen name="requestPermissions_whyButton_topMargin">10dp</dimen>
     <dimen name="requestPermissions_whyText_sidePadding">10dp</dimen>
     <dimen name="requestPermissions_whyText_topMargin">10dp</dimen>
+    <dimen name="settings_boundsMargin">5dp</dimen>
 </resources>

@@ -26,40 +26,38 @@ class MoonCalendarActivity: HomeButtonSupportActivity(), MoonCalendarContract.Vi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val resources = resources
+        val res = resources
         actionBar {
-            title = resources.getText(R.string.moonCalendar)
+            title = res.getText(R.string.moonCalendar)
 
             setDisplayHomeAsUpEnabled(true)
         }
 
         content {
-            val density = resources.displayMetrics.density
-            val dp5 = (5f * density).toInt()
-            val dp10 = (10f * density).toInt()
-            val dp200 = (200f * density).toInt()
             val body1 = TextAppearance(this, R.style.TextAppearance_MaterialComponents_Body1)
 
             LinearLayout(this) {
                 orientation = LinearLayout.VERTICAL
 
-
                 PrefixTextView {
                     linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
-                        leftMargin = dp5
+                        leftMargin = res.getDimensionPixelOffset(R.dimen.moonCalendar_moonPhaseText_leftMargin)
                     }
 
                     moonPhaseView = this
-                    prefix = resources.getString(R.string.moonPhase)
+                    prefix = res.getString(R.string.moonPhase)
                     applyTextAppearance(body1)
                 }
 
                 MoonView {
-                    linearLayoutParams(dp200, dp200) {
+                    val size = res.getDimensionPixelSize(R.dimen.moonCalendar_moonSize)
+                    val topBottomMargin = res.getDimensionPixelOffset(R.dimen.moonCalendar_moonTopBottomMargin)
+
+                    linearLayoutParams(size, size) {
                         gravity = Gravity.CENTER_HORIZONTAL
 
-                        topMargin = dp10
-                        bottomMargin = dp10
+                        topMargin = topBottomMargin
+                        bottomMargin = topBottomMargin
                     }
 
                     moonView = this

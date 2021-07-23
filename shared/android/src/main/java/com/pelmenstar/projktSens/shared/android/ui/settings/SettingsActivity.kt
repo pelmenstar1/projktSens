@@ -105,8 +105,8 @@ class SettingsActivity : HomeButtonSupportActivity() {
         val settings = settingsContext.data
 
         val res = resources
-        val dp5 = (5 * res.displayMetrics.density).toInt()
         val context = this
+        val boundsMargin = res.getDimensionPixelSize(R.dimen.settings_boundsMargin)
 
         val body1 = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
 
@@ -129,7 +129,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
                             rowSpec,
                             columnSpec = settingNameSpec
                         ) {
-                            leftMargin = dp5
+                            leftMargin = boundsMargin
                         }
 
                         applyTextAppearance(body1)
@@ -142,7 +142,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
                             rowSpec,
                             columnSpec = viewSpec
                         ) {
-                            rightMargin = dp5
+                            rightMargin = boundsMargin
                         }
                     })
                 }
@@ -152,8 +152,8 @@ class SettingsActivity : HomeButtonSupportActivity() {
                 Button {
                     frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
                         gravity = Gravity.BOTTOM or Gravity.END
-                        rightMargin = dp5
-                        bottomMargin = dp5
+                        rightMargin = boundsMargin
+                        bottomMargin = boundsMargin
                     }
                     saveButton = this
                     text = res.getText(R.string.settings_save)

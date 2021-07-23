@@ -67,12 +67,12 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
     }
 
     private fun createStateViews() {
-        val density = resources.displayMetrics.density
+        val res = resources
         val context = this
 
         loadingContent = FrameLayout(context) {
             TransitionView {
-                val size = (200 * density).toInt()
+                val size = res.getDimensionPixelSize(R.dimen.locationDependentActivity_transitionViewSize)
                 frameLayoutParams(size, size) {
                     gravity = Gravity.CENTER
                 }
@@ -90,14 +90,14 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
 
-                val textSizePx = resources.getDimensionPixelSize(R.dimen.locationDependentActivity_errorTextSize)
+                val textSizePx = res.getDimensionPixelSize(R.dimen.locationDependentActivity_errorTextSize)
 
                 textSize = textSizePx.toFloat()
                 setText(R.string.failedToGetLocation)
             }
 
             Button {
-                val size = (40 * density).toInt()
+                val size = res.getDimensionPixelSize(R.dimen.locationDependentActivity_retryButtonSize)
                 linearLayoutParams(size, size) {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }

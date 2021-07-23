@@ -46,7 +46,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
     private val mainThread = MainThreadHandler(this)
 
     init {
-        val density = context.resources.displayMetrics.density
+        val res = context.resources
 
         // for STATE_FAILED_TO_LOAD state.
         // another states have single view
@@ -59,9 +59,8 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
             )
         }
         transitionView = TransitionView(context).apply {
-            val dp50 = (density * 50f).toInt()
-
-            layoutParams = LayoutParams(dp50, dp50).apply {
+            val size = res.getDimensionPixelSize(R.dimen.lazyCalendar_transitionViewSize)
+            layoutParams = LayoutParams(size, size).apply {
                 gravity = Gravity.CENTER
             }
 
@@ -82,8 +81,8 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
         }
 
         retryButton = MaterialButton(context).apply {
-            val dp40 = (density * 40f).toInt()
-            layoutParams = LayoutParams(dp40, dp40).apply {
+            val size = res.getDimensionPixelSize(R.dimen.lazyCalendar_retryButtonSize)
+            layoutParams = LayoutParams(size, size).apply {
                 gravity = Gravity.CENTER_HORIZONTAL
             }
 

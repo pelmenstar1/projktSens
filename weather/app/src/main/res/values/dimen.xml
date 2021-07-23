@@ -19,5 +19,18 @@
 
     <dimen name="requestLocPerm_contentPadding">20dp</dimen>
     <dimen name="requestLocPerm_actionTopMargin">10dp</dimen>
+
     <dimen name="locationDependentActivity_errorTextSize">16sp</dimen>
+    <dimen name="locationDependentActivity_transitionViewSize">200dp</dimen>
+    <dimen name="locationDependentActivity_retryButtonSize">40dp</dimen>
+
+    <dimen name="lazyCalendar_transitionViewSize">50dp</dimen>
+    <dimen name="lazyCalendar_retryButtonSize">40dp</dimen>
+
+    <dimen name="moonCalendar_moonSize">200dp</dimen>
+    <dimen name="moonCalendar_moonPhaseText_leftMargin">5dp</dimen>
+    <dimen name="moonCalendar_moonTopBottomMargin">10dp</dimen>
+
+    <dimen name="sunriseSunsetCalendar_boundsMargin">5dp</dimen>
+    <dimen name="sunriseSunsetCalendar_calendarTopMargin">5dp</dimen>
 </resources>
