@@ -19,55 +19,43 @@ import com.pelmenstar.projktSens.weather.models.WeatherDataSource
 import kotlinx.coroutines.*
 
 abstract class ReportActivityBase<TReport : Any> protected constructor(private val serializer: ObjectSerializer<TReport>) : HomeButtonSupportActivity() {
-    private var transView: TransitionView? = null
-
     @Volatile
     private var report: TReport? = null
 
     private var loadReportJob: Job? = null
 
-    @Volatile
     private var status = STATUS_NO_DATA
     private val lock = Any()
 
     @Suppress("LeakingThis") // this reference will be cleared in onDestroy()
     private val mainThread = MainThreadHandler(this)
 
+    private var transitionView: TransitionView? = null
+
+    private var loadingView: View? = null
+    private var noDataView: View? = null
+    private var errorView: View? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState != null) {
-            status = savedInstanceState.getByte(STATE_STATUS).toInt()
+        run try_load_from_saved_state@ {
+            if (savedInstanceState != null) {
+                status = savedInstanceState.getByte(STATE_STATUS).toInt()
 
-            val view: View
-            when (status) {
-                STATUS_NO_DATA -> {
-                    view = createNoDataView()
-                }
-                STATUS_ERROR -> {
-                    view = createErrorView()
-                }
-                STATUS_OK -> {
+                if (status == STATUS_OK) {
                     val rawData = savedInstanceState.getByteArray(STATE_REPORT)
                     if (rawData == null) {
                         Log.e(TAG, "Invalid saved state. STATE_REPORT property is null")
-                        startLoadingReport()
-                        return
+
+                        return@try_load_from_saved_state
                     }
 
-                    val report = Serializable.ofByteArray(rawData, serializer)
-                    this.report = report
+                    report = Serializable.ofByteArray(rawData, serializer)
+                }
 
-                    view = createChartView(report)
-                }
-                else -> {
-                    Log.e(TAG, "Invalid status in state")
-                    startLoadingReport()
-                    return
-                }
+                setStatus(status)
             }
-
-            setContentView(view)
         }
 
         startLoadingReport()
@@ -79,9 +67,9 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
             return
         }
 
-        setContentView(createAnimationView())
+        setStatus(STATUS_LOADING)
 
-        loadReportJob = GlobalScope.launch(Dispatchers.Default) {
+        loadReportJob = scope.launch {
             val component = DaggerAppComponent
                 .builder()
                 .appModule(AppModule(this@ReportActivityBase))
@@ -89,50 +77,76 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
 
             val dataSource = component.dataSource()
 
-            var view: View
-
+            var newStatus: Int
             try {
-                val report = loadReport(dataSource)
+                val r = loadReport(dataSource)
 
-                if (report == null) {
-                    status = STATUS_NO_DATA
-                    view = createNoDataView()
+                newStatus = if (r == null) {
+                    STATUS_NO_DATA
                 } else {
-                    status = STATUS_OK
-                    view = createChartView(report)
+                    STATUS_OK
                 }
 
-                this@ReportActivityBase.report = report
+                report = r
             } catch (e: Exception) {
                 Log.e(TAG, "when loading data", e)
 
-                status = STATUS_ERROR
-                view = createErrorView()
-            }
-
-            synchronized(lock) {
-                transView?.stopAnimation()
-                transView = null
+                newStatus = STATUS_ERROR
             }
 
             mainThread.sendMessage(Message {
-                what = MSG_SET_CONTENT_VIEW
-                obj = view
+                what = MSG_SET_STATUS
+                arg1 = newStatus
             })
         }.also { job ->
             job.invokeOnCompletion { loadReportJob = null }
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
+    private fun setStatus(status: Int) {
+        this.status = status
 
-        outState.putInt(STATE_STATUS, status)
+        if(status != STATUS_LOADING) {
+            transitionView?.stopAnimation()
+        }
 
-        synchronized(lock) {
-            val report = report
-            if (report != null) {
-                outState.putByteArray(STATE_REPORT, Serializable.toByteArray(report, serializer))
+        when(status) {
+            STATUS_LOADING -> {
+                if(loadingView == null) {
+                    loadingView = createLoadingView()
+                }
+
+                transitionView?.startAnimation()
+                setContentView(loadingView)
+            }
+            STATUS_NO_DATA -> {
+                if(noDataView == null) {
+                    noDataView = createNoDataView()
+                }
+
+                setContentView(noDataView)
+            }
+            STATUS_ERROR -> {
+                if(errorView == null) {
+                    errorView = createErrorView()
+                }
+
+                setContentView(errorView)
+            }
+            STATUS_OK -> {
+                val r = report
+                if(r == null) {
+                    Log.e(TAG, "setStatus(STATUS_OK), but report is null")
+                    return
+                }
+
+                transitionView = null
+
+                noDataView = null
+                errorView = null
+                loadingView = null
+
+                setContentView(createChartView(r))
             }
         }
     }
@@ -146,7 +160,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                     gravity = Gravity.CENTER_HORIZONTAL or Gravity.TOP
                 }
 
-                TextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline5).apply(this)
+                applyTextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline4)
                 text = resources.getText(R.string.noData)
             }
         }
@@ -160,12 +174,14 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         val retryButtonTopMargin = res.getDimensionPixelSize(R.dimen.reportActivity_errorView_retryButtonTopMargin)
 
         return LinearLayout(this) {
+            orientation = android.widget.LinearLayout.VERTICAL
+
             TextView {
                 linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
 
-                applyTextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline3)
+                applyTextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline5)
                 text = res.getText(R.string.errorOccurred)
             }
 
@@ -183,7 +199,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         }
     }
 
-    private fun createAnimationView(): View {
+    private fun createLoadingView(): View {
         val size = resources.getDimensionPixelSize(R.dimen.reportActivity_transitionViewSize)
         val context = this
 
@@ -194,7 +210,20 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                 }
 
                 transition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
-                startAnimation()
+                transitionView = this
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putInt(STATE_STATUS, status)
+
+        synchronized(lock) {
+            val report = report
+            if (report != null) {
+                outState.putByteArray(STATE_REPORT, Serializable.toByteArray(report, serializer))
             }
         }
     }
@@ -203,8 +232,9 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         super.onDestroy()
 
         synchronized(lock) {
-            transView?.stopAnimation()
+            transitionView?.stopAnimation()
         }
+        loadReportJob?.cancel()
 
         mainThread.removeCallbacksAndMessages(null)
         mainThread.activity = null
@@ -222,16 +252,18 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
             }
 
             when(msg.what) {
-                MSG_SET_CONTENT_VIEW -> {
-                    activity.setContentView(msg.obj as View)
+                MSG_SET_STATUS -> {
+                    activity.setStatus(msg.arg1)
                 }
             }
         }
     }
 
     companion object {
-        private const val MSG_SET_CONTENT_VIEW = 0
+        private val scope = CoroutineScope(Dispatchers.Default + CoroutineName("ReportScope"))
+        private const val MSG_SET_STATUS = 0
 
+        private const val STATUS_LOADING = 3
         private const val STATUS_NO_DATA = 0
         private const val STATUS_ERROR = 1
         private const val STATUS_OK = 2
