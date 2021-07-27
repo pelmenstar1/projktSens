@@ -48,6 +48,11 @@ public final class ShortTime {
         return time >= 0 && time < TimeConstants.SECONDS_IN_DAY;
     }
 
+    @TimeInt
+    public static int defaultIfNone(@TimeInt int time, @TimeInt int defaultValue) {
+        return time == NONE ? defaultValue : time;
+    }
+
     /**
      * Returns now time in seconds of day.
      */

@@ -2,13 +2,15 @@ package com.pelmenstar.projktSens.weather.app.ui.home
 
 import com.pelmenstar.projktSens.shared.android.mvp.DefaultContract
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
+import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.RequestLocationSubcomponent
+import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.RetryGetLocationSubcomponent
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
 
 interface HomeContract {
     interface Presenter : DefaultContract.Presenter<View> {
         fun getLoadMinMaxCalendarHandler(): LazyLoadingCalendarView.LoadMinMaxHandler
-        fun getOnRetryGetLocationListener(): ComplexWeatherView.OnRetryGetLocationListener
-        fun getRequestLocationPermissionHandler(): ComplexWeatherView.RequestLocationPermissionHandler
+        fun getOnRetryGetLocationListener(): RetryGetLocationSubcomponent.OnRetryGetLocationListener
+        fun getRequestLocationPermissionHandler(): RequestLocationSubcomponent.RequestLocationPermissionHandler
 
         fun startTodayReportView()
         fun startYesterdayReportView()

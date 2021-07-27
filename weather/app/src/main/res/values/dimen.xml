@@ -17,6 +17,12 @@
     <dimen name="weatherView_failedGetLocationTextSize">16sp</dimen>
     <dimen name="weatherView_requestGpsSize">30dp</dimen>
 
+    <dimen name="sunriseSunsetArc_dashedArcThickness">0.8dp</dimen>
+    <dimen name="sunriseSunsetArc_overArcThickness">2.5dp</dimen>
+    <dimen name="sunriseSunsetArc_height">60dp</dimen>
+    <dimen name="sunriseSunsetArc_primaryPadding">5dp</dimen>
+    <dimen name="sunriseSunsetArc_textSize">14sp</dimen>
+
     <dimen name="requestLocPerm_contentPadding">20dp</dimen>
     <dimen name="requestLocPerm_actionTopMargin">10dp</dimen>
 

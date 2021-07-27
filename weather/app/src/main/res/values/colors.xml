@@ -15,6 +15,13 @@
     <color name="weatherView_textColor_day">#000000</color>
     <color name="weatherView_textColor_night">#ffffff</color>
 
+    <color name="weatherView_iconTint_day">#000000</color>
+    <color name="weatherView_iconTint_night">#ffffff</color>
+
+    <color name="sunriseSunsetArc_dashedArcColor">#ffffff</color>
+    <color name="sunriseSunsetArc_overArcColor">#DCDCDC</color>
+    <color name="sunriseSunsetArc_textColor">#ffffff</color>
+
     <array name="defaultTransitionColors">
         <item>#852F14</item>
         <item>#BC441E</item>

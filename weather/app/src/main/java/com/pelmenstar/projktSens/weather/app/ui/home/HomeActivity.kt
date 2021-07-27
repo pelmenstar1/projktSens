@@ -21,6 +21,7 @@ import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
 import com.pelmenstar.projktSens.weather.app.ui.ComplexWeatherView
+import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarActivity
 import com.pelmenstar.projktSens.weather.app.ui.settings.SETTINGS
 import com.pelmenstar.projktSens.weather.app.ui.sunriseSunset.SunriseSunsetCalendarActivity
@@ -361,7 +362,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
     }
 
     override fun setCurrentTime(time: Int) {
-        weatherView.setTime(time)
+        weatherView.time = time
     }
 
     override fun setSunriseSunset(sunrise: Int, sunset: Int) {

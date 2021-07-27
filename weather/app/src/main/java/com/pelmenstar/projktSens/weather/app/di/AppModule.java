@@ -90,7 +90,7 @@ public final class AppModule {
     @Provides
     @NotNull
     public GeolocationProvider geolocationProvider() {
-        return new ConstGeolocationProvider(50.585661f, 26.31601f);
+        return new ConstGeolocationProvider(50.4500f, 30.5233f);
     }
 
     @Provides

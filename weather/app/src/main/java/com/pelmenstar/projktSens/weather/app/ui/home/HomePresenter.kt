@@ -17,6 +17,8 @@ import com.pelmenstar.projktSens.shared.time.ShortDateTime
 import com.pelmenstar.projktSens.weather.app.GeolocationCache
 import com.pelmenstar.projktSens.weather.app.PermissionUtils
 import com.pelmenstar.projktSens.weather.app.ui.RequestLocationPermissionDialog
+import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.RequestLocationSubcomponent
+import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.RetryGetLocationSubcomponent
 import com.pelmenstar.projktSens.weather.app.ui.report.DayReportActivity
 import com.pelmenstar.projktSens.weather.app.ui.report.MonthReportActivity
 import com.pelmenstar.projktSens.weather.app.ui.report.WeekReportActivity
@@ -53,14 +55,14 @@ class HomePresenter(
         }
     }
 
-    override fun getOnRetryGetLocationListener(): ComplexWeatherView.OnRetryGetLocationListener {
-        return ComplexWeatherView.OnRetryGetLocationListener {
+    override fun getOnRetryGetLocationListener(): RetryGetLocationSubcomponent.OnRetryGetLocationListener {
+        return RetryGetLocationSubcomponent.OnRetryGetLocationListener {
             startLoadingLocation()
         }
     }
 
-    override fun getRequestLocationPermissionHandler(): ComplexWeatherView.RequestLocationPermissionHandler {
-        return ComplexWeatherView.RequestLocationPermissionHandler {
+    override fun getRequestLocationPermissionHandler(): RequestLocationSubcomponent.RequestLocationPermissionHandler {
+        return RequestLocationSubcomponent.RequestLocationPermissionHandler {
             if(Build.VERSION.SDK_INT < 23) {
                 return@RequestLocationPermissionHandler
             }
