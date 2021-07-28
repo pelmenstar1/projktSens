@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
  * <b>Total: 12 bytes</b>
  */
 public final class ValueWithDate extends AppendableToStringBuilder {
-    public static final int SERIALIZED_OBJECT_SIZE = 12;
+    public static final int SERIALIZED_OBJECT_SIZE = 9;
 
     @NotNull
     public static final ObjectSerializer<ValueWithDate> SERIALIZER;
@@ -98,14 +98,14 @@ public final class ValueWithDate extends AppendableToStringBuilder {
 
         @Override
         public void writeObject(@NotNull ValueWithDate value, @NotNull ValueWriter writer) {
-            writer.emitInt64(value.dateTime);
+            writer.emitInt40(value.dateTime);
             writer.emitFloat(value.value);
         }
 
         @NotNull
         @Override
         public ValueWithDate readObject(@NotNull ValueReader reader) throws ValidationException {
-            long dateTime = reader.readInt64();
+            long dateTime = reader.readInt40();
             float value = reader.readFloat();
 
             if(!ShortDateTime.isValid(dateTime)) {

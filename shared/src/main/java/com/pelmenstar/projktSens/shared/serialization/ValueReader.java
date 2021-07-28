@@ -111,6 +111,21 @@ public final class ValueReader {
         return l;
     }
 
+    public int readInt24() {
+        int i = Bytes.readInt24(data, position);
+        position += 3;
+
+
+        return i;
+    }
+
+    public long readInt40() {
+        long l = Bytes.readInt40(data, position);
+        position += 5;
+
+        return l;
+    }
+
     /**
      * Reads byte array with specified size from the internal buffer and moves cursor for size of byte array.
      *

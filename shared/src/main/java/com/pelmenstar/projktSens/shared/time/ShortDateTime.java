@@ -54,7 +54,7 @@ public final class ShortDateTime {
     }
 
     private static long ofInternal(@ShortDateInt int date, @TimeInt int time) {
-        return (((long)date) << 32) | ((long)time & 0xffffffffL);
+        return ((long)(date & 0x7FFFFF) << 17) | ((long)time & 0x1FFFF);
     }
 
     /**
@@ -69,7 +69,7 @@ public final class ShortDateTime {
             throw new IllegalArgumentException("date");
         }
 
-        return (long)date << 32;
+        return ofInternal(date, 0);
     }
 
     /**
@@ -99,6 +99,11 @@ public final class ShortDateTime {
      * Determines whether particular datetime-long is valid
      */
     public static boolean isValid(@ShortDateTimeLong long dateTime) {
+        // unused bits should be clear
+        if((dateTime & 0xFFFFFF0000000000L) != 0) {
+            return false;
+        }
+
         return ShortDate.isValid(getDate(dateTime)) && ShortTime.isValid(getTime(dateTime));
     }
 
@@ -107,7 +112,7 @@ public final class ShortDateTime {
      */
     @ShortDateInt
     public static int getDate(@ShortDateTimeLong long dateTime) {
-        return (int)(dateTime >> 32);
+        return (int)(dateTime >> 17);
     }
 
     /**
@@ -115,7 +120,7 @@ public final class ShortDateTime {
      */
     @TimeInt
     public static int getTime(@ShortDateTimeLong long dateTime) {
-        return (int)dateTime;
+        return (int)dateTime & 0x1FFFF;
     }
 
     /**

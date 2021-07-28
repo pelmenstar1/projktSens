@@ -19,14 +19,14 @@ import java.util.Random;
  * A data class which contains information about weather (temperature, humidity, pressure) and timestamp of taking values.
  * Instances of this class can be serialized in format described below: <br/>
  * - units | 4 bytes <br/>
- * - dateTime | 8 bytes <br/>
+ * - dateTime | 5 bytes <br/>
  * - temperature | 4 bytes <br/>
  * - humidity | 4 bytes <br/>
  * - pressure | 4 bytes <br/>
- * <b>Total: 24 bytes</b>
+ * <b>Total: 21 bytes</b>
  */
 public final class WeatherInfo extends AppendableToStringBuilder {
-    public static final int SERIALIZED_OBJECT_SIZE = 24;
+    public static final int SERIALIZED_OBJECT_SIZE = 21;
 
     @NotNull
     public static final ObjectSerializer<WeatherInfo> SERIALIZER;
@@ -135,7 +135,7 @@ public final class WeatherInfo extends AppendableToStringBuilder {
         @Override
         public void writeObject(@NotNull WeatherInfo value, @NotNull ValueWriter writer) {
             writer.emitInt32(value.units);
-            writer.emitInt64(value.dateTime);
+            writer.emitInt40(value.dateTime);
             writer.emitFloat(value.temperature);
             writer.emitFloat(value.humidity);
             writer.emitFloat(value.pressure);
@@ -145,7 +145,7 @@ public final class WeatherInfo extends AppendableToStringBuilder {
         @Override
         public WeatherInfo readObject(@NotNull ValueReader reader) throws ValidationException {
             int units = reader.readInt32();
-            long dateTime = reader.readInt64();
+            long dateTime = reader.readInt40();
             float temperature = reader.readFloat();
             float humidity = reader.readFloat();
             float pressure = reader.readFloat();

@@ -32,6 +32,20 @@ public final class Bytes {
         buffer[offset + 3] = (byte)(value >> 24);
     }
 
+    public static void writeInt24(int value, byte @NotNull [] buffer, int offset) {
+        buffer[offset] = (byte)value;
+        buffer[offset + 1] = (byte)(value >> 8);
+        buffer[offset + 2] = (byte)(value >> 16);
+    }
+
+    public static void writeInt40(long value, byte @NotNull [] buffer, int offset) {
+        buffer[offset] = (byte)value;
+        buffer[offset + 1] = (byte)(value >> 8);
+        buffer[offset + 2] = (byte)(value >> 16);
+        buffer[offset + 3] = (byte)(value >> 24);
+        buffer[offset + 4] = (byte)(value >> 32);
+    }
+
     /**
      * Writes float32 to buffer at specified offset
      */
@@ -61,6 +75,14 @@ public final class Bytes {
                 ((buffer[offset + 7] & 0xffL) << 56);
     }
 
+    public static long readInt40(byte @NotNull [] buffer, int offset) {
+        return ((buffer[offset] & 0xffL)) |
+                ((buffer[offset + 1] & 0xffL) << 8 ) |
+                ((buffer[offset + 2] & 0xffL) << 16) |
+                ((buffer[offset + 3] & 0xffL) << 24) |
+                ((buffer[offset + 4] & 0xffL) << 32);
+    }
+
     /**
      * Returns int32 value from buffer at specified offset
      */
@@ -69,6 +91,12 @@ public final class Bytes {
                 ((buffer[offset + 1] & 0xFF) << 8 ) |
                 ((buffer[offset + 2] & 0xFF) << 16) |
                 ((buffer[offset + 3] & 0xFF) << 24);
+    }
+
+    public static int readInt24(byte @NotNull [] buffer, int offset) {
+        return (buffer[offset] & 0xFF) |
+                ((buffer[offset + 1] & 0xFF) << 8 ) |
+                ((buffer[offset + 2] & 0xFF) << 16);
     }
 
     /**

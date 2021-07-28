@@ -106,6 +106,16 @@ public final class ValueWriter {
         position += 8;
     }
 
+    public void emitInt24(int value) {
+        Bytes.writeInt24(value, data, position);
+        position += 3;
+    }
+
+    public void emitInt40(long value) {
+        Bytes.writeInt40(value, data, position);
+        position += 5;
+    }
+
     /**
      * Writes specified array and moves cursor for given array valuesLength
      *

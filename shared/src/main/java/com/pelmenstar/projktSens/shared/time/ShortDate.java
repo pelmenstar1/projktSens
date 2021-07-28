@@ -43,28 +43,28 @@ public final class ShortDate {
     @ShortDateInt
     @TestOnly
     public static int ofInternal(int year, int month, int dayOfMonth) {
-        return (year << 16) | (month << 8) | dayOfMonth;
+        return (year << 9) | (month << 5) | dayOfMonth;
     }
 
     /**
      * Returns year of date-int, in range of [0; 9999]
      */
     public static int getYear(@ShortDateInt int date) {
-        return (date >> 16) & 0xffff;
+        return (date >> 9) & 0b111111_11111111;
     }
 
     /**
      * Returns month of date-int, in range of [1; 12]
      */
     public static int getMonth(@ShortDateInt int date) {
-        return (date >> 8) & 0xff;
+        return (date >> 5) & 0b1111;
     }
 
     /**
      * Returns day of month of date-int, in range of [1; *days in month*]
      */
     public static int getDayOfMonth(@ShortDateInt int date) {
-        return date & 0xff;
+        return date & 0b11111;
     }
 
     /**
@@ -146,7 +146,12 @@ public final class ShortDate {
      * Determines whether date-int is valid
      */
     public static boolean isValid(@ShortDateInt int date) {
-       return isValid(getYear(date), getMonth(date), getDayOfMonth(date));
+        // date is invalid, if last unused bit is set
+        if((date & 0x8000_0000) != 0) {
+            return false;
+        }
+
+        return isValid(getYear(date), getMonth(date), getDayOfMonth(date));
     }
 
     private static boolean isValid(int year, int month, int day) {

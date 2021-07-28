@@ -214,7 +214,7 @@ public final class DayReport extends AppendableToStringBuilder {
     private static final class Serializer implements ObjectSerializer<DayReport> {
         @Override
         public int getSerializedObjectSize(@NotNull DayReport value) {
-            return ReportStats.SERIALIZED_OBJECT_SIZE + 2 + (16 * value.entries.length);
+            return ReportStats.SERIALIZED_OBJECT_SIZE + 2 + (15 * value.entries.length);
         }
 
         @Override
@@ -223,7 +223,7 @@ public final class DayReport extends AppendableToStringBuilder {
             writer.emitInt16((short)value.entries.length);
 
             for(Entry e: value.entries) {
-                writer.emitInt32(e.time);
+                writer.emitInt24(e.time);
                 writer.emitFloat(e.temperature);
                 writer.emitFloat(e.humidity);
                 writer.emitFloat(e.pressure);
@@ -241,8 +241,8 @@ public final class DayReport extends AppendableToStringBuilder {
             int entriesLength = reader.readInt16();
             Entry[] entries = new Entry[entriesLength];
 
-            for(int i = 0; i < entries.length; i++) {
-                int time = reader.readInt32();
+            for(int i = 0; i < entriesLength; i++) {
+                int time = reader.readInt24();
                 float temp = reader.readFloat();
                 float hum = reader.readFloat();
                 float press = reader.readFloat();
