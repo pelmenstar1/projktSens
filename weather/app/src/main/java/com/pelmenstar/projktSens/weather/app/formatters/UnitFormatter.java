@@ -1,5 +1,6 @@
 package com.pelmenstar.projktSens.weather.app.formatters;
 
+import com.pelmenstar.projktSens.shared.MyMath;
 import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter;
 import com.pelmenstar.projktSens.weather.models.UnitValue;
@@ -26,7 +27,7 @@ public final class UnitFormatter {
 
     @NotNull
     public String formatValue(float value, int unit) {
-        return value + getUnitString(unit);
+        return MyMath.round(value) + getUnitString(unit);
     }
 
     @NotNull
@@ -34,11 +35,11 @@ public final class UnitFormatter {
         String unitStr = getUnitString(unit);
         StringBuilder sb = new StringBuilder();
 
-        sb.append(value);
+        sb.append(MyMath.round(value));
         sb.append(unitStr);
         sb.append(' ');
         sb.append('(');
-        StringUtils.appendSigned(delta, sb);
+        StringUtils.appendSigned(MyMath.round(delta), sb);
         sb.append(unitStr);
         sb.append(')');
 
@@ -51,7 +52,7 @@ public final class UnitFormatter {
 
         StringBuilder sb = new StringBuilder(32);
 
-        sb.append(UnitValue.getAbsoluteValue(value));
+        sb.append(MyMath.round(UnitValue.getAbsoluteValue(value)));
         sb.append(getUnitString(UnitValue.getUnit(value)));
         sb.append(' ');
         sb.append('(');

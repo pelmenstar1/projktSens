@@ -30,10 +30,10 @@ public final class ParameterStats extends AppendableToStringBuilder {
             float avg,
             float median
     ) {
-        this.min = MyMath.round(min);
-        this.max = MyMath.round(max);
-        this.avg = MyMath.round(avg);
-        this.median = MyMath.round(median);
+        this.min = min;
+        this.max = max;
+        this.avg = avg;
+        this.median = median;
     }
 
     @Override

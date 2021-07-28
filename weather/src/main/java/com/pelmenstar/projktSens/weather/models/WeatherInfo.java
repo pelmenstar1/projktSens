@@ -70,9 +70,9 @@ public final class WeatherInfo extends AppendableToStringBuilder {
 
         this.units = units;
         this.dateTime = dateTime;
-        this.temperature = MyMath.round(temperature);
-        this.humidity = MyMath.round(humidity);
-        this.pressure = MyMath.round(pressure);
+        this.temperature = temperature;
+        this.humidity = humidity;
+        this.pressure = pressure;
     }
 
     @Override

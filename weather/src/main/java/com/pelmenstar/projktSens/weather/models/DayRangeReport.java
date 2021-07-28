@@ -1,7 +1,6 @@
 package com.pelmenstar.projktSens.weather.models;
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
-import com.pelmenstar.projktSens.shared.MyMath;
 import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer;
 import com.pelmenstar.projktSens.shared.serialization.Serializable;
@@ -49,14 +48,14 @@ public final class DayRangeReport extends AppendableToStringBuilder {
                      float minHumidity,    float maxHumidity,
                      float minPressure,    float maxPressure) {
             this.date = date;
-            this.minTemperature = MyMath.round(minTemperature);
-            this.maxTemperature = MyMath.round(maxTemperature);
+            this.minTemperature = minTemperature;
+            this.maxTemperature = maxTemperature;
 
-            this.minHumidity = MyMath.round(minHumidity);
-            this.maxHumidity = MyMath.round(maxHumidity);
+            this.minHumidity = minHumidity;
+            this.maxHumidity = maxHumidity;
 
-            this.minPressure = MyMath.round(minPressure);
-            this.maxPressure = MyMath.round(maxPressure);
+            this.minPressure = minPressure;
+            this.maxPressure = maxPressure;
         }
 
         @Override

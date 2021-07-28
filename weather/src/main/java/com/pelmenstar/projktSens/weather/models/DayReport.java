@@ -1,7 +1,6 @@
 package com.pelmenstar.projktSens.weather.models;
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
-import com.pelmenstar.projktSens.shared.MyMath;
 import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer;
 import com.pelmenstar.projktSens.shared.serialization.Serializable;
@@ -41,9 +40,9 @@ public final class DayReport extends AppendableToStringBuilder {
 
         public Entry(int time, float temp, float hum, float press) {
             this.time = time;
-            this.temperature = MyMath.round(temp);
-            this.humidity = MyMath.round(hum);
-            this.pressure = MyMath.round(press);
+            this.temperature = temp;
+            this.humidity = hum;
+            this.pressure = press;
         }
 
         @Override

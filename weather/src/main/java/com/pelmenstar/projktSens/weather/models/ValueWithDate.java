@@ -39,7 +39,7 @@ public final class ValueWithDate extends AppendableToStringBuilder {
 
     ValueWithDate(long dateTime, float value, @SuppressWarnings("unused") boolean ignore) {
         this.dateTime = dateTime;
-        this.value = MyMath.round(value);
+        this.value = value;
     }
 
     public ValueWithDate(long dateTime, float value) {
