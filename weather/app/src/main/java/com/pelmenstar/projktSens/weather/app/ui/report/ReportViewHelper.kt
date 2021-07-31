@@ -21,59 +21,73 @@ import com.pelmenstar.projktSens.weather.app.ui.MaterialChart
 import com.pelmenstar.projktSens.weather.models.*
 
 private class ParameterStatsPrefixStrings(
-    val min: String,
-    val max: String,
-    val avg: String,
-    val median: String
+    @JvmField val min: String,
+    @JvmField val max: String,
+    @JvmField val avg: String,
+    @JvmField val median: String
 )
 
 private class ChartViewCreationContext(
-    val textLeftMargin: Int, val chartSideMargin: Int, val blockTopMargin: Int,
-    val chartHeight: Int,
-    val headline4: TextAppearance, val body1: TextAppearance,
-    val unitFormatter: UnitFormatter,
-    val strings: ParameterStatsPrefixStrings,
-    val chartOptions: (LineChart) -> Unit
-)
+    @JvmField val textLeftMargin: Int,
+    chartSideMargin: Int, blockTopMargin: Int, chartHeight: Int,
+    @JvmField val headerAppearance: TextAppearance, @JvmField val paramAppearance: TextAppearance,
+    @JvmField val unitFormatter: UnitFormatter,
+    @JvmField val strings: ParameterStatsPrefixStrings,
+    @JvmField val chartOptions: (LineChart) -> Unit
+) {
+    @JvmField
+    val headerLayoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+        gravity = Gravity.CENTER_HORIZONTAL
+        topMargin = blockTopMargin
+    }
+
+    @JvmField
+    val chartLayoutParams = LinearLayout.LayoutParams(MATCH_PARENT, chartHeight).apply {
+        leftMargin = chartSideMargin
+        rightMargin = chartSideMargin
+    }
+}
+
+private class ValueParamCreationContext(
+    @JvmField val statsUnit: Int, @JvmField val prefUnit: Int,
+    @JvmField val unitFormatter: UnitFormatter,
+    @JvmField val textLeftMargin: Int,
+    @JvmField val textAppearance: TextAppearance
+) {
+    @JvmField
+    val layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+        leftMargin = textLeftMargin
+    }
+}
 
 private fun ViewGroup.ValueParamView(
     prefix: String, vd: ValueWithDate,
-    statsUnit: Int, prefUnit: Int,
-    unitFormatter: UnitFormatter,
-    textLeftMargin: Int,
-    textAppearance: TextAppearance
+    c: ValueParamCreationContext
 ) {
     PrefixTextView {
-        linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-            leftMargin = textLeftMargin
-        }
+        layoutParams = c.layoutParams
 
         this.prefix = prefix
-        this.value = unitFormatter.formatValueWithDate(vd.unit(statsUnit, prefUnit))
+        this.value = c.unitFormatter.formatValueWithDate(vd.unit(c.statsUnit, c.prefUnit))
 
-        applyTextAppearance(textAppearance)
+        applyTextAppearance(c.textAppearance)
     }
 }
 
 private fun ViewGroup.ValueParamView(
     prefix: String, value: Float,
-    statsUnit: Int, prefUnit: Int,
-    unitFormatter: UnitFormatter,
-    textLeftMargin: Int,
-    textAppearance: TextAppearance
+    c: ValueParamCreationContext
 ) {
     PrefixTextView {
-        linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-            leftMargin = textLeftMargin
-        }
+        layoutParams = c.layoutParams
 
         this.prefix = prefix
-        this.value = unitFormatter.formatValue(
-            UnitValue.getValue(value, statsUnit, prefUnit),
-            prefUnit
+        this.value = c.unitFormatter.formatValue(
+            UnitValue.getValue(value, c.statsUnit, c.prefUnit),
+            c.prefUnit
         )
 
-        applyTextAppearance(textAppearance)
+        applyTextAppearance(c.textAppearance)
     }
 }
 
@@ -84,35 +98,29 @@ private fun ViewGroup.ParamStatsBlock(
     data: ChartData,
     creationContext: ChartViewCreationContext
 ) {
-    val unitFormatter = creationContext.unitFormatter
     val strings = creationContext.strings
 
-    val body1 = creationContext.body1
-
-    val textLeftMargin = creationContext.textLeftMargin
-
     TextView {
-        linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-            gravity = Gravity.CENTER_HORIZONTAL
-            topMargin = creationContext.blockTopMargin
-        }
+        layoutParams = creationContext.headerLayoutParams
 
         text = context.resources.getText(headerRes)
-        applyTextAppearance(creationContext.headline4)
+        applyTextAppearance(creationContext.headerAppearance)
     }
 
-    ValueParamView(strings.min, paramStats.min, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
-    ValueParamView(strings.max, paramStats.max, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
-    ValueParamView(strings.avg, paramStats.avg, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
-    ValueParamView(strings.median, paramStats.median, statsUnit, prefUnit, unitFormatter, textLeftMargin, body1)
+    val vpContext = ValueParamCreationContext(
+        statsUnit, prefUnit,
+        creationContext.unitFormatter,
+        creationContext.textLeftMargin,
+        creationContext.paramAppearance
+    )
+
+    ValueParamView(strings.min, paramStats.min, vpContext)
+    ValueParamView(strings.max, paramStats.max, vpContext)
+    ValueParamView(strings.avg, paramStats.avg, vpContext)
+    ValueParamView(strings.median, paramStats.median, vpContext)
 
     MaterialChart {
-        val chartSideMargin = creationContext.chartSideMargin
-
-        linearLayoutParams(MATCH_PARENT, creationContext.chartHeight) {
-            leftMargin = chartSideMargin
-            rightMargin = chartSideMargin
-        }
+        layoutParams = creationContext.chartLayoutParams
 
         creationContext.chartOptions(this)
         this.data = data
@@ -149,8 +157,8 @@ fun createChartView(
     val blockTopMargin = res.getDimensionPixelOffset(R.dimen.reportActivity_chartViewBlockTopMargin)
     val chartHeight = res.getDimensionPixelSize(R.dimen.reportActivity_chartHeight)
 
-    val headline4 = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline4)
-    val body1 = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
+    val headerAppearance = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline4)
+    val paramAppearance = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
 
     val strings = ParameterStatsPrefixStrings(
         res.getString(R.string.min),
@@ -162,7 +170,7 @@ fun createChartView(
     val creationContext = ChartViewCreationContext(
         textLeftMargin, chartSideMargin, blockTopMargin,
         chartHeight,
-        headline4, body1,
+        headerAppearance, paramAppearance,
         unitFormatter,
         strings,
         chartOptions
