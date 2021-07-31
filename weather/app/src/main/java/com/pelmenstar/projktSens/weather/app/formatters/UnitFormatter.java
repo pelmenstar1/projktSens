@@ -5,6 +5,7 @@ import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter;
 import com.pelmenstar.projktSens.weather.models.UnitValue;
 import com.pelmenstar.projktSens.weather.models.UnitValueWithDate;
+import com.pelmenstar.projktSens.weather.models.ValueWithDate;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +28,19 @@ public final class UnitFormatter {
 
     @NotNull
     public String formatValue(float value, int unit) {
-        return MyMath.round(value) + getUnitString(unit);
+        return formatValueToBuilder(value, unit).toString();
+    }
+
+    @NotNull
+    public StringBuilder formatValueToBuilder(float value, int unit) {
+        String unitString = getUnitString(unit);
+        int sbLength = unitString.length() + MyMath.decimalDigitCount((int)value) + 2;
+
+        StringBuilder sb = new StringBuilder(sbLength);
+        sb.append(MyMath.round(value));
+        sb.append(unitString);
+
+        return sb;
     }
 
     @NotNull
@@ -47,19 +60,32 @@ public final class UnitFormatter {
     }
 
     @NotNull
-    public String formatValueWithDate(@NotNull UnitValueWithDate ud) {
-        long value = ud.value;
+    public String formatValueWithDate(@NotNull ValueWithDate vd, int currentUnit, int prefUnit) {
+        return formatValueWithDateToBuilder(vd, currentUnit, prefUnit).toString();
+    }
 
-        StringBuilder sb = new StringBuilder(32);
+    @NotNull
+    public StringBuilder formatValueWithDateToBuilder(
+            @NotNull ValueWithDate vd,
+            int currentUnit, int prefUnit
+    ) {
+        long dateTime = vd.dateTime;
+        float value = UnitValue.getValue(vd.value, currentUnit, prefUnit);
+        String unitString = getUnitString(prefUnit);
 
-        sb.append(MyMath.round(UnitValue.getAbsoluteValue(value)));
-        sb.append(getUnitString(UnitValue.getUnit(value)));
+        int sbLength = MyMath.decimalDigitCount((int)value) +
+                unitString.length() + dateFormatter.approximatePrettyDateTimeLength(dateTime) + 5;
+
+        StringBuilder sb = new StringBuilder(sbLength);
+
+        sb.append(MyMath.round(value));
+        sb.append(unitString);
         sb.append(' ');
         sb.append('(');
-        dateFormatter.appendPrettyDateTime(ud.dateTime, sb);
+        dateFormatter.appendPrettyDateTime(dateTime, sb);
         sb.append(')');
 
-        return sb.toString();
+        return sb;
     }
 
     @NotNull

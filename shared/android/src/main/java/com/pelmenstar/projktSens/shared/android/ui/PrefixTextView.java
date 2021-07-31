@@ -25,6 +25,9 @@ public final class PrefixTextView extends MaterialTextView {
     @NotNull
     private String value = "";
 
+    @Nullable
+    private StringBuilder valueSb;
+
     public PrefixTextView(@NotNull Context context) {
         this(context, null,  android.R.attr.textViewStyle, 0);
     }
@@ -94,13 +97,41 @@ public final class PrefixTextView extends MaterialTextView {
         invalidateText();
     }
 
+    public void setValue(@NotNull StringBuilder inSb) {
+        valueSb = inSb;
+
+        invalidateText();
+    }
+
+    public void setPrefixAndValue(@NotNull String prefix, @NotNull String value) {
+        this.prefix = prefix;
+        this.value = value;
+
+        invalidateText();
+    }
+
+    public void setPrefixAndValue(@NotNull String prefix, @NotNull StringBuilder valueSb) {
+        this.prefix = prefix;
+        this.valueSb = valueSb;
+
+        invalidateText();
+    }
+
     private char[] textCache = EmptyArray.CHAR;
 
     private void invalidateText() {
-        int prefixLength = prefix.length();
-        int valueLength = value.length();
+        StringBuilder valueSb = this.valueSb;
 
-        int textLength = prefixLength + valueLength + 2;
+        int prefixLength = prefix.length();
+        int valueLength;
+        if(valueSb != null) {
+            valueLength = valueSb.length();
+        } else {
+            valueLength = value.length();
+        }
+
+        int valueBegin = prefixLength + 2;
+        int textLength = valueBegin + valueLength;
         char[] buffer;
 
         if(textCache.length == textLength) {
@@ -113,7 +144,13 @@ public final class PrefixTextView extends MaterialTextView {
         prefix.getChars(0, prefixLength, buffer, 0);
         buffer[prefixLength] = ':';
         buffer[prefixLength + 1] = ' ';
-        value.getChars(0, valueLength, buffer, prefixLength + 2);
+
+        if(valueSb != null) {
+            valueSb.getChars(0, valueLength, buffer, valueBegin);
+            this.valueSb = null;
+        } else {
+            value.getChars(0, valueLength, buffer, valueBegin);
+        }
 
         setText(buffer, 0, textLength);
     }

@@ -1,5 +1,6 @@
 package com.pelmenstar.projktSens.shared.time;
 
+import com.pelmenstar.projktSens.shared.MyMath;
 import com.pelmenstar.projktSens.shared.StringUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -8,6 +9,19 @@ import org.jetbrains.annotations.NotNull;
  * Abstract class that responsible for formatting dates in pretty view.
  */
 public abstract class PrettyDateFormatter {
+    public final int approximatePrettyDateTimeLength(@ShortDateTimeLong long dateTime) {
+        return approximatePrettyDateLength(ShortDateTime.getDate(dateTime)) + 6;
+    }
+
+    public final int approximatePrettyDateLength(@ShortDateInt int date) {
+        int month = ShortDate.getMonth(date);
+        int day = ShortDate.getDayOfMonth(date);
+        int monthStrLength = getMonthWithDayString(month).length();
+        int dayStrLength = MyMath.decimalDigitCount(day);
+
+        return dayStrLength + monthStrLength + /* year */ 4 + /* whitespaces */ 2;
+    }
+
     /**
      * Appends date-time to specified {@link StringBuilder}.
      *
