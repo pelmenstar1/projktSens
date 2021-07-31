@@ -9,6 +9,7 @@ import com.pelmenstar.projktSens.shared.serialization.ValueReader;
 import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 import com.pelmenstar.projktSens.shared.time.ShortDate;
 import com.pelmenstar.projktSens.shared.time.ShortDateInt;
+import com.pelmenstar.projktSens.shared.time.ShortDateTime;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -156,20 +157,18 @@ public final class DayRangeReport extends AppendableToStringBuilder {
     }
 
     @NotNull
-    public static DayRangeReport create(int units,
-                                        int @NotNull [] dateValues,
-                                        float @NotNull [] tempValues,
-                                        float @NotNull [] humValues,
-                                        float @NotNull [] pressValues) {
-        int length = tempValues.length;
+    public static DayRangeReport create(@NotNull WeatherInfo @NotNull [] values) {
+        return create(new ArrayWeatherPropertyIterable(values));
+    }
+
+    @NotNull
+    public static DayRangeReport create(@NotNull WeatherPropertyIterable data) {
+        int length = data.size();
         if(length == 0) {
             throw new IllegalArgumentException("Data is empty");
         }
 
         Entry[] entries = new Entry[0];
-
-        int tempUnit = ValueUnitsPacked.getTemperatureUnit(units);
-        int pressUnit = ValueUnitsPacked.getPressureUnit(units);
 
         float tempSum = 0;
         float humSum = 0;
@@ -188,11 +187,25 @@ public final class DayRangeReport extends AppendableToStringBuilder {
         int currentDate = 0;
         int maxIdx = length - 1;
 
-        for(int i = 0; i < length; i++) {
-            int date = dateValues[i];
-            float temp = UnitValue.getValue(tempValues[i], tempUnit, ValueUnit.CELSIUS);
-            float hum = humValues[i];
-            float press = UnitValue.getValue(pressValues[i], pressUnit, ValueUnit.MM_OF_MERCURY);
+        float[] tempValues = new float[length];
+        float[] humValues = new float[length];
+        float[] pressValues = new float[length];
+
+        int i = 0;
+        while(data.moveNext()) {
+            int units = data.getUnits();
+            int tempUnit = ValueUnitsPacked.getTemperatureUnit(units);
+            int pressUnit = ValueUnitsPacked.getPressureUnit(units);
+
+            long dateTime = data.getDateTime();
+            int date = ShortDateTime.getDate(dateTime);
+            float temp = UnitValue.getValue(data.getTemperature(), tempUnit, ValueUnit.CELSIUS);
+            float hum = data.getHumidity();
+            float press = UnitValue.getValue(data.getPressure(), pressUnit, ValueUnit.MM_OF_MERCURY);
+
+            tempValues[i] = temp;
+            humValues[i] = hum;
+            pressValues[i] = press;
 
             if (first) {
                 first = false;
@@ -251,6 +264,8 @@ public final class DayRangeReport extends AppendableToStringBuilder {
             tempSum += temp;
             humSum += hum;
             pressSum += press;
+
+            i++;
         }
 
         float invLength = 1f / length;

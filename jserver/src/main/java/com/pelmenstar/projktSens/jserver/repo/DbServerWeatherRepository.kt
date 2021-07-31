@@ -73,31 +73,11 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
         }
 
         return db.querySuspend(createDayQuery(date)).use { c ->
-            val count = c.count
-            if (count == 0) {
+            if (c.count == 0) {
                 return null
             }
 
-            val timeValues = IntArray(count)
-            val tempValues = FloatArray(count)
-            val humValues = FloatArray(count)
-            val pressValues = FloatArray(count)
-
-            for(i in 0 until count) {
-                c.moveToPosition(i)
-
-                timeValues[i] = (c.getLong(0) % TimeConstants.SECONDS_IN_DAY).toInt()
-                tempValues[i] = c.getFloat(1)
-                humValues[i] = c.getFloat(2)
-                pressValues[i] = c.getFloat(3)
-            }
-
-            DayReport.create(ValueUnitsPacked.CELSIUS_MM_OF_MERCURY,
-                timeValues,
-                tempValues,
-                humValues,
-                pressValues
-            )
+            DayReport.create(CursorWeatherPropertyIterable(c))
         }
     }
 
@@ -105,33 +85,11 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
         val sql = createDayRangeQuery(range)
 
         return db.querySuspend(sql).use { c ->
-            val count = c.count
-
-            if (count == 0) {
+            if (c.count == 0) {
                 return null
             }
 
-            val dateValues = IntArray(count)
-            val tempValues = FloatArray(count)
-            val humValues = FloatArray(count)
-            val pressValues = FloatArray(count)
-
-            for(i in 0 until count) {
-                c.moveToPosition(i)
-
-                val epochDay = c.getLong(0) / TimeConstants.SECONDS_IN_DAY
-                dateValues[i] = ShortDate.ofEpochDay(epochDay)
-                tempValues[i] = c.getFloat(1)
-                humValues[i] = c.getFloat(2)
-                pressValues[i] = c.getFloat(3)
-            }
-
-            DayRangeReport.create(ValueUnitsPacked.CELSIUS_MM_OF_MERCURY,
-                dateValues,
-                tempValues,
-                humValues,
-                pressValues
-            )
+            DayRangeReport.create(CursorWeatherPropertyIterable(c))
         }
     }
 
@@ -176,6 +134,19 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
         }
 
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
+    }
+
+    private class CursorWeatherPropertyIterable(private val cursor: Cursor): WeatherPropertyIterable {
+        override fun size(): Int = cursor.count
+
+        override fun getUnits(): Int = ValueUnitsPacked.CELSIUS_MM_OF_MERCURY
+
+        override fun getDateTime(): Long = ShortDateTime.ofEpochSecond(cursor.getLong(0))
+        override fun getTemperature(): Float = cursor.getFloat(1)
+        override fun getHumidity(): Float = cursor.getFloat(2)
+        override fun getPressure(): Float = cursor.getFloat(3)
+
+        override fun moveNext(): Boolean = cursor.moveToNext()
     }
 
     companion object {

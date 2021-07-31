@@ -7,6 +7,7 @@ import com.pelmenstar.projktSens.shared.serialization.Serializable;
 import com.pelmenstar.projktSens.shared.serialization.ValidationException;
 import com.pelmenstar.projktSens.shared.serialization.ValueReader;
 import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
+import com.pelmenstar.projktSens.shared.time.ShortDateTime;
 import com.pelmenstar.projktSens.shared.time.ShortTime;
 import com.pelmenstar.projktSens.shared.time.TimeInt;
 
@@ -130,65 +131,74 @@ public final class DayReport extends AppendableToStringBuilder {
     }
 
     @NotNull
-    public static DayReport create(int units,
-                                   int @NotNull [] timeValues,
-                                   float @NotNull [] tempValues,
-                                   float @NotNull [] humValues,
-                                   float @NotNull [] pressValues) {
-        int length = tempValues.length;
+    public static DayReport create(@NotNull WeatherInfo @NotNull [] data) {
+        return create(new ArrayWeatherPropertyIterable(data));
+    }
 
-        if(length == 0) {
+    @NotNull
+    public static DayReport create(@NotNull WeatherPropertyIterable data) {
+        int size = data.size();
+        if(size == 0) {
             throw new IllegalArgumentException("Data is empty");
         }
 
-        Entry[] entries = new Entry[length];
+        Entry[] entries = new Entry[size];
 
         float tempSum = 0;
         float humSum = 0;
         float pressSum = 0;
 
-        int tempUnit = ValueUnitsPacked.getTemperatureUnit(units);
-        int pressUnit = ValueUnitsPacked.getPressureUnit(units);
+        float[] tempValues = new float[size];
+        float[] humValues = new float[size];
+        float[] pressValues = new float[size];
+        int i = 0;
 
-        for(int i = 0; i < length; i++) {
-            float temp = UnitValue.getValue(tempValues[i], tempUnit, ValueUnit.CELSIUS);
-            float hum = humValues[i];
-            float press = UnitValue.getValue(pressValues[i], pressUnit, ValueUnit.MM_OF_MERCURY);
+        while(data.moveNext()) {
+            int units = data.getUnits();
+            int tempUnit = ValueUnitsPacked.getTemperatureUnit(units);
+            int pressUnit = ValueUnitsPacked.getPressureUnit(units);
+
+            float temp = UnitValue.getValue(data.getTemperature(), tempUnit, ValueUnit.CELSIUS);
+            float hum = data.getHumidity();
+            float press = UnitValue.getValue(data.getPressure(), pressUnit, ValueUnit.MM_OF_MERCURY);
 
             tempValues[i] = temp;
+            humValues[i] = hum;
             pressValues[i] = press;
 
-            entries[i] = new Entry(timeValues[i], temp, hum, press);
+            entries[i] = new Entry(ShortDateTime.getTime(data.getDateTime()), temp, hum, press);
 
             tempSum += temp;
             humSum += hum;
             pressSum += press;
+
+            i++;
         }
 
-        float invLength = 1f / length;
-        float avgTemp = tempSum * invLength;
-        float avgHum = humSum * invLength;
-        float avgPress = pressSum * invLength;
+        float invSize = 1f / size;
+        float avgTemp = tempSum * invSize;
+        float avgHum = humSum * invSize;
+        float avgPress = pressSum * invSize;
 
         Arrays.sort(tempValues);
         Arrays.sort(humValues);
         Arrays.sort(pressValues);
 
         float minTemp = tempValues[0];
-        float maxTemp = tempValues[length - 1];
+        float maxTemp = tempValues[size - 1];
 
         float minHum = humValues[0];
-        float maxHum = humValues[length - 1];
+        float maxHum = humValues[size - 1];
 
         float minPress = pressValues[0];
-        float maxPress = pressValues[length - 1];
+        float maxPress = pressValues[size - 1];
 
         float medianTemp;
         float medianHum;
         float medianPress;
 
-        int mid = length / 2;
-        if(mid * 2 == length) {
+        int mid = size / 2;
+        if(mid * 2 == size) {
             medianTemp = (tempValues[mid] + tempValues[mid + 1]) * 0.5f;
             medianHum = (humValues[mid] + humValues[mid + 1]) * 0.5f;
             medianPress = (pressValues[mid] + pressValues[mid + 1]) * 0.5f;
