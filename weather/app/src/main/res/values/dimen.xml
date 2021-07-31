@@ -8,6 +8,10 @@
     <dimen name="reportActivity_chartViewSideMargin">3dp</dimen>
     <dimen name="reportActivity_chartViewBlockTopMargin">10dp</dimen>
 
+    <dimen name="materialChart_textSize">8sp</dimen>
+    <dimen name="materialChart_circleRadius">3dp</dimen>
+    <dimen name="materialChart_lineWidth">1dp</dimen>
+
     <dimen name="weatherView_tempTextSize">24sp</dimen>
     <dimen name="weatherView_tempUnitTextSize">16sp</dimen>
     <dimen name="weatherView_humPressTextSize">15sp</dimen>

@@ -11,6 +11,7 @@ import com.pelmenstar.projktSens.chartLite.components.XAxis
 import com.pelmenstar.projktSens.chartLite.components.YAxis
 import com.pelmenstar.projktSens.chartLite.data.ChartData
 import com.pelmenstar.projktSens.shared.android.obtainStyledAttributes
+import com.pelmenstar.projktSens.weather.app.R
 
 class MaterialLineChart @JvmOverloads constructor(
     context: Context,
@@ -21,8 +22,13 @@ class MaterialLineChart @JvmOverloads constructor(
     @ColorInt
     private val materialTextColor: Int
 
+    private val valueTextSize: Float
+    private val circleRadius: Float
+    private val lineWidth: Float
+
     init {
         val theme = context.theme
+        val res = context.resources
         val labelColor: Int
 
         theme.obtainStyledAttributes(android.R.style.Theme, android.R.attr.textColorPrimary) { a ->
@@ -30,6 +36,10 @@ class MaterialLineChart @JvmOverloads constructor(
         }
 
         materialTextColor = labelColor
+
+        valueTextSize = res.getDimension(R.dimen.materialChart_textSize)
+        circleRadius = res.getDimension(R.dimen.materialChart_circleRadius)
+        lineWidth = res.getDimension(R.dimen.materialChart_lineWidth)
 
         flags = flags or FLAG_AUTO_ANIMATED
         xAxis.apply {
@@ -51,13 +61,12 @@ class MaterialLineChart @JvmOverloads constructor(
         if (data == null) {
             return
         }
+
         for (dataSet in data.dataSets) {
-            dataSet.valueTextSize = 15f
-            dataSet.circleRadius = 6f
+            dataSet.valueTextSize = valueTextSize
+            dataSet.circleRadius = circleRadius
             dataSet.valueTextColor = materialTextColor
-            dataSet.lineWidth = 1.5f
+            dataSet.lineWidth = lineWidth
         }
     }
-
-
 }
