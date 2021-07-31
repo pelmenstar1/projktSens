@@ -11,27 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * A data class which contains basic statistics information.
- * Instances of this class can be serialized in format described below: <br/>
- * - units | 4 bytes<br/>
- * <br/>
- * - minTemperature.dateTime | 8 bytes <br/>
- * - minTemperature.value | 2 bytes <br/>
- * - maxTemperature.dateTime | 8 bytes <br/>
- * - maxTemperature.value | 2 bytes <br/>
- * - avgTemperature | 2 bytes <br/>
- * <br/>
- * - minHumidity.dateTime | 8 bytes <br/>
- * - minHumidity.value | 1 byte <br/>
- * - maxHumidity.dateTime | 8 bytes <br/>
- * - maxHumidity.value | 1 byte <br/>
- * - avgHumidity | 1 byte <br/>
- * <br/>
- * - minPressure.dateTime | 8 bytes <br/>
- * - minPressure.value | 4 byte <br/>
- * - maxPressure.dateTime | 8 bytes <br/>
- * - maxPressure.value | 4 byte <br/>
- * - avgPressure | 4 byte <br/>
- * <b>Total: 73 bytes</b>
  */
 public final class ReportStats extends AppendableToStringBuilder {
     public static final int SERIALIZED_OBJECT_SIZE = 4 + 3 * ParameterStats.SERIALIZED_OBJECT_SIZE;
@@ -133,12 +112,12 @@ public final class ReportStats extends AppendableToStringBuilder {
             ParameterStats press = ParameterStats.SERIALIZER.readObject(reader);
 
             // validate temperature
-            if(!UnitValue.isValid(temp.min, tempUnit)) {
-                throw ValidationException.invalidValue("min temperature", temp.min);
+            if(!UnitValue.isValid(temp.min.value, tempUnit)) {
+                throw ValidationException.invalidValue("min temperature", temp.min.value);
             }
 
-            if(!UnitValue.isValid(temp.max, tempUnit)) {
-                throw ValidationException.invalidValue("max temperature", temp.max);
+            if(!UnitValue.isValid(temp.max.value, tempUnit)) {
+                throw ValidationException.invalidValue("max temperature", temp.max.value);
             }
 
             if(!UnitValue.isValid(temp.avg, tempUnit)) {
@@ -146,12 +125,12 @@ public final class ReportStats extends AppendableToStringBuilder {
             }
 
             // validate humidity
-            if(!UnitValue.isValid(hum.min, ValueUnit.HUMIDITY)) {
-                throw ValidationException.invalidValue("min humidity", hum.min);
+            if(!UnitValue.isValid(hum.min.value, ValueUnit.HUMIDITY)) {
+                throw ValidationException.invalidValue("min humidity", hum.min.value);
             }
 
-            if(!UnitValue.isValid(hum.max, ValueUnit.HUMIDITY)) {
-                throw ValidationException.invalidValue("max humidity", hum.max);
+            if(!UnitValue.isValid(hum.max.value, ValueUnit.HUMIDITY)) {
+                throw ValidationException.invalidValue("max humidity", hum.max.value);
             }
 
             if(!UnitValue.isValid(hum.avg, ValueUnit.HUMIDITY)) {
@@ -159,12 +138,12 @@ public final class ReportStats extends AppendableToStringBuilder {
             }
 
             // validate pressure
-            if(!UnitValue.isValid(press.min, pressUnit)) {
-                throw ValidationException.invalidValue("min pressure", press.min);
+            if(!UnitValue.isValid(press.min.value, pressUnit)) {
+                throw ValidationException.invalidValue("min pressure", press.min.value);
             }
 
-            if(!UnitValue.isValid(press.max, pressUnit)) {
-                throw ValidationException.invalidValue("max pressure", press.max);
+            if(!UnitValue.isValid(press.max.value, pressUnit)) {
+                throw ValidationException.invalidValue("max pressure", press.max.value);
             }
 
             if(!UnitValue.isValid(press.avg, pressUnit)) {

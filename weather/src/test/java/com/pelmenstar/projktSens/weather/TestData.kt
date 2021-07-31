@@ -63,8 +63,8 @@ object TestData {
 
     fun paramStats(unit: Int): ParameterStats {
         return ParameterStats(
-            value(unit),
-            value(unit),
+            valueWithDate(unit),
+            valueWithDate(unit),
             value(unit),
             value(unit)
         )

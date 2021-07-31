@@ -36,8 +36,26 @@ private class ChartViewCreationContext(
     val chartOptions: (LineChart) -> Unit
 )
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun ViewGroup.ValueParamView(
+private fun ViewGroup.ValueParamView(
+    prefix: String, vd: ValueWithDate,
+    statsUnit: Int, prefUnit: Int,
+    unitFormatter: UnitFormatter,
+    textLeftMargin: Int,
+    textAppearance: TextAppearance
+) {
+    PrefixTextView {
+        linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
+            leftMargin = textLeftMargin
+        }
+
+        this.prefix = prefix
+        this.value = unitFormatter.formatValueWithDate(vd.unit(statsUnit, prefUnit))
+
+        applyTextAppearance(textAppearance)
+    }
+}
+
+private fun ViewGroup.ValueParamView(
     prefix: String, value: Float,
     statsUnit: Int, prefUnit: Int,
     unitFormatter: UnitFormatter,

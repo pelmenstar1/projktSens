@@ -183,6 +183,24 @@ public final class DayRangeReport extends AppendableToStringBuilder {
         float dayMinPress = Float.MAX_VALUE;
         float dayMaxPress = Float.MIN_VALUE;
 
+        float minTempValue = Float.MAX_VALUE;
+        long minTempDt = ShortDateTime.NONE;
+
+        float maxTempValue = Float.MIN_VALUE;
+        long maxTempDt = ShortDateTime.NONE;
+
+        float minHumValue = Float.MAX_VALUE;
+        long minHumDt = ShortDateTime.NONE;
+
+        float maxHumValue = Float.MIN_VALUE;
+        long maxHumDt = ShortDateTime.NONE;
+
+        float minPressValue = Float.MAX_VALUE;
+        long minPressDt = ShortDateTime.NONE;
+
+        float maxPressValue = Float.MIN_VALUE;
+        long maxPressDt = ShortDateTime.NONE;
+
         boolean first = true;
         int currentDate = 0;
         int maxIdx = length - 1;
@@ -237,6 +255,7 @@ public final class DayRangeReport extends AppendableToStringBuilder {
                 dayMaxPress = Float.MIN_VALUE;
             }
 
+            // day min-max
             if (temp < dayMinTemp) {
                 dayMinTemp = temp;
             }
@@ -261,6 +280,37 @@ public final class DayRangeReport extends AppendableToStringBuilder {
                 dayMaxPress = press;
             }
 
+            // general min-max
+            if(temp < minTempValue) {
+                minTempValue = temp;
+                minTempDt = dateTime;
+            }
+
+            if(temp > maxTempValue) {
+                maxTempValue = temp;
+                maxTempDt = dateTime;
+            }
+
+            if(hum < minHumValue) {
+                minHumValue = hum;
+                minHumDt = dateTime;
+            }
+
+            if(hum > maxHumValue) {
+                maxHumValue = hum;
+                maxHumDt = dateTime;
+            }
+
+            if(press < minPressValue) {
+                minPressValue = press;
+                minPressDt = dateTime;
+            }
+
+            if(press > maxPressValue) {
+                maxPressValue = press;
+                maxPressDt = dateTime;
+            }
+
             tempSum += temp;
             humSum += hum;
             pressSum += press;
@@ -277,15 +327,6 @@ public final class DayRangeReport extends AppendableToStringBuilder {
         Arrays.sort(humValues);
         Arrays.sort(pressValues);
 
-        float minTemp = tempValues[0];
-        float maxTemp = tempValues[maxIdx];
-
-        float minHum = humValues[0];
-        float maxHum = humValues[maxIdx];
-
-        float minPress = pressValues[0];
-        float maxPress = pressValues[maxIdx];
-
         float medianTemp;
         float medianHum;
         float medianPress;
@@ -301,9 +342,24 @@ public final class DayRangeReport extends AppendableToStringBuilder {
             medianPress = pressValues[mid];
         }
 
-        ParameterStats tempStats = new ParameterStats(minTemp, maxTemp, avgTemp, medianTemp);
-        ParameterStats humStats = new ParameterStats(minHum, maxHum, avgHum, medianHum);
-        ParameterStats pressStats = new ParameterStats(minPress, maxPress, avgPress, medianPress);
+        ParameterStats tempStats = new ParameterStats(
+                new ValueWithDate(minTempDt, minTempValue),
+                new ValueWithDate(maxTempDt, maxTempValue),
+                avgTemp,
+                medianTemp
+        );
+        ParameterStats humStats = new ParameterStats(
+                new ValueWithDate(minHumDt, minHumValue),
+                new ValueWithDate(maxHumDt, maxHumValue),
+                avgHum,
+                medianHum
+        );
+        ParameterStats pressStats = new ParameterStats(
+                new ValueWithDate(minPressDt, minPressValue),
+                new ValueWithDate(maxPressDt, maxPressValue),
+                avgPress,
+                medianPress
+        );
 
         ReportStats stats = new ReportStats(
                 ValueUnitsPacked.CELSIUS_MM_OF_MERCURY,

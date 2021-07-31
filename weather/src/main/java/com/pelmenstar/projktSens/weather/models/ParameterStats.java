@@ -11,11 +11,14 @@ import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 import org.jetbrains.annotations.NotNull;
 
 public final class ParameterStats extends AppendableToStringBuilder {
-    public static final int SERIALIZED_OBJECT_SIZE = 16;
+    public static final int SERIALIZED_OBJECT_SIZE = 8 + 2 * ValueWithDate.SERIALIZED_OBJECT_SIZE;
     public static final ObjectSerializer<ParameterStats> SERIALIZER;
 
-    public final float min;
-    public final float max;
+    @NotNull
+    public final ValueWithDate min;
+
+    @NotNull
+    public final ValueWithDate max;
     public final float avg;
     public final float median;
 
@@ -25,8 +28,8 @@ public final class ParameterStats extends AppendableToStringBuilder {
     }
 
     public ParameterStats(
-            float min,
-            float max,
+            @NotNull ValueWithDate min,
+            @NotNull ValueWithDate max,
             float avg,
             float median
     ) {
@@ -43,16 +46,16 @@ public final class ParameterStats extends AppendableToStringBuilder {
 
         ParameterStats o = (ParameterStats) other;
 
-        return min == o.min &&
-                max == o.max &&
+        return min.equals(o.min) &&
+                max.equals(o.max) &&
                 avg == o.avg &&
                 median == o.median;
     }
 
     @Override
     public int hashCode() {
-        int result = Float.floatToIntBits(min);
-        result = 31 * result + Float.floatToIntBits(max);
+        int result = min.hashCode();
+        result = 31 * result + max.hashCode();
         result = 31 * result + Float.floatToIntBits(avg);
         result = 31 * result + Float.floatToIntBits(median);
 
@@ -62,9 +65,9 @@ public final class ParameterStats extends AppendableToStringBuilder {
     @Override
     public void append(@NotNull StringBuilder sb) {
         sb.append("{min=");
-        sb.append(min);
+        min.append(sb);
         sb.append(", max=");
-        sb.append(max);
+        max.append(sb);
         sb.append(", avg=");
         sb.append(avg);
         sb.append(", median=");
@@ -80,8 +83,8 @@ public final class ParameterStats extends AppendableToStringBuilder {
 
         @Override
         public void writeObject(@NotNull ParameterStats value, @NotNull ValueWriter writer) {
-            writer.emitFloat(value.min);
-            writer.emitFloat(value.max);
+            ValueWithDate.SERIALIZER.writeObject(value.min, writer);
+            ValueWithDate.SERIALIZER.writeObject(value.max, writer);
             writer.emitFloat(value.avg);
             writer.emitFloat(value.median);
         }
@@ -89,17 +92,12 @@ public final class ParameterStats extends AppendableToStringBuilder {
         @NotNull
         @Override
         public ParameterStats readObject(@NotNull ValueReader reader) throws ValidationException {
-            float min = reader.readFloat();
-            float max = reader.readFloat();
+            ValueWithDate min = ValueWithDate.SERIALIZER.readObject(reader);
+            ValueWithDate max = ValueWithDate.SERIALIZER.readObject(reader);
             float avg = reader.readFloat();
             float median = reader.readFloat();
 
-            return new ParameterStats(
-                    min,
-                    max,
-                    avg,
-                    median
-            );
+            return new ParameterStats(min, max, avg, median);
         }
     }
 }

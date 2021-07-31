@@ -153,11 +153,30 @@ public final class DayReport extends AppendableToStringBuilder {
         float[] pressValues = new float[size];
         int i = 0;
 
+        float minTempValue = Float.MAX_VALUE;
+        long minTempDt = ShortDateTime.NONE;
+
+        float maxTempValue = Float.MIN_VALUE;
+        long maxTempDt = ShortDateTime.NONE;
+
+        float minHumValue = Float.MAX_VALUE;
+        long minHumDt = ShortDateTime.NONE;
+
+        float maxHumValue = Float.MIN_VALUE;
+        long maxHumDt = ShortDateTime.NONE;
+
+        float minPressValue = Float.MAX_VALUE;
+        long minPressDt = ShortDateTime.NONE;
+
+        float maxPressValue = Float.MIN_VALUE;
+        long maxPressDt = ShortDateTime.NONE;
+
         while(data.moveNext()) {
             int units = data.getUnits();
             int tempUnit = ValueUnitsPacked.getTemperatureUnit(units);
             int pressUnit = ValueUnitsPacked.getPressureUnit(units);
 
+            long dateTime = data.getDateTime();
             float temp = UnitValue.getValue(data.getTemperature(), tempUnit, ValueUnit.CELSIUS);
             float hum = data.getHumidity();
             float press = UnitValue.getValue(data.getPressure(), pressUnit, ValueUnit.MM_OF_MERCURY);
@@ -166,11 +185,41 @@ public final class DayReport extends AppendableToStringBuilder {
             humValues[i] = hum;
             pressValues[i] = press;
 
-            entries[i] = new Entry(ShortDateTime.getTime(data.getDateTime()), temp, hum, press);
+            entries[i] = new Entry(ShortDateTime.getTime(dateTime), temp, hum, press);
 
             tempSum += temp;
             humSum += hum;
             pressSum += press;
+
+            if(temp < minTempValue) {
+                minTempValue = temp;
+                minTempDt = dateTime;
+            }
+
+            if(temp > maxTempValue) {
+                maxTempValue = temp;
+                maxTempDt = dateTime;
+            }
+
+            if(hum < minHumValue) {
+                minHumValue = hum;
+                minHumDt = dateTime;
+            }
+
+            if(hum > maxHumValue) {
+                maxHumValue = hum;
+                maxHumDt = dateTime;
+            }
+
+            if(press < minPressValue) {
+                minPressValue = press;
+                minPressDt = dateTime;
+            }
+
+            if(press > maxPressValue) {
+                maxPressValue = press;
+                maxPressDt = dateTime;
+            }
 
             i++;
         }
@@ -183,15 +232,6 @@ public final class DayReport extends AppendableToStringBuilder {
         Arrays.sort(tempValues);
         Arrays.sort(humValues);
         Arrays.sort(pressValues);
-
-        float minTemp = tempValues[0];
-        float maxTemp = tempValues[size - 1];
-
-        float minHum = humValues[0];
-        float maxHum = humValues[size - 1];
-
-        float minPress = pressValues[0];
-        float maxPress = pressValues[size - 1];
 
         float medianTemp;
         float medianHum;
@@ -208,9 +248,24 @@ public final class DayReport extends AppendableToStringBuilder {
             medianPress = pressValues[mid];
         }
 
-        ParameterStats tempStats = new ParameterStats(minTemp, maxTemp, avgTemp, medianTemp);
-        ParameterStats humStats = new ParameterStats(minHum, maxHum, avgHum, medianHum);
-        ParameterStats pressStats = new ParameterStats(minPress, maxPress, avgPress, medianPress);
+        ParameterStats tempStats = new ParameterStats(
+                new ValueWithDate(minTempDt, minTempValue),
+                new ValueWithDate(maxTempDt, maxTempValue),
+                avgTemp,
+                medianTemp
+        );
+        ParameterStats humStats = new ParameterStats(
+                new ValueWithDate(minHumDt, minHumValue),
+                new ValueWithDate(maxHumDt, maxHumValue),
+                avgHum,
+                medianHum
+        );
+        ParameterStats pressStats = new ParameterStats(
+                new ValueWithDate(minPressDt, minPressValue),
+                new ValueWithDate(maxPressDt, maxPressValue),
+                avgPress,
+                medianPress
+        );
 
         ReportStats stats = new ReportStats(
                 ValueUnitsPacked.CELSIUS_MM_OF_MERCURY,
