@@ -114,25 +114,16 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
     }
 
     private class GoToButtonContext(context: Context) {
-        private val dp3 = (3 * context.resources.displayMetrics.density).toInt()
-
         @JvmField val layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
-            leftMargin = dp3
-            rightMargin = dp3
+            val sideMargin = context.resources.getDimensionPixelOffset(R.dimen.homeActivity_goToButton_sideMargin)
+
+            leftMargin = sideMargin
+            rightMargin = sideMargin
         }
     }
 
     private fun createContent(): View {
         val res = resources
-
-        val body1 = TextAppearance(this, R.style.TextAppearance_MaterialComponents_Body1)
-        val density = res.displayMetrics.density
-
-        val dp1 = density.toInt()
-        val dp10 = (10f * density).toInt()
-        val dp3 = (3f * density).toInt()
-        val dp20 = (20f * density).toInt()
-        val dp200 = (200f * density).toInt()
 
         return LinearLayout(this) {
             orientation = LinearLayout.VERTICAL
@@ -142,14 +133,16 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                 linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                     gravity = Gravity.CENTER_HORIZONTAL
 
-                    leftMargin = dp3
-                    rightMargin = dp3
+                    val sideMargin = res.getDimensionPixelOffset(R.dimen.homeActivity_serverUnavailable_sideMargin)
 
-                    topMargin = dp1
-                    bottomMargin = dp10
+                    leftMargin = sideMargin
+                    rightMargin = sideMargin
+
+                    topMargin = res.getDimensionPixelOffset(R.dimen.homeActivity_serverUnavailable_topMargin)
+                    bottomMargin = res.getDimensionPixelOffset(R.dimen.homeActivity_serverUnavailable_bottomMargin)
                 }
 
-                applyTextAppearance(body1)
+                applyTextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
                 visibility = View.GONE
                 text = res.getText(R.string.serverUnavailable)
             }
@@ -161,7 +154,8 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                     orientation = LinearLayout.VERTICAL
 
                     weatherView = ComplexWeatherView {
-                        linearLayoutParams(MATCH_PARENT, dp200)
+                        val height = res.getDimensionPixelSize(R.dimen.homeActivity_weatherViewHeight)
+                        linearLayoutParams(MATCH_PARENT, height)
                     }
 
                     val goToContext = GoToButtonContext(context)
@@ -195,7 +189,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
                     LazyLoadingCalendarView {
                         linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
-                            topMargin = dp20
+                            topMargin = res.getDimensionPixelOffset(R.dimen.homeActivity_lazyLoadingCalendar_topMargin)
                         }
 
                         setOnDateChangeListener { _, year, month, dayOfMonth ->
