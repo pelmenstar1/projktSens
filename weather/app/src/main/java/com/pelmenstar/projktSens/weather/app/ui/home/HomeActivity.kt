@@ -7,6 +7,7 @@ import android.view.*
 import android.widget.Button
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.button.MaterialButton
 import com.pelmenstar.projktSens.shared.android.obtainStyledAttributes
@@ -98,7 +99,6 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                 requestLocationPermissionHandler = it.getRequestLocationPermissionHandler()
             }
         }
-
     }
 
     private fun initRes() {
@@ -110,6 +110,15 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
         theme.obtainStyledAttributes(android.R.style.Theme, android.R.attr.textColorPrimary) { a ->
             zeroColor = a.getColor(0, 0)
+        }
+    }
+
+    private class GoToButtonContext(context: Context) {
+        private val dp3 = (3 * context.resources.displayMetrics.density).toInt()
+
+        @JvmField val layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+            leftMargin = dp3
+            rightMargin = dp3
         }
     }
 
@@ -155,99 +164,33 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                         linearLayoutParams(MATCH_PARENT, dp200)
                     }
 
+                    val goToContext = GoToButtonContext(context)
+
                     // day
-                    gotoTodayReportButton = Button(R.attr.materialButtonOutlinedStyle) {
-                        linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
-                            leftMargin = dp3
-                            rightMargin = dp3
-                        }
-
-                        setOnClickListener {
-                            presenter?.startTodayReportView()
-                        }
-
-                        applyGoToButtonStyle()
-
-                        text = res.getText(R.string.today)
+                    gotoTodayReportButton = GoToButton(goToContext, R.string.today) {
+                        presenter?.startTodayReportView()
                     }
 
-                    gotoYesterdayReportButton = Button(R.attr.materialButtonOutlinedStyle) {
-                        linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
-                            leftMargin = dp3
-                            rightMargin = dp3
-                        }
-
-                        setOnClickListener {
-                            presenter?.startYesterdayReportView()
-                        }
-
-                        applyGoToButtonStyle()
-
-                        text = res.getText(R.string.yesterday)
+                    gotoYesterdayReportButton = GoToButton(goToContext, R.string.yesterday) {
+                        presenter?.startYesterdayReportView()
                     }
 
                     // week
-
-                    gotoThisWeekReportButton = Button(R.attr.materialButtonOutlinedStyle) {
-                        linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
-                            leftMargin = dp3
-                            rightMargin = dp3
-                        }
-
-                        setOnClickListener {
-                            presenter?.startThisWeekReportView()
-                        }
-
-                        applyGoToButtonStyle()
-
-                        text = res.getText(R.string.thisWeek)
+                    gotoThisWeekReportButton = GoToButton(goToContext, R.string.thisWeek) {
+                        presenter?.startThisWeekReportView()
                     }
 
-                    gotoPrevWeekReportButton = Button(R.attr.materialButtonOutlinedStyle) {
-                        linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
-                            leftMargin = dp3
-                            rightMargin = dp3
-                        }
-
-                        setOnClickListener {
-                            presenter?.startPreviousWeekReportView()
-                        }
-
-                        applyGoToButtonStyle()
-
-                        text = res.getText(R.string.prevWeek)
+                    gotoPrevWeekReportButton = GoToButton(goToContext, R.string.prevWeek) {
+                        presenter?.startYesterdayReportView()
                     }
 
                     // month
-
-                    gotoThisMonthReportButton = Button(R.attr.materialButtonOutlinedStyle) {
-                        linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
-                            leftMargin = dp3
-                            rightMargin = dp3
-                        }
-
-                        setOnClickListener {
-                            presenter?.startThisMonthReportView()
-                        }
-
-                        applyGoToButtonStyle()
-
-                        text = res.getText(R.string.thisMonth)
+                    gotoThisMonthReportButton = GoToButton(goToContext, R.string.thisMonth) {
+                        presenter?.startThisMonthReportView()
                     }
 
-                    gotoPrevMonthReportButton = Button(R.attr.materialButtonOutlinedStyle) {
-                        linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
-                            leftMargin = dp3
-                            rightMargin = dp3
-                        }
-
-                        setOnClickListener {
-                            presenter?.startPreviousMonthReportView()
-                        }
-
-                        applyGoToButtonStyle()
-
-                        text = res.getText(R.string.prevMonth)
+                    gotoPrevMonthReportButton = GoToButton(goToContext, R.string.prevMonth) {
+                        presenter?.startPreviousMonthReportView()
                     }
 
                     LazyLoadingCalendarView {
@@ -272,9 +215,20 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
         }
     }
 
-    @Suppress("NOTHING_TO_INLINE")
-    private inline fun MaterialButton.applyGoToButtonStyle() {
-        gravity = Gravity.START or Gravity.CENTER_VERTICAL
+    private inline fun ViewGroup.GoToButton(
+        goToButtonContext: GoToButtonContext,
+        @StringRes textRes: Int,
+        crossinline onClick: () -> Unit
+    ): MaterialButton {
+        return Button(R.attr.materialButtonOutlinedStyle) {
+            layoutParams = goToButtonContext.layoutParams
+
+            gravity = Gravity.START or Gravity.CENTER_VERTICAL
+
+            text = resources.getText(textRes)
+
+            setOnClickListener { onClick() }
+        }
     }
 
     override fun onStart() {
