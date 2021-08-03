@@ -1,16 +1,20 @@
-package com.pelmenstar.projktSens.jserver.servers
+package com.pelmenstar.projktSens.jserver
 
-import com.pelmenstar.projktSens.jserver.serverConfig
 import com.pelmenstar.projktSens.serverProtocol.Errors
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoContract
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoRequest
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoResponse
+import com.pelmenstar.projktSens.shared.acceptSuspend
+import com.pelmenstar.projktSens.shared.bindSuspend
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.weather.models.DayRangeReport
 import com.pelmenstar.projktSens.weather.models.DayReport
 import com.pelmenstar.projktSens.weather.models.WeatherRepository
+import kotlinx.coroutines.*
+import java.net.InetSocketAddress
+import java.net.ServerSocket
 import java.net.Socket
 
 /**
@@ -31,19 +35,86 @@ import java.net.Socket
  *  - [RepoCommands.GET_LAST_WEATHER]. No arguments is required.
  *  Last added weather will be returned.
  */
-class RepoServer : ServerBase({ repoServerPort }) {
+class RepoServer {
     private val contract: RepoContract
     private val repo: WeatherRepository
+
+    private val scope = CoroutineScope(Dispatchers.IO)
+
+    @Volatile
+    private var serverSocket: ServerSocket? = null
+
+    @Volatile
+    private var job: Job? = null
+
+    private val address: InetSocketAddress
+
+    private val log: Logger
 
     init {
         val serverConfig = serverConfig
         val protoConfig = serverConfig.protoConfig
 
+        log = Logger(javaClass.simpleName, serverConfig.loggerConfig)
+        address = InetSocketAddress(serverConfig.host, protoConfig.port)
+
         contract = protoConfig.repoContract
         repo = serverConfig.sharedRepo
     }
 
-    override suspend fun processClient(client: Socket) {
+    fun startOnNewThread() {
+        job = scope.launch {
+            startOnCurrentThread()
+        }
+    }
+
+    fun startOnCurrentThreadBlocking() {
+        runBlocking { startOnCurrentThread() }
+    }
+
+    suspend fun startOnCurrentThread() {
+        try {
+            ServerSocket().use { server ->
+                server.bindSuspend(address, 5)
+                log.info("server started")
+
+                serverSocket = server
+
+                while (true) {
+                    val client = server.acceptSuspend()
+
+                    scope.launch {
+                        try {
+                            client.use {
+                                processClient(client)
+                            }
+                        } catch (e: Throwable) {
+                            log.error(e)
+                        }
+                    }
+                }
+            }
+        } catch (e: Throwable) {
+            log.error(e)
+        }
+    }
+
+    /**
+     * Stops the server and cleans up all resources connected with it
+     */
+    fun stop() {
+        try {
+            job?.cancel()
+            job = null
+
+            serverSocket?.close()
+            serverSocket = null
+        } catch (e: Exception) {
+            log.error(e)
+        }
+    }
+
+    private suspend fun processClient(client: Socket) {
         try {
             val input = client.getInputStream()
             val out = client.getOutputStream()
@@ -117,6 +188,11 @@ class RepoServer : ServerBase({ repoServerPort }) {
                     val weather = repo.getLastWeather()
 
                     RepoResponse.okOrEmpty(weather)
+                }
+                RepoCommands.GET_WAIT_TIME_FOR_NEXT_WEATHER -> {
+                    val waitTime = WeatherMonitor.getNextWeatherRequestTime() - System.currentTimeMillis()
+
+                    RepoResponse.ok(waitTime)
                 }
                 else -> RepoResponse.error(Errors.INVALID_COMMAND)
             }

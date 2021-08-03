@@ -1,7 +1,5 @@
 package com.pelmenstar.projktSens.jserver
 
-import com.pelmenstar.projktSens.jserver.servers.RepoServer
-import com.pelmenstar.projktSens.jserver.servers.WeatherChannelInfoServer
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.weather.models.debugGenDb
 import kotlinx.coroutines.CoroutineScope
@@ -11,25 +9,21 @@ import kotlinx.coroutines.launch
 class Controller(private val config: Config) {
     private val scope = CoroutineScope(Dispatchers.Default)
     private val repoServer: RepoServer
-    private val weatherChannelInfoServer: WeatherChannelInfoServer
 
     init {
         serverConfig = config
 
         repoServer = RepoServer()
-        weatherChannelInfoServer = WeatherChannelInfoServer()
     }
 
     fun startAll() {
         WeatherMonitor.start()
-        repoServer.start()
-        weatherChannelInfoServer.start()
+        repoServer.startOnNewThread()
     }
 
     fun stopAll() {
         WeatherMonitor.stop()
         repoServer.stop()
-        weatherChannelInfoServer.stop()
     }
 
     fun clearRepository() {

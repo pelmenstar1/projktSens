@@ -28,7 +28,6 @@ val SETTINGS: Array<out Setting<*>> = arrayOf(
     ServerHostSetting(),
     ServerContractSetting(),
     RepoPortSetting(),
-    WciPortSetting(),
     WeatherReceiveIntervalSetting()
 )
 
@@ -439,18 +438,6 @@ class RepoPortSetting: PortSettingBase() {
     }
 
     override fun getPreferencesKey(): Int = AppPreferences.REPO_PORT
-}
-
-class WciPortSetting: PortSettingBase() {
-    override fun getNameId(): Int {
-        return R.string.settings_weatherChannelInfoPortName
-    }
-
-    override fun getBundleStatePortKey(): String {
-        return "WciPortSetting.State.port"
-    }
-
-    override fun getPreferencesKey(): Int = AppPreferences.WCI_PORT
 }
 
 class WeatherReceiveIntervalSetting: Setting<WeatherReceiveIntervalSetting.State>() {

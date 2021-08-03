@@ -18,7 +18,8 @@ public final class Serializable {
 
     static {
         // common serializers
-        cachedSerializers.put(Integer.class, new IntegerSerializer());
+        cachedSerializers.put(Integer.class, new PrimitiveSerializers.Int32());
+        cachedSerializers.put(Long.class, new PrimitiveSerializers.Int64());
     }
 
     /**

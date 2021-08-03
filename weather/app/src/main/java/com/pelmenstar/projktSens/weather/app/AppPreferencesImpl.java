@@ -15,7 +15,6 @@ public class AppPreferencesImpl implements AppPreferences {
     public static final AppPreferencesImpl INSTANCE = new AppPreferencesImpl();
     private static final String DEFAULT_SEVER_ADDRESS_STRING = "192.168.17.21";
     private static final int DEFAULT_REPO_SERVER_PORT = 10001;
-    private static final int DEFAULT_WCI_SERVER_PORT = 10002;
     private static final int DEFAULT_WEATHER_RECEIVE_INTERVAL = 10 * 1000;
     private static final int DEFAULT_REPO_CONTRACT_TYPE = RepoContractType.CONTRACT_RAW;
 
@@ -24,7 +23,6 @@ public class AppPreferencesImpl implements AppPreferences {
     private static final String KEY_SERVER_HOST = "serverHost";
     private static final String KEY_CONTRACT = "contract";
     private static final String KEY_REPO_PORT = "repoPort";
-    private static final String KEY_WCI_PORT = "wciPort";
     private static final String KEY_WEATHER_RECEIVE_INTERVAL = "weatherRcvInterval";
     private static final String KEY_IS_GPS_PERMISSION_DENIED = "isGpsDenied";
 
@@ -60,7 +58,6 @@ public class AppPreferencesImpl implements AppPreferences {
                 int units = prefs.getInt(KEY_UNITS, ValueUnitsPacked.NONE);
                 int contractType = prefs.getInt(KEY_CONTRACT, -1);
                 int repoPort = prefs.getInt(KEY_REPO_PORT, -1);
-                int wciPort = prefs.getInt(KEY_WCI_PORT, -1);
                 int weatherReceiveInterval = prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, -1);
 
                 String serverHostStr = prefs.getString(KEY_SERVER_HOST, null);
@@ -73,7 +70,7 @@ public class AppPreferencesImpl implements AppPreferences {
                 if (!ValueUnitsPacked.isValid(units) ||
                         !isValidHost ||
                         !isGpsDeniedExists ||
-                        (contractType | repoPort | wciPort | weatherReceiveInterval) < 0) {
+                        (contractType | repoPort | weatherReceiveInterval) < 0) {
                     writeDefault();
                 }
             }
@@ -87,7 +84,6 @@ public class AppPreferencesImpl implements AppPreferences {
                 .putString(KEY_SERVER_HOST, DEFAULT_SEVER_ADDRESS_STRING)
                 .putInt(KEY_CONTRACT, RepoContractType.CONTRACT_RAW)
                 .putInt(KEY_REPO_PORT, DEFAULT_REPO_SERVER_PORT)
-                .putInt(KEY_WCI_PORT, DEFAULT_WCI_SERVER_PORT)
                 .putInt(KEY_WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL)
                 .putBoolean(KEY_IS_GPS_PERMISSION_DENIED, false)
                 .apply();
@@ -105,8 +101,6 @@ public class AppPreferencesImpl implements AppPreferences {
                 return getContractType();
             case REPO_PORT:
                 return getRepoPort();
-            case WCI_PORT:
-                return getWciPort();
             case WEATHER_RECEIVE_INTERVAL:
                 return getWeatherReceiveInterval();
             default:
@@ -125,8 +119,6 @@ public class AppPreferencesImpl implements AppPreferences {
                 return getContractType();
             case REPO_PORT:
                 return getRepoPort();
-            case WCI_PORT:
-                return getWciPort();
             case WEATHER_RECEIVE_INTERVAL:
                 return getWeatherReceiveInterval();
             default:
@@ -158,9 +150,6 @@ public class AppPreferencesImpl implements AppPreferences {
             case REPO_PORT:
                 setRepoPort((Integer) value);
                 break;
-            case WCI_PORT:
-                setWciPort((Integer) value);
-                break;
             case WEATHER_RECEIVE_INTERVAL:
                 setWeatherReceiveInterval((Integer) value);
                 break;
@@ -182,9 +171,6 @@ public class AppPreferencesImpl implements AppPreferences {
                 break;
             case REPO_PORT:
                 setRepoPort(value);
-                break;
-            case WCI_PORT:
-                setWciPort(value);
                 break;
             case WEATHER_RECEIVE_INTERVAL:
                 setWeatherReceiveInterval(value);
@@ -251,15 +237,6 @@ public class AppPreferencesImpl implements AppPreferences {
     public void setRepoPort(int port) {
         prefs.edit().putInt(KEY_REPO_PORT, port).apply();
     }
-
-    public int getWciPort() {
-        return prefs.getInt(KEY_WCI_PORT, DEFAULT_WCI_SERVER_PORT);
-    }
-
-    public void setWciPort(int port) {
-        prefs.edit().putInt(KEY_WCI_PORT, port).apply();
-    }
-
     public int getWeatherReceiveInterval() {
         return prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL);
     }

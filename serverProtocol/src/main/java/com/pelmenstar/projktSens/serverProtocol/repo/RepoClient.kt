@@ -7,7 +7,6 @@ import com.pelmenstar.projktSens.shared.connectSuspend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.net.InetSocketAddress
 import java.net.Socket
 
 /**
@@ -15,7 +14,7 @@ import java.net.Socket
  */
 class RepoClient(config: HostedProtoConfig) {
     private val repoContract = config.repoContract
-    private val repoAddress: InetSocketAddress = config.socketAddress { repoServerPort }
+    private val address = config.socketAddress
 
     suspend inline fun<T:Any> request(command: Int, responseValueClass: Class<T>): T? {
         return request(RepoRequest(command), responseValueClass)
@@ -89,7 +88,7 @@ class RepoClient(config: HostedProtoConfig) {
         return withContext(Dispatchers.IO) {
             Socket().use { socket ->
                 socket.soTimeout = 5000
-                socket.connectSuspend(repoAddress, 5000)
+                socket.connectSuspend(address, 5000)
 
                 repoContract.writeRequest(request, socket.getOutputStream())
                 repoContract.readResponse(socket.getInputStream(), responseValueClass)

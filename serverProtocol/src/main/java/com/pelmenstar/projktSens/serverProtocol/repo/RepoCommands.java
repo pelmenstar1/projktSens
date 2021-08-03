@@ -28,6 +28,8 @@ public final class RepoCommands {
      */
     public static final int GET_LAST_WEATHER = 4;
 
+    public static final int GET_WAIT_TIME_FOR_NEXT_WEATHER = 5;
+
     public static int fromString(@NotNull String commandName) {
         if(commandName.equalsIgnoreCase("GEN_DAY_REPORT")) {
             return GEN_DAY_REPORT;
@@ -37,6 +39,8 @@ public final class RepoCommands {
             return GET_AVAILABLE_DATE_RANGE;
         } else if(commandName.equalsIgnoreCase("GET_LAST_WEATHER")) {
             return GET_LAST_WEATHER;
+        } else if(commandName.equalsIgnoreCase("GET_WAIT_TIME_FOR_NEXT_WEATHER")) {
+            return GET_WAIT_TIME_FOR_NEXT_WEATHER;
         }
         throw new IllegalArgumentException("Invalid command name '" + commandName + "'");
     }
@@ -55,6 +59,7 @@ public final class RepoCommands {
             case GEN_DAY_RANGE_REPORT: return "GEN_DAY_RANGE_REPORT";
             case GET_AVAILABLE_DATE_RANGE: return "GET_AVAILABLE_DATE_RANGE";
             case GET_LAST_WEATHER: return "GET_LAST_WEATHER";
+            case GET_WAIT_TIME_FOR_NEXT_WEATHER: return "GET_WAIT_TIME_FOR_NEXT_WEATHER";
 
             default: throw new IllegalArgumentException("command");
         }

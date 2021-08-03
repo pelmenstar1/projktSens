@@ -11,7 +11,6 @@ public interface AppPreferences extends Preferences {
     int SERVER_HOST = 1;
     int CONTRACT = 2;
     int REPO_PORT = 3;
-    int WCI_PORT = 4;
     int WEATHER_RECEIVE_INTERVAL = 5;
     int IS_GPS_PERMISSION_DENIED = 6;
 
@@ -30,9 +29,6 @@ public interface AppPreferences extends Preferences {
 
     int getRepoPort();
     void setRepoPort(int port);
-
-    int getWciPort();
-    void setWciPort(int port);
 
     int getWeatherReceiveInterval();
     void setWeatherReceiveInterval(int interval);

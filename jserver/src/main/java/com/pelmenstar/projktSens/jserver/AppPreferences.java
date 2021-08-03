@@ -16,12 +16,10 @@ public final class AppPreferences implements Preferences {
     private static SharedPreferences prefs;
 
     private static final int DEFAULT_REPO_PORT = 10001;
-    private static final int DEFAULT_WCI_PORT = 10002;
     private static final int DEFAULT_SERVER_CONTRACT = RepoContractType.CONTRACT_RAW;
     private static final int DEFAULT_WEATHER_SEND_INTERVAL = 10 * 1000;
 
     private static final String KEY_REPO_PORT = "repoPort";
-    private static final String KEY_WCI_PORT = "wciPort";
     private static final String KEY_SERVER_CONTRACT = "serverContract";
     private static final String KEY_WEATHER_SEND_INTERVAL = "weatherSendInterval";
 
@@ -48,11 +46,10 @@ public final class AppPreferences implements Preferences {
 
                 prefs = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
                 int repoPort = prefs.getInt(KEY_REPO_PORT, -1);
-                int wciPort = prefs.getInt(KEY_WCI_PORT, -1);
                 int serverContract = prefs.getInt(KEY_SERVER_CONTRACT, -1);
                 int weatherSendInterval = prefs.getInt(KEY_WEATHER_SEND_INTERVAL, -1);
 
-                if((repoPort | wciPort | serverContract | weatherSendInterval) < 0) {
+                if((repoPort | serverContract | weatherSendInterval) < 0) {
                     writeDefault();
                 }
             }
@@ -62,7 +59,6 @@ public final class AppPreferences implements Preferences {
     private static void writeDefault() {
         prefs.edit()
                 .putInt(KEY_REPO_PORT, DEFAULT_REPO_PORT)
-                .putInt(KEY_WCI_PORT, DEFAULT_WCI_PORT)
                 .putInt(KEY_SERVER_CONTRACT, DEFAULT_SERVER_CONTRACT)
                 .putInt(KEY_WEATHER_SEND_INTERVAL, DEFAULT_WEATHER_SEND_INTERVAL)
                 .apply();
@@ -74,8 +70,6 @@ public final class AppPreferences implements Preferences {
         switch (id) {
             case REPO_PORT:
                 return getRepoPort();
-            case WCI_PORT:
-                return getWciPort();
             case SERVER_CONTRACT:
                 return getServerContract();
             case WEATHER_SEND_INTERVAL:
@@ -90,8 +84,6 @@ public final class AppPreferences implements Preferences {
         switch (id) {
             case REPO_PORT:
                 return getRepoPort();
-            case WCI_PORT:
-                return getWciPort();
             case SERVER_CONTRACT:
                 return getServerContract();
             case WEATHER_SEND_INTERVAL:
@@ -112,9 +104,6 @@ public final class AppPreferences implements Preferences {
             case REPO_PORT:
                 setRepoPort((Integer)value);
                 break;
-            case WCI_PORT:
-                setWciPort((Integer)value);
-                break;
             case SERVER_CONTRACT:
                 setServerContract((Integer)value);
                 break;
@@ -131,9 +120,6 @@ public final class AppPreferences implements Preferences {
         switch (id) {
             case REPO_PORT:
                 setRepoPort(value);
-                break;
-            case WCI_PORT:
-                setWciPort(value);
                 break;
             case SERVER_CONTRACT:
                 setServerContract(value);
@@ -157,14 +143,6 @@ public final class AppPreferences implements Preferences {
 
     public void setRepoPort(int port) {
         prefs.edit().putInt(KEY_REPO_PORT, port).apply();
-    }
-
-    public int getWciPort() {
-        return prefs.getInt(KEY_WCI_PORT, DEFAULT_WCI_PORT);
-    }
-
-    public void setWciPort(int port) {
-        prefs.edit().putInt(KEY_WCI_PORT, port).apply();
     }
 
     public int getServerContract() {

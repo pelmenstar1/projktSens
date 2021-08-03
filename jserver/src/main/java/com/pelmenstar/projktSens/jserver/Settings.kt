@@ -18,7 +18,6 @@ import com.pelmenstar.projktSens.shared.equalsPattern
 @JvmField
 val SETTINGS: Array<out Setting<*>> = arrayOf(
     RepoPortSetting(),
-    WciPortSetting(),
     ServerContractSetting(),
     WeatherSendIntervalSetting()
 )
@@ -134,12 +133,6 @@ class RepoPortSetting: PortSettingBase() {
     override fun getNameId(): Int = R.string.settings_repoPortName
     override fun getBundleStatePortKey(): String = "RepoPortSetting.State.port"
     override fun getPreferencesKey(): Int = AppPreferences.REPO_PORT
-}
-
-class WciPortSetting: PortSettingBase() {
-    override fun getNameId(): Int = R.string.settings_weatherChannelInfoPortName
-    override fun getBundleStatePortKey(): String = "WciPortSetting.State.port"
-    override fun getPreferencesKey(): Int = AppPreferences.WCI_PORT
 }
 
 class ServerContractSetting: Setting<ServerContractSetting.State>() {

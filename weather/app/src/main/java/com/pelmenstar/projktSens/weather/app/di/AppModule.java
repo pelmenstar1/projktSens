@@ -140,7 +140,6 @@ public final class AppModule {
         int contractType = prefs.getContractType();
         return new ProtoConfigImpl(
                 prefs.getRepoPort(),
-                prefs.getWciPort(),
                 prefs.getWeatherReceiveInterval(),
                 RepoContractType.get(contractType)
         );

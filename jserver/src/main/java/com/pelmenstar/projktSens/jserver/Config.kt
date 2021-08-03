@@ -34,7 +34,6 @@ class MainConfig(private val context: Context): Config() {
             val prefs = AppPreferences.of(context)
             return ProtoConfigImpl(
                 prefs.repoPort,
-                prefs.wciPort,
                 prefs.weatherSendInterval,
                 RepoContractType.get(prefs.serverContract)
             )
