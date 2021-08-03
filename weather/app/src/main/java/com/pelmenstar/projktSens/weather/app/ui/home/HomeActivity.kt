@@ -10,7 +10,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.button.MaterialButton
-import com.pelmenstar.projktSens.shared.android.obtainStyledAttributes
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsActivity
 import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsContext
@@ -49,10 +48,6 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
     private lateinit var prettyDateFormatter: PrettyDateFormatter
     private lateinit var unitFormatter: UnitFormatter
 
-    private var greaterThanZeroColor: Int = 0
-    private var lessThanZeroColor: Int = 0
-    private var zeroColor: Int = 0
-
     private var presenter: HomeContract.Presenter? = null
 
     private val startSettingActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -76,8 +71,6 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
         setContentView(createContent())
 
-        initRes()
-
         val component: AppComponent = DaggerAppComponent
             .builder()
             .appModule(AppModule(this))
@@ -98,18 +91,6 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                 onRetryGetLocationListener = it.getOnRetryGetLocationListener()
                 requestLocationPermissionHandler = it.getRequestLocationPermissionHandler()
             }
-        }
-    }
-
-    private fun initRes() {
-        val res = resources
-        val theme = theme
-
-        greaterThanZeroColor = ResourcesCompat.getColor(res, R.color.tempDeltaGreaterThanZero, theme)
-        lessThanZeroColor = ResourcesCompat.getColor(res, R.color.tempDeltaLessThanZero, theme)
-
-        theme.obtainStyledAttributes(android.R.style.Theme, android.R.attr.textColorPrimary) { a ->
-            zeroColor = a.getColor(0, 0)
         }
     }
 
