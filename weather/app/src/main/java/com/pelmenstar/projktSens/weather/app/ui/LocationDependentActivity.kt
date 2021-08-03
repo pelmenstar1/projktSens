@@ -71,14 +71,13 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
         val context = this
 
         loadingContent = FrameLayout(context) {
-            TransitionView {
+            transitionView = TransitionView {
                 val size = res.getDimensionPixelSize(R.dimen.locationDependentActivity_transitionViewSize)
                 frameLayoutParams(size, size) {
                     gravity = Gravity.CENTER
                 }
 
                 transition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
-                transitionView = this
             }
         }
 

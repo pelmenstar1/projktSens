@@ -149,13 +149,12 @@ class SettingsActivity : HomeButtonSupportActivity() {
             }
 
             FrameLayout {
-                Button {
+                saveButton = Button {
                     frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
                         gravity = Gravity.BOTTOM or Gravity.END
                         rightMargin = boundsMargin
                         bottomMargin = boundsMargin
                     }
-                    saveButton = this
                     text = res.getText(R.string.settings_save)
 
                     setOnClickListener {

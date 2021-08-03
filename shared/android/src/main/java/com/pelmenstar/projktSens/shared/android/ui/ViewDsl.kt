@@ -7,10 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.GridLayout
-import android.widget.LinearLayout
-import android.widget.ScrollView
+import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
@@ -77,125 +74,124 @@ inline fun View.gridLayoutParams(
     layoutParams = GridLayout.LayoutParams(rowSpec, columnSpec).apply(block)
 }
 
-
-inline fun ViewGroup.View(block: View.() -> Unit) {
+inline fun ViewGroup.View(block: View.() -> Unit): View {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(View(context), block)
+    return addApply(View(context), block)
 }
 
-inline fun ViewGroup.CoordinatorLayout(block: CoordinatorLayout.() -> Unit) {
+inline fun ViewGroup.CoordinatorLayout(block: CoordinatorLayout.() -> Unit): CoordinatorLayout {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(CoordinatorLayout(context), block)
+    return addApply(CoordinatorLayout(context), block)
 }
 
-inline fun ViewGroup.ScrollableCalendarView(block: ScrollableCalendarView.() -> Unit) {
+inline fun ViewGroup.ScrollableCalendarView(block: ScrollableCalendarView.() -> Unit): ScrollableCalendarView {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(ScrollableCalendarView(context), block)
+    return addApply(ScrollableCalendarView(context), block)
 }
 
-inline fun ViewGroup.TimeTextView(block: TimeTextView.() -> Unit) {
+inline fun ViewGroup.TimeTextView(block: TimeTextView.() -> Unit): TimeTextView {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(TimeTextView(context), block)
+    return addApply(TimeTextView(context), block)
 }
 
-inline fun ViewGroup.TimePrefixTextView(block: TimePrefixTextView.() -> Unit) {
+inline fun ViewGroup.TimePrefixTextView(block: TimePrefixTextView.() -> Unit): TimePrefixTextView {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(TimePrefixTextView(context), block)
+    return addApply(TimePrefixTextView(context), block)
 }
 
-inline fun ViewGroup.Button(block: MaterialButton.() -> Unit) {
+inline fun ViewGroup.Button(block: MaterialButton.() -> Unit): MaterialButton {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(MaterialButton(context), block)
+    return addApply(MaterialButton(context), block)
 }
 
-inline fun ViewGroup.Button(defStyleAttr: Int, block: MaterialButton.() -> Unit) {
+inline fun ViewGroup.Button(defStyleAttr: Int, block: MaterialButton.() -> Unit): MaterialButton {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(MaterialButton(context, null, defStyleAttr), block)
+    return addApply(MaterialButton(context, null, defStyleAttr), block)
 }
 
-inline fun ViewGroup.FrameLayout(block: FrameLayout.() -> Unit) {
+inline fun ViewGroup.FrameLayout(block: FrameLayout.() -> Unit): FrameLayout {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(FrameLayout(context), block)
+    return addApply(FrameLayout(context), block)
 }
 
-inline fun ViewGroup.ScrollView(block: ScrollView.() -> Unit) {
+inline fun ViewGroup.ScrollView(block: ScrollView.() -> Unit): ScrollView {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(ScrollView(context), block)
+    return addApply(ScrollView(context), block)
 }
 
-inline fun ViewGroup.LinearLayout(block: LinearLayout.() -> Unit) {
+inline fun ViewGroup.LinearLayout(block: LinearLayout.() -> Unit): LinearLayout {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(LinearLayout(context), block)
+    return addApply(LinearLayout(context), block)
 }
 
-inline fun ViewGroup.GridLayout(block: GridLayout.() -> Unit) {
+inline fun ViewGroup.GridLayout(block: GridLayout.() -> Unit): GridLayout {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(GridLayout(context), block)
+    return addApply(GridLayout(context), block)
 }
 
-inline fun ViewGroup.TextView(block: MaterialTextView.() -> Unit) {
+inline fun ViewGroup.TextView(block: MaterialTextView.() -> Unit): TextView {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(MaterialTextView(context), block)
+    return addApply(MaterialTextView(context), block)
 }
 
-inline fun ViewGroup.PrefixTextView(block: PrefixTextView.() -> Unit) {
+inline fun ViewGroup.PrefixTextView(block: PrefixTextView.() -> Unit): PrefixTextView {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(PrefixTextView(context), block)
+    return addApply(PrefixTextView(context), block)
 }
 
-inline fun ViewGroup.TransitionView(block: TransitionView.() -> Unit) {
+inline fun ViewGroup.TransitionView(block: TransitionView.() -> Unit): TransitionView {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(TransitionView(context), block)
+    return addApply(TransitionView(context), block)
 }
 
-inline fun ViewGroup.EditText(block: AppCompatEditText.() -> Unit) {
+inline fun ViewGroup.EditText(block: AppCompatEditText.() -> Unit): EditText {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    addApply(AppCompatEditText(context), block)
+    return addApply(AppCompatEditText(context), block)
 }
 
 inline fun LinearLayout(context: Context, block: LinearLayout.() -> Unit): LinearLayout {
@@ -230,13 +226,15 @@ inline fun EditText(context: Context, block: AppCompatEditText.() -> Unit): AppC
     return AppCompatEditText(context).apply(block)
 }
 
-inline fun<TView:View> ViewGroup.addApply(view: TView, block: TView.() -> Unit) {
+inline fun<TView:View> ViewGroup.addApply(view: TView, block: TView.() -> Unit): TView {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    view.apply(block)
+    view.block()
     addView(view)
+
+    return view
 }
 
 inline fun Activity.content(block: () -> View) {

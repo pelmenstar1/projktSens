@@ -39,17 +39,16 @@ class MoonCalendarActivity: HomeButtonSupportActivity(), MoonCalendarContract.Vi
             LinearLayout(this) {
                 orientation = LinearLayout.VERTICAL
 
-                PrefixTextView {
+                moonPhaseView = PrefixTextView {
                     linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                         leftMargin = res.getDimensionPixelOffset(R.dimen.moonCalendar_moonPhaseText_leftMargin)
                     }
 
-                    moonPhaseView = this
                     prefix = res.getString(R.string.moonPhase)
                     applyTextAppearance(body1)
                 }
 
-                MoonView {
+                moonView = MoonView {
                     val size = res.getDimensionPixelSize(R.dimen.moonCalendar_moonSize)
                     val topBottomMargin = res.getDimensionPixelOffset(R.dimen.moonCalendar_moonTopBottomMargin)
 
@@ -59,8 +58,6 @@ class MoonCalendarActivity: HomeButtonSupportActivity(), MoonCalendarContract.Vi
                         topMargin = topBottomMargin
                         bottomMargin = topBottomMargin
                     }
-
-                    moonView = this
                 }
 
                 ScrollableCalendarView {

@@ -58,28 +58,25 @@ class SunriseSunsetCalendarActivity: LocationDependentActivity(), SunriseSunsetC
                 leftMargin = boundsMargin
             }
 
-            TimePrefixTextView {
+            sunriseTimeView = TimePrefixTextView {
                 layoutParams = textViewLayoutParams
 
-                sunriseTimeView = this
                 prefix = res.getString(R.string.sunrise)
 
                 applyTextAppearance(body1)
             }
 
-            TimePrefixTextView {
+            sunsetTimeView = TimePrefixTextView {
                 layoutParams = textViewLayoutParams
 
-                sunsetTimeView = this
                 prefix = res.getString(R.string.sunset)
 
                 applyTextAppearance(body1)
             }
 
-            TimePrefixTextView {
+            dayLengthView = TimePrefixTextView {
                 layoutParams = textViewLayoutParams
 
-                dayLengthView = this
                 prefix = res.getString(R.string.dayLength)
 
                 applyTextAppearance(body1)

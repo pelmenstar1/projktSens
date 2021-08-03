@@ -21,6 +21,7 @@ import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
 import com.pelmenstar.projktSens.weather.app.ui.ComplexWeatherView
+import com.pelmenstar.projktSens.weather.app.ui.LazyLoadingCalendarView
 import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarActivity
 import com.pelmenstar.projktSens.weather.app.ui.settings.SETTINGS
@@ -128,7 +129,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
             orientation = LinearLayout.VERTICAL
             layoutTransition = LayoutTransition()
 
-            TextView {
+            serverUnavailableView = TextView {
                 linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                     gravity = Gravity.CENTER_HORIZONTAL
 
@@ -142,8 +143,6 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                 applyTextAppearance(body1)
                 visibility = View.GONE
                 text = res.getText(R.string.serverUnavailable)
-
-                serverUnavailableView = this
             }
 
             ScrollView {
@@ -152,15 +151,12 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                 LinearLayout {
                     orientation = LinearLayout.VERTICAL
 
-
-                    ComplexWeatherView {
+                    weatherView = ComplexWeatherView {
                         linearLayoutParams(MATCH_PARENT, dp200)
-
-                        weatherView = this
                     }
 
                     // day
-                    Button(R.attr.materialButtonOutlinedStyle) {
+                    gotoTodayReportButton = Button(R.attr.materialButtonOutlinedStyle) {
                         linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                             leftMargin = dp3
                             rightMargin = dp3
@@ -173,10 +169,9 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                         applyGoToButtonStyle()
 
                         text = res.getText(R.string.today)
-                        gotoTodayReportButton = this
                     }
 
-                    Button(R.attr.materialButtonOutlinedStyle) {
+                    gotoYesterdayReportButton = Button(R.attr.materialButtonOutlinedStyle) {
                         linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                             leftMargin = dp3
                             rightMargin = dp3
@@ -189,12 +184,11 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                         applyGoToButtonStyle()
 
                         text = res.getText(R.string.yesterday)
-                        gotoYesterdayReportButton = this
                     }
 
                     // week
 
-                    Button(R.attr.materialButtonOutlinedStyle) {
+                    gotoThisWeekReportButton = Button(R.attr.materialButtonOutlinedStyle) {
                         linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                             leftMargin = dp3
                             rightMargin = dp3
@@ -207,10 +201,9 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                         applyGoToButtonStyle()
 
                         text = res.getText(R.string.thisWeek)
-                        gotoThisWeekReportButton = this
                     }
 
-                    Button(R.attr.materialButtonOutlinedStyle) {
+                    gotoPrevWeekReportButton = Button(R.attr.materialButtonOutlinedStyle) {
                         linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                             leftMargin = dp3
                             rightMargin = dp3
@@ -223,12 +216,11 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                         applyGoToButtonStyle()
 
                         text = res.getText(R.string.prevWeek)
-                        gotoPrevWeekReportButton = this
                     }
 
                     // month
 
-                    Button(R.attr.materialButtonOutlinedStyle) {
+                    gotoThisMonthReportButton = Button(R.attr.materialButtonOutlinedStyle) {
                         linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                             leftMargin = dp3
                             rightMargin = dp3
@@ -241,10 +233,9 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                         applyGoToButtonStyle()
 
                         text = res.getText(R.string.thisMonth)
-                        gotoThisMonthReportButton = this
                     }
 
-                    Button(R.attr.materialButtonOutlinedStyle) {
+                    gotoPrevMonthReportButton = Button(R.attr.materialButtonOutlinedStyle) {
                         linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                             leftMargin = dp3
                             rightMargin = dp3
@@ -257,10 +248,9 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                         applyGoToButtonStyle()
 
                         text = res.getText(R.string.prevMonth)
-                        gotoPrevMonthReportButton = this
                     }
 
-                    addApply(LazyLoadingCalendarView(context)) {
+                    LazyLoadingCalendarView {
                         linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                             topMargin = dp20
                         }

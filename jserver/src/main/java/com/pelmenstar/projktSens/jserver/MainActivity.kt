@@ -25,8 +25,7 @@ class MainActivity : AppCompatActivity() {
             LinearLayout(this) {
                 orientation = LinearLayout.VERTICAL
 
-                Button {
-                    startButton = this
+                startButton = Button {
                     text = "Start"
 
                     setOnClickListener {
@@ -37,8 +36,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                Button {
-                    stopButton = this
+                stopButton = Button {
                     text = "Stop"
                     isEnabled = false
 
