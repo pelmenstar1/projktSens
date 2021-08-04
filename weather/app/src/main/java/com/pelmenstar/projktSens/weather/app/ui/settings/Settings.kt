@@ -17,7 +17,6 @@ import com.pelmenstar.projktSens.shared.android.ui.EditText
 import com.pelmenstar.projktSens.shared.android.ui.settings.Setting
 import com.pelmenstar.projktSens.shared.equalsPattern
 import com.pelmenstar.projktSens.weather.app.AppPreferences
-import com.pelmenstar.projktSens.weather.app.PreferredUnits
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.models.ValueUnit
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
@@ -73,10 +72,9 @@ class TemperatureSetting: Setting<ValueUnitState>() {
     }
 
     override fun saveStateToPrefs(prefs: Preferences) {
-        val pressUnit = ValueUnitsPacked.getPressureUnit(PreferredUnits.getUnits())
+        val pressUnit = ValueUnitsPacked.getPressureUnit(prefs.getInt(AppPreferences.UNITS))
         val newUnits = ValueUnitsPacked.create(state.unit, pressUnit)
 
-        PreferredUnits.setUnits(newUnits)
         prefs.setInt(AppPreferences.UNITS, newUnits)
     }
 
@@ -140,10 +138,9 @@ class PressureSetting: Setting<ValueUnitState>() {
     }
 
     override fun saveStateToPrefs(prefs: Preferences) {
-        val tempUnit = ValueUnitsPacked.getTemperatureUnit(PreferredUnits.getUnits())
+        val tempUnit = ValueUnitsPacked.getTemperatureUnit(prefs.getInt(AppPreferences.UNITS))
         val newUnits = ValueUnitsPacked.create(tempUnit, state.unit)
 
-        PreferredUnits.setUnits(newUnits)
         prefs.setInt(AppPreferences.UNITS, newUnits)
     }
 

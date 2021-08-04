@@ -12,7 +12,6 @@ import androidx.annotation.StringRes
 import com.pelmenstar.projktSens.chartLite.LineChart
 import com.pelmenstar.projktSens.chartLite.data.ChartData
 import com.pelmenstar.projktSens.shared.android.ui.*
-import com.pelmenstar.projktSens.weather.app.PreferredUnits
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
@@ -142,12 +141,13 @@ fun createChartView(
         .build()
 
     val unitFormatter = component.unitFormatter()
+    val prefs = component.preferences()
 
     val statsUnits = stats.units
     val statsTempUnit = ValueUnitsPacked.getTemperatureUnit(statsUnits)
     val statsPressUnit = ValueUnitsPacked.getPressureUnit(statsUnits)
 
-    val prefUnits = PreferredUnits.getUnits()
+    val prefUnits = prefs.units
     val prefTempUnit = ValueUnitsPacked.getTemperatureUnit(prefUnits)
     val prefPressUnit = ValueUnitsPacked.getPressureUnit(prefUnits)
 

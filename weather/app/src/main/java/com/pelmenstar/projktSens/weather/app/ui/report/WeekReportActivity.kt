@@ -17,7 +17,6 @@ import com.pelmenstar.projktSens.shared.android.ui.requireIntent
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
-import com.pelmenstar.projktSens.weather.app.PreferredUnits
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppComponent
 import com.pelmenstar.projktSens.weather.app.di.AppModule
@@ -65,9 +64,12 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
         val theme = theme
         val minColor = ResourcesCompat.getColor(resources, R.color.chartMinColor, theme)
         val maxColor = ResourcesCompat.getColor(resources, R.color.chartMaxColor, theme)
-        val unitFormatter = appComponent.unitFormatter()
 
-        val prefUnits = PreferredUnits.getUnits()
+        val ac = appComponent
+        val unitFormatter = ac.unitFormatter()
+        val prefs = ac.preferences()
+
+        val prefUnits = prefs.units
         val prefTempUnit = ValueUnitsPacked.getTemperatureUnit(prefUnits)
         val prefPressUnit = ValueUnitsPacked.getPressureUnit(prefUnits)
 

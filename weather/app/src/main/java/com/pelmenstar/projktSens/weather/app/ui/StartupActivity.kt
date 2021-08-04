@@ -9,7 +9,6 @@ import com.pelmenstar.projktSens.shared.android.ui.requestPermissions.RequestPer
 import com.pelmenstar.projktSens.shared.android.ui.requestPermissions.RequestPermissionsContext
 import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.R
-import com.pelmenstar.projktSens.weather.app.Startup
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.ui.home.HomeActivity
@@ -50,7 +49,6 @@ class StartupActivity : Activity() {
 
     private fun startHomeActivityAndFinish() {
         val appContext = applicationContext
-        Startup.init(appContext)
 
         val intent = Intent(appContext, HomeActivity::class.java)
         startActivityForResult(intent, 0, null)

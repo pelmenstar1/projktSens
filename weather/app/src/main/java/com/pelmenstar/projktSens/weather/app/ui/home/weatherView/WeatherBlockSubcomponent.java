@@ -10,7 +10,7 @@ import android.graphics.Typeface;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.pelmenstar.projktSens.shared.PointL;
-import com.pelmenstar.projktSens.weather.app.PreferredUnits;
+import com.pelmenstar.projktSens.weather.app.AppPreferences;
 import com.pelmenstar.projktSens.weather.app.R;
 import com.pelmenstar.projktSens.weather.app.di.AppComponent;
 import com.pelmenstar.projktSens.weather.app.di.AppModule;
@@ -50,12 +50,15 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
     private final UnitFormatter unitFormatter;
     private final Rect textSizeBuffer = new Rect();
 
+    private final AppPreferences preferences;
+
     public WeatherBlockSubcomponent(@NotNull Context context) {
-        AppComponent component = DaggerAppComponent
+        AppComponent appComponent = DaggerAppComponent
                 .builder()
                 .appModule(new AppModule(context))
                 .build();
-        unitFormatter = component.unitFormatter();
+        unitFormatter = appComponent.unitFormatter();
+        preferences = appComponent.preferences();
 
         Resources res = context.getResources();
         Resources.Theme theme = context.getTheme();
@@ -105,7 +108,7 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
     }
 
     public void setWeather(@NotNull WeatherInfo value) {
-        int prefUnits = PreferredUnits.getUnits();
+        int prefUnits = preferences.getUnits();
         int prefTempUnit = ValueUnitsPacked.getTemperatureUnit(prefUnits);
         int prefPressUnit = ValueUnitsPacked.getPressureUnit(prefUnits);
 
