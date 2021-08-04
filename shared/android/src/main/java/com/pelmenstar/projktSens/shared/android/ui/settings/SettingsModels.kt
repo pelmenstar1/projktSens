@@ -95,30 +95,75 @@ abstract class Setting<TState : Any> {
     abstract fun saveStateToBundle(outState: Bundle)
 }
 
+private typealias SettingClass = Class<out Setting<*>>
+
 /**
  * Stores information needed for handling settings. This class implements [Parcelable]
  */
 class SettingsContext : Parcelable {
-    val data: Array<out Setting<*>>
+    private var _settings: Array<out Setting<*>>? = null
+    val settings: Array<out Setting<*>>
+        get() {
+            var s = _settings
+            if(s != null) {
+                return s
+            }
 
-    constructor(vararg data: Setting<*>) {
-        this.data = data
+            val sc = _settingClasses ?: throw RuntimeException("Something goes wrong. _settingClasses == null")
+            s = Array(sc.size) { i ->
+                ReflectionUtils.createFromEmptyConstructor(sc[i])
+            }
+            _settings = s
+            return s
+        }
+
+    private var _settingClasses: Array<out SettingClass>? = null
+    val settingsClasses: Array<out SettingClass>
+        get() {
+            var sc = _settingClasses
+            if(sc != null) {
+                return sc
+            }
+
+            val s = _settings ?: throw RuntimeException("Something goes wrong. _settings == null")
+            sc = Array(s.size) { i -> s[i].javaClass }
+            _settingClasses = sc
+
+            return sc
+        }
+
+    constructor(settings: Array<out Setting<*>>) {
+        _settings = settings
     }
 
-    constructor(parcel: Parcel)  {
+    constructor(classes: Array<out SettingClass>) {
+        _settingClasses = classes
+    }
+
+    constructor(parcel: Parcel) {
         val classLoader = javaClass.classLoader ?: ClassLoader.getSystemClassLoader()
 
         val size = parcel.readInt()
-        data = Array(size) {
+        _settingClasses = Array(size) {
             val name = parcel.readNonNullString()
-            ReflectionUtils.createFromEmptyConstructor(name, true, classLoader)
+            Class.forName(name, true, classLoader) as SettingClass
         }
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(data.size)
-        for(setting in data) {
-            parcel.writeString(setting.javaClass.name)
+        val sc = _settingClasses
+        if(sc != null) {
+            parcel.writeInt(sc.size)
+            for (c in sc) {
+                parcel.writeString(c.name)
+            }
+        } else {
+            val settings = _settings ?: throw IllegalStateException("Something goes wrong. _settings == null")
+
+            parcel.writeInt(settings.size)
+            for(setting in settings) {
+                parcel.writeString(setting.javaClass.name)
+            }
         }
     }
 

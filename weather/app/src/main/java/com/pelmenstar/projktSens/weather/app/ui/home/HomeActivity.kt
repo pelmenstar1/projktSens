@@ -24,7 +24,7 @@ import com.pelmenstar.projktSens.weather.app.ui.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.LazyLoadingCalendarView
 import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarActivity
-import com.pelmenstar.projktSens.weather.app.ui.settings.SETTINGS
+import com.pelmenstar.projktSens.weather.app.ui.settings.APP_SETTING_CLASSES
 import com.pelmenstar.projktSens.weather.app.ui.sunriseSunset.SunriseSunsetCalendarActivity
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
 
@@ -235,7 +235,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
         val context = this
         val component = DaggerAppComponent.builder().appModule(AppModule(context)).build()
         val prefsClass = component.preferences().javaClass
-        val settingsContext = SettingsContext(*SETTINGS)
+        val settingsContext = SettingsContext(APP_SETTING_CLASSES)
 
         menu.add {
             item(

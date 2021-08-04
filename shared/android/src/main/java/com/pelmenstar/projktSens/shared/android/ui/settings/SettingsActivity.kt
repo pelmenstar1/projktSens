@@ -52,7 +52,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
     }
 
     private fun loadStates(savedInstanceState: Bundle?) {
-        settingsContext.data.forEach {
+        settingsContext.settings.forEach {
             if(savedInstanceState != null) {
                 val success = it.loadStateFromBundle(savedInstanceState)
                 if(!success) {
@@ -65,7 +65,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
     }
 
     private fun computeHashes(savedInstanceState: Bundle?) {
-        val settings = settingsContext.data
+        val settings = settingsContext.settings
         initialStateHashes = if(savedInstanceState != null) {
             val hashes = savedInstanceState.getIntArray(STATE_INITIAL_STATE_HASHES) ?: throw NullPointerException("STATE_INITIAL_STATE_HASHES is null")
 
@@ -86,7 +86,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
             saveButton.isEnabled = isValid
         }
 
-        settingsContext.data.forEach {
+        settingsContext.settings.forEach {
             // after state is loaded
             val state = it.state
 
@@ -102,7 +102,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     private fun createContent(): View {
         val prefs = prefs
-        val settings = settingsContext.data
+        val settings = settingsContext.settings
 
         val res = resources
         val context = this
@@ -187,7 +187,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        val settings = settingsContext.data
+        val settings = settingsContext.settings
 
         settings.forEach {
             it.saveStateToBundle(outState)
@@ -225,10 +225,10 @@ class SettingsActivity : HomeButtonSupportActivity() {
         const val RETURN_DATA_STATE_CHANGED = "SettingsActivity.returnData.stateChanged"
 
         @JvmStatic
-        fun<TPrefs: Preferences> intent(
+        fun intent(
             context: Context,
             settingsContext: SettingsContext,
-            prefsClass: Class<TPrefs>
+            prefsClass: Class<out Preferences>
         ): Intent {
             return Intent(context, SettingsActivity::class.java) {
                 putExtra(EXTRA_SETTINGS_CONTEXT, settingsContext)

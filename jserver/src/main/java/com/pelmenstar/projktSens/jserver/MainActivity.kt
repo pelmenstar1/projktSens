@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val settingsContext = SettingsContext(*SETTINGS)
+        val settingsContext = SettingsContext(APP_SETTING_CLASSES)
         val context = this
 
         menu.add {

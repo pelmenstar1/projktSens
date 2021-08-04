@@ -16,10 +16,10 @@ import com.pelmenstar.projktSens.shared.android.ui.settings.Setting
 import com.pelmenstar.projktSens.shared.equalsPattern
 
 @JvmField
-val SETTINGS: Array<out Setting<*>> = arrayOf(
-    RepoPortSetting(),
-    ServerContractSetting(),
-    WeatherSendIntervalSetting()
+val APP_SETTING_CLASSES: Array<out Class<out Setting<*>>> = arrayOf(
+    RepoPortSetting::class.java,
+    ServerContractSetting::class.java,
+    WeatherSendIntervalSetting::class.java
 )
 
 abstract class PortSettingBase: Setting<PortSettingBase.State>() {

@@ -22,13 +22,13 @@ import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.models.ValueUnit
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
 
-val SETTINGS: Array<out Setting<*>> = arrayOf(
-    TemperatureSetting(),
-    PressureSetting(),
-    ServerHostSetting(),
-    ServerContractSetting(),
-    RepoPortSetting(),
-    WeatherReceiveIntervalSetting()
+val APP_SETTING_CLASSES: Array<out Class<out Setting<*>>> = arrayOf(
+    TemperatureSetting::class.java,
+    PressureSetting::class.java,
+    ServerHostSetting::class.java,
+    ServerContractSetting::class.java,
+    RepoPortSetting::class.java,
+    WeatherReceiveIntervalSetting::class.java
 )
 
 data class ValueUnitState(@JvmField var unit: Int)
