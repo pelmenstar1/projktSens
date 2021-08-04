@@ -11,6 +11,11 @@
     <string name="settings_weatherSendInterval_name">Send interval (ms)</string>
     <string name="settings_weatherSendInterval_lessOrEqZero">Less or equal 0</string>
 
+    <string name="serverNotification_channelName">Server state</string>
+    <string name="serverNotification_channelDescription">Shows that server is running</string>
+    <string name="serverNotification_title">Server</string>
+    <string name="serverNotification_content">Server is currently running</string>
+
     <string-array name="serverContracts">
         <item>Raw</item>
         <item>JSON</item>
