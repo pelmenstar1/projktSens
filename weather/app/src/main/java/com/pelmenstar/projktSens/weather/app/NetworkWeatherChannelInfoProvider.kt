@@ -1,15 +1,11 @@
 package com.pelmenstar.projktSens.weather.app
 
-import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig
+import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoClient
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
-import com.pelmenstar.projktSens.shared.connectSuspend
-import com.pelmenstar.projktSens.shared.getLong
-import com.pelmenstar.projktSens.shared.readNSuspend
 import com.pelmenstar.projktSens.weather.models.WeatherChannelInfoProvider
-import java.net.Socket
 
-class NetworkWeatherChannelInfoProvider(config: HostedProtoConfig) : WeatherChannelInfoProvider {
+class NetworkWeatherChannelInfoProvider(config: ProtoConfig) : WeatherChannelInfoProvider {
     private val client = RepoClient(config)
 
     override val receiveInterval: Long = config.weatherChannelReceiveInterval.toLong()

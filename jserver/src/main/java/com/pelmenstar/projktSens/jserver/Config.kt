@@ -9,6 +9,7 @@ import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType
 import com.pelmenstar.projktSens.weather.models.WeatherInfoProvider
 import com.pelmenstar.projktSens.weather.models.WeatherRepository
 import java.net.InetAddress
+import java.net.InetSocketAddress
 
 private var _serverConfig: Config? = null
 var serverConfig: Config
@@ -33,7 +34,7 @@ class MainConfig(private val context: Context): Config() {
         get() {
             val prefs = AppPreferences.of(context)
             return ProtoConfigImpl(
-                prefs.repoPort,
+                InetSocketAddress(host, prefs.repoPort),
                 prefs.weatherSendInterval,
                 RepoContractType.get(prefs.serverContract)
             )

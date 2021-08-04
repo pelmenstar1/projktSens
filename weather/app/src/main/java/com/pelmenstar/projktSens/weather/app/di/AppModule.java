@@ -2,7 +2,6 @@ package com.pelmenstar.projktSens.weather.app.di;
 
 import android.content.Context;
 
-import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig;
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig;
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfigImpl;
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType;
@@ -31,6 +30,8 @@ import com.pelmenstar.projktSens.weather.models.astro.MoonInfoProvider;
 import com.pelmenstar.projktSens.weather.models.astro.SunInfoProvider;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.net.InetSocketAddress;
 
 import dagger.Module;
 import dagger.Provides;
@@ -78,7 +79,7 @@ public final class AppModule {
     @Provides
     @NotNull
     public WeatherDataSource dataSource() {
-        return new NetworkDataSource(hostedProtoConfig());
+        return new NetworkDataSource(protoConfig());
     }
 
     @Provides
@@ -124,7 +125,7 @@ public final class AppModule {
     @Provides
     @NotNull
     public WeatherChannelInfoProvider weatherChannelInfoProvider() {
-        return new NetworkWeatherChannelInfoProvider(hostedProtoConfig());
+        return new NetworkWeatherChannelInfoProvider(protoConfig());
     }
 
     @NotNull
@@ -139,16 +140,9 @@ public final class AppModule {
         AppPreferences prefs = preferences();
         int contractType = prefs.getContractType();
         return new ProtoConfigImpl(
-                prefs.getRepoPort(),
+                new InetSocketAddress(prefs.getServerHost(), prefs.getRepoPort()),
                 prefs.getWeatherReceiveInterval(),
                 RepoContractType.get(contractType)
         );
-    }
-
-    @NotNull
-    private HostedProtoConfig hostedProtoConfig() {
-        AppPreferences prefs = preferences();
-
-        return new HostedProtoConfig(prefs.getServerHost(), protoConfig());
     }
 }

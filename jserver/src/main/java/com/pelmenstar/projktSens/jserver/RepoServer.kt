@@ -56,7 +56,7 @@ class RepoServer {
         val protoConfig = serverConfig.protoConfig
 
         log = Logger(javaClass.simpleName, serverConfig.loggerConfig)
-        address = InetSocketAddress(serverConfig.host, protoConfig.port)
+        address = protoConfig.socketAddress
 
         contract = protoConfig.repoContract
         repo = serverConfig.sharedRepo

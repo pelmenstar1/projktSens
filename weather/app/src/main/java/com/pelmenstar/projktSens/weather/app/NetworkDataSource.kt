@@ -2,7 +2,7 @@
 
 package com.pelmenstar.projktSens.weather.app
 
-import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig
+import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoClient
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
 import com.pelmenstar.projktSens.shared.time.ShortDate
@@ -10,7 +10,7 @@ import com.pelmenstar.projktSens.shared.time.ShortDateInt
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.weather.models.*
 
-class NetworkDataSource(config: HostedProtoConfig) : WeatherDataSource {
+class NetworkDataSource(config: ProtoConfig) : WeatherDataSource {
     private val client = RepoClient(config)
 
     override suspend fun getDayReport(@ShortDateInt date: Int): DayReport? {

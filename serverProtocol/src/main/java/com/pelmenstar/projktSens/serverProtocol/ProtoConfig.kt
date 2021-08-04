@@ -1,12 +1,13 @@
 package com.pelmenstar.projktSens.serverProtocol
 
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoContract
+import java.net.InetSocketAddress
 
 /**
  * Contains constant information of servers
  */
 interface ProtoConfig {
-    val port: Int
+    val socketAddress: InetSocketAddress
 
     /**
      * Interval of refreshing weather-info and putting it to data repository
