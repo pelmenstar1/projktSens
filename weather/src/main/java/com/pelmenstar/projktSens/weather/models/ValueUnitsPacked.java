@@ -3,6 +3,9 @@ package com.pelmenstar.projktSens.weather.models;
 import org.jetbrains.annotations.NotNull;
 
 public final class ValueUnitsPacked {
+    public static final int TYPE_TEMPERATURE = 8;
+    public static final int TYPE_PRESSURE = 0;
+
     public static final int NONE = (ValueUnit.NONE & 0xff) << 8 | (ValueUnit.NONE & 0xff);
     public static final int CELSIUS_MM_OF_MERCURY = ValueUnit.CELSIUS << 8 | ValueUnit.MM_OF_MERCURY;
 
@@ -19,11 +22,21 @@ public final class ValueUnitsPacked {
     }
 
     public static int getTemperatureUnit(int units) {
-        return (units >> 8) & 0xff;
+        return getUnit(units, TYPE_TEMPERATURE);
     }
 
     public static int getPressureUnit(int units) {
-        return units & 0xff;
+        return getUnit(units, TYPE_PRESSURE);
+    }
+
+    public static int getUnit(int units, int type) {
+        return (units >> type) & 0xff;
+    }
+
+    public static int withUnit(int units, int type, int value) {
+        int eraser = ~(0xff << type);
+
+        return (units & eraser) | (value << type);
     }
 
     public static void append(int units, @NotNull StringBuilder sb) {

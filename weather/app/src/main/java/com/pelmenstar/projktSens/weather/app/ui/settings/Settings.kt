@@ -30,25 +30,28 @@ val APP_SETTING_CLASSES: Array<out Class<out Setting<*>>> = arrayOf(
     WeatherReceiveIntervalSetting::class.java
 )
 
-data class ValueUnitState(@JvmField var unit: Int)
+abstract class ValueUnitSetting: Setting<ValueUnitSetting.State>() {
+    data class State(@JvmField var unit: Int)
 
-class TemperatureSetting: Setting<ValueUnitState>() {
-    override fun getNameId(): Int {
-        return R.string.temperature
-    }
+    abstract val bundleKey: String
+
+    abstract val packedUnitType: Int
+    abstract val spinnerInfo: Long
 
     override fun createView(context: Context): View {
         return AppCompatSpinner(context).apply {
-            adapter = simpleArrayAdapter(context, R.array.temperatureUnits)
+            val si = spinnerInfo
+            val arrayRes = getArrayRes(si)
+            val unitOffset = getUnitOffset(si)
+            val valuesCount = getValuesCount(si)
 
-            setSelection(
-                when (state.unit) {
-                    ValueUnit.CELSIUS -> 0
-                    ValueUnit.KELVIN -> 1
-                    ValueUnit.FAHRENHEIT -> 2
-                    else -> throw IllegalStateException("Illegal prefs")
-                }
-            )
+            adapter = simpleArrayAdapter(context, arrayRes)
+
+            val index = state.unit - unitOffset
+            if(index < 0 || index > valuesCount) {
+                throw RuntimeException("Invalid unit")
+            }
+            setSelection(index)
 
             onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(
@@ -57,13 +60,10 @@ class TemperatureSetting: Setting<ValueUnitState>() {
                     position: Int,
                     id: Long
                 ) {
-                    state.unit = when (position) {
-                        0 -> ValueUnit.CELSIUS
-                        1 -> ValueUnit.KELVIN
-                        2 -> ValueUnit.FAHRENHEIT
-
-                        else -> return
+                    if(position > valuesCount) {
+                        throw RuntimeException("Invalid position")
                     }
+                    state.unit = position + unitOffset
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -72,25 +72,25 @@ class TemperatureSetting: Setting<ValueUnitState>() {
     }
 
     override fun saveStateToPrefs(prefs: Preferences) {
-        val pressUnit = ValueUnitsPacked.getPressureUnit(prefs.getInt(AppPreferences.UNITS))
-        val newUnits = ValueUnitsPacked.create(state.unit, pressUnit)
+        val units = prefs.getInt(AppPreferences.UNITS)
+        val newUnits = ValueUnitsPacked.withUnit(units, packedUnitType, state.unit)
 
         prefs.setInt(AppPreferences.UNITS, newUnits)
     }
 
     override fun saveStateToBundle(outState: Bundle) {
-        outState.putInt(BUNDLE_STATE_UNIT, state.unit)
+        outState.putInt(bundleKey, state.unit)
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
         val units = prefs.getInt(AppPreferences.UNITS)
-        state = ValueUnitState(ValueUnitsPacked.getTemperatureUnit(units))
+        state = State(ValueUnitsPacked.getUnit(units, packedUnitType))
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val unit = bundle.getInt(BUNDLE_STATE_UNIT, ValueUnit.NONE)
+        val unit = bundle.getInt(bundleKey, ValueUnit.NONE)
         return if(unit != ValueUnit.NONE) {
-            state = ValueUnitState(unit)
+            state = State(unit)
             true
         } else {
             false
@@ -98,75 +98,47 @@ class TemperatureSetting: Setting<ValueUnitState>() {
     }
 
     companion object {
-        private const val BUNDLE_STATE_UNIT = "TemperatureSetting.State.unit"
+        fun spinnerInfo(@ArrayRes arrayRes: Int, unitOffset: Int, valuesCount: Int): Long {
+            return (valuesCount.toLong() shl 48) or (unitOffset.toLong() shl 32) or arrayRes.toLong()
+        }
+
+        @ArrayRes
+        private fun getArrayRes(spinnerInfo: Long): Int {
+            return spinnerInfo.toInt()
+        }
+
+        private fun getUnitOffset(spinnerInfo: Long): Int {
+            return (spinnerInfo shr 32).toInt() and 0xffff
+        }
+
+        private fun getValuesCount(spinnerInfo: Long): Int {
+            return (spinnerInfo shr 48).toInt() and 0xffff
+        }
     }
 }
 
-class PressureSetting: Setting<ValueUnitState>() {
-    override fun getNameId(): Int {
-        return R.string.pressure
-    }
+class TemperatureSetting: ValueUnitSetting() {
+    override fun getNameId(): Int = R.string.temperature
 
-    override fun createView(context: Context): View {
-        return AppCompatSpinner(context).apply {
-            adapter = simpleArrayAdapter(context, R.array.pressureUnits)
+    override val bundleKey: String
+        get() = "TemperatureSetting.state.unit"
 
-            setSelection(when(state.unit) {
-                ValueUnit.MM_OF_MERCURY -> 0
-                ValueUnit.PASCAL -> 1
-                else -> throw IllegalStateException("Illegal prefs")
-            })
+    override val spinnerInfo: Long = spinnerInfo(R.array.temperatureUnits, 0, 3)
 
-            onItemSelectedListener = object : OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View,
-                    position: Int,
-                    id: Long
-                ) {
-                    state.unit = when (position) {
-                        0 -> ValueUnit.MM_OF_MERCURY
-                        1 -> ValueUnit.PASCAL
+    override val packedUnitType: Int
+        get() = ValueUnitsPacked.TYPE_TEMPERATURE
+}
 
-                        else -> return
-                    }
-                }
+class PressureSetting: ValueUnitSetting() {
+    override fun getNameId(): Int = R.string.pressure
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
-            }
-        }
-    }
+    override val bundleKey: String
+        get() = "PressureSetting.state.unit"
 
-    override fun saveStateToPrefs(prefs: Preferences) {
-        val tempUnit = ValueUnitsPacked.getTemperatureUnit(prefs.getInt(AppPreferences.UNITS))
-        val newUnits = ValueUnitsPacked.create(tempUnit, state.unit)
+    override val spinnerInfo: Long = spinnerInfo(R.array.pressureUnits, 4, 2)
 
-        prefs.setInt(AppPreferences.UNITS, newUnits)
-    }
-
-    override fun saveStateToBundle(outState: Bundle) {
-        outState.putInt(BUNDLE_STATE_UNIT, state.unit)
-    }
-
-    override fun loadStateFromPrefs(prefs: Preferences) {
-        val units = prefs.getInt(AppPreferences.UNITS)
-
-        state = ValueUnitState(ValueUnitsPacked.getPressureUnit(units))
-    }
-
-    override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val unit = bundle.getInt(BUNDLE_STATE_UNIT, ValueUnit.NONE)
-        return if(unit != ValueUnit.NONE) {
-            state = ValueUnitState(unit)
-            true
-        } else {
-            false
-        }
-    }
-
-    companion object {
-        private const val BUNDLE_STATE_UNIT = "PressureSetting.State.unit"
-    }
+    override val packedUnitType: Int
+        get() = ValueUnitsPacked.TYPE_PRESSURE
 }
 
 class ServerHostSetting: Setting<ServerHostSetting.State>() {
