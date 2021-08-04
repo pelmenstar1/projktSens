@@ -48,28 +48,26 @@ public final class ReflectionUtils {
      * @param c class of instance which will be created
      * @param <T> result type
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("deprecation")
     @NotNull
     public static<T> T createFromEmptyConstructor(@NotNull Class<T> c) {
-        Constructor<?>[] constructors = c.getConstructors();
-
-        for(Constructor<?> constructor: constructors) {
-            Class<?>[] params = constructor.getParameterTypes();
-            if(params.length == 0) {
-                try {
-                    Object instance = constructor.newInstance(EmptyArray.OBJECT);
-                    return (T)instance;
-                } catch (InstantiationException e) {
-                    throw new RuntimeException("Constructor threw exception", e);
-                } catch (IllegalAccessException e) {
-                    // will never happen. we checked length of parameters
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException("Class " + c.getName() + " is abstract");
-                }
-            }
+        int mods = c.getModifiers();
+        if((mods & Modifier.ABSTRACT) != 0) {
+            throw new RuntimeException("Class " + c.getName() + " is abstract");
         }
 
-        throw new RuntimeException("Class has no public constructor with no parameters");
+        try {
+            return c.newInstance();
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Class has constructor with no parameters, but it can't be accessed (not public)", e);
+        } catch (InstantiationException e) {
+            Throwable cause = e.getCause();
+            if(cause != null) {
+                 throw new RuntimeException("Constructor threw exception", cause);
+            } else {
+                throw new RuntimeException("Class has no public constructor with no parameters", e);
+            }
+        }
     }
 
     /**
@@ -144,9 +142,9 @@ public final class ReflectionUtils {
                 } catch (InstantiationException e) {
                     throw new RuntimeException("Constructor threw exception", e);
                 } catch (IllegalAccessException e) {
-                    // will never happen. we checked length of parameters
+                    // Will never happen. We checked length of parameters
                 } catch (InvocationTargetException e) {
-                    // will never happen. we checked whether class is abstract
+                    // Will never happen. Class can't be abstract
                 }
             }
         }
