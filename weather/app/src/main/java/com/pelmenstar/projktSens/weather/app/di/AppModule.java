@@ -5,6 +5,7 @@ import android.content.Context;
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig;
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfigImpl;
 import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType;
+import com.pelmenstar.projktSens.shared.InetAddressUtils;
 import com.pelmenstar.projktSens.shared.geo.ConstGeolocationProvider;
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider;
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter;
@@ -31,6 +32,7 @@ import com.pelmenstar.projktSens.weather.models.astro.SunInfoProvider;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import dagger.Module;
@@ -139,8 +141,10 @@ public final class AppModule {
     public ProtoConfig protoConfig() {
         AppPreferences prefs = preferences();
         int contractType = prefs.getContractType();
+        InetAddress inetAddress = InetAddressUtils.parseInt(prefs.getServerHostInt());
+
         return new ProtoConfigImpl(
-                new InetSocketAddress(prefs.getServerHost(), prefs.getRepoPort()),
+                new InetSocketAddress(inetAddress, prefs.getRepoPort()),
                 prefs.getWeatherReceiveInterval(),
                 RepoContractType.get(contractType)
         );

@@ -149,15 +149,30 @@ class ServerHostSetting: Setting<ServerHostSetting.State>() {
             set(value) {
                 _hostString = value
 
-                isValid = InetAddressUtils.isValidNumericalIpv4(value)
+                val ipInt = InetAddressUtils.parseNumericalIpv4ToInt(value)
+                if(ipInt != InetAddressUtils.IP_ERROR) {
+                    isValid = true
+                    _hostInt = ipInt
+                } else {
+                    isValid = false
+                }
+            }
+
+        private var _hostInt: Int = 0
+        var hostInt: Int
+            get() = _hostInt
+            set(value) {
+                _hostInt = value
+                _hostString = InetAddressUtils.intIpv4ToString(value)
+                isValid = value != InetAddressUtils.IP_ERROR
             }
 
         constructor(hostString: String) {
             this.hostString = hostString
         }
 
-        constructor(hostString: String, notParseHostMarker: Boolean) {
-            _hostString = hostString
+        constructor(ipInt: Int) {
+            hostInt = ipInt
         }
 
         override fun equals(other: Any?): Boolean {
@@ -198,7 +213,7 @@ class ServerHostSetting: Setting<ServerHostSetting.State>() {
     }
 
     override fun saveStateToPrefs(prefs: Preferences) {
-        prefs[AppPreferences.SERVER_HOST] = state.hostString
+        prefs.setInt(AppPreferences.SERVER_HOST_INT, state.hostInt)
     }
 
     override fun saveStateToBundle(outState: Bundle) {
@@ -206,7 +221,7 @@ class ServerHostSetting: Setting<ServerHostSetting.State>() {
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
-        state = State(prefs[AppPreferences.SERVER_HOST] as String, false)
+        state = State(prefs.getInt(AppPreferences.SERVER_HOST_INT))
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {

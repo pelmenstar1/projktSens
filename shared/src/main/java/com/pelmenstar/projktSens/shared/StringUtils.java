@@ -293,4 +293,29 @@ public final class StringUtils {
             buffer[offset + 3] = (char) ('0' + (number - (d2 * 10)));
         }
     }
+
+    public static void writeByte(@NotNull char[] buffer, int offset, int value) {
+        if(value < 0 || value > 255) {
+            throw new IllegalArgumentException("value");
+        }
+
+        if (value < 10) {
+            buffer[offset] = (char) ('0' + value);
+        } else if (value < 100) {
+            int d2 = value / 10;
+
+            buffer[offset] = (char) ('0' + d2);
+            buffer[offset + 1] = (char) ('0' + (value - (d2 * 10)));
+        } else {
+            int d3 = value / 100;
+
+            value -= (d3 * 100);
+
+            int d2 = value / 10;
+
+            buffer[offset] = (char) ('0' + d3);
+            buffer[offset + 1] = (char) ('0' + d2);
+            buffer[offset + 2] = (char) ('0' + (value - (d2 * 10)));
+        }
+    }
 }

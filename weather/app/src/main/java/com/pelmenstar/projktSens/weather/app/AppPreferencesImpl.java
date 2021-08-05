@@ -13,7 +13,7 @@ import java.net.InetAddress;
 
 public class AppPreferencesImpl implements AppPreferences {
     public static final AppPreferencesImpl INSTANCE = new AppPreferencesImpl();
-    private static final String DEFAULT_SEVER_ADDRESS_STRING = "192.168.17.21";
+    private static final int DEFAULT_SEVER_ADDRESS_INT = 0;
     private static final int DEFAULT_REPO_SERVER_PORT = 10001;
     private static final int DEFAULT_WEATHER_RECEIVE_INTERVAL = 10 * 1000;
     private static final int DEFAULT_REPO_CONTRACT_TYPE = RepoContractType.CONTRACT_RAW;
@@ -60,15 +60,10 @@ public class AppPreferencesImpl implements AppPreferences {
                 int repoPort = prefs.getInt(KEY_REPO_PORT, -1);
                 int weatherReceiveInterval = prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, -1);
 
-                String serverHostStr = prefs.getString(KEY_SERVER_HOST, null);
-                boolean isValidHost = false;
-                if(serverHostStr != null) {
-                    isValidHost = InetAddressUtils.isValidNumericalIpv4(serverHostStr);
-                }
                 boolean isGpsDeniedExists = prefs.contains(KEY_IS_GPS_PERMISSION_DENIED);
 
                 if (!ValueUnitsPacked.isValid(units) ||
-                        !isValidHost ||
+                        !prefs.contains(KEY_SERVER_HOST) ||
                         !isGpsDeniedExists ||
                         (contractType | repoPort | weatherReceiveInterval) < 0) {
                     writeDefault();
@@ -81,7 +76,7 @@ public class AppPreferencesImpl implements AppPreferences {
     private static void writeDefault() {
         prefs.edit()
                 .putInt(KEY_UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY)
-                .putString(KEY_SERVER_HOST, DEFAULT_SEVER_ADDRESS_STRING)
+                .putInt(KEY_SERVER_HOST, DEFAULT_SEVER_ADDRESS_INT)
                 .putInt(KEY_CONTRACT, RepoContractType.CONTRACT_RAW)
                 .putInt(KEY_REPO_PORT, DEFAULT_REPO_SERVER_PORT)
                 .putInt(KEY_WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL)
@@ -95,8 +90,8 @@ public class AppPreferencesImpl implements AppPreferences {
         switch (id) {
             case UNITS:
                 return getUnits();
-            case SERVER_HOST:
-                return getServerHostString();
+            case SERVER_HOST_INT:
+                return getServerHostInt();
             case CONTRACT:
                 return getContractType();
             case REPO_PORT:
@@ -113,8 +108,8 @@ public class AppPreferencesImpl implements AppPreferences {
         switch (id) {
             case UNITS:
                 return getUnits();
-            case SERVER_HOST:
-                throw new IllegalArgumentException("SERVER_HOST isn't int");
+            case SERVER_HOST_INT:
+                return getServerHostInt();
             case CONTRACT:
                 return getContractType();
             case REPO_PORT:
@@ -141,8 +136,8 @@ public class AppPreferencesImpl implements AppPreferences {
             case UNITS:
                 setUnits((Integer) value);
                 break;
-            case SERVER_HOST:
-                setServerHostString((String) value);
+            case SERVER_HOST_INT:
+                setServerHostInt((Integer) value);
                 break;
             case CONTRACT:
                 setContractType((Integer) value);
@@ -164,8 +159,9 @@ public class AppPreferencesImpl implements AppPreferences {
             case UNITS:
                 setUnits(value);
                 break;
-            case SERVER_HOST:
-                throw new IllegalArgumentException("SERVER_HOST isn't int");
+            case SERVER_HOST_INT:
+                setServerHostInt(value);
+                break;
             case CONTRACT:
                 setContractType(value);
                 break;
@@ -204,18 +200,14 @@ public class AppPreferencesImpl implements AppPreferences {
         prefs.edit().putInt(KEY_UNITS, units).apply();
     }
 
-    @NotNull
-    public InetAddress getServerHost() {
-        return InetAddressUtils.parseNumericalIpv4OrThrow(getServerHostString());
+    @Override
+    public int getServerHostInt() {
+        return prefs.getInt(KEY_SERVER_HOST, 0);
     }
 
-    @NotNull
-    public String getServerHostString() {
-        return prefs.getString(KEY_SERVER_HOST, DEFAULT_SEVER_ADDRESS_STRING);
-    }
-
-    public void setServerHostString(@NotNull String hostString) {
-        prefs.edit().putString(KEY_SERVER_HOST, hostString).apply();
+    @Override
+    public void setServerHostInt(int value) {
+        prefs.edit().putInt(KEY_SERVER_HOST, value).apply();
     }
 
     public int getContractType() {

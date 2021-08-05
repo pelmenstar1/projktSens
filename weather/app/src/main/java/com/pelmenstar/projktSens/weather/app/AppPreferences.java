@@ -8,7 +8,7 @@ import java.net.InetAddress;
 
 public interface AppPreferences extends Preferences {
     int UNITS = 0;
-    int SERVER_HOST = 1;
+    int SERVER_HOST_INT = 1;
     int CONTRACT = 2;
     int REPO_PORT = 3;
     int WEATHER_RECEIVE_INTERVAL = 5;
@@ -17,12 +17,8 @@ public interface AppPreferences extends Preferences {
     int getUnits();
     void setUnits(int units);
 
-    @NotNull
-    InetAddress getServerHost();
-
-    @NotNull
-    String getServerHostString();
-    void setServerHostString(@NotNull String host);
+    int getServerHostInt();
+    void setServerHostInt(int value);
 
     int getContractType();
     void setContractType(int type);

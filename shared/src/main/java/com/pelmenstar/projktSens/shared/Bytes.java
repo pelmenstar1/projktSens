@@ -8,6 +8,11 @@ import org.jetbrains.annotations.NotNull;
 public final class Bytes {
     private Bytes() {}
 
+    public static int withByte(int bits, int byteIndex, int value) {
+        int shift = byteIndex << 3;
+        return (bits & ~(0xff << shift)) | (value << shift);
+    }
+
     /**
      * Writes int64 to buffer at specified offset
      */

@@ -21,7 +21,7 @@ class InetAddressUtilsTests {
         succeedOn("1.2.3.4")
         succeedOn("123.255.124.64")
         succeedOn("1.23.45.100")
-        succeedOn("0.0.0.0")
+        succeedOn("0.0.0.1")
     }
 
     @Test
@@ -51,7 +51,7 @@ class InetAddressUtilsTests {
         succeedOn("1.2.3.4")
         succeedOn("123.255.124.64")
         succeedOn("1.23.45.100")
-        succeedOn("0.0.0.0")
+        succeedOn("0.0.0.1")
     }
 
     @Test
@@ -70,5 +70,20 @@ class InetAddressUtilsTests {
         failsOn("123.")
         failsOn("123.34.")
         failsOn("222.33.55.")
+    }
+
+    @Test
+    fun ipv4ToString_succeed() {
+        fun testOn(str: String) {
+            val i = InetAddressUtils.parseNumericalIpv4ToInt(str)
+            val actual = InetAddressUtils.intIpv4ToString(i)
+
+            assertEquals(str, actual)
+        }
+
+        testOn("1.0.0.0")
+        testOn("43.255.0.1")
+        testOn("255.255.255.255")
+        testOn("11.11.11.11")
     }
 }
