@@ -1,4 +1,4 @@
-package com.pelmenstar.projktSens.weather.app.ui.settings
+package com.pelmenstar.projktSens.weather.app.ui
 
 import android.content.Context
 import android.os.Bundle

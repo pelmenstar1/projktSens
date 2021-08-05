@@ -24,7 +24,7 @@ import com.pelmenstar.projktSens.weather.app.ui.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.LazyLoadingCalendarView
 import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarActivity
-import com.pelmenstar.projktSens.weather.app.ui.settings.APP_SETTING_CLASSES
+import com.pelmenstar.projktSens.weather.app.ui.APP_SETTING_CLASSES
 import com.pelmenstar.projktSens.weather.app.ui.sunriseSunset.SunriseSunsetCalendarActivity
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
 
