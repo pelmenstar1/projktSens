@@ -14,25 +14,6 @@ import kotlin.math.min
 
 /**
  * Writes and reads [Request], [Response] in raw non-human readable compact binary form.
- * ## RepoRequest
- * Binary format:
- * - 1 byte | [Request.command]
- * - 2 bytes | size of [Request.args], if args is null, contains 0
- * - size of args bytes | [Request.args], if args is not null
- *
- * ## RepoResponse
- * Binary format:
- * if response is [Response.Empty]
- * - 0 (1 byte)
- *
- * if response is [Response.Error]
- * - 1 (1 byte)
- * - 4 bytes | [Response.Error.error]
- *
- * if response is [Response.Ok]
- * - 2 (1 byte)
- * - 2 bytes | size of serialized value of response
- * - various byte | serialized representation of response
  */
 object RawContract: Contract {
     internal const val RESPONSE_BUFFER_SIZE = 1024
@@ -49,20 +30,20 @@ object RawContract: Contract {
 
             val buffer: ByteArray
             if (arg == null) {
-                buffer = ByteArray(3)
+                buffer = ByteArray(5)
                 buffer[0] = command
             } else {
                 val argClass = arg.javaClass
+                val argClassName = argClass.name
                 val serializer = Serializable.getSerializer(argClass)
                 val objectSize = serializer.getSerializedObjectSize(arg)
-                val argClassNameBytes = argClass.name.toByteArray(Charsets.UTF_8)
 
-                buffer = buildByteArray(objectSize + argClassNameBytes.size + 5) {
+                buffer = buildByteArray(objectSize + argClassName.length + 5) {
                     this[0] = command
                     writeShort(1, objectSize.toShort())
-                    serializer.writeObject(arg, ValueWriter(this, 3))
-                    writeShort(objectSize + 3, argClassNameBytes.size.toShort())
-                    System.arraycopy(argClassNameBytes, 0, this, objectSize + 5, argClassNameBytes.size)
+                    writeShort(3, argClassName.length.toShort())
+                    serializer.writeObject(arg, ValueWriter(this, 5))
+                    StringUtils.writeAsciiBytes(argClassName, this, objectSize + 5)
                 }
             }
             output.writeSuspend(buffer)
@@ -71,26 +52,26 @@ object RawContract: Contract {
 
     override suspend fun readRequest(input: InputStream): Request {
         return withContext(Dispatchers.IO) {
-            val header = input.readNSuspend(3)
+            val header = input.readNSuspend(5)
 
             val command = header[0].toInt() and 0xff
-            val argBytesLength = header.getShort(1).toInt()
+            val argContentLength = header.getShort(1).toInt()
+            val argClassNameLength = header.getShort(3).toInt()
+
             val argBytes: ByteArray
 
             when {
-                argBytesLength == 0 -> {
+                argContentLength == 0 -> {
                     return@withContext Request(command)
                 }
-                argBytesLength > 0 -> {
-                    argBytes = input.readNSuspend(argBytesLength)
+                argContentLength > 0 -> {
+                    argBytes = input.readNSuspend(argContentLength + argClassNameLength)
                 }
                 else -> throw IOException()
             }
 
-            val argClassNameLengthBuffer = input.readNSuspend(2)
-            val argClassNameLength = argClassNameLengthBuffer.getShort(0).toInt()
-            val argClassNameBytes = input.readNSuspend(argClassNameLength)
-            val argClassName = String(argClassNameBytes, Charsets.UTF_8)
+            val argClassName = String(argBytes, argContentLength, argClassNameLength, Charsets.US_ASCII)
+
             val serializer = Serializable.getSerializer(Class.forName(argClassName))
             val arg = serializer.readObject(ValueReader(argBytes))
 

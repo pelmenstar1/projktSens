@@ -318,4 +318,18 @@ public final class StringUtils {
             buffer[offset + 2] = (char) ('0' + (value - (d2 * 10)));
         }
     }
+
+    public static void writeAsciiBytes(@NotNull String str, @NotNull byte[] outBuffer, int offset) {
+        for(int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            byte mapped;
+            if(c > 0x7f) {
+                mapped = '?';
+            } else {
+                mapped = (byte)c;
+            }
+
+            outBuffer[offset + i] = mapped;
+        }
+    }
 }
