@@ -30,18 +30,23 @@ public final class Commands {
 
     public static final int GET_WAIT_TIME_FOR_NEXT_WEATHER = 5;
 
+    private static final int MAX_COMMAND = GET_WAIT_TIME_FOR_NEXT_WEATHER;
+
+    private static final String[] COMMAND_NAMES = new String[] {
+            "GEN_DAY_REPORT",
+            "GEN_DAY_RANGE_REPORT",
+            "GET_AVAILABLE_DATE_RANGE",
+            "GET_LAST_WEATHER",
+            "GET_WAIT_TIME_FOR_NEXT_WEATHER"
+    };
+
     public static int fromString(@NotNull String commandName) {
-        if(commandName.equalsIgnoreCase("GEN_DAY_REPORT")) {
-            return GEN_DAY_REPORT;
-        } else if(commandName.equalsIgnoreCase("GEN_DAY_RANGE_REPORT")) {
-            return GEN_DAY_RANGE_REPORT;
-        } else if(commandName.equalsIgnoreCase("GET_AVAILABLE_DATE_RANGE")) {
-            return GET_AVAILABLE_DATE_RANGE;
-        } else if(commandName.equalsIgnoreCase("GET_LAST_WEATHER")) {
-            return GET_LAST_WEATHER;
-        } else if(commandName.equalsIgnoreCase("GET_WAIT_TIME_FOR_NEXT_WEATHER")) {
-            return GET_WAIT_TIME_FOR_NEXT_WEATHER;
+        for(int i = 0; i < COMMAND_NAMES.length; i++) {
+            if(COMMAND_NAMES[i].equalsIgnoreCase(commandName)) {
+                return i + 1;
+            }
         }
+
         throw new IllegalArgumentException("Invalid command name '" + commandName + "'");
     }
 
@@ -54,14 +59,10 @@ public final class Commands {
      */
     @NotNull
     public static String toString(int command) {
-        switch (command) {
-            case GEN_DAY_REPORT: return "GEN_DAY_REPORT";
-            case GEN_DAY_RANGE_REPORT: return "GEN_DAY_RANGE_REPORT";
-            case GET_AVAILABLE_DATE_RANGE: return "GET_AVAILABLE_DATE_RANGE";
-            case GET_LAST_WEATHER: return "GET_LAST_WEATHER";
-            case GET_WAIT_TIME_FOR_NEXT_WEATHER: return "GET_WAIT_TIME_FOR_NEXT_WEATHER";
-
-            default: throw new IllegalArgumentException("command");
+        if(command < 0 || command > MAX_COMMAND) {
+            throw new IllegalArgumentException("command");
         }
+
+        return COMMAND_NAMES[command - 1];
     }
 }
