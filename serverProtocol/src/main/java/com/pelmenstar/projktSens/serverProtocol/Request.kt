@@ -1,19 +1,19 @@
-package com.pelmenstar.projktSens.serverProtocol.repo
+package com.pelmenstar.projktSens.serverProtocol
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder
 import com.pelmenstar.projktSens.shared.equalsPattern
 
 /**
- * Contains information to make request to repo-server
+ * Contains information to make request to server
  */
-class RepoRequest: AppendableToStringBuilder {
+class Request: AppendableToStringBuilder {
     /**
      * Command of request
      */
     val command: Int
 
     /**
-     * Optional binary arguments of request
+     * Optional argument of request
      */
     val argument: Any?
 
@@ -43,7 +43,7 @@ class RepoRequest: AppendableToStringBuilder {
     override fun append(builder: StringBuilder) {
         builder.run {
             append("{command=")
-            append(RepoCommands.toString(command))
+            append(Commands.toString(command))
             append("; argument=")
             append(argument)
             append('}')

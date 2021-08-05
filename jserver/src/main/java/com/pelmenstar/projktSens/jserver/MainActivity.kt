@@ -9,7 +9,7 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoAvailabilityProvider
+import com.pelmenstar.projktSens.serverProtocol.ServerAvailabilityProvider
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsActivity
 import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsContext
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun isServerActuallyStarted(): Boolean {
         val sc = serverConfig
-        val provider = RepoAvailabilityProvider(sc.protoConfig)
+        val provider = ServerAvailabilityProvider(sc.protoConfig)
 
         return provider.isAvailable()
     }

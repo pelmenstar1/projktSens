@@ -1,24 +1,23 @@
-package com.pelmenstar.projktSens.serverProtocol.repo
+package com.pelmenstar.projktSens.serverProtocol
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.pelmenstar.projktSens.serverProtocol.Errors
 import com.pelmenstar.projktSens.shared.readString
 import com.pelmenstar.projktSens.shared.writeString
 import java.io.InputStream
 import java.io.OutputStream
 
-object JsonRepoContract: RepoContract {
+object JsonContract: Contract {
     private const val BUFFER_SIZE = 1024
     private val gson = Gson()
 
-    override suspend fun writeRequest(request: RepoRequest, output: OutputStream) {
+    override suspend fun writeRequest(request: Request, output: OutputStream) {
         val arg = request.argument
 
         val json = buildString {
             append("{command=\"")
-            append(RepoCommands.toString(request.command))
+            append(Commands.toString(request.command))
             append('"')
 
             if(arg != null) {
@@ -35,13 +34,13 @@ object JsonRepoContract: RepoContract {
         output.writeString(json, Charsets.UTF_8)
     }
 
-    override suspend fun readRequest(input: InputStream): RepoRequest {
+    override suspend fun readRequest(input: InputStream): Request {
         val json = input.readString(Charsets.UTF_8, BUFFER_SIZE)
 
         try {
             val root = JsonParser.parseString(json) as JsonObject
             val commandName = root.get("command").asString
-            val command = RepoCommands.fromString(commandName)
+            val command = Commands.fromString(commandName)
 
             return if(root.has("argClass") && root.has("arg")) {
                 val argClassString = root.get("argClass").asString
@@ -49,22 +48,22 @@ object JsonRepoContract: RepoContract {
                 val argElement = root.get("arg")
                 val arg = gson.fromJson(argElement, argClass)
 
-                RepoRequest(command, arg)
+                Request(command, arg)
             } else {
-                RepoRequest(command)
+                Request(command)
             }
         } catch (e: Exception) {
             throw RuntimeException("Illegal request JSON", e)
         }
     }
 
-    override suspend fun writeResponse(response: RepoResponse, output: OutputStream) {
+    override suspend fun writeResponse(response: Response, output: OutputStream) {
         val json = when(response) {
-            RepoResponse.Empty -> "{}"
-            is RepoResponse.Error -> {
+            Response.Empty -> "{}"
+            is Response.Error -> {
                 "{error=${Errors.toString(response.error)}}"
             }
-            is RepoResponse.Ok<*> -> {
+            is Response.Ok<*> -> {
                 gson.toJson(response.value)
             }
         }
@@ -74,24 +73,24 @@ object JsonRepoContract: RepoContract {
     override suspend fun <T : Any> readResponse(
         input: InputStream,
         valueClass: Class<T>
-    ): RepoResponse {
+    ): Response {
         val json = input.readString(Charsets.UTF_8, BUFFER_SIZE)
 
         try {
             val root = JsonParser.parseString(json) as JsonObject
             if(root.size() == 0) {
-                return RepoResponse.Empty
+                return Response.Empty
             }
 
             if(root.has("error")) {
                 val errorName = root.get("error").asString
                 val errorId = Errors.fromString(errorName)
 
-                return RepoResponse.error(errorId)
+                return Response.error(errorId)
             }
 
             val value = gson.fromJson(json, valueClass)
-            return RepoResponse.ok(value)
+            return Response.ok(value)
         } catch (e: Exception) {
             throw RuntimeException("Illegal request JSON", e)
         }

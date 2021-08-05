@@ -5,7 +5,7 @@ import com.pelmenstar.projktSens.jserver.logging.AndroidLogDelegate
 import com.pelmenstar.projktSens.jserver.repo.DbServerWeatherRepository
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfigImpl
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType
+import com.pelmenstar.projktSens.serverProtocol.ContractType
 import com.pelmenstar.projktSens.weather.models.WeatherInfoProvider
 import com.pelmenstar.projktSens.weather.models.WeatherRepository
 import java.net.InetAddress
@@ -34,9 +34,9 @@ class MainConfig(private val context: Context): Config() {
         get() {
             val prefs = AppPreferences.of(context)
             return ProtoConfigImpl(
-                InetSocketAddress(host, prefs.repoPort),
+                InetSocketAddress(host, prefs.serverPort),
                 prefs.weatherSendInterval,
-                RepoContractType.get(prefs.serverContract)
+                ContractType.get(prefs.serverContract)
             )
         }
 

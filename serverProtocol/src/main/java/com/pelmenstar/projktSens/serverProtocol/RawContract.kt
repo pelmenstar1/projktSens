@@ -1,4 +1,4 @@
-package com.pelmenstar.projktSens.serverProtocol.repo
+package com.pelmenstar.projktSens.serverProtocol
 
 import com.pelmenstar.projktSens.shared.*
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
@@ -13,28 +13,28 @@ import java.io.OutputStream
 import kotlin.math.min
 
 /**
- * Writes and reads [RepoRequest], [RepoResponse] in raw non-human readable compact binary form.
+ * Writes and reads [Request], [Response] in raw non-human readable compact binary form.
  * ## RepoRequest
  * Binary format:
- * - 1 byte | [RepoRequest.command]
- * - 2 bytes | size of [RepoRequest.args], if args is null, contains 0
- * - size of args bytes | [RepoRequest.args], if args is not null
+ * - 1 byte | [Request.command]
+ * - 2 bytes | size of [Request.args], if args is null, contains 0
+ * - size of args bytes | [Request.args], if args is not null
  *
  * ## RepoResponse
  * Binary format:
- * if response is [RepoResponse.Empty]
+ * if response is [Response.Empty]
  * - 0 (1 byte)
  *
- * if response is [RepoResponse.Error]
+ * if response is [Response.Error]
  * - 1 (1 byte)
- * - 4 bytes | [RepoResponse.Error.error]
+ * - 4 bytes | [Response.Error.error]
  *
- * if response is [RepoResponse.Ok]
+ * if response is [Response.Ok]
  * - 2 (1 byte)
  * - 2 bytes | size of serialized value of response
  * - various byte | serialized representation of response
  */
-object RawRepoContract: RepoContract {
+object RawContract: Contract {
     internal const val RESPONSE_BUFFER_SIZE = 1024
     private const val STATUS_EMPTY: Byte = 0
     private const val STATUS_ERROR: Byte = 1
@@ -42,7 +42,7 @@ object RawRepoContract: RepoContract {
 
     private val RESPONSE_STATE_EMPTY_BUFFER = byteArrayOf(STATUS_EMPTY)
 
-    override suspend fun writeRequest(request: RepoRequest, output: OutputStream) {
+    override suspend fun writeRequest(request: Request, output: OutputStream) {
         withContext(Dispatchers.IO) {
             val command = request.command.toByte()
             val arg = request.argument
@@ -69,7 +69,7 @@ object RawRepoContract: RepoContract {
         }
     }
 
-    override suspend fun readRequest(input: InputStream): RepoRequest {
+    override suspend fun readRequest(input: InputStream): Request {
         return withContext(Dispatchers.IO) {
             val header = input.readNSuspend(3)
 
@@ -79,7 +79,7 @@ object RawRepoContract: RepoContract {
 
             when {
                 argBytesLength == 0 -> {
-                    return@withContext RepoRequest(command)
+                    return@withContext Request(command)
                 }
                 argBytesLength > 0 -> {
                     argBytes = input.readNSuspend(argBytesLength)
@@ -94,25 +94,25 @@ object RawRepoContract: RepoContract {
             val serializer = Serializable.getSerializer(Class.forName(argClassName))
             val arg = serializer.readObject(ValueReader(argBytes))
 
-            RepoRequest(command, arg)
+            Request(command, arg)
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    override suspend fun writeResponse(response: RepoResponse, output: OutputStream) {
+    override suspend fun writeResponse(response: Response, output: OutputStream) {
         when(response) {
-            RepoResponse.Empty -> {
+            Response.Empty -> {
                 output.writeSuspend(RESPONSE_STATE_EMPTY_BUFFER)
             }
 
-            is RepoResponse.Error -> {
+            is Response.Error -> {
                 output.writeSuspend(buildByteArray(5) {
                     this[0] = STATUS_ERROR
                     writeInt(1, response.error)
                 })
             }
 
-            is RepoResponse.Ok<*> -> {
+            is Response.Ok<*> -> {
                 val value = response.value
                 val serializer = Serializable.getSerializer(value.javaClass) as ObjectSerializer<Any>
                 val objectSize = serializer.getSerializedObjectSize(response.value)
@@ -131,16 +131,16 @@ object RawRepoContract: RepoContract {
         }
     }
 
-    override suspend fun <T:Any> readResponse(input: InputStream, valueClass: Class<T>): RepoResponse {
+    override suspend fun <T:Any> readResponse(input: InputStream, valueClass: Class<T>): Response {
         val stateBuffer = input.readNSuspend(1)
 
         return when(val state = stateBuffer[0]) {
-            STATUS_EMPTY -> RepoResponse.Empty
+            STATUS_EMPTY -> Response.Empty
             STATUS_ERROR -> {
                 val errorBuffer = input.readNSuspend(4)
                 val error = errorBuffer.getInt(0)
 
-                RepoResponse.error(error)
+                Response.error(error)
             }
             STATUS_OK -> {
                 val dataSizeBuffer = input.readNSuspend(2)
@@ -163,7 +163,7 @@ object RawRepoContract: RepoContract {
                 val serializer = Serializable.getSerializer(valueClass)
                 val value = Serializable.ofByteArray(data, serializer)
 
-                RepoResponse.ok(value)
+                Response.ok(value)
             }
             else -> throw IOException("Illegal state of response. $state")
         }

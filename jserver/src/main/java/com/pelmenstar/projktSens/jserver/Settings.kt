@@ -8,7 +8,7 @@ import android.widget.AdapterView
 import androidx.annotation.ArrayRes
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType
+import com.pelmenstar.projktSens.serverProtocol.ContractType
 import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
 import com.pelmenstar.projktSens.shared.android.ui.EditText
@@ -17,12 +17,12 @@ import com.pelmenstar.projktSens.shared.equalsPattern
 
 @JvmField
 val APP_SETTING_CLASSES: Array<out Class<out Setting<*>>> = arrayOf(
-    RepoPortSetting::class.java,
+    ServerPortSetting::class.java,
     ServerContractSetting::class.java,
     WeatherSendIntervalSetting::class.java
 )
 
-abstract class PortSettingBase: Setting<PortSettingBase.State>() {
+class ServerPortSetting: Setting<ServerPortSetting.State>() {
     class State(port: Int): IncompleteState() {
         var port: Int = 0
             set(value) {
@@ -46,6 +46,10 @@ abstract class PortSettingBase: Setting<PortSettingBase.State>() {
         override fun hashCode(): Int {
             return port
         }
+    }
+
+    override fun getNameId(): Int {
+        return R.string.settings_serverPortName
     }
 
     override fun createView(context: Context): View {
@@ -91,20 +95,20 @@ abstract class PortSettingBase: Setting<PortSettingBase.State>() {
     }
 
     override fun saveStateToPrefs(prefs: Preferences) {
-        prefs.setInt(getPreferencesKey(), state.port)
+        prefs.setInt(AppPreferences.SERVER_PORT, state.port)
     }
 
     override fun saveStateToBundle(outState: Bundle) {
-        outState.putInt(getBundleStatePortKey(), state.port)
+        outState.putInt(BUNDLE_PORT, state.port)
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
-        val port = prefs.getInt(getPreferencesKey())
+        val port = prefs.getInt(AppPreferences.SERVER_PORT)
         state = State(port)
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val port = bundle.getInt(getBundleStatePortKey(), -1)
+        val port = bundle.getInt(BUNDLE_PORT, -1)
 
         return if(port != -1) {
             state = State(port)
@@ -115,10 +119,10 @@ abstract class PortSettingBase: Setting<PortSettingBase.State>() {
         }
     }
 
-    protected abstract fun getBundleStatePortKey(): String
-    protected abstract fun getPreferencesKey(): Int
 
     companion object {
+        private const val BUNDLE_PORT = "ServerPortSetting.state.port"
+
         private const val PORT_MIN = 1024
         private const val PORT_MAX = 49151
 
@@ -127,12 +131,6 @@ abstract class PortSettingBase: Setting<PortSettingBase.State>() {
             return port in (PORT_MIN..PORT_MAX)
         }
     }
-}
-
-class RepoPortSetting: PortSettingBase() {
-    override fun getNameId(): Int = R.string.settings_repoPortName
-    override fun getBundleStatePortKey(): String = "RepoPortSetting.State.port"
-    override fun getPreferencesKey(): Int = AppPreferences.REPO_PORT
 }
 
 class ServerContractSetting: Setting<ServerContractSetting.State>() {
@@ -147,8 +145,8 @@ class ServerContractSetting: Setting<ServerContractSetting.State>() {
             adapter = simpleArrayAdapter(context, R.array.serverContracts)
 
             setSelection(when(state.contractType) {
-                RepoContractType.CONTRACT_RAW -> 0
-                RepoContractType.CONTRACT_JSON -> 1
+                ContractType.CONTRACT_RAW -> 0
+                ContractType.CONTRACT_JSON -> 1
                 else -> throw RuntimeException("Invalid state.contractType")
             })
 
@@ -160,8 +158,8 @@ class ServerContractSetting: Setting<ServerContractSetting.State>() {
                     id: Long
                 ) {
                     state.contractType = when (position) {
-                        0 -> RepoContractType.CONTRACT_RAW
-                        1 -> RepoContractType.CONTRACT_JSON
+                        0 -> ContractType.CONTRACT_RAW
+                        1 -> ContractType.CONTRACT_JSON
 
                         else -> return
                     }

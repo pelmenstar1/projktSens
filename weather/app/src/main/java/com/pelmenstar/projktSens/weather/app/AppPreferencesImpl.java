@@ -3,26 +3,23 @@ package com.pelmenstar.projktSens.weather.app;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType;
-import com.pelmenstar.projktSens.shared.InetAddressUtils;
+import com.pelmenstar.projktSens.serverProtocol.ContractType;
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.net.InetAddress;
-
 public class AppPreferencesImpl implements AppPreferences {
     public static final AppPreferencesImpl INSTANCE = new AppPreferencesImpl();
     private static final int DEFAULT_SEVER_ADDRESS_INT = 0;
-    private static final int DEFAULT_REPO_SERVER_PORT = 10001;
+    private static final int DEFAULT_SERVER_PORT = 10001;
     private static final int DEFAULT_WEATHER_RECEIVE_INTERVAL = 10 * 1000;
-    private static final int DEFAULT_REPO_CONTRACT_TYPE = RepoContractType.CONTRACT_RAW;
+    private static final int DEFAULT_CONTRACT_TYPE = ContractType.CONTRACT_RAW;
 
     // should not be changed
     private static final String KEY_UNITS = "units";
     private static final String KEY_SERVER_HOST = "serverHost";
     private static final String KEY_CONTRACT = "contract";
-    private static final String KEY_REPO_PORT = "repoPort";
+    private static final String KEY_SERVER_PORT = "PORT";
     private static final String KEY_WEATHER_RECEIVE_INTERVAL = "weatherRcvInterval";
     private static final String KEY_IS_GPS_PERMISSION_DENIED = "isGpsDenied";
 
@@ -57,7 +54,7 @@ public class AppPreferencesImpl implements AppPreferences {
 
                 int units = prefs.getInt(KEY_UNITS, ValueUnitsPacked.NONE);
                 int contractType = prefs.getInt(KEY_CONTRACT, -1);
-                int repoPort = prefs.getInt(KEY_REPO_PORT, -1);
+                int serverPort = prefs.getInt(KEY_SERVER_PORT, -1);
                 int weatherReceiveInterval = prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, -1);
 
                 boolean isGpsDeniedExists = prefs.contains(KEY_IS_GPS_PERMISSION_DENIED);
@@ -65,7 +62,7 @@ public class AppPreferencesImpl implements AppPreferences {
                 if (!ValueUnitsPacked.isValid(units) ||
                         !prefs.contains(KEY_SERVER_HOST) ||
                         !isGpsDeniedExists ||
-                        (contractType | repoPort | weatherReceiveInterval) < 0) {
+                        (contractType | serverPort | weatherReceiveInterval) < 0) {
                     writeDefault();
                 }
             }
@@ -77,8 +74,8 @@ public class AppPreferencesImpl implements AppPreferences {
         prefs.edit()
                 .putInt(KEY_UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY)
                 .putInt(KEY_SERVER_HOST, DEFAULT_SEVER_ADDRESS_INT)
-                .putInt(KEY_CONTRACT, RepoContractType.CONTRACT_RAW)
-                .putInt(KEY_REPO_PORT, DEFAULT_REPO_SERVER_PORT)
+                .putInt(KEY_CONTRACT, ContractType.CONTRACT_RAW)
+                .putInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT)
                 .putInt(KEY_WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL)
                 .putBoolean(KEY_IS_GPS_PERMISSION_DENIED, false)
                 .apply();
@@ -94,8 +91,8 @@ public class AppPreferencesImpl implements AppPreferences {
                 return getServerHostInt();
             case CONTRACT:
                 return getContractType();
-            case REPO_PORT:
-                return getRepoPort();
+            case SERVER_PORT:
+                return getServerPort();
             case WEATHER_RECEIVE_INTERVAL:
                 return getWeatherReceiveInterval();
             default:
@@ -112,8 +109,8 @@ public class AppPreferencesImpl implements AppPreferences {
                 return getServerHostInt();
             case CONTRACT:
                 return getContractType();
-            case REPO_PORT:
-                return getRepoPort();
+            case SERVER_PORT:
+                return getServerPort();
             case WEATHER_RECEIVE_INTERVAL:
                 return getWeatherReceiveInterval();
             default:
@@ -142,8 +139,8 @@ public class AppPreferencesImpl implements AppPreferences {
             case CONTRACT:
                 setContractType((Integer) value);
                 break;
-            case REPO_PORT:
-                setRepoPort((Integer) value);
+            case SERVER_PORT:
+                setServerPort((Integer) value);
                 break;
             case WEATHER_RECEIVE_INTERVAL:
                 setWeatherReceiveInterval((Integer) value);
@@ -165,8 +162,8 @@ public class AppPreferencesImpl implements AppPreferences {
             case CONTRACT:
                 setContractType(value);
                 break;
-            case REPO_PORT:
-                setRepoPort(value);
+            case SERVER_PORT:
+                setServerPort(value);
                 break;
             case WEATHER_RECEIVE_INTERVAL:
                 setWeatherReceiveInterval(value);
@@ -211,24 +208,25 @@ public class AppPreferencesImpl implements AppPreferences {
     }
 
     public int getContractType() {
-        return prefs.getInt(KEY_CONTRACT, DEFAULT_REPO_CONTRACT_TYPE);
+        return prefs.getInt(KEY_CONTRACT, DEFAULT_CONTRACT_TYPE);
     }
 
     public void setContractType(int contractType) {
-        if(!RepoContractType.isValid(contractType)) {
+        if(!ContractType.isValid(contractType)) {
             throw new IllegalArgumentException("contractType");
         }
 
         prefs.edit().putInt(KEY_CONTRACT, contractType).apply();
     }
 
-    public int getRepoPort() {
-        return prefs.getInt(KEY_REPO_PORT, DEFAULT_REPO_SERVER_PORT);
+    public int getServerPort() {
+        return prefs.getInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT);
     }
 
-    public void setRepoPort(int port) {
-        prefs.edit().putInt(KEY_REPO_PORT, port).apply();
+    public void setServerPort(int port) {
+        prefs.edit().putInt(KEY_SERVER_PORT, port).apply();
     }
+
     public int getWeatherReceiveInterval() {
         return prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL);
     }

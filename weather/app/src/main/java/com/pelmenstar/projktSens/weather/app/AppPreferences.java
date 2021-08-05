@@ -10,7 +10,7 @@ public interface AppPreferences extends Preferences {
     int UNITS = 0;
     int SERVER_HOST_INT = 1;
     int CONTRACT = 2;
-    int REPO_PORT = 3;
+    int SERVER_PORT = 3;
     int WEATHER_RECEIVE_INTERVAL = 5;
     int IS_GPS_PERMISSION_DENIED = 6;
 
@@ -23,8 +23,8 @@ public interface AppPreferences extends Preferences {
     int getContractType();
     void setContractType(int type);
 
-    int getRepoPort();
-    void setRepoPort(int port);
+    int getServerPort();
+    void setServerPort(int port);
 
     int getWeatherReceiveInterval();
     void setWeatherReceiveInterval(int interval);

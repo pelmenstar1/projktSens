@@ -1,6 +1,5 @@
 package com.pelmenstar.projktSens.serverProtocol
 
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoContract
 import java.net.InetSocketAddress
 
 /**
@@ -14,8 +13,5 @@ interface ProtoConfig {
      */
     val weatherChannelReceiveInterval: Int
 
-    /**
-     * Binary contract of repo-server
-     */
-    val repoContract: RepoContract
+    val contract: Contract
 }

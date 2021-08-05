@@ -1,4 +1,4 @@
-package com.pelmenstar.projktSens.serverProtocol.repo
+package com.pelmenstar.projktSens.serverProtocol
 
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.shared.connectSuspend
@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.Socket
 
-class RepoAvailabilityProvider(config: ProtoConfig) {
+class ServerAvailabilityProvider(config: ProtoConfig) {
     private val address = config.socketAddress
 
     suspend fun isAvailable(): Boolean {

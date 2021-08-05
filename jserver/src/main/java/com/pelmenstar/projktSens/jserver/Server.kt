@@ -1,10 +1,10 @@
 package com.pelmenstar.projktSens.jserver
 
 import com.pelmenstar.projktSens.serverProtocol.Errors
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoContract
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoRequest
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoResponse
+import com.pelmenstar.projktSens.serverProtocol.Commands
+import com.pelmenstar.projktSens.serverProtocol.Contract
+import com.pelmenstar.projktSens.serverProtocol.Request
+import com.pelmenstar.projktSens.serverProtocol.Response
 import com.pelmenstar.projktSens.shared.acceptSuspend
 import com.pelmenstar.projktSens.shared.bindSuspend
 import com.pelmenstar.projktSens.shared.time.ShortDate
@@ -19,24 +19,24 @@ import java.net.Socket
 
 /**
  * Server that connects server weather repository and client.
- * After [RepoRequest] has been sent, server will respond with [RepoResponse].
+ * After [Request] has been sent, server will respond with [Response].
  *
  * Command of request should be one of these:
- * - [RepoCommands.GEN_DAY_REPORT]. Arguments should contain date of desired report.
+ * - [Commands.GEN_DAY_REPORT]. Arguments should contain date of desired report.
  *   If date is out of available data, server will return empty response, otherwise, will return instance of [DayReport]
  *
- * - [RepoCommands.GEN_DAY_RANGE_REPORT]. Arguments should contain range of dates of desired report.
+ * - [Commands.GEN_DAY_RANGE_REPORT]. Arguments should contain range of dates of desired report.
  *   Arguments should be instance of [ShortDateRange].
  *   If range is out of available data, server will return empty response, otherwise, will return instance of [DayRangeReport].
  *
- * - [RepoCommands.GET_AVAILABLE_DATE_RANGE]. No arguments is required.
+ * - [Commands.GET_AVAILABLE_DATE_RANGE]. No arguments is required.
  *  By name of command, you can assume that server will return date range of available data and you will be right, it does exactly this.
  *
- *  - [RepoCommands.GET_LAST_WEATHER]. No arguments is required.
+ *  - [Commands.GET_LAST_WEATHER]. No arguments is required.
  *  Last added weather will be returned.
  */
-class RepoServer {
-    private val contract: RepoContract
+class Server {
+    private val contract: Contract
     private val repo: WeatherRepository
 
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -58,7 +58,7 @@ class RepoServer {
         log = Logger(javaClass.simpleName, serverConfig.loggerConfig)
         address = protoConfig.socketAddress
 
-        contract = protoConfig.repoContract
+        contract = protoConfig.contract
         repo = serverConfig.sharedRepo
     }
 
@@ -138,25 +138,25 @@ class RepoServer {
         }
     }
 
-    private suspend fun processRequest(request: RepoRequest): RepoResponse {
+    private suspend fun processRequest(request: Request): Response {
         return try {
             val arg = request.argument
 
             when (request.command) {
-                RepoCommands.GET_AVAILABLE_DATE_RANGE -> {
+                Commands.GET_AVAILABLE_DATE_RANGE -> {
                     val range = repo.getAvailableDateRange()
 
-                    RepoResponse.okOrEmpty(range)
+                    Response.okOrEmpty(range)
                 }
-                RepoCommands.GEN_DAY_REPORT -> {
+                Commands.GEN_DAY_REPORT -> {
                     if(arg == null) {
-                        return RepoResponse.error(Errors.INVALID_ARGUMENTS)
+                        return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
                     val date = arg as Int
 
                     if(!ShortDate.isValid(date)) {
-                        return RepoResponse.error(Errors.INVALID_ARGUMENTS)
+                        return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
                     log.info {
@@ -166,11 +166,11 @@ class RepoServer {
 
                     val report = repo.getDayReport(date)
 
-                    RepoResponse.okOrEmpty(report)
+                    Response.okOrEmpty(report)
                 }
-                RepoCommands.GEN_DAY_RANGE_REPORT -> {
+                Commands.GEN_DAY_RANGE_REPORT -> {
                     if(arg == null) {
-                        return RepoResponse.error(Errors.INVALID_ARGUMENTS)
+                        return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
                     val range = arg as ShortDateRange
@@ -182,24 +182,24 @@ class RepoServer {
 
                     val report = repo.getDayRangeReport(range)
 
-                    RepoResponse.okOrEmpty(report)
+                    Response.okOrEmpty(report)
                 }
-                RepoCommands.GET_LAST_WEATHER -> {
+                Commands.GET_LAST_WEATHER -> {
                     val weather = repo.getLastWeather()
 
-                    RepoResponse.okOrEmpty(weather)
+                    Response.okOrEmpty(weather)
                 }
-                RepoCommands.GET_WAIT_TIME_FOR_NEXT_WEATHER -> {
+                Commands.GET_WAIT_TIME_FOR_NEXT_WEATHER -> {
                     val waitTime = WeatherMonitor.getNextWeatherRequestTime() - System.currentTimeMillis()
 
-                    RepoResponse.ok(waitTime)
+                    Response.ok(waitTime)
                 }
-                else -> RepoResponse.error(Errors.INVALID_COMMAND)
+                else -> Response.error(Errors.INVALID_COMMAND)
             }
         } catch (e: Exception) {
             log.error(e)
 
-            RepoResponse.error(e)
+            Response.error(e)
         }
     }
 }

@@ -1,17 +1,16 @@
-package com.pelmenstar.projktSens.serverProtocol.repo
+package com.pelmenstar.projktSens.serverProtocol
 
-import com.pelmenstar.projktSens.serverProtocol.Errors
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder
 import com.pelmenstar.projktSens.shared.equalsPattern
 
 /**
- * Represents all possible types of response returned by repo-server
+ * Represents all possible types of response
  */
-sealed class RepoResponse: AppendableToStringBuilder() {
+sealed class Response: AppendableToStringBuilder() {
     /**
      * Empty response
      */
-    object Empty: RepoResponse() {
+    object Empty: Response() {
         override fun append(sb: StringBuilder) {
             sb.append("{Empty}")
         }
@@ -29,7 +28,7 @@ sealed class RepoResponse: AppendableToStringBuilder() {
      * Response with error.
      * This class has private constructor, so static methods [Companion.error] should be used
      */
-    class Error internal constructor(val error: Int): RepoResponse() {
+    class Error internal constructor(val error: Int): Response() {
         override fun append(sb: StringBuilder) {
             sb.append("{Error=")
             sb.append(Errors.toString(error))
@@ -51,7 +50,7 @@ sealed class RepoResponse: AppendableToStringBuilder() {
      * Response with value paired with its class.
      * This class has private constructor, so static methods [Companion.ok] should be used
      */
-    class Ok<T:Any> internal constructor(val value: T): RepoResponse() {
+    class Ok<T:Any> internal constructor(val value: T): Response() {
         override fun append(sb: StringBuilder) {
             sb.append("{ Value=")
             sb.append(value)
@@ -106,7 +105,7 @@ sealed class RepoResponse: AppendableToStringBuilder() {
          * Note that generic parameter of this method is marked as reified,
          * so type of [value] should be known in compile-time
          */
-        fun<T:Any> okOrEmpty(value: T?): RepoResponse {
+        fun<T:Any> okOrEmpty(value: T?): Response {
             return if(value != null) ok(value) else Empty
         }
     }

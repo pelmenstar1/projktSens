@@ -41,7 +41,7 @@
     <string name="invalidNumberFormat">Isn\'t a number</string>
     <string name="settings_portReservedError_less">Only greater than 1024</string>
     <string name="settings_portReservedError_greater">Greater than 49151</string>
-    <string name="settings_repoPortName">\'Repo\' port</string>
+    <string name="settings_serverPortName">Server port</string>
     <string name="settings_weatherRcvInterval_name">Receive interval (ms)</string>
     <string name="settings_weatherRcvInterval_lessOrEqZero">Less or equal 0</string>
 

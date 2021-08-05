@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig;
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfigImpl;
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoContractType;
+import com.pelmenstar.projktSens.serverProtocol.ContractType;
 import com.pelmenstar.projktSens.shared.InetAddressUtils;
 import com.pelmenstar.projktSens.shared.geo.ConstGeolocationProvider;
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider;
@@ -144,9 +144,9 @@ public final class AppModule {
         InetAddress inetAddress = InetAddressUtils.parseInt(prefs.getServerHostInt());
 
         return new ProtoConfigImpl(
-                new InetSocketAddress(inetAddress, prefs.getRepoPort()),
+                new InetSocketAddress(inetAddress, prefs.getServerPort()),
                 prefs.getWeatherReceiveInterval(),
-                RepoContractType.get(contractType)
+                ContractType.get(contractType)
         );
     }
 }

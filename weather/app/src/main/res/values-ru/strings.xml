@@ -41,7 +41,7 @@
     <string name="settings_portReservedError_less">Только больше 1024</string>
     <string name="settings_portReservedError_greater">Больше чем 49151</string>
 
-    <string name="settings_repoPortName">\'Repo\' порт</string>
+    <string name="settings_serverPortName">\'Repo\' порт</string>
     <!-- TODO: Придумать понятный перевод -->
     <string name="settings_weatherRcvInterval_name">Receive interval (ms)</string>
     <string name="settings_weatherRcvInterval_lessOrEqZero">Меньше или равно 0</string>

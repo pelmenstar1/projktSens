@@ -1,12 +1,12 @@
-package com.pelmenstar.projktSens.serverProtocol.repo;
+package com.pelmenstar.projktSens.serverProtocol;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Contains constant commands for repo-server.
+ * Contains constant commands.
  */
-public final class RepoCommands {
-    private RepoCommands() {}
+public final class Commands {
+    private Commands() {}
 
     /**
      * Makes repo-server to return instance of day report

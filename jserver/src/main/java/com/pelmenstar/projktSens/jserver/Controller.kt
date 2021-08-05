@@ -1,7 +1,7 @@
 package com.pelmenstar.projktSens.jserver
 
 class Controller {
-    private val repoServer = RepoServer()
+    private val repoServer = Server()
 
     fun startAll() {
         WeatherMonitor.start()

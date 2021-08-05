@@ -2,7 +2,7 @@
     <string name="app_name">JServer</string>
 
     <string name="main_menu_settings">Settings</string>
-    <string name="settings_repoPortName">\'Repo\' port</string>
+    <string name="settings_serverPortName">Server port</string>
     <string name="settings_weatherChannelInfoPortName">\'WCI\' port</string>
     <string name="invalidNumberFormat">Isn\'t a number</string>
     <string name="settings_portReservedError_less">Only greater than 1024</string>

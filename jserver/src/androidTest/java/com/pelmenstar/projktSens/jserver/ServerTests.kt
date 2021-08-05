@@ -2,11 +2,7 @@ package com.pelmenstar.projktSens.jserver
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.pelmenstar.projktSens.serverProtocol.Errors
-import com.pelmenstar.projktSens.serverProtocol.HostedProtoConfig
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoClient
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoCommands
-import com.pelmenstar.projktSens.serverProtocol.repo.RepoResponse
+import com.pelmenstar.projktSens.serverProtocol.*
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.weather.models.*
@@ -21,7 +17,7 @@ import kotlin.test.assertTrue
 
 // Tests only the server request-response logic, not exactly repository logic
 @RunWith(AndroidJUnit4::class)
-class RepoServerTests {
+class ServerTests {
     //
     // getAvailableDateRange
     //
@@ -29,7 +25,7 @@ class RepoServerTests {
     fun getAvailableDateRange_returns_empty_response_if_db_is_empty() {
         runBlocking {
             repo.clear()
-            val response = client.requestRawResponse<Any>(RepoCommands.GET_AVAILABLE_DATE_RANGE)
+            val response = client.requestRawResponse<Any>(Commands.GET_AVAILABLE_DATE_RANGE)
 
             assertTrue(response.isEmpty())
         }
@@ -40,7 +36,7 @@ class RepoServerTests {
         runBlocking {
             repo.debugGenDb(ShortDate.now(), 48)
 
-            val range = client.request<ShortDateRange>(RepoCommands.GET_AVAILABLE_DATE_RANGE)
+            val range = client.request<ShortDateRange>(Commands.GET_AVAILABLE_DATE_RANGE)
             assertNotNull(range)
         }
     }
@@ -51,8 +47,8 @@ class RepoServerTests {
     @Test
     fun genDayReport_returns_invalid_args_error_if_no_arguments_were_given() {
         runBlocking {
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_REPORT)
-            val error = (response as RepoResponse.Error).error
+            val response = client.requestRawResponse<Any>(Commands.GEN_DAY_REPORT)
+            val error = (response as Response.Error).error
 
             assertEquals(Errors.INVALID_ARGUMENTS, error)
         }
@@ -61,8 +57,8 @@ class RepoServerTests {
     @Test
     fun genDayReport_returns_invalid_args_error_if_date_was_invalid() {
         runBlocking {
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_REPORT, ShortDate.NONE)
-            val error = (response as RepoResponse.Error).error
+            val response = client.requestRawResponse<Any>(Commands.GEN_DAY_REPORT, ShortDate.NONE)
+            val error = (response as Response.Error).error
 
             assertEquals(Errors.INVALID_ARGUMENTS, error)
         }
@@ -74,7 +70,7 @@ class RepoServerTests {
             val nowDate = ShortDate.now()
             repo.debugGenDb(nowDate, 48)
 
-            val report = client.request<DayReport>(RepoCommands.GEN_DAY_REPORT, nowDate)
+            val report = client.request<DayReport>(Commands.GEN_DAY_REPORT, nowDate)
             assertNotNull(report)
         }
     }
@@ -85,7 +81,7 @@ class RepoServerTests {
             val nowDate = ShortDate.now()
             repo.clear()
 
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_REPORT, nowDate)
+            val response = client.requestRawResponse<Any>(Commands.GEN_DAY_REPORT, nowDate)
 
             assertTrue(response.isEmpty())
         }
@@ -97,7 +93,7 @@ class RepoServerTests {
             val nowDate = ShortDate.now()
 
             val response = client.requestRawResponse<Any>(
-                RepoCommands.GEN_DAY_REPORT,
+                Commands.GEN_DAY_REPORT,
                 ShortDate.minusDays(nowDate, 3)
             )
 
@@ -111,8 +107,8 @@ class RepoServerTests {
     @Test
     fun genDayRangeReport_returns_invalid_args_error_if_no_arguments_were_given() {
         runBlocking {
-            val response = client.requestRawResponse<Any>(RepoCommands.GEN_DAY_RANGE_REPORT)
-            val error = (response as RepoResponse.Error).error
+            val response = client.requestRawResponse<Any>(Commands.GEN_DAY_RANGE_REPORT)
+            val error = (response as Response.Error).error
 
             assertEquals(Errors.INVALID_ARGUMENTS, error)
         }
@@ -125,7 +121,7 @@ class RepoServerTests {
             repo.debugGenDb(nowDate, 24 * 4)
 
             val report = client.request<DayRangeReport>(
-                RepoCommands.GEN_DAY_RANGE_REPORT,
+                Commands.GEN_DAY_RANGE_REPORT,
                 ShortDateRange(nowDate, ShortDate.plusDays(nowDate, 1))
             )
 
@@ -140,7 +136,7 @@ class RepoServerTests {
             repo.clear()
 
             val response = client.requestRawResponse<Any>(
-                RepoCommands.GEN_DAY_RANGE_REPORT,
+                Commands.GEN_DAY_RANGE_REPORT,
                 ShortDateRange(nowDate, ShortDate.plusDays(nowDate, 1))
             )
 
@@ -155,7 +151,7 @@ class RepoServerTests {
             repo.debugGenDb(nowDate, 48)
 
             val response = client.requestRawResponse<Any>(
-                RepoCommands.GEN_DAY_RANGE_REPORT,
+                Commands.GEN_DAY_RANGE_REPORT,
                 ShortDateRange(ShortDate.minusDays(nowDate, 3), ShortDate.minusDays(nowDate, 2))
             )
 
@@ -171,7 +167,7 @@ class RepoServerTests {
         runBlocking {
             repo.clear()
 
-            val response = client.requestRawResponse<Any>(RepoCommands.GET_LAST_WEATHER)
+            val response = client.requestRawResponse<Any>(Commands.GET_LAST_WEATHER)
 
             assertTrue(response.isEmpty())
         }
@@ -182,25 +178,25 @@ class RepoServerTests {
         runBlocking {
             repo.debugGenDb(ShortDate.now(), 48)
 
-            assertNotNull(client.request<WeatherInfo>(RepoCommands.GET_LAST_WEATHER))
+            assertNotNull(client.request<WeatherInfo>(Commands.GET_LAST_WEATHER))
         }
     }
 
     companion object {
         private val context = InstrumentationRegistry.getInstrumentation().context
-        private lateinit var client: RepoClient
+        private lateinit var client: Client
         private lateinit var repo: WeatherRepository
-        private lateinit var repoServer: RepoServer
+        private lateinit var server: Server
 
         @BeforeClass
         @JvmStatic
         fun before() {
             val config = TestConfig(context)
             serverConfig = config
-            client = RepoClient(HostedProtoConfig(config.host, config.protoConfig))
+            client = Client(config.protoConfig)
 
             repo = serverConfig.sharedRepo
-            repoServer = RepoServer().also {
+            server = Server().also {
                 it.startOnNewThread()
             }
         }
@@ -208,7 +204,7 @@ class RepoServerTests {
         @AfterClass
         @JvmStatic
         fun after() {
-            repoServer.stop()
+            server.stop()
         }
     }
 }
