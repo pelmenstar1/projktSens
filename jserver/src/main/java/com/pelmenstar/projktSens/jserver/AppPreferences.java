@@ -4,16 +4,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.pelmenstar.projktSens.serverProtocol.ContractType;
+import com.pelmenstar.projktSens.shared.android.AbstractPreferencesThroughShared;
 import com.pelmenstar.projktSens.shared.android.Preferences;
 
 import org.jetbrains.annotations.NotNull;
 
-public final class AppPreferences implements Preferences {
+public final class AppPreferences extends AbstractPreferencesThroughShared implements Preferences {
     public static final AppPreferences INSTANCE = new AppPreferences();
-
-    private static boolean isInitialized = false;
-    private static final Object lock = new Object();
-    private static SharedPreferences prefs;
 
     private static final int DEFAULT_SERVER_PORT = 10001;
     private static final int DEFAULT_SERVER_CONTRACT = ContractType.CONTRACT_RAW;
@@ -36,27 +33,30 @@ public final class AppPreferences implements Preferences {
     }
 
     @Override
-    public void initialize(@NotNull Context context) {
-        synchronized (lock) {
-            if(!isInitialized) {
-                isInitialized = true;
+    @NotNull
+    protected String getPreferencesName() {
+        return BuildConfig.APPLICATION_ID;
+    }
 
-                context = context.getApplicationContext();
+    @Override
+    protected int getPreferenceValuesCount() {
+        return 3;
+    }
 
-                prefs = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
-                int serverPort = prefs.getInt(KEY_SERVER_PORT, -1);
-                int serverContract = prefs.getInt(KEY_SERVER_CONTRACT, -1);
-                int weatherSendInterval = prefs.getInt(KEY_WEATHER_SEND_INTERVAL, -1);
+    @Override
+    protected void checkIfCorrupted() {
+        SharedPreferences prefs = preferences;
+        int serverPort = prefs.getInt(KEY_SERVER_PORT, -1);
+        int serverContract = prefs.getInt(KEY_SERVER_CONTRACT, -1);
+        int weatherSendInterval = prefs.getInt(KEY_WEATHER_SEND_INTERVAL, -1);
 
-                if((serverPort | serverContract | weatherSendInterval) < 0) {
-                    writeDefault();
-                }
-            }
+        if((serverPort | serverContract | weatherSendInterval) < 0) {
+            writeDefault();
         }
     }
 
-    private static void writeDefault() {
-        prefs.edit()
+    private void writeDefault() {
+        preferences.edit()
                 .putInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT)
                 .putInt(KEY_SERVER_CONTRACT, DEFAULT_SERVER_CONTRACT)
                 .putInt(KEY_WEATHER_SEND_INTERVAL, DEFAULT_WEATHER_SEND_INTERVAL)
@@ -137,15 +137,15 @@ public final class AppPreferences implements Preferences {
     }
 
     public int getServerPort() {
-        return prefs.getInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT);
+        return safeGetInt(KEY_SERVER_PORT, SERVER_PORT, DEFAULT_SERVER_PORT);
     }
 
     public void setServerPort(int port) {
-        prefs.edit().putInt(KEY_SERVER_PORT, port).apply();
+        safePutInt(KEY_SERVER_PORT, SERVER_PORT, port);
     }
 
     public int getServerContract() {
-        return prefs.getInt(KEY_SERVER_CONTRACT, DEFAULT_SERVER_CONTRACT);
+        return safeGetInt(KEY_SERVER_CONTRACT, SERVER_CONTRACT, DEFAULT_SERVER_CONTRACT);
     }
 
     public void setServerContract(int contractType) {
@@ -153,14 +153,14 @@ public final class AppPreferences implements Preferences {
             throw new IllegalArgumentException("contractType");
         }
 
-        prefs.edit().putInt(KEY_SERVER_CONTRACT, contractType).apply();
+        safePutInt(KEY_SERVER_CONTRACT, SERVER_CONTRACT, contractType);
     }
 
     public int getWeatherSendInterval() {
-        return prefs.getInt(KEY_WEATHER_SEND_INTERVAL, DEFAULT_WEATHER_SEND_INTERVAL);
+        return safeGetInt(KEY_WEATHER_SEND_INTERVAL, WEATHER_SEND_INTERVAL, DEFAULT_WEATHER_SEND_INTERVAL);
     }
 
     public void setWeatherSendInterval(int interval) {
-        prefs.edit().putInt(KEY_WEATHER_SEND_INTERVAL, interval).apply();
+        safePutInt(KEY_WEATHER_SEND_INTERVAL, WEATHER_SEND_INTERVAL, interval);
     }
 }

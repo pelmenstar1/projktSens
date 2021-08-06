@@ -170,9 +170,11 @@ class SettingsActivity : HomeButtonSupportActivity() {
                         }
 
                         if(changed) {
+                            prefs.beginModifying()
                             settings.forEach {
                                 it.saveStateToPrefs(prefs)
                             }
+                            prefs.endModifying()
                         }
 
                         setResult(RESULT_OK, Intent().apply {

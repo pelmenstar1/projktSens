@@ -4,11 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.pelmenstar.projktSens.serverProtocol.ContractType;
+import com.pelmenstar.projktSens.shared.android.AbstractPreferencesThroughShared;
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked;
 
 import org.jetbrains.annotations.NotNull;
 
-public class AppPreferencesImpl implements AppPreferences {
+public class AppPreferencesImpl extends AbstractPreferencesThroughShared implements AppPreferences {
     public static final AppPreferencesImpl INSTANCE = new AppPreferencesImpl();
     private static final int DEFAULT_SEVER_ADDRESS_INT = 0;
     private static final int DEFAULT_SERVER_PORT = 10001;
@@ -22,11 +23,6 @@ public class AppPreferencesImpl implements AppPreferences {
     private static final String KEY_SERVER_PORT = "PORT";
     private static final String KEY_WEATHER_RECEIVE_INTERVAL = "weatherRcvInterval";
     private static final String KEY_IS_GPS_PERMISSION_DENIED = "isGpsDenied";
-
-    private static SharedPreferences prefs;
-
-    private static volatile boolean isInitialized = false;
-    private static final Object lock = new Object();
 
     private AppPreferencesImpl() {
     }
@@ -45,33 +41,37 @@ public class AppPreferencesImpl implements AppPreferences {
     }
 
     @Override
-    public void initialize(@NotNull Context context) {
-        synchronized (lock) {
-            if(!isInitialized) {
-                isInitialized = true;
+    @NotNull
+    protected String getPreferencesName() {
+        return BuildConfig.APPLICATION_ID;
+    }
 
-                prefs = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
+    @Override
+    protected int getPreferenceValuesCount() {
+        return 6;
+    }
 
-                int units = prefs.getInt(KEY_UNITS, ValueUnitsPacked.NONE);
-                int contractType = prefs.getInt(KEY_CONTRACT, -1);
-                int serverPort = prefs.getInt(KEY_SERVER_PORT, -1);
-                int weatherReceiveInterval = prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, -1);
+    @Override
+    protected void checkIfCorrupted() {
+        SharedPreferences prefs = preferences;
+        int units = prefs.getInt(KEY_UNITS, ValueUnitsPacked.NONE);
+        int contractType = prefs.getInt(KEY_CONTRACT, -1);
+        int serverPort = prefs.getInt(KEY_SERVER_PORT, -1);
+        int weatherReceiveInterval = prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, -1);
 
-                boolean isGpsDeniedExists = prefs.contains(KEY_IS_GPS_PERMISSION_DENIED);
+        boolean isGpsDeniedExists = prefs.contains(KEY_IS_GPS_PERMISSION_DENIED);
 
-                if (!ValueUnitsPacked.isValid(units) ||
-                        !prefs.contains(KEY_SERVER_HOST) ||
-                        !isGpsDeniedExists ||
-                        (contractType | serverPort | weatherReceiveInterval) < 0) {
-                    writeDefault();
-                }
-            }
+        if (!ValueUnitsPacked.isValid(units) ||
+                !prefs.contains(KEY_SERVER_HOST) ||
+                !isGpsDeniedExists ||
+                (contractType | serverPort | weatherReceiveInterval) < 0) {
+            writeDefault();
         }
     }
 
     // writes default preferences
-    private static void writeDefault() {
-        prefs.edit()
+    private void writeDefault() {
+        preferences.edit()
                 .putInt(KEY_UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY)
                 .putInt(KEY_SERVER_HOST, DEFAULT_SEVER_ADDRESS_INT)
                 .putInt(KEY_CONTRACT, ContractType.CONTRACT_RAW)
@@ -186,7 +186,7 @@ public class AppPreferencesImpl implements AppPreferences {
      * Gets packed units which was saved in {@link SharedPreferences}
      */
     public int getUnits() {
-        return prefs.getInt(KEY_UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY);
+        return safeGetInt(KEY_UNITS, UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY);
     }
 
     public void setUnits(int units) {
@@ -194,21 +194,21 @@ public class AppPreferencesImpl implements AppPreferences {
             throw new IllegalArgumentException("units");
         }
 
-        prefs.edit().putInt(KEY_UNITS, units).apply();
+        safePutInt(KEY_UNITS, UNITS, units);
     }
 
     @Override
     public int getServerHostInt() {
-        return prefs.getInt(KEY_SERVER_HOST, 0);
+        return safeGetInt(KEY_SERVER_HOST, SERVER_HOST_INT, DEFAULT_SEVER_ADDRESS_INT);
     }
 
     @Override
     public void setServerHostInt(int value) {
-        prefs.edit().putInt(KEY_SERVER_HOST, value).apply();
+        safePutInt(KEY_SERVER_HOST, SERVER_HOST_INT, value);
     }
 
     public int getContractType() {
-        return prefs.getInt(KEY_CONTRACT, DEFAULT_CONTRACT_TYPE);
+        return safeGetInt(KEY_CONTRACT, CONTRACT, DEFAULT_CONTRACT_TYPE);
     }
 
     public void setContractType(int contractType) {
@@ -216,32 +216,32 @@ public class AppPreferencesImpl implements AppPreferences {
             throw new IllegalArgumentException("contractType");
         }
 
-        prefs.edit().putInt(KEY_CONTRACT, contractType).apply();
+        safePutInt(KEY_CONTRACT, CONTRACT, contractType);
     }
 
     public int getServerPort() {
-        return prefs.getInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT);
+        return safeGetInt(KEY_SERVER_PORT, SERVER_PORT, DEFAULT_SERVER_PORT);
     }
 
     public void setServerPort(int port) {
-        prefs.edit().putInt(KEY_SERVER_PORT, port).apply();
+        safePutInt(KEY_SERVER_PORT, SERVER_PORT, port);
     }
 
     public int getWeatherReceiveInterval() {
-        return prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL);
+        return safeGetInt(KEY_WEATHER_RECEIVE_INTERVAL, WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL);
     }
 
     public void setWeatherReceiveInterval(int interval) {
-        prefs.edit().putInt(KEY_WEATHER_RECEIVE_INTERVAL, interval).apply();
+        safePutInt(KEY_WEATHER_RECEIVE_INTERVAL, WEATHER_RECEIVE_INTERVAL, interval);
     }
 
     @Override
     public boolean isGpsPermissionDenied() {
-        return prefs.getBoolean(KEY_IS_GPS_PERMISSION_DENIED, false);
+        return safeGetBoolean(KEY_IS_GPS_PERMISSION_DENIED, IS_GPS_PERMISSION_DENIED, false);
     }
 
     @Override
     public void setGpsPermissionDenied(boolean value) {
-        prefs.edit().putBoolean(KEY_IS_GPS_PERMISSION_DENIED, value).apply();
+        safePutBoolean(KEY_IS_GPS_PERMISSION_DENIED, IS_GPS_PERMISSION_DENIED, value);
     }
 }
