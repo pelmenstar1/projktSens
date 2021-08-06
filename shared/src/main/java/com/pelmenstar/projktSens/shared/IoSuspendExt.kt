@@ -145,10 +145,10 @@ suspend fun InputStream.readNSuspend(size: Int): ByteArray {
 suspend fun OutputStream.writeString(str: String, charset: Charset) {
     val bytes = str.toByteArray(charset)
 
-    writeSuspend(buildByteArray(4) {
+    writeSuspend(buildByteArray(bytes.size + 4) {
         writeInt(0, bytes.size)
+        System.arraycopy(bytes, 0, this, 4, bytes.size)
     })
-    writeSuspend(bytes)
 }
 
 suspend fun InputStream.readString(charset: Charset, bufferSize: Int = 1024): String {
@@ -157,7 +157,7 @@ suspend fun InputStream.readString(charset: Charset, bufferSize: Int = 1024): St
     val bytes = ByteArray(byteLength)
 
     if(byteLength < bufferSize) {
-        readSuspend(bytes)
+        readSuspendAndThrowIfNotEnough(bytes)
     } else {
         var offset = 0
         while(offset < byteLength) {
