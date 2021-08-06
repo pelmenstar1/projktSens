@@ -22,21 +22,19 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     private lateinit var saveButton: Button
 
-    // here could be int, I'd like reduce collisions as possible
-    // but in other way, don't reduce performance
-    private lateinit var initialStateHashes: IntArray
+    private var initialStateHash: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         actionBar {
-            title = resources.getText(R.string.settings_title)
+            title = getText(R.string.settings_title)
             setDisplayHomeAsUpEnabled(true)
         }
 
         initFromIntentExtra()
         loadStates(savedInstanceState)
-        computeHashes(savedInstanceState)
+        computeHashOrGetFromBundle(savedInstanceState)
 
         setContentView(createContent())
 
@@ -55,30 +53,30 @@ class SettingsActivity : HomeButtonSupportActivity() {
         settingsContext.settings.forEach {
             if(savedInstanceState != null) {
                 val success = it.loadStateFromBundle(savedInstanceState)
-                if(!success) {
-                    it.loadStateFromPrefs(prefs)
+                if(success) {
+                    return@forEach
                 }
-            } else {
-                it.loadStateFromPrefs(prefs)
             }
+            it.loadStateFromPrefs(prefs)
         }
     }
 
-    private fun computeHashes(savedInstanceState: Bundle?) {
-        val settings = settingsContext.settings
-        initialStateHashes = if(savedInstanceState != null) {
-            val hashes = savedInstanceState.getIntArray(STATE_INITIAL_STATE_HASHES) ?: throw NullPointerException("STATE_INITIAL_STATE_HASHES is null")
-
-            if(hashes.size != settings.size) {
-                throw RuntimeException("Hashes loaded from savedInstanceState has size that differ from settings.size")
-            }
-
-            hashes
+    private fun computeHashOrGetFromBundle(savedInstanceState: Bundle?) {
+        initialStateHash = if(savedInstanceState != null && savedInstanceState.containsKey(STATE_INITIAL_STATE_HASHES)) {
+            savedInstanceState.getLong(STATE_INITIAL_STATE_HASHES)
         } else {
-            IntArray(settings.size) { i ->
-                settings[i].state.hashCode()
-            }
+            computeCurrentStateHash()
         }
+    }
+
+    private fun computeCurrentStateHash(): Long {
+        val settings = settingsContext.settings
+        var result: Long = 1
+        for(setting in settings) {
+            result = result * 31 + setting.state.hashCode()
+        }
+
+        return result
     }
 
     private fun disableSaveButtonIfSettingsInvalid() {
@@ -158,16 +156,8 @@ class SettingsActivity : HomeButtonSupportActivity() {
                     text = res.getText(R.string.settings_save)
 
                     setOnClickListener {
-                        var changed = false
-                        for(i in settings.indices) {
-                            val initialHash = initialStateHashes[i]
-                            val currentHash = settings[i].state.hashCode()
-
-                            if(initialHash != currentHash) {
-                                changed = true
-                                break
-                            }
-                        }
+                        val recomputedHash: Long = computeCurrentStateHash()
+                        val changed = recomputedHash != initialStateHash
 
                         if(changed) {
                             prefs.beginModifying()
@@ -177,14 +167,18 @@ class SettingsActivity : HomeButtonSupportActivity() {
                             prefs.endModifying()
                         }
 
-                        setResult(RESULT_OK, Intent().apply {
-                            putExtra(RETURN_DATA_STATE_CHANGED, changed)
-                        })
+                        setResult(changed)
                         finish()
                     }
                 }
             }
         }
+    }
+
+    private fun setResult(settingsChanged: Boolean) {
+        setResult(RESULT_OK, Intent().apply {
+            putExtra(RETURN_DATA_STATE_CHANGED, settingsChanged)
+        })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -208,14 +202,11 @@ class SettingsActivity : HomeButtonSupportActivity() {
         // And why to save settings to preferences if they were not changed, right?
         // So user changed settings, but they were not saved.
         // To avoid that, we compute hashes only once on activity start.
-        outState.putIntArray(STATE_INITIAL_STATE_HASHES, initialStateHashes)
+        outState.putLong(STATE_INITIAL_STATE_HASHES, initialStateHash)
     }
 
     override fun onBackPressed() {
-        setResult(RESULT_OK, Intent().apply {
-            putExtra(RETURN_DATA_STATE_CHANGED, false)
-        })
-
+        setResult(settingsChanged = false)
         super.onBackPressed()
     }
 
