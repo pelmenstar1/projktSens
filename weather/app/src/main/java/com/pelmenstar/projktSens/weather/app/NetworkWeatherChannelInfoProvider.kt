@@ -10,12 +10,7 @@ class NetworkWeatherChannelInfoProvider(config: ProtoConfig) : WeatherChannelInf
 
     override val receiveInterval: Long = config.weatherChannelReceiveInterval.toLong()
 
-    override suspend fun getWaitTimeForNextWeather(): Long {
-        var waitTime = client.request<Long>(Commands.GET_WAIT_TIME_FOR_NEXT_WEATHER) ?: 0
-        if(waitTime < 0) {
-            waitTime = 0
-        }
-
-        return waitTime
+    override suspend fun getNextWeatherTime(): Long {
+        return client.request(Commands.GET_NEXT_WEATHER_TIME)!!
     }
 }

@@ -28,6 +28,7 @@ import com.pelmenstar.projktSens.weather.models.WeatherInfo
 import com.pelmenstar.projktSens.weather.models.astro.MoonInfoProvider
 import com.pelmenstar.projktSens.weather.models.astro.SunInfoProvider
 import kotlinx.coroutines.*
+import kotlin.math.max
 
 class HomePresenter(
     private val sunInfoProvider: SunInfoProvider,
@@ -189,8 +190,11 @@ class HomePresenter(
         weatherChannelJob = scope.launch(Dispatchers.IO) {
             try {
                 val interval = weatherChannelInfoProvider.receiveInterval
-                val waitTime = weatherChannelInfoProvider.getWaitTimeForNextWeather() - 10 // -10 ms
-                delay(waitTime)
+                val nextTime = weatherChannelInfoProvider.getNextWeatherTime()
+                val waitTime = nextTime - System.currentTimeMillis()
+                if(waitTime > 0) {
+                    delay(waitTime)
+                }
 
                 while (isActive) {
                     val value = dataSource.getLastWeather()

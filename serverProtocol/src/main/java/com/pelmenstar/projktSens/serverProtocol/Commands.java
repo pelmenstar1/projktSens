@@ -28,16 +28,16 @@ public final class Commands {
      */
     public static final int GET_LAST_WEATHER = 4;
 
-    public static final int GET_WAIT_TIME_FOR_NEXT_WEATHER = 5;
+    public static final int GET_NEXT_WEATHER_TIME = 5;
 
-    private static final int MAX_COMMAND = GET_WAIT_TIME_FOR_NEXT_WEATHER;
+    private static final int MAX_COMMAND = GET_NEXT_WEATHER_TIME;
 
     private static final String[] COMMAND_NAMES = new String[] {
             "GEN_DAY_REPORT",
             "GEN_DAY_RANGE_REPORT",
             "GET_AVAILABLE_DATE_RANGE",
             "GET_LAST_WEATHER",
-            "GET_WAIT_TIME_FOR_NEXT_WEATHER"
+            "GET_NEXT_WEATHER_TIME"
     };
 
     public static int fromString(@NotNull String commandName) {

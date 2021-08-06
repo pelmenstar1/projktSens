@@ -10,7 +10,7 @@ interface WeatherChannelInfoProvider {
     val receiveInterval: Long
 
     /**
-     * Returns time to wait for the next weather
+     * Returns time when next weather will be requested
      */
-    suspend fun getWaitTimeForNextWeather(): Long
+    suspend fun getNextWeatherTime(): Long
 }

@@ -189,10 +189,10 @@ class Server {
 
                     Response.okOrEmpty(weather)
                 }
-                Commands.GET_WAIT_TIME_FOR_NEXT_WEATHER -> {
-                    val waitTime = WeatherMonitor.getNextWeatherRequestTime() - System.currentTimeMillis()
+                Commands.GET_NEXT_WEATHER_TIME -> {
+                    val time = WeatherMonitor.getNextWeatherRequestTime()
 
-                    Response.ok(waitTime)
+                    Response.ok(time)
                 }
                 else -> Response.error(Errors.INVALID_COMMAND)
             }
