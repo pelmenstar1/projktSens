@@ -142,6 +142,23 @@ suspend fun InputStream.readNSuspend(size: Int): ByteArray {
     return buffer
 }
 
+suspend fun InputStream.readNBufferedSuspend(size: Int, bufferSize: Int = 1024): ByteArray {
+    val bytes = ByteArray(size)
+
+    if(size < bufferSize) {
+        readSuspendAndThrowIfNotEnough(bytes)
+    } else {
+        var offset = 0
+        while(offset < size) {
+            val expectedToRead = min(size - offset, bufferSize)
+            readSuspendAndThrowIfNotEnough(bytes, offset, expectedToRead)
+            offset += expectedToRead
+        }
+    }
+
+    return bytes
+}
+
 suspend fun OutputStream.writeString(str: String, charset: Charset) {
     val bytes = str.toByteArray(charset)
 
@@ -154,18 +171,7 @@ suspend fun OutputStream.writeString(str: String, charset: Charset) {
 suspend fun InputStream.readString(charset: Charset, bufferSize: Int = 1024): String {
     val byteLengthBuffer = readNSuspend(4)
     val byteLength = byteLengthBuffer.getInt(0)
-    val bytes = ByteArray(byteLength)
-
-    if(byteLength < bufferSize) {
-        readSuspendAndThrowIfNotEnough(bytes)
-    } else {
-        var offset = 0
-        while(offset < byteLength) {
-            val expectedToRead = min(byteLength - offset, bufferSize)
-            readSuspendAndThrowIfNotEnough(bytes, offset, expectedToRead)
-            offset += expectedToRead
-        }
-    }
+    val bytes = readNBufferedSuspend(byteLength, bufferSize)
 
     return String(bytes, charset)
 }

@@ -127,19 +127,7 @@ object RawContract: Contract {
                 val dataSizeBuffer = input.readNSuspend(2)
                 val dataSize = dataSizeBuffer.getShort(0).toInt()
 
-                val data = ByteArray(dataSize)
-                if (dataSize < RESPONSE_BUFFER_SIZE) {
-                    input.readSuspendAndThrowIfNotEnough(data)
-                } else {
-                    var offset = 0
-                    while (offset < dataSize) {
-                        val expectedBytesToRead = min(dataSize - offset, RESPONSE_BUFFER_SIZE)
-
-                        input.readSuspendAndThrowIfNotEnough(data, offset, expectedBytesToRead)
-
-                        offset += expectedBytesToRead
-                    }
-                }
+                val data = input.readNBufferedSuspend(dataSize, RESPONSE_BUFFER_SIZE)
 
                 val serializer = Serializable.getSerializer(valueClass)
                 val value = Serializable.ofByteArray(data, serializer)
