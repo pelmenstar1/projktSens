@@ -6,7 +6,6 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.StringRes
 import com.pelmenstar.projktSens.shared.add
-import com.pelmenstar.projktSens.shared.android.StringOrResource
 import com.pelmenstar.projktSens.shared.android.readNonNullString
 import com.pelmenstar.projktSens.shared.appendArray
 import com.pelmenstar.projktSens.shared.equalsPattern
@@ -93,31 +92,32 @@ class ModePermissionArray : Parcelable {
 }
 
 class RequestPermissionInfo : Parcelable {
-    val userDescription: StringOrResource
-    val whyText: StringOrResource
+    @StringRes
+    val userDescriptionId: Int
+
+    @StringRes
+    val whyTextId: Int
     val modePermissions: ModePermissionArray
 
-    constructor(userDescription: String, whyText: String, permissions: ModePermissionArray):
-            this(StringOrResource(userDescription), StringOrResource(whyText), permissions)
-
-    constructor(@StringRes userDescriptionId: Int, @StringRes whyTextId: Int, permissions: ModePermissionArray):
-            this(StringOrResource(userDescriptionId), StringOrResource(whyTextId), permissions)
-
-    constructor(userDescription: StringOrResource, whyText: StringOrResource, permissions: ModePermissionArray) {
-        this.userDescription = userDescription
-        this.whyText = whyText
+    constructor(
+        @StringRes userDescriptionId: Int,
+        @StringRes whyTextId: Int,
+        permissions: ModePermissionArray
+    ) {
+        this.userDescriptionId = userDescriptionId
+        this.whyTextId = whyTextId
         this.modePermissions = permissions
     }
 
     private constructor(parcel: Parcel) {
-        userDescription = StringOrResource.CREATOR.createFromParcel(parcel)
-        whyText = StringOrResource.CREATOR.createFromParcel(parcel)
+        userDescriptionId = parcel.readInt()
+        whyTextId = parcel.readInt()
         modePermissions = ModePermissionArray.CREATOR.createFromParcel(parcel)
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        userDescription.writeToParcel(dest, 0)
-        whyText.writeToParcel(dest, 0)
+        dest.writeInt(userDescriptionId)
+        dest.writeInt(whyTextId)
         modePermissions.writeToParcel(dest, 0)
     }
 
@@ -125,20 +125,20 @@ class RequestPermissionInfo : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         return equalsPattern(other) { o ->
-            userDescription == o.userDescription && whyText == o.whyText && modePermissions == o.modePermissions
+            userDescriptionId == o.userDescriptionId && whyTextId == o.whyTextId && modePermissions == o.modePermissions
         }
     }
 
     override fun hashCode(): Int {
-        var result = userDescription.hashCode()
+        var result = userDescriptionId
         result = 31 * result + modePermissions.hashCode()
-        result = 31 * result + whyText.hashCode()
+        result = 31 * result + whyTextId
 
         return result
     }
 
     override fun toString(): String {
-        return "{userDescription=$userDescription, whyText=$whyText, modePermissions=$modePermissions}"
+        return "{userDescriptionId=$userDescriptionId, whyTextId=$whyTextId, modePermissions=$modePermissions}"
     }
 
     companion object {
@@ -217,28 +217,12 @@ class RequestPermissionsContextBuilder {
     var _permissions = emptyArray<RequestPermissionInfo>()
 
     inline fun permission(
-        userDescription: String,
-        whyText: String,
-        block: PermissionArrayModeSelect.() -> ModePermissionArray
-    ) {
-        permission(StringOrResource(userDescription), StringOrResource(whyText), block)
-    }
-
-    inline fun permission(
         @StringRes userDescriptionId: Int,
         @StringRes whyTextId: Int,
         block: PermissionArrayModeSelect.() -> ModePermissionArray
     ) {
-        permission(StringOrResource(userDescriptionId), StringOrResource(whyTextId), block)
-    }
-
-    inline fun permission(
-        userDescription: StringOrResource,
-        whyText: StringOrResource,
-        block: PermissionArrayModeSelect.() -> ModePermissionArray
-    ) {
         val modeArray = block(PermissionArrayModeSelect)
-        val perm = RequestPermissionInfo(userDescription, whyText, modeArray)
+        val perm = RequestPermissionInfo(userDescriptionId, whyTextId, modeArray)
 
         _permissions = _permissions.add(perm)
     }

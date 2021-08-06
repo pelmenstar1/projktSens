@@ -15,6 +15,7 @@ import com.pelmenstar.projktSens.shared.EmptyArray
 import com.pelmenstar.projktSens.shared.add
 import com.pelmenstar.projktSens.shared.android.Intent
 import com.pelmenstar.projktSens.shared.android.R
+import com.pelmenstar.projktSens.shared.android.ui.requireIntent
 
 class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_permissions) {
     private lateinit var permContext: RequestPermissionsContext
@@ -36,7 +37,7 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
 
         initViews()
 
-        val intent = intent ?: throw IllegalStateException("Intent is null")
+        val intent = requireIntent()
         val permContext = intent.getParcelableExtra<RequestPermissionsContext>(EXTRA_PERM_CONTEXT) ?: throw NullPointerException("$EXTRA_PERM_CONTEXT in intent is null")
         this.permContext = permContext
 
@@ -66,9 +67,10 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
     }
 
     private fun showWhyTextForCurrentPermission() {
-        val context = this
+        val res = resources
+
         whyTextView.apply {
-            text = currentPermission.whyText.getValue(context)
+            text = res.getText(currentPermission.whyTextId)
             visibility = View.VISIBLE
         }
     }
@@ -110,7 +112,8 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
     }
 
     private fun showPermission(requestPermissionInfo: RequestPermissionInfo) {
-        descriptionView.text = requestPermissionInfo.userDescription.getValue(this)
+        val res = resources
+        descriptionView.text = res.getText(requestPermissionInfo.userDescriptionId)
     }
 
     private fun finishRequestingPermissions() {
