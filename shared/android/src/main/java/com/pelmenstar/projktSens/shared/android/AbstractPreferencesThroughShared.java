@@ -43,7 +43,7 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
     @SuppressLint("CommitPrefEdits")
     @Override
     public final void beginModifying() {
-        if(sessionEditor == null) {
+        if(sessionEditor != null) {
             Log.e(tag, "endModifying() wasn't called");
         } else {
             sessionEditor = preferences.edit();
