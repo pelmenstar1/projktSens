@@ -40,6 +40,7 @@ class InetAddressUtilsTests {
         failsOn("123.")
         failsOn("123.34.")
         failsOn("222.33.55.")
+        failsOn("192.168..1")
     }
 
     @Test

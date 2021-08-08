@@ -60,6 +60,7 @@ public class InetAddressUtils {
         int ip = 0;
         int byteIndex = 0;
         int currentByte = 0;
+        int strByteStartIndex = 0;
 
         int maxIdx = str.length() - 1;
         for(int i = 0; i < str.length(); i++) {
@@ -72,11 +73,12 @@ public class InetAddressUtils {
                     return IP_ERROR;
                 }
             } else if(c == '.') {
-                if(byteIndex == 4 || i == maxIdx) {
+                if(byteIndex == 4 || i == maxIdx || i == strByteStartIndex) {
                     return IP_ERROR;
                 }
 
                 ip = Bytes.withByte(ip, byteIndex, currentByte & 0xff);
+                strByteStartIndex = i + 1;
                 byteIndex++;
 
                 currentByte = 0;
