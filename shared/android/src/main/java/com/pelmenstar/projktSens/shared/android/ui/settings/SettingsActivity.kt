@@ -62,8 +62,9 @@ class SettingsActivity : HomeButtonSupportActivity() {
     }
 
     private fun computeHashOrGetFromBundle(savedInstanceState: Bundle?) {
-        initialStateHash = if(savedInstanceState != null && savedInstanceState.containsKey(STATE_INITIAL_STATE_HASHES)) {
-            savedInstanceState.getLong(STATE_INITIAL_STATE_HASHES)
+        val savedHash = savedInstanceState?.get(STATE_INITIAL_STATE_HASH)
+        initialStateHash = if(savedHash != null) {
+            savedHash as Long
         } else {
             computeCurrentStateHash()
         }
@@ -202,7 +203,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
         // And why to save settings to preferences if they were not changed, right?
         // So user changed settings, but they were not saved.
         // To avoid that, we compute hashes only once on activity start.
-        outState.putLong(STATE_INITIAL_STATE_HASHES, initialStateHash)
+        outState.putLong(STATE_INITIAL_STATE_HASH, initialStateHash)
     }
 
     override fun onBackPressed() {
@@ -211,7 +212,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
     }
 
     companion object {
-        private const val STATE_INITIAL_STATE_HASHES = "SettingsActivity.state.initialStateHashes"
+        private const val STATE_INITIAL_STATE_HASH = "SettingsActivity.state.initialStateHash"
         private const val EXTRA_SETTINGS_CONTEXT = "SettingsActivity.intent.settingsContext"
         private const val EXTRA_PREFERENCES = "SettingsActivity.intent.preferences"
 
