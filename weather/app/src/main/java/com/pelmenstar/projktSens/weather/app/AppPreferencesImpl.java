@@ -83,25 +83,6 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
     }
 
     @Override
-    @NotNull
-    public Object get(int id) {
-        switch (id) {
-            case UNITS:
-                return getUnits();
-            case SERVER_HOST_INT:
-                return getServerHostInt();
-            case CONTRACT:
-                return getContractType();
-            case SERVER_PORT:
-                return getServerPort();
-            case WEATHER_RECEIVE_INTERVAL:
-                return getWeatherReceiveInterval();
-            default:
-                throw new IllegalArgumentException("No option found with id " + id);
-        }
-    }
-
-    @Override
     public int getInt(int id) {
         switch (id) {
             case UNITS:
@@ -126,29 +107,6 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
         }
 
         throw new IllegalArgumentException("Option " + id + " isn't boolean");
-    }
-
-    @Override
-    public void set(int id, @NotNull Object value) {
-        switch (id) {
-            case UNITS:
-                setUnits((Integer) value);
-                break;
-            case SERVER_HOST_INT:
-                setServerHostInt((Integer) value);
-                break;
-            case CONTRACT:
-                setContractType((Integer) value);
-                break;
-            case SERVER_PORT:
-                setServerPort((Integer) value);
-                break;
-            case WEATHER_RECEIVE_INTERVAL:
-                setWeatherReceiveInterval((Integer) value);
-                break;
-            default:
-                throw new IllegalArgumentException("No option found with id " + id);
-        }
     }
 
     @Override

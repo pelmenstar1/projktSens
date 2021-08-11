@@ -63,21 +63,6 @@ public final class AppPreferences extends AbstractPreferencesThroughShared imple
                 .apply();
     }
 
-    @NotNull
-    @Override
-    public Object get(int id) {
-        switch (id) {
-            case SERVER_PORT:
-                return getServerPort();
-            case SERVER_CONTRACT:
-                return getServerContract();
-            case WEATHER_SEND_INTERVAL:
-                return getWeatherSendInterval();
-            default:
-                throw new IllegalArgumentException("No option found with id " + id);
-        }
-    }
-
     @Override
     public int getInt(int id) {
         switch (id) {
@@ -95,23 +80,6 @@ public final class AppPreferences extends AbstractPreferencesThroughShared imple
     @Override
     public boolean getBoolean(int id) {
         throw new IllegalArgumentException("Option " + id + " isn't boolean");
-    }
-
-    @Override
-    public void set(int id, @NotNull Object value) {
-        switch (id) {
-            case SERVER_PORT:
-                setServerPort((Integer)value);
-                break;
-            case SERVER_CONTRACT:
-                setServerContract((Integer)value);
-                break;
-            case WEATHER_SEND_INTERVAL:
-                setWeatherSendInterval((Integer)value);
-                break;
-            default:
-                throw new IllegalArgumentException("No option found with id " + id);
-        }
     }
 
     @Override
