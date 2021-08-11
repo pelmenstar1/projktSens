@@ -191,7 +191,7 @@ class ServerHostSetting: Setting<ServerHostSetting.State>() {
     }
 
     override fun createView(context: Context): View {
-        val invalidAddressStr = context.resources.getString(R.string.serverIsNotAvailable_settings)
+        val invalidAddressStr = context.resources.getString(R.string.invalidInetAddress)
 
         return EditText(context) {
             setText(state.hostString)
@@ -310,7 +310,7 @@ class ServerPortSetting: Setting<ServerPortSetting.State>() {
         var port: Int = 0
             set(value) {
                 field = value
-                isValid = isValidPort(value)
+                isValid = InetAddressUtils.isValidFreePort(value)
             }
 
         init {
@@ -332,22 +332,22 @@ class ServerPortSetting: Setting<ServerPortSetting.State>() {
     }
 
     override fun getNameId(): Int {
-        return R.string.settings_serverPortName
+        return R.string.port
     }
 
     override fun createView(context: Context): View {
         val res = context.resources
         val invalidPortNumberStr = res.getString(R.string.invalidNumberFormat)
-        val portReservedErrorLess = res.getString(R.string.settings_portReservedError_less)
-        val portReservedErrorGreater = res.getString(R.string.settings_portReservedError_greater)
+        val portReservedErrorLess = res.getString(R.string.portReservedError_less)
+        val portReservedErrorGreater = res.getString(R.string.portReservedError_greater)
 
         return EditText(context) {
             fun setErrorIfInvalidPort(port: Int) {
                 when {
-                    (port < PORT_MIN) -> {
+                    (port < InetAddressUtils.FREE_MIN_PORT) -> {
                         error = portReservedErrorLess
                     }
-                    (port > PORT_MAX) -> {
+                    (port > InetAddressUtils.FREE_MAX_PORT) -> {
                         error = portReservedErrorGreater
                     }
                 }
@@ -405,14 +405,6 @@ class ServerPortSetting: Setting<ServerPortSetting.State>() {
 
     companion object {
         private const val BUNDLE_PORT = "ServerPortSetting.state.port"
-
-        private const val PORT_MIN = 1024
-        private const val PORT_MAX = 49151
-
-        // maybe isn't the best place for such method
-        private fun isValidPort(port: Int): Boolean {
-            return port in (PORT_MIN..PORT_MAX)
-        }
     }
 }
 

@@ -11,6 +11,7 @@ import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
+import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartActivity
 import com.pelmenstar.projktSens.weather.app.ui.home.HomeActivity
 
 class StartupActivity : Activity() {
@@ -42,28 +43,45 @@ class StartupActivity : Activity() {
             startActivityForResult(intent, 0)
             overridePendingTransition(0, 0)
         } else {
-            startHomeActivityAndFinish()
+            onPermissionsRequested()
         }
         setContentView(View(this))
     }
 
-    private fun startHomeActivityAndFinish() {
-        val appContext = applicationContext
+    private fun onPermissionsRequested() {
+        if(prefs.isFirstStart) {
+            val intent = FirstStartActivity.intent(this)
+            startActivityForResult(intent, REQUEST_CODE_FIRST_START, null)
+        } else {
+           startHomeActivityAndFinish()
+        }
+    }
 
-        val intent = Intent(appContext, HomeActivity::class.java)
-        startActivityForResult(intent, 0, null)
+    private fun startHomeActivityAndFinish() {
+        val intent = Intent(this, HomeActivity::class.java)
+        startActivityForResult(intent, REQUEST_CODE_PERMISSIONS, null)
         finish()
         overridePendingTransition(0, 0)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(data != null && !prefs.isGpsPermissionDenied) {
-            val deniedPermissions = data.getIntArrayExtra(RequestPermissionsActivity.RETURN_DATA_DENIED_PERMISSION_INDICES)
-            if(deniedPermissions != null && deniedPermissions.contains(0)) {
-                prefs.isGpsPermissionDenied = true
+        if(requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (data != null && !prefs.isGpsPermissionDenied) {
+                val deniedPermissions =
+                    data.getIntArrayExtra(RequestPermissionsActivity.RETURN_DATA_DENIED_PERMISSION_INDICES)
+                if (deniedPermissions != null && deniedPermissions.contains(0)) {
+                    prefs.isGpsPermissionDenied = true
+                }
             }
-        }
 
-        startHomeActivityAndFinish()
+            onPermissionsRequested()
+        } else if(requestCode == REQUEST_CODE_FIRST_START) {
+            startHomeActivityAndFinish()
+        }
+    }
+
+    companion object {
+        private const val REQUEST_CODE_PERMISSIONS = 0
+        private const val REQUEST_CODE_FIRST_START = 1
     }
 }

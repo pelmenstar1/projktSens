@@ -13,6 +13,7 @@ public interface AppPreferences extends Preferences {
     int SERVER_PORT = 3;
     int WEATHER_RECEIVE_INTERVAL = 5;
     int IS_GPS_PERMISSION_DENIED = 6;
+    int IS_FIRST_START = 7;
 
     int getUnits();
     void setUnits(int units);
@@ -31,4 +32,7 @@ public interface AppPreferences extends Preferences {
 
     boolean isGpsPermissionDenied();
     void setGpsPermissionDenied(boolean value);
+
+    boolean isFirstStart();
+    void setFirstStart(boolean value);
 }

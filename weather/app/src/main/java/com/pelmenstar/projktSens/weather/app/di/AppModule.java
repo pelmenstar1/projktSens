@@ -17,6 +17,9 @@ import com.pelmenstar.projktSens.weather.app.R;
 import com.pelmenstar.projktSens.weather.app.formatters.MoonPhaseFormatter;
 import com.pelmenstar.projktSens.weather.app.formatters.ResourcesPrettyDateFormatter;
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter;
+import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartActivity;
+import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartContract;
+import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartPresenter;
 import com.pelmenstar.projktSens.weather.app.ui.home.HomeContract;
 import com.pelmenstar.projktSens.weather.app.ui.home.HomePresenter;
 import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarContract;
@@ -76,6 +79,12 @@ public final class AppModule {
     @NotNull
     public SunriseSunsetCalendarContract.Presenter sunriseSunsetCalendarPresenter() {
         return new SunriseSunsetCalendarPresenter(sunInfoProvider());
+    }
+
+    @Provides
+    @NotNull
+    public FirstStartContract.Presenter firstStartPresenter() {
+        return new FirstStartPresenter(preferences());
     }
 
     @Provides

@@ -50,4 +50,9 @@
 
     <dimen name="sunriseSunsetCalendar_boundsMargin">5dp</dimen>
     <dimen name="sunriseSunsetCalendar_calendarTopMargin">5dp</dimen>
+    
+    <dimen name="firstStartActivity_actionButtonMargin">5dp</dimen>
+    <dimen name="firstStartActivity_screenPadding">7dp</dimen>
+    <dimen name="firstStartActivity_titleTopMargin">6dp</dimen>
+    <dimen name="firstStartActivity_actionButtonSize">60dp</dimen>
 </resources>

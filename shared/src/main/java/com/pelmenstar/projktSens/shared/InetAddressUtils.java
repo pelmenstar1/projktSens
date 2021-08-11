@@ -8,6 +8,16 @@ import java.net.UnknownHostException;
 
 public class InetAddressUtils {
     public static final int IP_ERROR = 0;
+    public static final int FREE_MIN_PORT = 1024;
+    public static final int FREE_MAX_PORT = 49151;
+
+    public static boolean isValidFreePort(int port) {
+        return port >= FREE_MIN_PORT && port <= FREE_MAX_PORT;
+    }
+
+    public static int ip(int b1, int b2, int b3, int b4) {
+        return (b1 & 0xff) | ((b2 & 0xff) << 8) | ((b3 & 0xff) << 16) | ((b4 & 0xff) << 24);
+    }
 
     @NotNull
     public static String intIpv4ToString(int value) {

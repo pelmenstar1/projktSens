@@ -30,18 +30,21 @@
     <string name="noData">Ммм… Ничего</string>
     <string name="errorOccurred">Упс… Ошибка</string>
 
+    <string name="firstStart_chooseAddressAndPortTitle">Введите сервер и порт</string>
+    <string name="firstStart_chooseServerContractTitle">Укажите способ передачи</string>
+
     <string name="settings">Настройки</string>
     <string name="save_settings">Сохранить</string>
 
     <string name="serverHost">Сервер</string>
-    <string name="serverIsNotAvailable_settings">Неправильный адресс</string>
+    <string name="invalidInetAddress">Неправильный адресс</string>
     <string name="serverContract">Протокол</string>
 
     <string name="invalidNumberFormat">Не число</string>
-    <string name="settings_portReservedError_less">Только больше 1024</string>
-    <string name="settings_portReservedError_greater">Больше чем 49151</string>
+    <string name="portReservedError_less">Только больше 1024</string>
+    <string name="portReservedError_greater">Больше чем 49151</string>
 
-    <string name="settings_serverPortName">\'Repo\' порт</string>
+    <string name="port">\'Repo\' порт</string>
     <!-- TODO: Придумать понятный перевод -->
     <string name="settings_weatherRcvInterval_name">Receive interval (ms)</string>
     <string name="settings_weatherRcvInterval_lessOrEqZero">Меньше или равно 0</string>

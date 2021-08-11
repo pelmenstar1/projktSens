@@ -11,6 +11,7 @@ import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.AppCompatSpinner
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
@@ -192,6 +193,14 @@ inline fun ViewGroup.EditText(block: AppCompatEditText.() -> Unit): EditText {
     }
 
     return addApply(AppCompatEditText(context), block)
+}
+
+inline fun ViewGroup.Spinner(block: AppCompatSpinner.() -> Unit): AppCompatSpinner {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return addApply(AppCompatSpinner(context), block)
 }
 
 inline fun LinearLayout(context: Context, block: LinearLayout.() -> Unit): LinearLayout {

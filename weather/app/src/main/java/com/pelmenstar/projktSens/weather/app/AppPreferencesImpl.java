@@ -23,6 +23,7 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
     private static final String KEY_SERVER_PORT = "PORT";
     private static final String KEY_WEATHER_RECEIVE_INTERVAL = "weatherRcvInterval";
     private static final String KEY_IS_GPS_PERMISSION_DENIED = "isGpsDenied";
+    private static final String KEY_IS_FIRST_START = "isFirstStart";
 
     private AppPreferencesImpl() {
     }
@@ -243,5 +244,15 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
     @Override
     public void setGpsPermissionDenied(boolean value) {
         safePutBoolean(KEY_IS_GPS_PERMISSION_DENIED, IS_GPS_PERMISSION_DENIED, value);
+    }
+
+    @Override
+    public boolean isFirstStart() {
+        return safeGetBoolean(KEY_IS_FIRST_START, IS_FIRST_START, true);
+    }
+
+    @Override
+    public void setFirstStart(boolean value) {
+        safePutBoolean(KEY_IS_FIRST_START, IS_FIRST_START, value);
     }
 }
