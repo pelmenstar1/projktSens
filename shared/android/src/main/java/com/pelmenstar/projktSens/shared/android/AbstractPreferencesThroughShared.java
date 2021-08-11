@@ -66,7 +66,7 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
         if(sessionEditor != null) {
             int keyIndex = sessionModifiedInts.indexOfKey(id);
             if(keyIndex >= 0) {
-                return sessionModifiedInts.keyAt(keyIndex);
+                return sessionModifiedInts.valueAt(keyIndex);
             }
         }
 
@@ -86,7 +86,7 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
         if(sessionEditor != null) {
             int keyIndex = sessionModifiedInts.indexOfKey(id);
             if(keyIndex >= 0) {
-                return sessionModifiedInts.keyAt(keyIndex) == 1;
+                return sessionModifiedInts.valueAt(keyIndex) == 1;
             }
         }
 
