@@ -16,7 +16,7 @@ public class InetAddressUtils {
     }
 
     public static int ip(int b1, int b2, int b3, int b4) {
-        return (b1 & 0xff) | ((b2 & 0xff) << 8) | ((b3 & 0xff) << 16) | ((b4 & 0xff) << 24);
+        return b1 | (b2 << 8) | (b3 << 16) | (b4 << 24);
     }
 
     @NotNull
@@ -87,7 +87,7 @@ public class InetAddressUtils {
                     return IP_ERROR;
                 }
 
-                ip = Bytes.withByte(ip, byteIndex, currentByte & 0xff);
+                ip = Bytes.withByte(ip, byteIndex, currentByte);
                 strByteStartIndex = i + 1;
                 byteIndex++;
 
@@ -101,17 +101,7 @@ public class InetAddressUtils {
             return IP_ERROR;
         }
 
-        return Bytes.withByte(ip, byteIndex, currentByte & 0xff);
-    }
-
-    @NotNull
-    public static InetAddress parseNumericalIpv4OrThrow(@NotNull String str) {
-        InetAddress result = parseNumericalIpv4OrNull(str);
-        if(result == null) {
-            throw new RuntimeException("str has invalid format");
-        }
-
-        return result;
+        return Bytes.withByte(ip, byteIndex, currentByte);
     }
 
     /**
