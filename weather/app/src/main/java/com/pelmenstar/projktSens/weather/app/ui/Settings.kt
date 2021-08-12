@@ -36,7 +36,7 @@ val APP_SETTING_CLASSES: Array<out Class<out Setting<*>>> = arrayOf(
 abstract class ValueUnitSetting: Setting<ValueUnitSetting.State>() {
     data class State(@JvmField var unit: Int)
 
-    abstract val bundleKey: String
+    private val bundleKey = "${javaClass.name}.state.unit"
 
     abstract val packedUnitType: Int
     abstract val spinnerInfo: Long
@@ -123,9 +123,6 @@ abstract class ValueUnitSetting: Setting<ValueUnitSetting.State>() {
 class TemperatureSetting: ValueUnitSetting() {
     override fun getNameId(): Int = R.string.temperature
 
-    override val bundleKey: String
-        get() = "TemperatureSetting.state.unit"
-
     override val spinnerInfo: Long = spinnerInfo(R.array.temperatureUnits, 0, 3)
 
     override val packedUnitType: Int
@@ -134,9 +131,6 @@ class TemperatureSetting: ValueUnitSetting() {
 
 class PressureSetting: ValueUnitSetting() {
     override fun getNameId(): Int = R.string.pressure
-
-    override val bundleKey: String
-        get() = "PressureSetting.state.unit"
 
     override val spinnerInfo: Long = spinnerInfo(R.array.pressureUnits, 4, 2)
 
