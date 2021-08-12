@@ -81,9 +81,9 @@ class ChooseServerContractScreen: FirstStartScreen<ChooseServerContractScreen.St
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val type = bundle.getInt(STATE_CONTRACT, -1)
-        return if(type != -1) {
-            state = State(type)
+        val type = bundle.get(STATE_CONTRACT)
+        return if(type != null) {
+            state = State(type as Int)
             true
         } else {
             false

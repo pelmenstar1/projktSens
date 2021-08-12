@@ -2,6 +2,7 @@ package com.pelmenstar.projktSens.weather.app.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
 import android.text.InputType
 import android.view.View
 import android.widget.AdapterView
@@ -10,7 +11,9 @@ import androidx.annotation.ArrayRes
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
 import com.pelmenstar.projktSens.serverProtocol.ContractType
+import com.pelmenstar.projktSens.shared.EmptyArray
 import com.pelmenstar.projktSens.shared.InetAddressUtils
+import com.pelmenstar.projktSens.shared.StringUtils
 import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
 import com.pelmenstar.projktSens.shared.android.ui.EditText
@@ -143,11 +146,11 @@ class PressureSetting: ValueUnitSetting() {
 
 class ServerHostSetting: Setting<ServerHostSetting.State>() {
     class State: IncompleteState {
-        private var _hostString: String = ""
-        var hostString: String
-            get() = _hostString
+        private var _hostBuffer = EmptyArray.CHAR
+        var hostBuffer: CharArray
+            get() = _hostBuffer
             set(value) {
-                _hostString = value
+                _hostBuffer = value
 
                 val ipInt = InetAddressUtils.parseNumericalIpv4ToInt(value)
                 if(ipInt != InetAddressUtils.IP_ERROR) {
@@ -163,26 +166,38 @@ class ServerHostSetting: Setting<ServerHostSetting.State>() {
             get() = _hostInt
             set(value) {
                 _hostInt = value
-                _hostString = InetAddressUtils.intIpv4ToString(value)
+                _hostBuffer = InetAddressUtils.intIpv4ToCharArray(_hostBuffer, value)
                 isValid = value != InetAddressUtils.IP_ERROR
             }
 
-        constructor(hostString: String) {
-            this.hostString = hostString
+        constructor(hostBuffer: CharArray) {
+            this.hostBuffer = hostBuffer
         }
 
         constructor(ipInt: Int) {
             hostInt = ipInt
         }
 
+        internal fun setHost(text: Editable) {
+            val textLength = text.length
+            val buffer = if(_hostBuffer.size != textLength) {
+                _hostBuffer
+            } else {
+                CharArray(textLength)
+            }
+            text.getChars(0, textLength, buffer, 0)
+
+            hostBuffer = buffer
+        }
+
         override fun equals(other: Any?): Boolean {
             return equalsPattern(other) { o ->
-                _hostString == o._hostString
+                _hostBuffer.contentEquals(o._hostBuffer)
             }
         }
 
         override fun hashCode(): Int {
-            return _hostString.hashCode()
+            return _hostBuffer.contentHashCode()
         }
     }
 
@@ -194,16 +209,17 @@ class ServerHostSetting: Setting<ServerHostSetting.State>() {
         val invalidAddressStr = context.resources.getString(R.string.invalidInetAddress)
 
         return EditText(context) {
-            setText(state.hostString)
+            val initialHost = state.hostBuffer
+            setText(initialHost, 0, initialHost.size)
             if(!state.isValid) {
                 error = invalidAddressStr
             }
 
-            addTextChangedListener {
-                if(it != null) {
+            addTextChangedListener { text ->
+                if(text != null) {
                     val state = state
-                    val text = it.toString()
-                    state.hostString = text
+                    state.setHost(text)
+
                     if (!state.isValid) {
                         error = invalidAddressStr
                     }
@@ -217,7 +233,7 @@ class ServerHostSetting: Setting<ServerHostSetting.State>() {
     }
 
     override fun saveStateToBundle(outState: Bundle) {
-        outState.putString(BUNDLE_STATE_HOST, state.hostString)
+        outState.putCharArray(BUNDLE_STATE_HOST, state.hostBuffer)
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
@@ -225,9 +241,9 @@ class ServerHostSetting: Setting<ServerHostSetting.State>() {
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val hostString = bundle.getString(BUNDLE_STATE_HOST)
-        return if(hostString != null) {
-            state = State(hostString)
+        val hostBuffer = bundle.getCharArray(BUNDLE_STATE_HOST)
+        return if(hostBuffer != null) {
+            state = State(hostBuffer)
 
             true
         } else {
@@ -290,9 +306,9 @@ class ServerContractSetting: Setting<ServerContractSetting.State>() {
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val type = bundle.getInt(BUNDLE_STATE_CONTRACT_TYPE, -1)
-        return if(type != -1) {
-            state = State(type)
+        val type = bundle.get(BUNDLE_STATE_CONTRACT_TYPE)
+        return if(type != null) {
+            state = State(type as Int)
 
             true
         } else {
@@ -358,17 +374,16 @@ class ServerPortSetting: Setting<ServerPortSetting.State>() {
 
             inputType = InputType.TYPE_CLASS_NUMBER
 
-            addTextChangedListener {
-                if (it != null) {
+            addTextChangedListener { text ->
+                if (text != null) {
                     val state = state
-                    val text = it.toString()
 
-                    try {
-                        val port = text.toInt()
+                    val port = StringUtils.parsePositiveInt(text)
+                    if(port != -1) {
                         state.port = port
 
                         setErrorIfInvalidPort(port)
-                    } catch (e: Exception) {
+                    } else {
                         error = invalidPortNumberStr
                         state.isValid = false
                     }
@@ -391,10 +406,10 @@ class ServerPortSetting: Setting<ServerPortSetting.State>() {
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val port = bundle.getInt(BUNDLE_PORT, -1)
+        val port = bundle.get(BUNDLE_PORT)
 
-        return if(port != -1) {
-            state = State(port)
+        return if(port != null) {
+            state = State(port as Int)
 
             true
         } else {
@@ -451,19 +466,18 @@ class WeatherReceiveIntervalSetting: Setting<WeatherReceiveIntervalSetting.State
 
             inputType = InputType.TYPE_CLASS_NUMBER
 
-            addTextChangedListener {
-                if (it != null) {
+            addTextChangedListener { text ->
+                if (text != null) {
                     val state = state
-                    val text = it.toString()
 
-                    try {
-                        val interval = text.toInt()
+                    val interval = StringUtils.parsePositiveInt(text)
+                    if(interval != -1) {
                         state.interval = interval
 
                         if (interval <= 0) {
                             error = lessOrZeroErrorStr
                         }
-                    } catch (e: Exception) {
+                    } else {
                         error = invalidNumberStr
                         state.isValid = false
                     }
@@ -485,9 +499,9 @@ class WeatherReceiveIntervalSetting: Setting<WeatherReceiveIntervalSetting.State
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val interval = bundle.getInt(BUNDLE_STATE_INTERVAL, -1)
-        return if(interval != -1) {
-            state = State(interval)
+        val interval = bundle.get(BUNDLE_STATE_INTERVAL)
+        return if(interval != null) {
+            state = State(interval as Int)
             true
         } else {
             false

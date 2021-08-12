@@ -21,6 +21,11 @@ public class InetAddressUtils {
 
     @NotNull
     public static String intIpv4ToString(int value) {
+        char[] buffer = intIpv4ToCharArray(value);
+        return new String(buffer, 0, buffer.length);
+    }
+
+    public static char @NotNull [] intIpv4ToCharArray(char @NotNull [] text, int value) {
         int b1 = value & 0xff;
         int b2 = (value >> 8) & 0xff;
         int b3 = (value >> 16) & 0xff;
@@ -36,7 +41,13 @@ public class InetAddressUtils {
         int b4Index = b3Index + b3Length + 1;
 
         int bufferLength = b4Index + b4Length;
-        char[] buffer = new char[bufferLength];
+        char[] buffer;
+        if(bufferLength == text.length) {
+            buffer = text;
+        } else {
+            buffer = new char[bufferLength];
+        }
+
         StringUtils.writeByte(buffer, 0, b1);
         buffer[b1Length] = '.';
         StringUtils.writeByte(buffer, b2Index, b2);
@@ -45,7 +56,11 @@ public class InetAddressUtils {
         buffer[b3Index + b4Length] = '.';
         StringUtils.writeByte(buffer, b4Index, b4);
 
-        return new String(buffer, 0, bufferLength);
+        return buffer;
+    }
+
+    public static char @NotNull [] intIpv4ToCharArray(int value) {
+        return intIpv4ToCharArray(EmptyArray.CHAR, value);
     }
 
     @NotNull
@@ -75,6 +90,44 @@ public class InetAddressUtils {
         int maxIdx = str.length() - 1;
         for(int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
+
+            if(c >= '0' && c <= '9') {
+                currentByte = currentByte * 10 + (c - '0');
+
+                if(currentByte > 255) {
+                    return IP_ERROR;
+                }
+            } else if(c == '.') {
+                if(byteIndex == 4 || i == maxIdx || i == strByteStartIndex) {
+                    return IP_ERROR;
+                }
+
+                ip = Bytes.withByte(ip, byteIndex, currentByte);
+                strByteStartIndex = i + 1;
+                byteIndex++;
+
+                currentByte = 0;
+            } else {
+                return IP_ERROR;
+            }
+        }
+
+        if(byteIndex != 3) {
+            return IP_ERROR;
+        }
+
+        return Bytes.withByte(ip, byteIndex, currentByte);
+    }
+
+    public static int parseNumericalIpv4ToInt(char @NotNull [] buffer) {
+        int ip = 0;
+        int byteIndex = 0;
+        int currentByte = 0;
+        int strByteStartIndex = 0;
+
+        int maxIdx = buffer.length - 1;
+        for(int i = 0; i < buffer.length; i++) {
+            char c = buffer[i];
 
             if(c >= '0' && c <= '9') {
                 currentByte = currentByte * 10 + (c - '0');

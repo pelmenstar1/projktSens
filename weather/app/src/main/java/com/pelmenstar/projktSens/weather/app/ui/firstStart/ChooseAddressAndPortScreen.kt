@@ -2,25 +2,25 @@ package com.pelmenstar.projktSens.weather.app.ui.firstStart
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
 import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.widget.GridLayout
 import androidx.core.widget.addTextChangedListener
-import com.pelmenstar.projktSens.shared.InetAddressUtils
+import com.pelmenstar.projktSens.shared.*
 import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ui.*
-import com.pelmenstar.projktSens.shared.equalsPattern
 import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.R
 
 class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.State>() {
     class State: IncompleteState {
-        private var _hostString: String = ""
-        var hostString: String
-            get() = _hostString
+        private var _hostBuffer = EmptyArray.CHAR
+        var hostBuffer: CharArray
+            get() = _hostBuffer
             set(value) {
-                _hostString = value
+                _hostBuffer = value
 
                 val ipInt = InetAddressUtils.parseNumericalIpv4ToInt(value)
                 if(ipInt != InetAddressUtils.IP_ERROR) {
@@ -39,7 +39,7 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
             get() = _hostInt
             set(value) {
                 _hostInt = value
-                _hostString = InetAddressUtils.intIpv4ToString(value)
+                _hostBuffer = InetAddressUtils.intIpv4ToCharArray(_hostBuffer, value)
                 _isHostValid = value != InetAddressUtils.IP_ERROR
                 updateValidity()
             }
@@ -56,11 +56,9 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
             }
 
         private var _isPortValid = true
-        val isPortValid: Boolean
-            get() = _isPortValid
 
-        constructor(hostStr: String, port: Int) {
-            hostString = hostStr
+        constructor(hostBuffer: CharArray, port: Int) {
+            this.hostBuffer = hostBuffer
             this.port = port
         }
 
@@ -69,18 +67,30 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
             this.port = port
         }
 
+        internal fun setHost(text: Editable) {
+            val textLength = text.length
+            val buffer = if(_hostBuffer.size != textLength) {
+                _hostBuffer
+            } else {
+                CharArray(textLength)
+            }
+            text.getChars(0, textLength, buffer, 0)
+
+            hostBuffer = buffer
+        }
+
         private fun updateValidity() {
             isValid = _isHostValid && _isPortValid
         }
 
         override fun equals(other: Any?): Boolean {
             return equalsPattern(other) { o ->
-                _hostString == o._hostString && port == o.port
+                _hostBuffer.contentEquals(o._hostBuffer) && port == o.port
             }
         }
 
         override fun hashCode(): Int {
-            var result = _hostString.hashCode()
+            var result = _hostBuffer.contentHashCode()
             result = result * 31 + port
 
             return result
@@ -121,16 +131,17 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
                 gridLayoutParams(firstRowSpec, viewColumnSpec)
 
                 inputType = IP_ADDRESS_INPUT_TYPE
-                setText(state.hostString)
+                val initialHost = state.hostBuffer
+                setText(initialHost, 0, initialHost.size)
+
                 if(!state.isHostValid) {
                     error = invalidAddressStr
                 }
 
-                addTextChangedListener {
-                    if(it != null) {
+                addTextChangedListener { text ->
+                    if(text != null) {
                         val state = state
-                        val text = it.toString()
-                        state.hostString = text
+                        state.setHost(text)
                         if (!state.isHostValid) {
                             error = invalidAddressStr
                         }
@@ -166,17 +177,14 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
 
                 inputType = InputType.TYPE_CLASS_NUMBER
 
-                addTextChangedListener {
-                    if (it != null) {
+                addTextChangedListener { text ->
+                    if (text != null) {
                         val state = state
-                        val text = it.toString()
-
-                        try {
-                            val port = text.toInt()
+                        val port = StringUtils.parsePositiveInt(text)
+                        if(port != -1) {
                             state.port = port
-
                             setErrorIfInvalidPort(port)
-                        } catch (e: Exception) {
+                        } else {
                             error = invalidPortNumberStr
                             state.isValid = false
                         }
@@ -191,11 +199,11 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val hostStr = bundle.getString(STATE_HOST_STRING)
-        if(hostStr != null) {
-            val port = bundle.getInt(STATE_PORT, -1)
-            if(port != -1) {
-                state = State(hostStr, port)
+        val hostBuffer = bundle.getCharArray(STATE_HOST_STRING)
+        if(hostBuffer != null) {
+            val port = bundle.get(STATE_PORT)
+            if(port != null) {
+                state = State(hostBuffer, port as Int)
                 return true
             }
         }
@@ -208,7 +216,7 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
     }
 
     override fun saveStateToBundle(outState: Bundle) {
-        outState.putString(STATE_HOST_STRING, state.hostString)
+        outState.putCharArray(STATE_HOST_STRING, state.hostBuffer)
         outState.putInt(STATE_PORT, state.port)
     }
 

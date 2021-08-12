@@ -9,6 +9,21 @@ import org.jetbrains.annotations.Nullable;
 public final class StringUtils {
     private StringUtils() {}
 
+    public static int parsePositiveInt(@NotNull CharSequence text) {
+        int n = 0;
+        for(int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+
+            if(c >= '0' && c <= '9') {
+                n = n * 10 + (c - '0');
+            } else {
+                return -1;
+            }
+        }
+
+        return n;
+    }
+
     /**
      * Appends given array of {@link Object}'s to the end of {@link StringBuilder} in format: <br/>
      * - if specified array is null, appends 'null' string
