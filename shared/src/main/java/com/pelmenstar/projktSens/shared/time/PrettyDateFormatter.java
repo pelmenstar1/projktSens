@@ -49,53 +49,33 @@ public abstract class PrettyDateFormatter {
      * @param sb {@link StringBuilder} to append date.
      */
     public final void appendPrettyDate(@ShortDateInt int date, @NotNull StringBuilder sb) {
-        boolean appendDate = true;
         int nowEpochDay = ShortDate.nowEpochDay();
 
         switch (ShortDate.toEpochDay(date) - nowEpochDay) {
             case 0: {
                 sb.append(getTodayString());
-                appendDate = false;
-
-                break;
+                return;
             }
 
             case -1: {
                 sb.append(getYesterdayString());
-                appendDate = false;
-
-                break;
+                return;
             }
         }
 
-        if(appendDate) {
-            int year = ShortDate.getYear(date);
-            int month = ShortDate.getMonth(date);
-            int day = ShortDate.getDayOfMonth(date);
+        int year = ShortDate.getYear(date);
+        int month = ShortDate.getMonth(date);
+        int day = ShortDate.getDayOfMonth(date);
 
-            sb.append(day);
-            sb.append(' ');
-            sb.append(getMonthWithDayString(month));
-
-            int now = ShortDate.ofEpochDay(nowEpochDay);
-            if(ShortDate.getYear(now) != year) {
-                sb.append(' ');
-                StringUtils.appendFourDigits(year, sb);
-            }
-        }
-    }
-
-    /**
-     * Appends only year and month to specified {@link StringBuilder}.
-     *
-     * @param year year, in range of [0; 9999].
-     * @param month month, in range of [1; 12].
-     * @param sb {@link StringBuilder} to append year and month.
-     */
-    public final void appendDate(int year, int month, @NotNull StringBuilder sb) {
-        sb.append(getMonthString(month));
+        sb.append(day);
         sb.append(' ');
-        StringUtils.appendFourDigits(year, sb);
+        sb.append(getMonthWithDayString(month));
+
+        int now = ShortDate.ofEpochDay(nowEpochDay);
+        if (ShortDate.getYear(now) != year) {
+            sb.append(' ');
+            StringUtils.appendFourDigits(year, sb);
+        }
     }
 
     /**
@@ -107,7 +87,7 @@ public abstract class PrettyDateFormatter {
      */
     @NotNull
     public final String prettyFormat(@ShortDateInt int date) {
-        StringBuilder builder = new StringBuilder(32);
+        StringBuilder builder = new StringBuilder(approximatePrettyDateLength(date));
 
         appendPrettyDate(date, builder);
 
@@ -119,16 +99,19 @@ public abstract class PrettyDateFormatter {
      *
      * @param year year, in range of [0; 9999].
      * @param month month, in range of [1; 12].
-     *
-     * @implNote internally it allocates instance of {@link StringBuilder}.
      */
     @NotNull
     public final String prettyFormat(int year, int month) {
-        StringBuilder builder = new StringBuilder(32);
+        String monthString = getMonthString(month);
+        int monthStrLength = monthString.length();
 
-        appendDate(year, month, builder);
+        int bufferLength = monthStrLength + /* whitespace */ 1 + /* year */ + 4;
+        char[] buffer = new char[bufferLength];
+        monthString.getChars(0, monthStrLength, buffer, 0);
+        buffer[monthStrLength] = ' ';
+        StringUtils.writeFourDigits(buffer, monthStrLength + 1, year);
 
-        return builder.toString();
+        return new String(buffer, 0, bufferLength);
     }
 
     /**
@@ -152,11 +135,7 @@ public abstract class PrettyDateFormatter {
     protected abstract String getMonthString(int month);
 
     /**
-     * Returns {@link String} that represents specified month.
-     * In some languages, like for example Ukrainian, '19 January' translates like '19 січня', but
-     * typical translation for 'January' is 'Січень', so this method returns {@link String} representation of
-     * month that goes after day. In English, methods {@link PrettyDateFormatter#getMonthString(int)} and
-     * this method returns the same string, but some others don't.
+     * Returns {@link String} that represents specified month which stays after day.
      *
      * @param month month, in range [1; 12]
      */
