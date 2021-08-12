@@ -50,9 +50,9 @@ public abstract class PrettyDateFormatter {
      */
     public final void appendPrettyDate(@ShortDateInt int date, @NotNull StringBuilder sb) {
         boolean appendDate = true;
-        long nowEpochDay = ShortDate.nowEpochDay();
+        int nowEpochDay = ShortDate.nowEpochDay();
 
-        switch ((int)(ShortDate.toEpochDay(date) - nowEpochDay)) {
+        switch (ShortDate.toEpochDay(date) - nowEpochDay) {
             case 0: {
                 sb.append(getTodayString());
                 appendDate = false;

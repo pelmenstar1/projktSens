@@ -17,8 +17,8 @@ public final class DateChartFormatter implements ValueFormatter {
     public String format(float value) {
         char[] text = textCache;
 
-        long epoch = (long)value;
-        ShortDate.writeToCharBuffer(ShortDate.ofEpochDay(epoch), text, 0);
+        int epochDay = (int)value;
+        ShortDate.writeToCharBuffer(ShortDate.ofEpochDay(epochDay), text, 0);
 
         return new String(text, 0, 10);
     }

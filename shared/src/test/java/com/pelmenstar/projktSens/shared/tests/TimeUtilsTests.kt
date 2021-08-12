@@ -6,7 +6,7 @@ import java.time.chrono.IsoChronology
 import kotlin.test.assertEquals
 
 const val UNTIL_9999_YEAR = 253402214399
-const val UNTIL_9999_YEAR_DAY: Long = 2932895
+const val UNTIL_9999_YEAR_DAY = 2932895
 
 class TimeUtilsTests  {
     @Test

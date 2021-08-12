@@ -23,6 +23,8 @@ public final class ShortDate {
      */
     public static final int MAX_YEAR = 9999;
 
+    private static final int MAX_EPOCH_DAY = 2932896;
+
     private ShortDate() {}
 
     /**
@@ -171,8 +173,8 @@ public final class ShortDate {
     /**
      * Returns today epoch day in current time-zone
      */
-    public static long nowEpochDay() {
-        return TimeUtils.currentLocalTimeMillis() / TimeConstants.MILLIS_IN_DAY;
+    public static int nowEpochDay() {
+        return (int)(TimeUtils.currentLocalTimeMillis() / TimeConstants.MILLIS_IN_DAY);
     }
 
     /**
@@ -183,7 +185,7 @@ public final class ShortDate {
      */
     @ShortDateInt
     public static int nowAndPlusDays(int days) {
-        return ofEpochDay(nowEpochDay() + (long)days);
+        return ofEpochDay(nowEpochDay() + days);
     }
 
     /**
@@ -194,7 +196,7 @@ public final class ShortDate {
      */
     @ShortDateInt
     public static int nowAndMinusDays(int days) {
-        return ofEpochDay(nowEpochDay() - (long)days);
+        return ofEpochDay(nowEpochDay() - days);
     }
 
     /**
@@ -209,7 +211,7 @@ public final class ShortDate {
             return date;
         }
 
-        return ofEpochDay(toEpochDay(date) + (long)days);
+        return ofEpochDay(toEpochDay(date) + days);
     }
 
     /**
@@ -224,7 +226,7 @@ public final class ShortDate {
             return date;
         }
 
-        return ofEpochDay(toEpochDay(date) - (long)days);
+        return ofEpochDay(toEpochDay(date) - days);
     }
 
     /**
@@ -234,14 +236,14 @@ public final class ShortDate {
      */
     @ShortDateInt
     public static int diffDays(@ShortDateInt int startDate, @ShortDateInt int endDate) {
-        long startEpoch = toEpochDay(startDate);
-        long endEpoch = toEpochDay(endDate);
+        int startEpochDay = toEpochDay(startDate);
+        int endEpochDay = toEpochDay(endDate);
 
-        if(startEpoch > endEpoch) {
+        if(startEpochDay > endEpochDay) {
             throw new IllegalArgumentException("startDate > endDate");
         }
 
-        return ofEpochDay(endEpoch - startEpoch);
+        return ofEpochDay(endEpochDay - startEpochDay);
     }
 
     /**
@@ -250,30 +252,30 @@ public final class ShortDate {
      * @throws IllegalArgumentException if epochDay is less than 0
      */
     @ShortDateInt
-    public static int ofEpochDay(long epochDay) {
-        if(epochDay < 0) {
+    public static int ofEpochDay(int epochDay) {
+        if(epochDay < 0 || epochDay > MAX_EPOCH_DAY) {
             throw new IllegalArgumentException("epochDay");
         }
 
-        long zeroDay = epochDay + TimeConstants.DAYS_0000_TO_1970;
+        int zeroDay = epochDay + TimeConstants.DAYS_0000_TO_1970;
         zeroDay -= 60;
 
-        long yearEst = (400 * zeroDay + 591) / TimeConstants.DAYS_PER_CYCLE;
-        long doyEst = zeroDay - (365 * yearEst + yearEst / 4 - yearEst / 100 + yearEst / 400);
+        int yearEst = (400 * zeroDay + 591) / TimeConstants.DAYS_PER_CYCLE;
+        int doyEst = zeroDay - (365 * yearEst + yearEst / 4 - yearEst / 100 + yearEst / 400);
 
         if (doyEst < 0) {
             yearEst--;
             doyEst = zeroDay - (365 * yearEst + yearEst / 4 - yearEst / 100 + yearEst / 400);
         }
 
-        int marchDoy0 = (int) doyEst;
+        int marchDoy0 = doyEst;
 
         int marchMonth0 = (marchDoy0 * 5 + 2) / 153;
         int month = (marchMonth0 + 2) % 12 + 1;
         int dom = marchDoy0 - (marchMonth0 * 306 + 5) / 10 + 1;
         yearEst += marchMonth0 / 10;
 
-        return ofInternal((int)yearEst, month, dom);
+        return ofInternal(yearEst, month, dom);
     }
 
     /**
@@ -281,7 +283,7 @@ public final class ShortDate {
      *
      * @throws IllegalArgumentException if date is invalid
      */
-    public static long toEpochDay(@ShortDateInt int date) {
+    public static int toEpochDay(@ShortDateInt int date) {
         if(!isValid(date)) {
             throw new IllegalArgumentException("date");
         }
@@ -289,12 +291,13 @@ public final class ShortDate {
         return toEpochDayInternal(date);
     }
 
-    private static long toEpochDayInternal(@ShortDateInt int date) {
+    // epoch day fits in int32 if max year is 9999
+    private static int toEpochDayInternal(@ShortDateInt int date) {
         int year = getYear(date);
         int month = getMonth(date);
         int day = getDayOfMonth(date);
 
-        long total = 0;
+        int total = 0;
         total += 365 * year;
         total += (year + 3) / 4 - (year + 99) / 100 + (year + 399) / 400;
 

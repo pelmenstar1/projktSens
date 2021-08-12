@@ -57,8 +57,8 @@ class ShortDateTests {
         val random = Random(0)
 
         repeat(100) {
-            val expected = random.nextLong(0, UNTIL_9999_YEAR_DAY)
-            val date = LocalDate.ofEpochDay(expected)
+            val expected = random.nextInt(0, UNTIL_9999_YEAR_DAY)
+            val date = LocalDate.ofEpochDay(expected.toLong())
             val input = ShortDate.of(date.year, date.monthValue, date.dayOfMonth)
 
             val actual = ShortDate.toEpochDay(input)
@@ -77,8 +77,8 @@ class ShortDateTests {
         val random = Random(0)
 
         repeat(100) {
-            val input = random.nextLong(0, UNTIL_9999_YEAR_DAY)
-            val date = LocalDate.ofEpochDay(input)
+            val input = random.nextInt(0, UNTIL_9999_YEAR_DAY)
+            val date = LocalDate.ofEpochDay(input.toLong())
             val expectedYear = date.year
             val expectedMonth = date.monthValue
             val expectedDay = date.dayOfMonth

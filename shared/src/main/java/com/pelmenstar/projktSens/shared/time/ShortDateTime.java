@@ -134,7 +134,7 @@ public final class ShortDateTime {
             throw new IllegalArgumentException("epochSecond");
         }
 
-        long epochDay = epochSecond / TimeConstants.SECONDS_IN_DAY;
+        int epochDay = (int)(epochSecond / TimeConstants.SECONDS_IN_DAY);
         int secsOfDay = (int)(epochSecond - epochDay * TimeConstants.SECONDS_IN_DAY);
 
         return ofInternal(ShortDate.ofEpochDay(epochDay), secsOfDay);
