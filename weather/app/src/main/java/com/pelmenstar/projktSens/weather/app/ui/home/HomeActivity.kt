@@ -12,7 +12,6 @@ import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.button.MaterialButton
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsActivity
-import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsContext
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.weather.app.R
@@ -24,7 +23,7 @@ import com.pelmenstar.projktSens.weather.app.ui.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.LazyLoadingCalendarView
 import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarActivity
-import com.pelmenstar.projktSens.weather.app.ui.APP_SETTING_CLASSES
+import com.pelmenstar.projktSens.weather.app.ui.APP_SETTING_CLASS_NAMES
 import com.pelmenstar.projktSens.weather.app.ui.sunriseSunset.SunriseSunsetCalendarActivity
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
 
@@ -235,7 +234,6 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
         val context = this
         val component = DaggerAppComponent.builder().appModule(AppModule(context)).build()
         val prefsClass = component.preferences().javaClass
-        val settingsContext = SettingsContext(APP_SETTING_CLASSES)
 
         menu.add {
             item(
@@ -245,7 +243,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
             ) {
                 val intent = SettingsActivity.intent(
                     context,
-                    settingsContext,
+                    APP_SETTING_CLASS_NAMES,
                     prefsClass
                 )
                 startSettingActivity.launch(intent)

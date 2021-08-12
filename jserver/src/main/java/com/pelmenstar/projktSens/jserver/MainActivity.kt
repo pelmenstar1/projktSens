@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.pelmenstar.projktSens.serverProtocol.ServerAvailabilityProvider
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsActivity
-import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsContext
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -116,7 +115,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val settingsContext = SettingsContext(APP_SETTING_CLASSES)
         val context = this
 
         menu.add {
@@ -125,7 +123,11 @@ class MainActivity : AppCompatActivity() {
                 showsAsAction = MenuItem.SHOW_AS_ACTION_IF_ROOM,
                 iconRes = R.drawable.ic_settings
             ) {
-                val intent = SettingsActivity.intent(context, settingsContext, AppPreferences::class.java)
+                val intent = SettingsActivity.intent(
+                    context,
+                    APP_SETTING_CLASS_NAMES,
+                    AppPreferences::class.java
+                )
                 context.startActivity(intent)
                 true
             }

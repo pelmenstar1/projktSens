@@ -17,7 +17,7 @@ import com.pelmenstar.projktSens.shared.android.R
 import com.pelmenstar.projktSens.shared.android.ui.*
 
 class SettingsActivity : HomeButtonSupportActivity() {
-    private lateinit var settingsContext: SettingsContext
+    private lateinit var settings: Array<out Setting<*>>
     private lateinit var prefs: Preferences
 
     private lateinit var saveButton: Button
@@ -43,14 +43,18 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     private fun initFromIntentExtra() {
         val intent = requireIntent()
-        settingsContext = intent.getParcelableExtra(EXTRA_SETTINGS_CONTEXT)!!
+        val settingClassNames = intent.getStringArrayExtra(EXTRA_SETTINGS)!!
+        settings = Array(settingClassNames.size) { i ->
+            ReflectionUtils.createFromEmptyConstructor(settingClassNames[i])
+        }
+
         val prefsName = intent.getStringExtra(EXTRA_PREFERENCES)!!
         prefs = ReflectionUtils.createFromEmptyConstructorOrInstance(prefsName)
         prefs.initialize(this)
     }
 
     private fun loadStates(savedInstanceState: Bundle?) {
-        settingsContext.settings.forEach {
+        settings.forEach {
             if(savedInstanceState != null) {
                 val success = it.loadStateFromBundle(savedInstanceState)
                 if(success) {
@@ -71,7 +75,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
     }
 
     private fun computeCurrentStateHash(): Long {
-        val settings = settingsContext.settings
+        val settings = settings
         var result: Long = 1
         for(setting in settings) {
             result = result * 31 + setting.state.hashCode()
@@ -85,7 +89,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
             saveButton.isEnabled = isValid
         }
 
-        settingsContext.settings.forEach {
+        settings.forEach {
             // after state is loaded
             val state = it.state
 
@@ -101,7 +105,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     private fun createContent(): View {
         val prefs = prefs
-        val settings = settingsContext.settings
+        val settings = settings
 
         val res = resources
         val context = this
@@ -184,11 +188,8 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        val settings = settingsContext.settings
 
-        settings.forEach {
-            it.saveStateToBundle(outState)
-        }
+        settings.forEach { it.saveStateToBundle(outState) }
 
         // Why to save hashes, if we can re-compute it?
         // Saving here is VERY important.
@@ -213,7 +214,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     companion object {
         private const val STATE_INITIAL_STATE_HASH = "SettingsActivity.state.initialStateHash"
-        private const val EXTRA_SETTINGS_CONTEXT = "SettingsActivity.intent.settingsContext"
+        private const val EXTRA_SETTINGS = "SettingsActivity.intent.settings"
         private const val EXTRA_PREFERENCES = "SettingsActivity.intent.preferences"
 
         const val RETURN_DATA_STATE_CHANGED = "SettingsActivity.returnData.stateChanged"
@@ -221,11 +222,24 @@ class SettingsActivity : HomeButtonSupportActivity() {
         @JvmStatic
         fun intent(
             context: Context,
-            settingsContext: SettingsContext,
+            settingClasses: Array<out Class<out Setting<*>>>,
+            prefsClass: Class<out Preferences>
+        ): Intent {
+            val names = Array(settingClasses.size) { i ->
+                settingClasses[i].name
+            }
+
+            return intent(context, names, prefsClass)
+        }
+
+        @JvmStatic
+        fun intent(
+            context: Context,
+            settingClassNames: Array<out String>,
             prefsClass: Class<out Preferences>
         ): Intent {
             return Intent(context, SettingsActivity::class.java) {
-                putExtra(EXTRA_SETTINGS_CONTEXT, settingsContext)
+                putExtra(EXTRA_SETTINGS, settingClassNames)
                 putExtra(EXTRA_PREFERENCES, prefsClass.name)
             }
         }

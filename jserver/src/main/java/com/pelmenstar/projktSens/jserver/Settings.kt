@@ -22,6 +22,11 @@ val APP_SETTING_CLASSES: Array<out Class<out Setting<*>>> = arrayOf(
     WeatherSendIntervalSetting::class.java
 )
 
+@JvmField
+val APP_SETTING_CLASS_NAMES: Array<out String> = Array(APP_SETTING_CLASSES.size) { i ->
+    APP_SETTING_CLASSES[i].name
+}
+
 class ServerPortSetting: Setting<ServerPortSetting.State>() {
     class State(port: Int): IncompleteState() {
         var port: Int = 0
