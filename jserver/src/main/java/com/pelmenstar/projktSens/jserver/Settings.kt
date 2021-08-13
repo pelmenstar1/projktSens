@@ -10,6 +10,7 @@ import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
 import com.pelmenstar.projktSens.serverProtocol.ContractType
 import com.pelmenstar.projktSens.shared.InetAddressUtils
+import com.pelmenstar.projktSens.shared.StringUtils
 import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
 import com.pelmenstar.projktSens.shared.android.ui.EditText
@@ -80,17 +81,16 @@ class ServerPortSetting : Setting<ServerPortSetting.State>() {
 
             inputType = InputType.TYPE_CLASS_NUMBER
 
-            addTextChangedListener {
-                if (it != null) {
+            addTextChangedListener { text ->
+                if (text != null) {
                     val state = state
-                    val text = it.toString()
 
-                    try {
-                        val port = text.toInt()
+                    val port = StringUtils.parsePositiveInt(text)
+                    if(port != -1) {
                         state.port = port
 
                         setErrorIfInvalidPort(port)
-                    } catch (e: Exception) {
+                    } else {
                         error = invalidPortNumberStr
                         state.isValid = false
                     }
@@ -236,19 +236,18 @@ class WeatherSendIntervalSetting : Setting<WeatherSendIntervalSetting.State>() {
 
             inputType = InputType.TYPE_CLASS_NUMBER
 
-            addTextChangedListener {
-                if (it != null) {
+            addTextChangedListener { text ->
+                if (text != null) {
                     val state = state
-                    val text = it.toString()
 
-                    try {
-                        val interval = text.toInt()
+                    val interval = StringUtils.parsePositiveInt(text)
+                    if(interval != -1) {
                         state.interval = interval
 
                         if (interval <= 0) {
                             error = lessOrZeroErrorStr
                         }
-                    } catch (e: Exception) {
+                    } else {
                         error = invalidNumberStr
                         state.isValid = false
                     }

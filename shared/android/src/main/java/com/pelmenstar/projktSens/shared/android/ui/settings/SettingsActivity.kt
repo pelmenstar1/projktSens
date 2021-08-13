@@ -15,6 +15,7 @@ import com.pelmenstar.projktSens.shared.android.Intent
 import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.R
 import com.pelmenstar.projktSens.shared.android.ui.*
+import com.pelmenstar.projktSens.shared.getChars
 
 class SettingsActivity : HomeButtonSupportActivity() {
     private lateinit var settings: Array<out Setting<*>>
@@ -49,8 +50,9 @@ class SettingsActivity : HomeButtonSupportActivity() {
         }
 
         val prefsName = intent.getStringExtra(EXTRA_PREFERENCES)!!
-        prefs = ReflectionUtils.createFromEmptyConstructorOrInstance(prefsName)
-        prefs.initialize(this)
+        prefs = ReflectionUtils.createFromEmptyConstructorOrInstance<Preferences>(prefsName).also {
+            it.initialize(this)
+        }
     }
 
     private fun loadStates(savedInstanceState: Bundle?) {
@@ -136,8 +138,15 @@ class SettingsActivity : HomeButtonSupportActivity() {
                         }
 
                         applyTextAppearance(body1)
+
                         val name = res.getString(setting.nameId)
-                        text = "$name:"
+                        val nameLength = name.length
+
+                        val buffer = CharArray(nameLength + 1)
+                        name.getChars(0, nameLength, buffer, 0)
+                        buffer[nameLength] = ':'
+
+                        setText(buffer, 0, buffer.size)
                     }
 
                     addView(setting.createView(context).apply {
