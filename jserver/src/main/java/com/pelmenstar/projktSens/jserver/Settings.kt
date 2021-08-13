@@ -9,6 +9,7 @@ import androidx.annotation.ArrayRes
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
 import com.pelmenstar.projktSens.serverProtocol.ContractType
+import com.pelmenstar.projktSens.shared.InetAddressUtils
 import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
 import com.pelmenstar.projktSens.shared.android.ui.EditText
@@ -27,12 +28,12 @@ val APP_SETTING_CLASS_NAMES: Array<out String> = Array(APP_SETTING_CLASSES.size)
     APP_SETTING_CLASSES[i].name
 }
 
-class ServerPortSetting: Setting<ServerPortSetting.State>() {
-    class State(port: Int): IncompleteState() {
+class ServerPortSetting : Setting<ServerPortSetting.State>() {
+    class State(port: Int) : IncompleteState() {
         var port: Int = 0
             set(value) {
                 field = value
-                isValid = isValidPort(value)
+                isValid = InetAddressUtils.isValidFreePort(value)
             }
 
         init {
@@ -53,9 +54,8 @@ class ServerPortSetting: Setting<ServerPortSetting.State>() {
         }
     }
 
-    override fun getNameId(): Int {
-        return R.string.settings_serverPortName
-    }
+    override val nameId: Int
+        get() = R.string.settings_serverPortName
 
     override fun createView(context: Context): View {
         val res = context.resources
@@ -66,10 +66,10 @@ class ServerPortSetting: Setting<ServerPortSetting.State>() {
         return EditText(context) {
             fun setErrorIfInvalidPort(port: Int) {
                 when {
-                    (port < PORT_MIN) -> {
+                    (port < InetAddressUtils.FREE_MIN_PORT) -> {
                         error = portReservedErrorLess
                     }
-                    (port > PORT_MAX) -> {
+                    (port > InetAddressUtils.FREE_MAX_PORT) -> {
                         error = portReservedErrorGreater
                     }
                 }
@@ -113,10 +113,9 @@ class ServerPortSetting: Setting<ServerPortSetting.State>() {
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val port = bundle.getInt(BUNDLE_PORT, -1)
-
-        return if(port != -1) {
-            state = State(port)
+        val port = bundle.get(BUNDLE_PORT)
+        return if (port != null) {
+            state = State(port as Int)
 
             true
         } else {
@@ -127,33 +126,25 @@ class ServerPortSetting: Setting<ServerPortSetting.State>() {
 
     companion object {
         private const val BUNDLE_PORT = "ServerPortSetting.state.port"
-
-        private const val PORT_MIN = 1024
-        private const val PORT_MAX = 49151
-
-        // maybe isn't the best place for such method
-        private fun isValidPort(port: Int): Boolean {
-            return port in (PORT_MIN..PORT_MAX)
-        }
     }
 }
 
-class ServerContractSetting: Setting<ServerContractSetting.State>() {
+class ServerContractSetting : Setting<ServerContractSetting.State>() {
     data class State(@JvmField var contractType: Int)
 
-    override fun getNameId(): Int {
-        return R.string.settings_serverContract
-    }
+    override val nameId: Int get() = R.string.settings_serverContract
 
     override fun createView(context: Context): View {
         return AppCompatSpinner(context).apply {
             adapter = simpleArrayAdapter(context, R.array.serverContracts)
 
-            setSelection(when(state.contractType) {
-                ContractType.CONTRACT_RAW -> 0
-                ContractType.CONTRACT_JSON -> 1
-                else -> throw RuntimeException("Invalid state.contractType")
-            })
+            setSelection(
+                when (state.contractType) {
+                    ContractType.CONTRACT_RAW -> 0
+                    ContractType.CONTRACT_JSON -> 1
+                    else -> throw RuntimeException("Invalid state.contractType")
+                }
+            )
 
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -188,9 +179,9 @@ class ServerContractSetting: Setting<ServerContractSetting.State>() {
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val type = bundle.getInt(BUNDLE_STATE_CONTRACT_TYPE, -1)
-        return if(type != -1) {
-            state = State(type)
+        val type = bundle.get(BUNDLE_STATE_CONTRACT_TYPE)
+        return if (type != null) {
+            state = State(type as Int)
 
             true
         } else {
@@ -203,8 +194,8 @@ class ServerContractSetting: Setting<ServerContractSetting.State>() {
     }
 }
 
-class WeatherSendIntervalSetting: Setting<WeatherSendIntervalSetting.State>() {
-    class State(interval: Int): IncompleteState() {
+class WeatherSendIntervalSetting : Setting<WeatherSendIntervalSetting.State>() {
+    class State(interval: Int) : IncompleteState() {
         var interval: Int = 0
             set(value) {
                 field = value
@@ -229,9 +220,8 @@ class WeatherSendIntervalSetting: Setting<WeatherSendIntervalSetting.State>() {
         }
     }
 
-    override fun getNameId(): Int {
-        return R.string.settings_weatherSendInterval_name
-    }
+    override val nameId: Int
+        get() = R.string.settings_weatherSendInterval_name
 
     override fun createView(context: Context): View {
         val res = context.resources
@@ -240,7 +230,7 @@ class WeatherSendIntervalSetting: Setting<WeatherSendIntervalSetting.State>() {
 
         return EditText(context) {
             setText(state.interval.toString())
-            if(!state.isValid) {
+            if (!state.isValid) {
                 error = lessOrZeroErrorStr
             }
 
@@ -280,9 +270,9 @@ class WeatherSendIntervalSetting: Setting<WeatherSendIntervalSetting.State>() {
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val interval = bundle.getInt(BUNDLE_STATE_INTERVAL, -1)
-        return if(interval != -1) {
-            state = State(interval)
+        val interval = bundle.get(BUNDLE_STATE_INTERVAL)
+        return if (interval != null) {
+            state = State(interval as Int)
             true
         } else {
             false
@@ -294,7 +284,10 @@ class WeatherSendIntervalSetting: Setting<WeatherSendIntervalSetting.State>() {
     }
 }
 
-private fun simpleArrayAdapter(context: Context, @ArrayRes resId: Int): ReadonlyArrayAdapter<String> {
+private fun simpleArrayAdapter(
+    context: Context,
+    @ArrayRes resId: Int
+): ReadonlyArrayAdapter<String> {
     return ReadonlyArrayAdapter(
         context,
         android.R.layout.simple_spinner_item,

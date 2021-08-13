@@ -61,8 +61,8 @@ abstract class Setting<TState : Any> {
     /**
      * Returns resource ID of string which describes the setting for user
      */
-    @StringRes
-    abstract fun getNameId(): Int
+    @get:StringRes
+    abstract val nameId: Int
 
     /**
      * Creates some [View] in order to give user a possibility to change setting

@@ -136,7 +136,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
                         }
 
                         applyTextAppearance(body1)
-                        val name = res.getString(setting.getNameId())
+                        val name = res.getString(setting.nameId)
                         text = "$name:"
                     }
 
