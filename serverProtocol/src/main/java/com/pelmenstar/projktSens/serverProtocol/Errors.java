@@ -44,6 +44,16 @@ public final class Errors {
      */
     public static final int INVALID_RESPONSE = 6;
 
+    private static final String[] ERROR_NAMES = new String[] {
+            "NONE",
+            "UNKNOWN",
+            "INVALID_ARGUMENTS",
+            "INVALID_COMMAND",
+            "INTERNAL_DB_ERROR",
+            "IO",
+            "INVALID_RESPONSE"
+    };
+
     private Errors() {
     }
 
@@ -51,12 +61,11 @@ public final class Errors {
      * If {@code e} is {@link IOException} returns {@link Errors#IO},
      * if {@code e} is {@link SQLException} returns {@link Errors#INTERNAL_DB_ERROR},
      * otherwise {@link Errors#UNKNOWN}
-     *
      */
     public static int exceptionToError(@NotNull Exception e) {
-        if(e instanceof IOException) {
+        if (e instanceof IOException) {
             return IO;
-        } else if(e instanceof SQLException) {
+        } else if (e instanceof SQLException) {
             return INTERNAL_DB_ERROR;
         } else {
             return UNKNOWN;
@@ -64,44 +73,26 @@ public final class Errors {
     }
 
     public static int fromString(@NotNull String name) {
-        if(name.equalsIgnoreCase("INVALID_ARGUMENTS")) {
-            return INVALID_ARGUMENTS;
-        } else if(name.equalsIgnoreCase("INVALID_COMMAND")) {
-            return INVALID_COMMAND;
-        } else if(name.equalsIgnoreCase("INVALID_RESPONSE")) {
-            return INVALID_RESPONSE;
-        } else if(name.equalsIgnoreCase("INTERNAL_DB_ERROR")) {
-            return INTERNAL_DB_ERROR;
-        } else if(name.equalsIgnoreCase("IO")) {
-            return IO;
-        } else if(name.equalsIgnoreCase("NONE")){
-            return NONE;
-        } else {
-            return UNKNOWN;
+        for(int i = 0; i < ERROR_NAMES.length; i++) {
+            if(ERROR_NAMES[i].equalsIgnoreCase(name)) {
+                return i;
+            }
         }
+
+        return UNKNOWN;
     }
 
     /**
      * Returns string representation of {@code error}
+     *
      * @param error error integer
      */
     @NotNull
     public static String toString(int error) {
-        switch (error) {
-            case INVALID_ARGUMENTS:
-                return "INVALID_ARGUMENTS";
-            case INVALID_COMMAND:
-                return "INVALID_COMMAND";
-            case INTERNAL_DB_ERROR:
-                return "INTERNAL_DB_ERROR";
-            case INVALID_RESPONSE:
-                return "INVALID_RESPONSE";
-            case IO:
-                return "IO";
-            case UNKNOWN:
-                return "UNKNOWN";
-            default:
-                return "NONE";
+        if(error < 0 || error >= ERROR_NAMES.length) {
+            throw new IllegalArgumentException("error");
         }
+
+        return ERROR_NAMES[error];
     }
 }

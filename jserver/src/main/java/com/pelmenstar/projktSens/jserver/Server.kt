@@ -22,10 +22,10 @@ import java.net.Socket
  * After [Request] has been sent, server will respond with [Response].
  *
  * Command of request should be one of these:
- * - [Commands.GEN_DAY_REPORT]. Arguments should contain date of desired report.
+ * - [Commands.GET_DAY_REPORT]. Arguments should contain date of desired report.
  *   If date is out of available data, server will return empty response, otherwise, will return instance of [DayReport]
  *
- * - [Commands.GEN_DAY_RANGE_REPORT]. Arguments should contain range of dates of desired report.
+ * - [Commands.GET_DAY_RANGE_REPORT]. Arguments should contain range of dates of desired report.
  *   Arguments should be instance of [ShortDateRange].
  *   If range is out of available data, server will return empty response, otherwise, will return instance of [DayRangeReport].
  *
@@ -148,7 +148,7 @@ class Server {
 
                     Response.okOrEmpty(range)
                 }
-                Commands.GEN_DAY_REPORT -> {
+                Commands.GET_DAY_REPORT -> {
                     if(arg == null) {
                         return Response.error(Errors.INVALID_ARGUMENTS)
                     }
@@ -168,7 +168,7 @@ class Server {
 
                     Response.okOrEmpty(report)
                 }
-                Commands.GEN_DAY_RANGE_REPORT -> {
+                Commands.GET_DAY_RANGE_REPORT -> {
                     if(arg == null) {
                         return Response.error(Errors.INVALID_ARGUMENTS)
                     }

@@ -15,3 +15,9 @@ interface ProtoConfig {
 
     val contract: Contract
 }
+
+class ProtoConfigImpl(
+    override val socketAddress: InetSocketAddress,
+    override val weatherChannelReceiveInterval: Int,
+    override val contract: Contract
+) : ProtoConfig

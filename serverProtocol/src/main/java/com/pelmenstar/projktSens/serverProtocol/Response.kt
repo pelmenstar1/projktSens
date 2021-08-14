@@ -15,13 +15,8 @@ sealed class Response: AppendableToStringBuilder() {
             sb.append("{Empty}")
         }
 
-        override fun equals(other: Any?): Boolean {
-            return other === Empty
-        }
-
-        override fun hashCode(): Int {
-            return 31
-        }
+        override fun equals(other: Any?): Boolean = other === Empty
+        override fun hashCode(): Int = 31
     }
 
     /**
@@ -41,9 +36,7 @@ sealed class Response: AppendableToStringBuilder() {
            }
         }
 
-        override fun hashCode(): Int {
-            return error
-        }
+        override fun hashCode(): Int = error
     }
 
     /**
@@ -63,9 +56,7 @@ sealed class Response: AppendableToStringBuilder() {
             }
         }
 
-        override fun hashCode(): Int {
-            return value.hashCode()
-        }
+        override fun hashCode(): Int = value.hashCode()
     }
 
     fun isEmpty(): Boolean {
@@ -106,7 +97,7 @@ sealed class Response: AppendableToStringBuilder() {
          * so type of [value] should be known in compile-time
          */
         fun<T:Any> okOrEmpty(value: T?): Response {
-            return if(value != null) ok(value) else Empty
+            return if(value != null) Ok(value) else Empty
         }
     }
 }

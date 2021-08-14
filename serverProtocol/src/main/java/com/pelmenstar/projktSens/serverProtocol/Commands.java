@@ -11,12 +11,12 @@ public final class Commands {
     /**
      * Makes repo-server to return instance of day report
      */
-    public static final int GEN_DAY_REPORT = 1;
+    public static final int GET_DAY_REPORT = 1;
 
     /**
      * Makes repo-server to return instance of day range report
      */
-    public static final int GEN_DAY_RANGE_REPORT = 2;
+    public static final int GET_DAY_RANGE_REPORT = 2;
 
     /**
      * Makes repo-server to get available date range that contains repository
@@ -33,8 +33,8 @@ public final class Commands {
     private static final int MAX_COMMAND = GET_NEXT_WEATHER_TIME;
 
     private static final String[] COMMAND_NAMES = new String[] {
-            "GEN_DAY_REPORT",
-            "GEN_DAY_RANGE_REPORT",
+            "GET_DAY_REPORT",
+            "GET_DAY_RANGE_REPORT",
             "GET_AVAILABLE_DATE_RANGE",
             "GET_LAST_WEATHER",
             "GET_NEXT_WEATHER_TIME"
@@ -59,7 +59,7 @@ public final class Commands {
      */
     @NotNull
     public static String toString(int command) {
-        if(command < 0 || command > MAX_COMMAND) {
+        if(command <= 0 || command > MAX_COMMAND) {
             throw new IllegalArgumentException("command");
         }
 

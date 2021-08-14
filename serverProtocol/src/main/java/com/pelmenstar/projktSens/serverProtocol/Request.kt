@@ -6,27 +6,7 @@ import com.pelmenstar.projktSens.shared.equalsPattern
 /**
  * Contains information to make request to server
  */
-class Request: AppendableToStringBuilder {
-    /**
-     * Command of request
-     */
-    val command: Int
-
-    /**
-     * Optional argument of request
-     */
-    val argument: Any?
-
-    constructor(command: Int) {
-        this.command = command
-        this.argument = null
-    }
-
-    constructor(command: Int, arg: Any?) {
-        this.command = command
-        this.argument = arg
-    }
-
+class Request(val command: Int, val argument: Any? = null) : AppendableToStringBuilder() {
     override fun equals(other: Any?): Boolean {
         return equalsPattern(other) { o ->
             command == o.command && argument == o.argument
@@ -35,7 +15,9 @@ class Request: AppendableToStringBuilder {
 
     override fun hashCode(): Int {
         var result = command
-        result = 31 * result + argument.hashCode()
+        if(argument != null) {
+            result = 31 * result + argument.hashCode()
+        }
 
         return result
     }

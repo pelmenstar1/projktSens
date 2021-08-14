@@ -17,7 +17,6 @@ import com.pelmenstar.projktSens.weather.app.R;
 import com.pelmenstar.projktSens.weather.app.formatters.MoonPhaseFormatter;
 import com.pelmenstar.projktSens.weather.app.formatters.ResourcesPrettyDateFormatter;
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter;
-import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartActivity;
 import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartContract;
 import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartPresenter;
 import com.pelmenstar.projktSens.weather.app.ui.home.HomeContract;
@@ -155,7 +154,7 @@ public final class AppModule {
         return new ProtoConfigImpl(
                 new InetSocketAddress(inetAddress, prefs.getServerPort()),
                 prefs.getWeatherReceiveInterval(),
-                ContractType.get(contractType)
+                ContractType.toObject(contractType)
         );
     }
 }

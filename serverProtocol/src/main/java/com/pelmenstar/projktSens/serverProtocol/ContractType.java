@@ -20,7 +20,7 @@ public final class ContractType {
     }
 
     @NotNull
-    public static Contract get(int contractType) {
+    public static Contract toObject(int contractType) {
         switch (contractType) {
             case CONTRACT_RAW:
                 return RawContract.INSTANCE;

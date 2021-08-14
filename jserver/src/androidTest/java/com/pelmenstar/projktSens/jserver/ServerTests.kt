@@ -47,7 +47,7 @@ class ServerTests {
     @Test
     fun genDayReport_returns_invalid_args_error_if_no_arguments_were_given() {
         runBlocking {
-            val response = client.requestRawResponse<Any>(Commands.GEN_DAY_REPORT)
+            val response = client.requestRawResponse<Any>(Commands.GET_DAY_REPORT)
             val error = (response as Response.Error).error
 
             assertEquals(Errors.INVALID_ARGUMENTS, error)
@@ -57,7 +57,7 @@ class ServerTests {
     @Test
     fun genDayReport_returns_invalid_args_error_if_date_was_invalid() {
         runBlocking {
-            val response = client.requestRawResponse<Any>(Commands.GEN_DAY_REPORT, ShortDate.NONE)
+            val response = client.requestRawResponse<Any>(Commands.GET_DAY_REPORT, ShortDate.NONE)
             val error = (response as Response.Error).error
 
             assertEquals(Errors.INVALID_ARGUMENTS, error)
@@ -70,7 +70,7 @@ class ServerTests {
             val nowDate = ShortDate.now()
             repo.debugGenDb(nowDate, 48)
 
-            val report = client.request<DayReport>(Commands.GEN_DAY_REPORT, nowDate)
+            val report = client.request<DayReport>(Commands.GET_DAY_REPORT, nowDate)
             assertNotNull(report)
         }
     }
@@ -81,7 +81,7 @@ class ServerTests {
             val nowDate = ShortDate.now()
             repo.clear()
 
-            val response = client.requestRawResponse<Any>(Commands.GEN_DAY_REPORT, nowDate)
+            val response = client.requestRawResponse<Any>(Commands.GET_DAY_REPORT, nowDate)
 
             assertTrue(response.isEmpty())
         }
@@ -93,7 +93,7 @@ class ServerTests {
             val nowDate = ShortDate.now()
 
             val response = client.requestRawResponse<Any>(
-                Commands.GEN_DAY_REPORT,
+                Commands.GET_DAY_REPORT,
                 ShortDate.minusDays(nowDate, 3)
             )
 
@@ -107,7 +107,7 @@ class ServerTests {
     @Test
     fun genDayRangeReport_returns_invalid_args_error_if_no_arguments_were_given() {
         runBlocking {
-            val response = client.requestRawResponse<Any>(Commands.GEN_DAY_RANGE_REPORT)
+            val response = client.requestRawResponse<Any>(Commands.GET_DAY_RANGE_REPORT)
             val error = (response as Response.Error).error
 
             assertEquals(Errors.INVALID_ARGUMENTS, error)
@@ -121,7 +121,7 @@ class ServerTests {
             repo.debugGenDb(nowDate, 24 * 4)
 
             val report = client.request<DayRangeReport>(
-                Commands.GEN_DAY_RANGE_REPORT,
+                Commands.GET_DAY_RANGE_REPORT,
                 ShortDateRange(nowDate, ShortDate.plusDays(nowDate, 1))
             )
 
@@ -136,7 +136,7 @@ class ServerTests {
             repo.clear()
 
             val response = client.requestRawResponse<Any>(
-                Commands.GEN_DAY_RANGE_REPORT,
+                Commands.GET_DAY_RANGE_REPORT,
                 ShortDateRange(nowDate, ShortDate.plusDays(nowDate, 1))
             )
 
@@ -151,7 +151,7 @@ class ServerTests {
             repo.debugGenDb(nowDate, 48)
 
             val response = client.requestRawResponse<Any>(
-                Commands.GEN_DAY_RANGE_REPORT,
+                Commands.GET_DAY_RANGE_REPORT,
                 ShortDateRange(ShortDate.minusDays(nowDate, 3), ShortDate.minusDays(nowDate, 2))
             )
 

@@ -1,6 +1,5 @@
 package com.pelmenstar.projktSens.serverProtocol
 
-import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.shared.connectSuspend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

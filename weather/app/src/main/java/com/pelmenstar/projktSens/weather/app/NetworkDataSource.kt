@@ -16,11 +16,11 @@ class NetworkDataSource(config: ProtoConfig) : WeatherDataSource {
     override suspend fun getDayReport(@ShortDateInt date: Int): DayReport? {
         require(ShortDate.isValid(date)) { "date" }
 
-        return useClient { request(Commands.GEN_DAY_REPORT, date) }
+        return useClient { request(Commands.GET_DAY_REPORT, date) }
     }
 
     override suspend fun getDayRangeReport(range: ShortDateRange): DayRangeReport? {
-        return useClient { request(Commands.GEN_DAY_RANGE_REPORT, range) }
+        return useClient { request(Commands.GET_DAY_RANGE_REPORT, range) }
     }
 
     override suspend fun getAvailableDateRange(): ShortDateRange? {

@@ -12,8 +12,8 @@ class JsonContractTests {
             ContractTestUtils.test(JsonContract, request)
         }
 
-        testCase(Commands.GEN_DAY_REPORT)
-        testCase(Commands.GEN_DAY_RANGE_REPORT)
+        testCase(Commands.GET_DAY_REPORT)
+        testCase(Commands.GET_DAY_RANGE_REPORT)
         testCase(Commands.GET_AVAILABLE_DATE_RANGE)
         testCase(Commands.GET_LAST_WEATHER)
     }
@@ -27,8 +27,8 @@ class JsonContractTests {
             ContractTestUtils.test(JsonContract, request)
         }
 
-        testCase(Commands.GEN_DAY_REPORT)
-        testCase(Commands.GEN_DAY_RANGE_REPORT)
+        testCase(Commands.GET_DAY_REPORT)
+        testCase(Commands.GET_DAY_RANGE_REPORT)
         testCase(Commands.GET_AVAILABLE_DATE_RANGE)
         testCase(Commands.GET_LAST_WEATHER)
     }

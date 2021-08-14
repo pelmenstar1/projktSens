@@ -36,7 +36,7 @@ class MainConfig(private val context: Context): Config() {
             return ProtoConfigImpl(
                 InetSocketAddress(host, prefs.serverPort),
                 prefs.weatherSendInterval,
-                ContractType.get(prefs.serverContract)
+                ContractType.toObject(prefs.serverContract)
             )
         }
 
