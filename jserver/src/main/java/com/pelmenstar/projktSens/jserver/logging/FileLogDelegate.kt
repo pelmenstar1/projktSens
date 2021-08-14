@@ -6,7 +6,7 @@ class FileLogDelegate(
     private val context: Context,
     private val fileName: String
 ): LogDelegate {
-    override fun print(level: LogLevel, message: String) {
+    override fun print(level: Int, message: String) {
         val msgEncoded = message.toByteArray(Charsets.UTF_8)
 
         context.openFileOutput(fileName, Context.MODE_APPEND).use { out ->

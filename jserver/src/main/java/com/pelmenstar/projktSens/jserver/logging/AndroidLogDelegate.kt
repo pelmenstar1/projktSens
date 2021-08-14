@@ -6,13 +6,13 @@ import android.util.Log
  * Implementation of [LogDelegate] which prints message using [Log]
  */
 object AndroidLogDelegate: LogDelegate {
-    override fun print(level: LogLevel, message: String) {
-        val aPriority: Int = when(level) {
-            LogLevel.DEBUG -> Log.DEBUG
-            LogLevel.INFO -> Log.INFO
-            LogLevel.ERROR -> Log.ERROR
-        }
+    private val ANDROID_LOG_MAP = intArrayOf(
+        Log.DEBUG,
+        Log.INFO,
+        Log.ERROR
+    )
 
-        Log.println(aPriority, "SERVER-LOG", message)
+    override fun print(level: Int, message: String) {
+        Log.println(ANDROID_LOG_MAP[level], "SERVER-LOG", message)
     }
 }

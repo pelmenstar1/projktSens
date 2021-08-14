@@ -65,7 +65,7 @@ class Server(
         try {
             ServerSocket().use { server ->
                 server.bindSuspend(address, 5)
-                log.info("server started")
+                log info "server started"
 
                 serverSocket = server
 
@@ -84,7 +84,7 @@ class Server(
                 }
             }
         } catch (e: Throwable) {
-            log.error(e)
+            log error e
         }
     }
 
@@ -109,21 +109,21 @@ class Server(
             val out = client.getOutputStream()
 
             val request = contract.readRequest(input)
-            log.info {
+            log info {
                 append("request=")
                 request.append(this)
             }
 
             val response = processRequest(request)
 
-            log.info {
+            log info {
                 append("response=")
                 response.append(this)
             }
 
             contract.writeResponse(response, out)
         } catch (e: Exception) {
-            log.error(e)
+            log error e
         }
     }
 
@@ -148,7 +148,7 @@ class Server(
                         return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
-                    log.info {
+                    log info {
                         append("date: ")
                         ShortDate.append(date, this)
                     }
@@ -164,7 +164,7 @@ class Server(
 
                     val range = arg as ShortDateRange
 
-                    log.info {
+                    log info {
                         append("range=")
                         append(range)
                     }
@@ -186,7 +186,7 @@ class Server(
                 else -> Response.error(Errors.INVALID_COMMAND)
             }
         } catch (e: Exception) {
-            log.error(e)
+            log error e
 
             Response.error(e)
         }

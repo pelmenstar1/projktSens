@@ -22,7 +22,7 @@ class WeatherMonitor(
     private var job: Job? = null
     private val nextWeatherRequestTime = AtomicLong()
 
-    private val log: Logger = Logger("WeatherMonitor", loggerConfig)
+    private val log = Logger("WeatherMonitor", loggerConfig)
 
     /**
      * Returns epoch millis when next weather will be requested
@@ -40,7 +40,7 @@ class WeatherMonitor(
      */
     fun start() {
         if (job != null) {
-            log.error("monitor is already running")
+            log error "monitor is already running"
             return
         }
 
@@ -57,13 +57,13 @@ class WeatherMonitor(
                         try {
                             weatherRepo.put(dataProvider.getWeather())
                         } catch (e: Exception) {
-                            log.error(e)
+                            log error e
                         }
                     }
 
                     delay(interval)
                 } catch (e: Exception) {
-                    log.error(e)
+                    log error e
                 }
             }
         }
