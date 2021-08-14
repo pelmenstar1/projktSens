@@ -1,4 +1,4 @@
-package com.pelmenstar.projktSens.jserver
+package com.pelmenstar.projktSens.jserver.logging
 
 /**
  * Represents various level of logging. When message is logger, it's possible to specify its priority using

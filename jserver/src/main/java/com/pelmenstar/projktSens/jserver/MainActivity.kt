@@ -9,6 +9,8 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import com.pelmenstar.projktSens.jserver.di.AppModule
+import com.pelmenstar.projktSens.jserver.di.DaggerAppComponent
 import com.pelmenstar.projktSens.serverProtocol.ServerAvailabilityProvider
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsActivity
@@ -26,8 +28,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        serverConfig = MainConfig(this)
 
         content {
             LinearLayout(this) {
@@ -94,8 +94,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun isServerActuallyStarted(): Boolean {
-        val sc = serverConfig
-        val provider = ServerAvailabilityProvider(sc.protoConfig)
+        val component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
+        val provider = ServerAvailabilityProvider(component.protoConfig())
 
         return provider.isAvailable()
     }

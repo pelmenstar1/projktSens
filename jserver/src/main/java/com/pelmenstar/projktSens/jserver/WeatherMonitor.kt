@@ -1,5 +1,8 @@
 package com.pelmenstar.projktSens.jserver
 
+import com.pelmenstar.projktSens.jserver.logging.Logger
+import com.pelmenstar.projktSens.jserver.logging.LoggerConfig
+import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.weather.models.WeatherInfoProvider
 import com.pelmenstar.projktSens.weather.models.WeatherRepository
 import kotlinx.coroutines.*
@@ -8,21 +11,18 @@ import java.util.concurrent.atomic.AtomicLong
 /**
  * Requests weather in [WeatherInfoProvider] and puts it to default [WeatherRepository]
  */
-object WeatherMonitor {
+class WeatherMonitor(
+    private val protoConfig: ProtoConfig,
+    loggerConfig: LoggerConfig,
+    private val dataProvider: WeatherInfoProvider,
+    private val weatherRepo: WeatherRepository,
+) {
     private val scope = CoroutineScope(Dispatchers.Default)
 
-    private const val TAG = "WeatherMonitor"
-
-    @JvmStatic
     private var job: Job? = null
     private val nextWeatherRequestTime = AtomicLong()
 
-    private val log: Logger
-
-    init {
-        val config = serverConfig
-        log = Logger("WeatherMonitor", config.loggerConfig)
-    }
+    private val log: Logger = Logger("WeatherMonitor", loggerConfig)
 
     /**
      * Returns epoch millis when next weather will be requested
@@ -45,10 +45,6 @@ object WeatherMonitor {
         }
 
         job = scope.launch {
-            val config = serverConfig
-            val protoConfig = config.protoConfig
-            val dataProvider = config.weatherProvider
-            val repo = config.sharedRepo
             val interval = protoConfig.weatherChannelReceiveInterval.toLong()
 
             while (isActive) {
@@ -59,7 +55,7 @@ object WeatherMonitor {
                         // additional try-block 'cause if exception occurs here,
                         // coroutine won't be delayed
                         try {
-                            repo.put(dataProvider.getWeather())
+                            weatherRepo.put(dataProvider.getWeather())
                         } catch (e: Exception) {
                             log.error(e)
                         }

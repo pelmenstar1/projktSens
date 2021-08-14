@@ -6,22 +6,31 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.pelmenstar.projktSens.jserver.di.AppModule
+import com.pelmenstar.projktSens.jserver.di.DaggerAppComponent
 
 class ServerService : Service() {
-    private lateinit var controller: Controller
+    private lateinit var server: Server
+    private lateinit var weatherMonitor: WeatherMonitor
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
 
-        serverConfig = MainConfig(this)
-        controller = Controller()
+        val component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
+        val wm = component.weatherMonitor()
+        weatherMonitor = wm
+        server = component.server().apply {
+            weatherMonitor = wm
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(NOTIFICATION_ID, createNotification())
-        controller.startAll()
+
+        weatherMonitor.start()
+        server.startOnNewThread()
 
         return START_NOT_STICKY
     }
@@ -30,7 +39,9 @@ class ServerService : Service() {
         super.onDestroy()
 
         stopForeground(true)
-        controller.stopAll()
+
+        weatherMonitor.stop()
+        server.stop()
     }
 
     private fun createNotificationChannel() {

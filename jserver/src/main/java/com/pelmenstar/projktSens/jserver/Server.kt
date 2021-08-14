@@ -1,10 +1,8 @@
 package com.pelmenstar.projktSens.jserver
 
-import com.pelmenstar.projktSens.serverProtocol.Errors
-import com.pelmenstar.projktSens.serverProtocol.Commands
-import com.pelmenstar.projktSens.serverProtocol.Contract
-import com.pelmenstar.projktSens.serverProtocol.Request
-import com.pelmenstar.projktSens.serverProtocol.Response
+import com.pelmenstar.projktSens.jserver.logging.Logger
+import com.pelmenstar.projktSens.jserver.logging.LoggerConfig
+import com.pelmenstar.projktSens.serverProtocol.*
 import com.pelmenstar.projktSens.shared.acceptSuspend
 import com.pelmenstar.projktSens.shared.bindSuspend
 import com.pelmenstar.projktSens.shared.time.ShortDate
@@ -35,32 +33,23 @@ import java.net.Socket
  *  - [Commands.GET_LAST_WEATHER]. No arguments is required.
  *  Last added weather will be returned.
  */
-class Server {
-    private val contract: Contract
-    private val repo: WeatherRepository
-
-    private val scope = CoroutineScope(Dispatchers.IO)
-
+class Server(
+    protoConfig: ProtoConfig,
+    loggerConfig: LoggerConfig,
+    private val weatherRepo: WeatherRepository
+) {
     @Volatile
     private var serverSocket: ServerSocket? = null
 
     @Volatile
     private var job: Job? = null
 
-    private val address: InetSocketAddress
+    var weatherMonitor: WeatherMonitor? = null
 
-    private val log: Logger
+    private val address: InetSocketAddress = protoConfig.socketAddress
+    private val contract: Contract = protoConfig.contract
 
-    init {
-        val serverConfig = serverConfig
-        val protoConfig = serverConfig.protoConfig
-
-        log = Logger(javaClass.simpleName, serverConfig.loggerConfig)
-        address = protoConfig.socketAddress
-
-        contract = protoConfig.contract
-        repo = serverConfig.sharedRepo
-    }
+    private val log: Logger = Logger(javaClass.simpleName, loggerConfig)
 
     fun startOnNewThread() {
         job = scope.launch {
@@ -144,18 +133,18 @@ class Server {
 
             when (request.command) {
                 Commands.GET_AVAILABLE_DATE_RANGE -> {
-                    val range = repo.getAvailableDateRange()
+                    val range = weatherRepo.getAvailableDateRange()
 
                     Response.okOrEmpty(range)
                 }
                 Commands.GET_DAY_REPORT -> {
-                    if(arg == null) {
+                    if (arg == null) {
                         return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
                     val date = arg as Int
 
-                    if(!ShortDate.isValid(date)) {
+                    if (!ShortDate.isValid(date)) {
                         return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
@@ -164,12 +153,12 @@ class Server {
                         ShortDate.append(date, this)
                     }
 
-                    val report = repo.getDayReport(date)
+                    val report = weatherRepo.getDayReport(date)
 
                     Response.okOrEmpty(report)
                 }
                 Commands.GET_DAY_RANGE_REPORT -> {
-                    if(arg == null) {
+                    if (arg == null) {
                         return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
@@ -180,17 +169,17 @@ class Server {
                         append(range)
                     }
 
-                    val report = repo.getDayRangeReport(range)
+                    val report = weatherRepo.getDayRangeReport(range)
 
                     Response.okOrEmpty(report)
                 }
                 Commands.GET_LAST_WEATHER -> {
-                    val weather = repo.getLastWeather()
+                    val weather = weatherRepo.getLastWeather()
 
                     Response.okOrEmpty(weather)
                 }
                 Commands.GET_NEXT_WEATHER_TIME -> {
-                    val time = WeatherMonitor.getNextWeatherRequestTime()
+                    val time = weatherMonitor?.getNextWeatherRequestTime() ?: 0
 
                     Response.ok(time)
                 }
@@ -201,5 +190,9 @@ class Server {
 
             Response.error(e)
         }
+    }
+
+    companion object {
+        private val scope = CoroutineScope(Dispatchers.IO)
     }
 }

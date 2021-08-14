@@ -1,8 +1,6 @@
 package com.pelmenstar.projktSens.jserver.logging
 
 import android.content.Context
-import com.pelmenstar.projktSens.jserver.LogDelegate
-import com.pelmenstar.projktSens.jserver.LogLevel
 
 class FileLogDelegate(
     private val context: Context,

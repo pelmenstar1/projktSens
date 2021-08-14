@@ -2,6 +2,7 @@ package com.pelmenstar.projktSens.jserver
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.pelmenstar.projktSens.jserver.di.DaggerAppComponent
 import com.pelmenstar.projktSens.serverProtocol.*
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
@@ -24,7 +25,7 @@ class ServerTests {
     @Test
     fun getAvailableDateRange_returns_empty_response_if_db_is_empty() {
         runBlocking {
-            repo.clear()
+            weatherRepo.clear()
             val response = client.requestRawResponse<Any>(Commands.GET_AVAILABLE_DATE_RANGE)
 
             assertTrue(response.isEmpty())
@@ -34,7 +35,7 @@ class ServerTests {
     @Test
     fun getAvailableDateRange_returns_valid_ok_response_if_db_is_not_empty() {
         runBlocking {
-            repo.debugGenDb(ShortDate.now(), 48)
+            weatherRepo.debugGenDb(ShortDate.now(), 48)
 
             val range = client.request<ShortDateRange>(Commands.GET_AVAILABLE_DATE_RANGE)
             assertNotNull(range)
@@ -68,7 +69,7 @@ class ServerTests {
     fun genDayReport_returns_valid_report() {
         runBlocking<Unit> {
             val nowDate = ShortDate.now()
-            repo.debugGenDb(nowDate, 48)
+            weatherRepo.debugGenDb(nowDate, 48)
 
             val report = client.request<DayReport>(Commands.GET_DAY_REPORT, nowDate)
             assertNotNull(report)
@@ -79,7 +80,7 @@ class ServerTests {
     fun genDayReport_returns_empty_response_if_db_is_empty() {
         runBlocking {
             val nowDate = ShortDate.now()
-            repo.clear()
+            weatherRepo.clear()
 
             val response = client.requestRawResponse<Any>(Commands.GET_DAY_REPORT, nowDate)
 
@@ -118,7 +119,7 @@ class ServerTests {
     fun genDayRangeReport_returns_valid_report() {
         runBlocking {
             val nowDate = ShortDate.now()
-            repo.debugGenDb(nowDate, 24 * 4)
+            weatherRepo.debugGenDb(nowDate, 24 * 4)
 
             val report = client.request<DayRangeReport>(
                 Commands.GET_DAY_RANGE_REPORT,
@@ -133,7 +134,7 @@ class ServerTests {
     fun genDayRangeReport_returns_empty_response_if_db_is_empty() {
         runBlocking {
             val nowDate = ShortDate.now()
-            repo.clear()
+            weatherRepo.clear()
 
             val response = client.requestRawResponse<Any>(
                 Commands.GET_DAY_RANGE_REPORT,
@@ -148,7 +149,7 @@ class ServerTests {
     fun genDayRangeReport_returns_empty_response_if_date_range_out_of_range() {
         runBlocking {
             val nowDate = ShortDate.now()
-            repo.debugGenDb(nowDate, 48)
+            weatherRepo.debugGenDb(nowDate, 48)
 
             val response = client.requestRawResponse<Any>(
                 Commands.GET_DAY_RANGE_REPORT,
@@ -165,7 +166,7 @@ class ServerTests {
     @Test
     fun getLastWeather_returns_empty_response_if_db_is_empty() {
         runBlocking {
-            repo.clear()
+            weatherRepo.clear()
 
             val response = client.requestRawResponse<Any>(Commands.GET_LAST_WEATHER)
 
@@ -176,7 +177,7 @@ class ServerTests {
     @Test
     fun getLastWeather_returns_valid_weather() {
         runBlocking {
-            repo.debugGenDb(ShortDate.now(), 48)
+            weatherRepo.debugGenDb(ShortDate.now(), 48)
 
             assertNotNull(client.request<WeatherInfo>(Commands.GET_LAST_WEATHER))
         }
@@ -185,18 +186,17 @@ class ServerTests {
     companion object {
         private val context = InstrumentationRegistry.getInstrumentation().context
         private lateinit var client: Client
-        private lateinit var repo: WeatherRepository
+        private lateinit var weatherRepo: WeatherRepository
         private lateinit var server: Server
 
         @BeforeClass
         @JvmStatic
         fun before() {
-            val config = TestConfig(context)
-            serverConfig = config
-            client = Client(config.protoConfig)
+            val component = DaggerAppComponent.builder().appModule(TestAppModule(context)).build()
+            client = Client(component.protoConfig())
 
-            repo = serverConfig.sharedRepo
-            server = Server().also {
+            weatherRepo = component.weatherRepository()
+            server = component.server().also {
                 it.startOnNewThread()
             }
         }
