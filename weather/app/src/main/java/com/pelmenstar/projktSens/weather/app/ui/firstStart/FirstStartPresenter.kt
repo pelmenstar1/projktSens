@@ -13,27 +13,30 @@ class FirstStartPresenter(
         ChooseServerContractScreen()
     )
     private val tempStateBundle = Bundle()
+
     private var position: Int = -1
+    private var savedPosition: Int = -1
 
     private val setCurrentScreenValid = FirstStartScreen.IncompleteState.OnValidChanged {
         view.setCurrentStateValid(it)
     }
 
-    override fun attach(view: FirstStartContract.View) {
-        super.attach(view)
-
-        changeScreen(0)
-    }
-
     override fun saveState(outState: Bundle) {
         outState.putInt(STATE_POSITION, position)
+
+        screens[position].saveStateToBundle(tempStateBundle)
+
         outState.putBundle(STATE_TEMP_INTERNAL_STATE_BUNDLE, tempStateBundle)
     }
 
+    override fun afterRestoredFromSavedState() {
+        changeScreen(if(savedPosition == -1) 0 else savedPosition)
+    }
+
     override fun restoreState(state: Bundle) {
-        val pos = state.getInt(STATE_POSITION, -1)
-        if(pos != -1) {
-            changeScreen(pos)
+        val pos = state.get(STATE_POSITION) as Int?
+        if(pos != null) {
+            savedPosition = pos
 
             val bundle = state.getBundle(STATE_TEMP_INTERNAL_STATE_BUNDLE)
             if (bundle != null) {

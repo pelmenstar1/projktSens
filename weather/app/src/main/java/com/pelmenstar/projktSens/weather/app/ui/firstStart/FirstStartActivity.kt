@@ -48,6 +48,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
             if(savedInstanceState != null) {
                 it.restoreState(savedInstanceState)
             }
+            it.afterRestoredFromSavedState()
         }
     }
 
