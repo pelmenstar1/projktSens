@@ -3,10 +3,12 @@ package com.pelmenstar.projktSens.serverProtocol
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.pelmenstar.projktSens.shared.readString
-import com.pelmenstar.projktSens.shared.writeString
-import java.io.InputStream
-import java.io.OutputStream
+import com.google.gson.JsonPrimitive
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
+import com.pelmenstar.projktSens.shared.*
+import java.io.*
+import kotlin.coroutines.suspendCoroutine
 
 object JsonContract: Contract {
     private const val BUFFER_SIZE = 1024
@@ -21,12 +23,10 @@ object JsonContract: Contract {
             append('"')
 
             if(arg != null) {
-                val argJson = gson.toJson(arg)
-
                 append(",argClass=\"")
                 append(arg.javaClass.name)
                 append("\",arg=")
-                append(argJson)
+                gson.toJson(arg, this)
             }
             append('}')
         }
@@ -60,13 +60,10 @@ object JsonContract: Contract {
     override suspend fun writeResponse(response: Response, output: OutputStream) {
         val json = when(response) {
             Response.Empty -> "{}"
-            is Response.Error -> {
-                "{error=${Errors.toString(response.error)}}"
-            }
-            is Response.Ok<*> -> {
-                gson.toJson(response.value)
-            }
+            is Response.Error -> "{error=${Errors.toString(response.error)}}"
+            is Response.Ok<*> -> gson.toJson(response.value)
         }
+
         output.writeString(json, Charsets.UTF_8)
     }
 
@@ -77,19 +74,21 @@ object JsonContract: Contract {
         val json = input.readString(Charsets.UTF_8, BUFFER_SIZE)
 
         try {
-            val root = JsonParser.parseString(json) as JsonObject
-            if(root.size() == 0) {
-                return Response.Empty
+            val root = JsonParser.parseString(json)
+            if(root is JsonObject) {
+                if (root.size() == 0) {
+                    return Response.Empty
+                }
+
+                val errorElement = root.get("error")
+                if (errorElement != null) {
+                    val errorName = errorElement.asString
+
+                    return Response.error(Errors.fromString(errorName))
+                }
             }
 
-            if(root.has("error")) {
-                val errorName = root.get("error").asString
-                val errorId = Errors.fromString(errorName)
-
-                return Response.error(errorId)
-            }
-
-            val value = gson.fromJson(json, valueClass)
+            val value = gson.fromJson(root, valueClass)
             return Response.ok(value)
         } catch (e: Exception) {
             throw RuntimeException("Illegal request JSON", e)
