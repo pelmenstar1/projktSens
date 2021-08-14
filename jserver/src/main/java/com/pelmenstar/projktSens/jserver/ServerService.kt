@@ -52,7 +52,18 @@ class ServerService : Service() {
         val intent = MainActivity.intent(this, serverStarted = true).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
         }
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        var pendingIntentFlags = PendingIntent.FLAG_UPDATE_CURRENT
+        if(Build.VERSION.SDK_INT >= 23) {
+            pendingIntentFlags = pendingIntentFlags or PendingIntent.FLAG_IMMUTABLE
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            pendingIntentFlags
+        )
 
         return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).run {
             priority = NotificationCompat.PRIORITY_DEFAULT
