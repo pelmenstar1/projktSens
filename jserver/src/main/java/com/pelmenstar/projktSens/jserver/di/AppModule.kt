@@ -18,7 +18,7 @@ import java.net.InetSocketAddress
 
 @Module
 open class AppModule(private val context: Context) {
-    private val host by lazy { InetUtils.getInetAddress(context)!! }
+    private val host by lazy { DeviceInetUtils.getInetAddress(context)!! }
     private val weatherRepo by lazy { DbServerWeatherRepository.file(context) }
     private val weatherProvider by lazy { SensorWeatherProvider() }
     private val loggerConfig by lazy {
