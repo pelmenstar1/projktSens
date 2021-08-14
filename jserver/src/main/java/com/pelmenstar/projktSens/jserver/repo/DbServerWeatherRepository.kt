@@ -171,7 +171,7 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
         }
 
         private fun createDayQuery(@ShortDateInt date: Int): String {
-            val dayEpoch = ShortDate.toEpochDay(date)
+            val dayEpoch = ShortDate.toEpochDay(date).toLong()
             val startDateTime = dayEpoch * TimeConstants.SECONDS_IN_DAY
             val endDateTime = startDateTime + (TimeConstants.SECONDS_IN_DAY - 1)
 
