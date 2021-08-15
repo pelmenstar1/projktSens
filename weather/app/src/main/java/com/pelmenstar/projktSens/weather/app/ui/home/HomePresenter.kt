@@ -38,7 +38,6 @@ class HomePresenter(
     private val weatherChannelInfoProvider: WeatherChannelInfoProvider
 ) : BasePresenter<HomeContract.View>(), HomeContract.Presenter {
     private val mainThread = MainThreadHandler(this)
-    private val scope = CoroutineScope(Dispatchers.Default)
 
     private var refreshAstroJob: Job? = null
     private var weatherChannelJob: Job? = null
@@ -343,6 +342,8 @@ class HomePresenter(
     }
 
     companion object {
+        private val scope = CoroutineScope(Dispatchers.Default)
+
         private const val TAG = "HomePresenter"
 
         private const val MSG_ON_SERVER_UNAVAILABLE = 0

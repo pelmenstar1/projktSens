@@ -105,7 +105,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
         setState(STATE_LOADING)
         val handler = loadMinMaxHandler
         if (handler != null) {
-            scope.launch {
+            scope.launch(Dispatchers.IO) {
                 try {
                     val range = handler.load()
 

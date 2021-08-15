@@ -11,24 +11,11 @@ import java.nio.charset.Charset
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.min
 
-/*
-private class ClosableCompletionHandler(private val closeable: Closeable): CompletionHandler {
-    override fun invoke(cause: Throwable?) {
-        try {
-            closeable.close()
-        } catch (e: Exception) {
-        }
-    }
-}
- */
-
 /**
  * Suspend version of [Socket.connect]
  */
 suspend fun Socket.connectSuspend(address: SocketAddress) {
     suspendCancellableCoroutine<Unit> { cont ->
-        //cont.invokeOnCancellation(ClosableCompletionHandler(this))
-
         connect(address)
         cont.resumeWith(UnitResult.SUCCESS)
     }
@@ -46,8 +33,6 @@ suspend fun Socket.connectSuspend(address: SocketAddress, timeout: Int) {
  */
 suspend fun ServerSocket.bindSuspend(address: SocketAddress, backlog: Int) {
     suspendCancellableCoroutine<Unit> { cont ->
-        //cont.invokeOnCancellation(ClosableCompletionHandler(this))
-
         bind(address, backlog)
         cont.resumeWith(UnitResult.SUCCESS)
     }
@@ -58,8 +43,6 @@ suspend fun ServerSocket.bindSuspend(address: SocketAddress, backlog: Int) {
  */
 suspend fun ServerSocket.acceptSuspend(): Socket {
     return suspendCancellableCoroutine { cont ->
-        //cont.invokeOnCancellation(ClosableCompletionHandler(this))
-
         val socket = accept()
 
         cont.resumeWith(Result.success(socket))

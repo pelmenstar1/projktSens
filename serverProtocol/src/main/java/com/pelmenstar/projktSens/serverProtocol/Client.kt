@@ -1,8 +1,6 @@
 package com.pelmenstar.projktSens.serverProtocol
 
 import com.pelmenstar.projktSens.shared.connectSuspend
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.Socket
 
@@ -82,14 +80,12 @@ class Client(config: ProtoConfig) {
      * Unlike [request], returns [Response] without additional mappings
      */
     suspend fun requestRawResponse(request: Request, responseValueClass: Class<*>): Response {
-        return withContext(Dispatchers.IO) {
-            Socket().use { socket ->
-                socket.soTimeout = 5000
-                socket.connectSuspend(address, 5000)
+        return Socket().use { socket ->
+            socket.soTimeout = 5000
+            socket.connectSuspend(address, 5000)
 
-                contract.writeRequest(request, socket.getOutputStream())
-                contract.readResponse(socket.getInputStream(), responseValueClass)
-            }
+            contract.writeRequest(request, socket.getOutputStream())
+            contract.readResponse(socket.getInputStream(), responseValueClass)
         }
     }
 }

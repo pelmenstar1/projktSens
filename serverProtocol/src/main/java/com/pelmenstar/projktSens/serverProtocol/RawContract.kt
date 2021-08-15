@@ -5,12 +5,9 @@ import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
 import com.pelmenstar.projktSens.shared.serialization.Serializable
 import com.pelmenstar.projktSens.shared.serialization.ValueReader
 import com.pelmenstar.projktSens.shared.serialization.ValueWriter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import kotlin.math.min
 
 /**
  * Writes and reads [Request], [Response] in raw non-human readable compact binary form.
@@ -24,59 +21,56 @@ object RawContract: Contract {
     private val RESPONSE_STATE_EMPTY_BUFFER = byteArrayOf(STATUS_EMPTY)
 
     override suspend fun writeRequest(request: Request, output: OutputStream) {
-        withContext(Dispatchers.IO) {
-            val command = request.command.toByte()
-            val arg = request.argument
+        val command = request.command.toByte()
+        val arg = request.argument
 
-            val buffer: ByteArray
-            if (arg == null) {
-                buffer = ByteArray(5)
-                buffer[0] = command
-            } else {
-                val argClass = arg.javaClass
-                val argClassName = argClass.name
-                val serializer = Serializable.getSerializer(argClass)
-                val objectSize = serializer.getSerializedObjectSize(arg)
+        val buffer: ByteArray
+        if (arg == null) {
+            buffer = ByteArray(5)
+            buffer[0] = command
+        } else {
+            val argClass = arg.javaClass
+            val argClassName = argClass.name
+            val serializer = Serializable.getSerializer(argClass)
+            val objectSize = serializer.getSerializedObjectSize(arg)
 
-                buffer = buildByteArray(objectSize + argClassName.length + 5) {
-                    this[0] = command
-                    writeShort(1, objectSize.toShort())
-                    writeShort(3, argClassName.length.toShort())
-                    serializer.writeObject(arg, ValueWriter(this, 5))
-                    StringUtils.writeAsciiBytes(argClassName, this, objectSize + 5)
-                }
+            buffer = buildByteArray(objectSize + argClassName.length + 5) {
+                this[0] = command
+                writeShort(1, objectSize.toShort())
+                writeShort(3, argClassName.length.toShort())
+                serializer.writeObject(arg, ValueWriter(this, 5))
+                StringUtils.writeAsciiBytes(argClassName, this, objectSize + 5)
             }
-            output.writeSuspend(buffer)
         }
+
+        output.writeSuspend(buffer)
     }
 
     override suspend fun readRequest(input: InputStream): Request {
-        return withContext(Dispatchers.IO) {
-            val header = input.readNSuspend(5)
+        val header = input.readNSuspend(5)
 
-            val command = header[0].toInt() and 0xff
-            val argContentLength = header.getShort(1).toInt()
-            val argClassNameLength = header.getShort(3).toInt()
+        val command = header[0].toInt() and 0xff
+        val argContentLength = header.getShort(1).toInt()
+        val argClassNameLength = header.getShort(3).toInt()
 
-            val argBytes: ByteArray
+        val argBytes: ByteArray
 
-            when {
-                argContentLength == 0 -> {
-                    return@withContext Request(command)
-                }
-                argContentLength > 0 -> {
-                    argBytes = input.readNSuspend(argContentLength + argClassNameLength)
-                }
-                else -> throw IOException()
+        when {
+            argContentLength == 0 -> {
+                return Request(command)
             }
-
-            val argClassName = String(argBytes, argContentLength, argClassNameLength, Charsets.US_ASCII)
-
-            val serializer = Serializable.getSerializer(Class.forName(argClassName))
-            val arg = serializer.readObject(ValueReader(argBytes))
-
-            Request(command, arg)
+            argContentLength > 0 -> {
+                argBytes = input.readNSuspend(argContentLength + argClassNameLength)
+            }
+            else -> throw IOException()
         }
+
+        val argClassName = String(argBytes, argContentLength, argClassNameLength, Charsets.US_ASCII)
+
+        val serializer = Serializable.getSerializer(Class.forName(argClassName))
+        val arg = serializer.readObject(ValueReader(argBytes))
+
+        return Request(command, arg)
     }
 
     @Suppress("UNCHECKED_CAST")
