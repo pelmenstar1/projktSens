@@ -68,11 +68,11 @@ class Client(config: ProtoConfig) {
         return requestRawResponse(command, arg, T::class.java)
     }
 
-    suspend inline fun<T:Any> requestRawResponse(command: Int, responseValueClass: Class<T>): Response {
+    suspend inline fun requestRawResponse(command: Int, responseValueClass: Class<*>): Response {
         return requestRawResponse(Request(command), responseValueClass)
     }
 
-    suspend inline fun<T:Any> requestRawResponse(command: Int, arg: Any, responseValueClass: Class<T>): Response {
+    suspend inline fun requestRawResponse(command: Int, arg: Any, responseValueClass: Class<*>): Response {
         return requestRawResponse(Request(command, arg), responseValueClass)
     }
 
@@ -81,7 +81,7 @@ class Client(config: ProtoConfig) {
      *
      * Unlike [request], returns [Response] without additional mappings
      */
-    suspend fun<T:Any> requestRawResponse(request: Request, responseValueClass: Class<T>): Response {
+    suspend fun requestRawResponse(request: Request, responseValueClass: Class<*>): Response {
         return withContext(Dispatchers.IO) {
             Socket().use { socket ->
                 socket.soTimeout = 5000
