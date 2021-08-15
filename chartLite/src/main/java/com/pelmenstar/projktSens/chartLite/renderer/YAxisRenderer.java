@@ -42,7 +42,7 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
         long vphHash = viewPortHandler.stateHashCode();
         long axisHash = axis.entriesHash;
 
-        if(computedPointsAxisEntriesHash == axisHash || computedPointsVphHash == vphHash) {
+        if(computedPointsAxisEntriesHash == axisHash && computedPointsVphHash == vphHash) {
             return;
         }
 
