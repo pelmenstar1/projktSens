@@ -10,6 +10,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="true" />
+
+    <uses-feature
         android:name="android.hardware.location"
         android:required="false" />
 
@@ -21,13 +25,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.firstStart.FirstStartActivity"/>
+        <activity android:name=".ui.firstStart.FirstStartActivity"
+            android:configChanges="orientation|screenSize"/>
         <activity
             android:name="com.pelmenstar.projktSens.shared.android.ui.settings.SettingsActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".ui.StartupActivity"
-            android:theme="@style/AppTheme.Launcher">
+            android:theme="@style/AppTheme.Launcher"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
