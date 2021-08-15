@@ -42,7 +42,7 @@ val APP_SETTING_CLASS_NAMES: Array<out String> = Array(APP_SETTING_CLASSES.size)
 abstract class ValueUnitSetting : Setting<ValueUnitSetting.State>() {
     data class State(@JvmField var unit: Int)
 
-    private val bundleKey = "${javaClass.name}.state.unit"
+    private val bundleKey = createBundleKey(javaClass)
 
     abstract val packedUnitType: Int
     abstract val spinnerInfo: Long
@@ -107,6 +107,25 @@ abstract class ValueUnitSetting : Setting<ValueUnitSetting.State>() {
     }
 
     companion object {
+        private fun createBundleKey(c: Class<*>): String {
+            val className = c.name
+            val dotIndex = className.lastIndexOf('.')
+            var reservedLength = className.length + 10
+            if(dotIndex >= 0) {
+                reservedLength -= dotIndex
+            }
+
+            return buildString(reservedLength) {
+                if(dotIndex < 0) {
+                    append(className)
+                } else {
+                    append(className, dotIndex, className.length)
+                }
+
+                append(".state.unit")
+            }
+        }
+
         @JvmStatic
         protected fun spinnerInfo(
             @ArrayRes arrayRes: Int,
