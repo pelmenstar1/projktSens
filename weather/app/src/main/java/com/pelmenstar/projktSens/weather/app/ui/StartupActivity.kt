@@ -76,7 +76,11 @@ class StartupActivity : Activity() {
 
             onPermissionsRequested()
         } else if(requestCode == REQUEST_CODE_FIRST_START) {
-            startHomeActivityAndFinish()
+            if(resultCode == RESULT_OK) {
+                startHomeActivityAndFinish()
+            } else {
+                finish()
+            }
         }
     }
 

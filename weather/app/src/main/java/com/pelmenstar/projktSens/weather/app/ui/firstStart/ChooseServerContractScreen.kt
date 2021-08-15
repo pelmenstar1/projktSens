@@ -2,18 +2,13 @@ package com.pelmenstar.projktSens.weather.app.ui.firstStart
 
 import android.content.Context
 import android.os.Bundle
-import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.widget.AdapterView
-import android.widget.GridLayout
-import androidx.core.widget.addTextChangedListener
 import com.pelmenstar.projktSens.serverProtocol.ContractType
-import com.pelmenstar.projktSens.shared.InetAddressUtils
 import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
 import com.pelmenstar.projktSens.shared.android.ui.*
-import com.pelmenstar.projktSens.shared.equalsPattern
 import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.R
 
@@ -29,7 +24,7 @@ class ChooseServerContractScreen: FirstStartScreen<ChooseServerContractScreen.St
         return FrameLayout(context) {
             TextView {
                 frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                    gravity = Gravity.START or Gravity.CENTER_VERTICAL
+                    gravity = Gravity.START
                 }
 
                 applyTextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)

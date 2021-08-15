@@ -28,6 +28,18 @@ const val MATCH_PARENT = ViewGroup.LayoutParams.MATCH_PARENT
  */
 const val WRAP_CONTENT = ViewGroup.LayoutParams.WRAP_CONTENT
 
+inline fun frameLayoutParams(width: Int, height: Int): FrameLayout.LayoutParams {
+    return FrameLayout.LayoutParams(width, height)
+}
+
+inline fun frameLayoutParams(width: Int, height: Int, block: FrameLayout.LayoutParams.() -> Unit): FrameLayout.LayoutParams {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return frameLayoutParams(width, height).apply(block)
+}
+
 inline fun View.frameLayoutParams(width: Int, height: Int) {
     layoutParams = FrameLayout.LayoutParams(width, height)
 }
@@ -37,7 +49,19 @@ inline fun View.frameLayoutParams(width: Int, height: Int, block: FrameLayout.La
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    layoutParams =  FrameLayout.LayoutParams(width, height).apply(block)
+    layoutParams = FrameLayout.LayoutParams(width, height).apply(block)
+}
+
+inline fun linearLayoutParams(width: Int, height: Int): LinearLayout.LayoutParams {
+    return LinearLayout.LayoutParams(width, height)
+}
+
+inline fun linearLayoutParams(width: Int, height: Int, block: LinearLayout.LayoutParams.() -> Unit): LinearLayout.LayoutParams {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return linearLayoutParams(width, height).apply(block)
 }
 
 inline fun View.linearLayoutParams(width: Int, height: Int) {

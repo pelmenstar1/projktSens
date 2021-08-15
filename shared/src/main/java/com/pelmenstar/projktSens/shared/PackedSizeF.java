@@ -1,7 +1,7 @@
 package com.pelmenstar.projktSens.shared;
 
-public final class SizeL {
-    private SizeL() {}
+public final class PackedSizeF {
+    private PackedSizeF() {}
 
     public static long create(float width, float height) {
         return FloatPair.of(width, height);

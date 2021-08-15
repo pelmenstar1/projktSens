@@ -50,24 +50,21 @@ class FirstStartPresenter(
     }
 
     override fun previousScreen() {
-        if(position == 0) {
-            Log.e(TAG, "previousScreen() and screen is the first")
-        } else {
+        if(position > 0) {
             changeScreen(position - 1)
         }
     }
 
     override fun nextScreen() {
-        if(position == screens.size - 1) {
-            Log.e(TAG, "previousScreen() and screen is the last")
-        } else {
+        if(position < screens.size - 1) {
             changeScreen(position + 1)
         }
     }
 
     private fun changeScreen(pos: Int) {
-        if(position != -1) {
-            val prevScreen = screens[position]
+        val oldPosition = position
+        if(oldPosition != -1) {
+            val prevScreen = screens[oldPosition]
             prevScreen.saveStateToBundle(tempStateBundle)
         }
 
@@ -83,7 +80,7 @@ class FirstStartPresenter(
         }
 
         v.setScreenTitle(context.resources.getString(screen.getTitleId()))
-        v.setScreenView(screen.createView(context))
+        v.setScreenView(screen.createView(context), oldPosition, pos)
 
         v.setCurrentScreenFlags(pos == 0, pos == screens.size - 1)
     }

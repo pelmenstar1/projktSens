@@ -14,7 +14,7 @@ interface FirstStartContract {
 
     interface View: DefaultContract.View {
         fun setScreenTitle(title: String)
-        fun setScreenView(view: android.view.View)
+        fun setScreenView(view: android.view.View, oldPosition: Int, newPosition: Int)
 
         fun setCurrentScreenFlags(first: Boolean, last: Boolean)
         fun setCurrentStateValid(value: Boolean)

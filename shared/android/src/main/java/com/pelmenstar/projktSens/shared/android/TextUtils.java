@@ -3,7 +3,7 @@ package com.pelmenstar.projktSens.shared.android;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import com.pelmenstar.projktSens.shared.SizeL;
+import com.pelmenstar.projktSens.shared.PackedSizeF;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -17,6 +17,6 @@ public final class TextUtils {
 
         paint.getTextBounds(text, 0, text.length, bounds);
 
-        return SizeL.create(bounds.width(), bounds.height());
+        return PackedSizeF.create(bounds.width(), bounds.height());
     }
 }

@@ -10,7 +10,7 @@ import android.graphics.RectF;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.pelmenstar.projktSens.shared.PointL;
-import com.pelmenstar.projktSens.shared.SizeL;
+import com.pelmenstar.projktSens.shared.PackedSizeF;
 import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.android.CanvasUtils;
 import com.pelmenstar.projktSens.shared.android.TextUtils;
@@ -171,10 +171,10 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
         float sunsetX;
         float sunsetY;
 
-        float sunriseHeight = SizeL.getHeight(sunriseTextSize);
-        float sunsetHeight = SizeL.getHeight(sunsetTextSize);
+        float sunriseHeight = PackedSizeF.getHeight(sunriseTextSize);
+        float sunsetHeight = PackedSizeF.getHeight(sunsetTextSize);
 
-        float textOnRightX = width - SizeL.getWidth(sunriseTextSize) - primaryPadding;
+        float textOnRightX = width - PackedSizeF.getWidth(sunriseTextSize) - primaryPadding;
 
         if(getDayState() == ComplexWeatherView.STATE_DAY) {
             sunriseX = primaryPadding;
@@ -199,12 +199,12 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
         float y = getY();
         float height = getHeight();
 
-        float left = x + primaryPadding + SizeL.getWidth(sunriseTextSize) * 0.5f;
+        float left = x + primaryPadding + PackedSizeF.getWidth(sunriseTextSize) * 0.5f;
         float top;
-        float right = (x + getWidth()) - primaryPadding - SizeL.getWidth(sunsetTextSize) * 0.5f;
+        float right = (x + getWidth()) - primaryPadding - PackedSizeF.getWidth(sunsetTextSize) * 0.5f;
         float bottom;
 
-        float maxTextHeight = Math.max(SizeL.getHeight(sunriseTextSize), SizeL.getHeight(sunsetTextSize));
+        float maxTextHeight = Math.max(PackedSizeF.getHeight(sunriseTextSize), PackedSizeF.getHeight(sunsetTextSize));
 
         if(getDayState() == ComplexWeatherView.STATE_DAY) {
             top = y + primaryPadding;
