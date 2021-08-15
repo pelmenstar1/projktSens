@@ -45,8 +45,8 @@ class ChooseServerContractScreen: FirstStartScreen<ChooseServerContractScreen.St
                 }
 
                 setSelection(when(state.contractType) {
-                    ContractType.CONTRACT_RAW -> 0
-                    ContractType.CONTRACT_JSON -> 1
+                    ContractType.RAW -> 0
+                    ContractType.JSON -> 1
                     else -> throw RuntimeException()
                 })
 
@@ -58,8 +58,8 @@ class ChooseServerContractScreen: FirstStartScreen<ChooseServerContractScreen.St
                         id: Long
                     ) {
                         state.contractType = when(position) {
-                            0 -> ContractType.CONTRACT_RAW
-                            1 -> ContractType.CONTRACT_JSON
+                            0 -> ContractType.RAW
+                            1 -> ContractType.JSON
                             else -> throw RuntimeException()
                         }
                     }
@@ -72,7 +72,7 @@ class ChooseServerContractScreen: FirstStartScreen<ChooseServerContractScreen.St
     }
 
     override fun loadDefaultState() {
-        state = State(ContractType.CONTRACT_RAW)
+        state = State(ContractType.RAW)
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {

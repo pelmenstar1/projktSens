@@ -14,7 +14,7 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
     private static final int DEFAULT_SEVER_ADDRESS_INT = 0;
     private static final int DEFAULT_SERVER_PORT = 10001;
     private static final int DEFAULT_WEATHER_RECEIVE_INTERVAL = 10 * 1000;
-    private static final int DEFAULT_CONTRACT_TYPE = ContractType.CONTRACT_RAW;
+    private static final int DEFAULT_CONTRACT_TYPE = ContractType.RAW;
 
     // should not be changed
     private static final String KEY_UNITS = "units";
@@ -75,7 +75,7 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
         preferences.edit()
                 .putInt(KEY_UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY)
                 .putInt(KEY_SERVER_HOST, DEFAULT_SEVER_ADDRESS_INT)
-                .putInt(KEY_CONTRACT, ContractType.CONTRACT_RAW)
+                .putInt(KEY_CONTRACT, ContractType.RAW)
                 .putInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT)
                 .putInt(KEY_WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL)
                 .putBoolean(KEY_IS_GPS_PERMISSION_DENIED, false)

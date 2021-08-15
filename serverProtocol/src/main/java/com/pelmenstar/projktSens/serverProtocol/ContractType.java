@@ -3,16 +3,16 @@ package com.pelmenstar.projktSens.serverProtocol;
 import org.jetbrains.annotations.NotNull;
 
 public final class ContractType {
-    public static final int CONTRACT_RAW = 0;
-    public static final int CONTRACT_JSON = 1;
+    public static final int RAW = 0;
+    public static final int JSON = 1;
 
     private ContractType() {
     }
 
     public static boolean isValid(int contractType) {
         switch (contractType) {
-            case CONTRACT_RAW:
-            case CONTRACT_JSON:
+            case RAW:
+            case JSON:
                 return true;
             default:
                 return false;
@@ -22,9 +22,9 @@ public final class ContractType {
     @NotNull
     public static Contract toObject(int contractType) {
         switch (contractType) {
-            case CONTRACT_RAW:
+            case RAW:
                 return RawContract.INSTANCE;
-            case CONTRACT_JSON:
+            case JSON:
                 return JsonContract.INSTANCE;
             default:
                 throw new IllegalArgumentException("contractType");

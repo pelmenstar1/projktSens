@@ -13,7 +13,7 @@ public final class AppPreferences extends AbstractPreferencesThroughShared imple
     public static final AppPreferences INSTANCE = new AppPreferences();
 
     private static final int DEFAULT_SERVER_PORT = 10001;
-    private static final int DEFAULT_SERVER_CONTRACT = ContractType.CONTRACT_RAW;
+    private static final int DEFAULT_SERVER_CONTRACT = ContractType.RAW;
     private static final int DEFAULT_WEATHER_SEND_INTERVAL = 10 * 1000;
 
     private static final String KEY_SERVER_PORT = "port";
