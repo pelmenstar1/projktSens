@@ -9,9 +9,9 @@ import android.view.Gravity
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import com.pelmenstar.projktSens.shared.android.Message
+import com.pelmenstar.projktSens.shared.android.SerializableParcelWrapper
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
-import com.pelmenstar.projktSens.shared.serialization.Serializable
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
@@ -44,14 +44,14 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                 status = savedInstanceState.getByte(STATE_STATUS).toInt()
 
                 if (status == STATUS_OK) {
-                    val rawData = savedInstanceState.getByteArray(STATE_REPORT)
-                    if (rawData == null) {
+                    val wrapper = savedInstanceState.getParcelable<SerializableParcelWrapper<TReport>>(STATE_REPORT)
+                    if (wrapper == null) {
                         Log.e(TAG, "Invalid saved state. STATE_REPORT property is null")
 
                         return@try_load_from_saved_state
                     }
 
-                    report = Serializable.ofByteArray(rawData, serializer)
+                    report = wrapper.value
                 }
 
                 setStatus(status)
@@ -223,7 +223,10 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         synchronized(lock) {
             val report = report
             if (report != null) {
-                outState.putByteArray(STATE_REPORT, Serializable.toByteArray(report, serializer))
+                outState.putParcelable(
+                    STATE_REPORT,
+                    SerializableParcelWrapper(report, serializer)
+                )
             }
         }
     }
