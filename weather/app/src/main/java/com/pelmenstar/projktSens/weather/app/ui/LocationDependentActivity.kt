@@ -7,9 +7,12 @@ import android.os.*
 import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
 import com.pelmenstar.projktSens.shared.android.Message
 import com.pelmenstar.projktSens.shared.android.ui.*
+import com.pelmenstar.projktSens.shared.geo.GeolocationProvider
+import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.GeolocationCache
 import com.pelmenstar.projktSens.weather.app.PermissionUtils
 import com.pelmenstar.projktSens.weather.app.R
@@ -28,10 +31,23 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
 
     private val mainThread = MainThreadHandler(this)
 
+    private lateinit var prefs: AppPreferences
+    private lateinit var locationProvider: GeolocationProvider
+
+    private var isAppDetailsInfoSettingExists = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        createStateViews()
+        // No sense to detect whether app-details activity exists
+        // if this information isn't in use.
+        if(Build.VERSION.SDK_INT >= 23) {
+            isAppDetailsInfoSettingExists = detectAppDetailsSettingsExists()
+        }
+
+        val component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
+        prefs = component.preferences()
+        locationProvider = component.geolocationProvider()
 
         val location = GeolocationCache.get()
         if(location == null) {
@@ -66,13 +82,10 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
         }
     }
 
-    private fun createStateViews() {
-        val res = resources
-        val context = this
-
-        loadingContent = FrameLayout(context) {
+    private fun createLoadingContent(): View {
+        return FrameLayout(this) {
             transitionView = TransitionView {
-                val size = res.getDimensionPixelSize(R.dimen.locationDependentActivity_transitionViewSize)
+                val size = resources.getDimensionPixelSize(R.dimen.locationDependentActivity_transitionViewSize)
                 frameLayoutParams(size, size) {
                     gravity = Gravity.CENTER
                 }
@@ -80,18 +93,19 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
                 transition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
             }
         }
+    }
 
-        failedToGetContent = LinearLayout(context) {
-            orientation = android.widget.LinearLayout.VERTICAL
+    private fun createFailedToGetContent(): View {
+        val res = resources
+        return LinearLayout(this) {
+            orientation = LinearLayout.VERTICAL
 
             TextView {
                 linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
 
-                val textSizePx = res.getDimensionPixelSize(R.dimen.locationDependentActivity_errorTextSize)
-
-                textSize = textSizePx.toFloat()
+                textSize = res.getDimension(R.dimen.locationDependentActivity_errorTextSize)
                 setText(R.string.failedToGetLocation)
             }
 
@@ -107,49 +121,54 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
                 }
             }
         }
+    }
 
-        if(Build.VERSION.SDK_INT >= 23) {
-            gpsNotGrantedContent = LinearLayout(context) {
-                orientation = android.widget.LinearLayout.VERTICAL
+    @RequiresApi(23)
+    private fun createGpsNotGrantedContent(): View {
+        return LinearLayout(this) {
+            orientation = LinearLayout.VERTICAL
 
-                TextView {
-                    linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                        gravity = Gravity.CENTER_HORIZONTAL
-                    }
-
-                    setText(R.string.gpsIsNotGranted)
-                }
-
-                Button(R.attr.materialButtonOutlinedStyle) {
-                    setText(R.string.allowGps)
-
-                    linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                        gravity = Gravity.CENTER_HORIZONTAL
-                    }
-
-                    setOnClickListener {
-                        requestGps()
-                    }
-                }
+            val params = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
             }
 
-            gpsNeverShowAgainContent = LinearLayout(context) {
-                orientation = android.widget.LinearLayout.VERTICAL
+            TextView {
+                layoutParams = params
 
-                TextView {
-                    linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                        gravity = Gravity.CENTER_HORIZONTAL
-                    }
+                setText(R.string.gpsIsNotGranted)
+            }
 
-                    setText(R.string.locDependentActivity_requestLocPerm_gpsNeverShowAgain)
+            Button(R.attr.materialButtonOutlinedStyle) {
+                layoutParams = params
+                setText(R.string.allowGps)
+
+                setOnClickListener {
+                    requestGps()
                 }
+            }
+        }
+    }
 
+    @RequiresApi(23)
+    private fun createGpsNeverShowAgainContent(): View {
+        return LinearLayout(this) {
+            orientation = LinearLayout.VERTICAL
+
+            val params = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+            }
+
+            TextView {
+                layoutParams = params
+
+                setText(R.string.locDependentActivity_requestLocPerm_gpsNeverShowAgain)
+            }
+
+            if(isAppDetailsInfoSettingExists) {
                 Button(R.attr.materialButtonOutlinedStyle) {
-                    setText(R.string.goToSettings)
+                    layoutParams = params
 
-                    linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
-                        gravity = Gravity.CENTER_HORIZONTAL
-                    }
+                    setText(R.string.goToSettings)
 
                     setOnClickListener {
                         goToSettingPermissions()
@@ -164,22 +183,36 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
         requestPermissions(PermissionUtils.LOCATION_PERMISSIONS, GPS_PERMISSION_REQUEST_CODE)
     }
 
-    private fun goToSettingPermissions() {
+    private fun detectAppDetailsSettingsExists(): Boolean {
+        val intent = createAppDetailsSettingsIntent()
+
+        val resolveFlags = if(Build.VERSION.SDK_INT >= 24) {
+            PackageManager.MATCH_SYSTEM_ONLY
+        } else {
+            PackageManager.MATCH_DEFAULT_ONLY
+        }
+
+        return packageManager.resolveActivity(intent, resolveFlags) != null
+    }
+
+    private fun createAppDetailsSettingsIntent(): Intent {
         val appUri = Uri.fromParts("package", packageName, null)
-        val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, appUri).apply {
+        return Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, appUri).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        startActivity(intent)
+    }
+
+    private fun goToSettingPermissions() {
+        if(isAppDetailsInfoSettingExists) {
+            val intent = createAppDetailsSettingsIntent()
+            startActivity(intent)
+        }
     }
 
     private fun startLoadingLocation() {
         setState(STATE_LOADING)
 
-        val context = this
         scope.launch {
-            val component = DaggerAppComponent.builder().appModule(AppModule(context)).build()
-            val locationProvider = component.geolocationProvider()
-
             try {
                 val location = locationProvider.getLastLocation()
                 GeolocationCache.set(location)
@@ -193,29 +226,24 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
     }
 
     private fun setState(state: Int) {
-        val transitionView = transitionView
-        val loadingContent = loadingContent
-        val failedToGetContent = failedToGetContent
-        val gpsNotGrantedContent = gpsNotGrantedContent
-        val gpsNeverShowAgainContent = gpsNeverShowAgainContent
-
-        if(transitionView == null ||
-            loadingContent == null ||
-            failedToGetContent == null) {
-            Log.w(TAG, "Views except main content are already recycled")
-            return
-        }
-
         if(state != STATE_LOADING) {
-            transitionView.stopAnimation()
+            transitionView?.stopAnimation()
         }
 
         when(state) {
             STATE_LOADING -> {
-                transitionView.startAnimation()
+                if(loadingContent == null) {
+                    loadingContent = createLoadingContent()
+                }
+
+                transitionView?.startAnimation()
                 setContentView(loadingContent)
             }
             STATE_FAILED_TO_GET -> {
+                if(failedToGetContent == null) {
+                    failedToGetContent = createFailedToGetContent()
+                }
+
                 setContentView(failedToGetContent)
             }
             STATE_GPS_NOT_GRANTED -> {
@@ -225,8 +253,7 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
                 }
 
                 if(gpsNotGrantedContent == null) {
-                    Log.e(TAG, "gpsNotGrantedContent was recycled")
-                    return
+                    gpsNotGrantedContent = createGpsNotGrantedContent()
                 }
 
                 setContentView(gpsNotGrantedContent)
@@ -238,8 +265,7 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
                 }
 
                 if(gpsNeverShowAgainContent == null) {
-                    Log.e(TAG, "gpsNeverShowAgainContent was recycled")
-                    return
+                    gpsNeverShowAgainContent = createGpsNeverShowAgainContent()
                 }
 
                 setContentView(gpsNeverShowAgainContent)
@@ -284,8 +310,6 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
 
         if(grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
             // now gps isn't denied
-            val component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
-            val prefs = component.preferences()
             prefs.isGpsPermissionDenied = false
 
             startLoadingLocation()
