@@ -1,5 +1,6 @@
 package com.pelmenstar.projktSens.shared.time;
 
+import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
 import com.pelmenstar.projktSens.shared.serialization.ValueReader;
 import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * - start | 4 bytes <br/>
  * - endInclusive | 4 bytes <br/>
  */
-public final class ShortDateRange {
+public final class ShortDateRange extends AppendableToStringBuilder {
     public static final int SERIALIZED_OBJECT_SIZE = 8;
 
     /**
@@ -92,9 +93,12 @@ public final class ShortDateRange {
     }
 
     @Override
-    @NotNull
-    public String toString() {
-        return '[' + ShortDate.toString(start) + ',' + ShortDate.toString(endInclusive)  + ']';
+    public void append(@NotNull StringBuilder sb) {
+        sb.append('[');
+        ShortDate.append(start, sb);
+        sb.append(',');
+        ShortDate.append(endInclusive, sb);
+        sb.append(']');
     }
 
     private static final class Serializer implements ObjectSerializer<ShortDateRange> {
