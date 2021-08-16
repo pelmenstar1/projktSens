@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.PorterDuff
@@ -13,7 +14,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -68,24 +68,14 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         }
     }
 
-    private fun initSlideComponentsIfNull() {
-        val placeholder = currentScreenPlaceholder
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
 
-        if(slideBitmap == null) {
-            val bitmap = Bitmap.createBitmap(
-                placeholder.width * 2, placeholder.height,
-                Bitmap.Config.ARGB_8888
-            )
+        slideBitmap?.recycle()
+        slideBitmap = null
 
-            slideBitmap = bitmap
-            slideBitmapCanvas = Canvas(bitmap)
-
-            slideView = SlideBitmapView(this).apply {
-                frameLayoutParams(MATCH_PARENT, MATCH_PARENT)
-
-                setBitmap(bitmap)
-            }
-        }
+        slideBitmapCanvas = null
+        slideView = null
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -122,6 +112,31 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         super.onDestroy()
 
         presenter.detach()
+    }
+
+    private fun initSlideComponentsIfNull() {
+        val placeholder = currentScreenPlaceholder
+
+        if(slideBitmap == null) {
+            val bitmapWidth = placeholder.width * 2
+            val bitmapHeight = placeholder.height
+
+            val bitmap =  Bitmap.createBitmap(
+                bitmapWidth, bitmapHeight,
+                Bitmap.Config.ARGB_8888,
+            )
+
+            slideBitmap = bitmap
+            slideBitmapCanvas = Canvas(bitmap)
+        }
+
+        if(slideView == null) {
+            slideView = SlideBitmapView(this).apply {
+                frameLayoutParams(MATCH_PARENT, MATCH_PARENT)
+
+                bitmap = slideBitmap
+            }
+        }
     }
 
     private fun createContent(): View {
