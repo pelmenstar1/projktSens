@@ -7,8 +7,9 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.PorterDuff
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -47,10 +48,15 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
     private var slideBitmap: Bitmap? = null
     private var slideBitmapCanvas: Canvas? = null
 
+    private var backgroundColor = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         actionBar { hide() }
+
+        val backgroundDrawable = window.decorView.background as ColorDrawable
+        backgroundColor = backgroundDrawable.color
 
         setContentView(createContent())
 
@@ -121,9 +127,14 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
             val bitmapWidth = placeholder.width * 2
             val bitmapHeight = placeholder.height
 
-            val bitmap =  Bitmap.createBitmap(
+            val bitmap = Bitmap.createBitmap(
                 bitmapWidth, bitmapHeight,
-                Bitmap.Config.ARGB_8888,
+                Bitmap.Config.RGB_565,
+            )
+
+            Log.i(
+                TAG,
+                "b.w=$bitmapWidth;b.h=$bitmapHeight;b.s=${bitmap.allocationByteCount}"
             )
 
             slideBitmap = bitmap
@@ -311,7 +322,8 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         val width = currentScreenPlaceholder.width
 
         val canvas = slideBitmapCanvas!!
-        canvas.drawColor(0, PorterDuff.Mode.CLEAR)
+
+        canvas.drawColor(backgroundColor)
 
         if(moveToLeft) {
             oldView.draw(canvas)
@@ -329,6 +341,8 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
     }
 
     companion object {
+        private const val TAG = "FirstStartActivity"
+
         fun intent(context: Context): Intent {
             return Intent(context, FirstStartActivity::class.java)
         }
