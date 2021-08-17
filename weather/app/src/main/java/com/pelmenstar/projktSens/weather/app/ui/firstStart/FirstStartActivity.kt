@@ -1,7 +1,6 @@
 package com.pelmenstar.projktSens.weather.app.ui.firstStart
 
-import android.animation.Animator
-import android.animation.ValueAnimator
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -18,6 +17,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.addListener
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.withTranslation
 import androidx.core.view.setMargins
@@ -335,31 +335,22 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         val slideToLeft = newPosition > oldPosition
         updateSlideBitmap(oldView, newView, slideToLeft)
 
-        val values = if (slideToLeft) {
+        val bitmapAnimationValues = if (slideToLeft) {
             floatArrayOf(0f, -placeholderWidth.toFloat())
         } else {
             floatArrayOf(-placeholderWidth.toFloat(), 0f)
         }
 
-        ValueAnimator().apply {
-            addUpdateListener {
-                slideView.offsetX = it.animatedValue as Float
-            }
+        ObjectAnimator().apply {
+            target = slideView
+            setProperty(SlideBitmapView.OFFSET_X)
+            setFloatValuesArray(bitmapAnimationValues)
 
-            setFloatValuesArray(values)
-
-            addListener(object : Animator.AnimatorListener {
-                override fun onAnimationEnd(animation: Animator?) {
-                    placeholder.removeAllViewsInLayout()
-                    placeholder.addView(newView)
-                }
-
-                override fun onAnimationStart(animation: Animator?) {}
-                override fun onAnimationCancel(animation: Animator?) {}
-                override fun onAnimationRepeat(animation: Animator?) {}
-
+            addListener(onEnd = {
+                placeholder.removeAllViewsInLayout()
+                placeholder.addView(newView)
             })
-            duration = 5000
+            duration = 200
 
             start()
         }
