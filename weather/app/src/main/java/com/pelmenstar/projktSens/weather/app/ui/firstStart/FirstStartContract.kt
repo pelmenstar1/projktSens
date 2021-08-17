@@ -8,13 +8,14 @@ interface FirstStartContract {
         fun nextScreen()
 
         fun afterRestoredFromSavedState()
+
+        fun getScreenTitles(): Array<out String>
         fun inflateAllScreens(): Array<out android.view.View>
 
         fun onFinish()
     }
 
     interface View: DefaultContract.View {
-        fun setScreenTitle(title: String)
         fun setPosition(oldPosition: Int, newPosition: Int)
 
         fun setCurrentScreenFlags(first: Boolean, last: Boolean)

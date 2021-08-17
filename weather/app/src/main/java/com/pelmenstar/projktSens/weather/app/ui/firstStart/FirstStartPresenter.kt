@@ -49,6 +49,16 @@ class FirstStartPresenter(
         }
     }
 
+    override fun getScreenTitles(): Array<out String> {
+        val res = context.resources
+
+        return Array(screens.size) { i ->
+            val strId = screens[i].getTitleId()
+
+            res.getString(strId)
+        }
+    }
+
     override fun restoreState(state: Bundle) {
         val pos = state.get(STATE_POSITION) as Int?
         if (pos != null) {
@@ -83,11 +93,9 @@ class FirstStartPresenter(
         }
 
         position = pos
-        val screen = screens[pos]
 
         val v = view
 
-        v.setScreenTitle(v.context.resources.getString(screen.getTitleId()))
         v.setPosition(oldPosition, pos)
 
         v.setCurrentScreenFlags(pos == 0, pos == screens.size - 1)

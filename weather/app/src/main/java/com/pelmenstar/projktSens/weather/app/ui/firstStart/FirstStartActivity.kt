@@ -40,6 +40,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
 
     private lateinit var presenter: FirstStartContract.Presenter
     private var screenViews: Array<out View>? = null
+    private var screenTitles: Array<out String>? = null
 
     private var isFirstScreen = false
     private var isLastScreen = false
@@ -132,6 +133,17 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         }
 
         return views
+    }
+
+
+    private fun getScreenTitlesOrCreate(): Array<out String> {
+        var titles = screenTitles
+        if(titles == null) {
+            titles = presenter.getScreenTitles()
+            screenTitles = titles
+        }
+
+        return titles
     }
 
     private fun computeMaxHeightOfScreens(): Int {
@@ -265,17 +277,13 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         }
     }
 
-    override fun setScreenTitle(title: String) {
-        screenTitleView.text = title
-    }
-
     override fun setPosition(oldPosition: Int, newPosition: Int) {
         val views = getScreenViewsOrInflate()
 
         val oldView = views[oldPosition]
         val newView = views[newPosition]
 
-        setScreenViewWithAnimation(oldView, newView, oldPosition, newPosition)
+        setPositionViewWithAnimation(oldView, newView, oldPosition, newPosition)
     }
 
     override fun setCurrentScreenFlags(first: Boolean, last: Boolean) {
@@ -310,15 +318,20 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         }
     }
 
-    private fun setScreenViewWithAnimation(
+    private fun setPositionViewWithAnimation(
         oldView: View, newView: View,
         oldPosition: Int, newPosition: Int
     ) {
         val placeholder = screenPlaceholder
+        val titleView = screenTitleView
+        val titles = getScreenTitlesOrCreate()
+        val newTitle = titles[newPosition]
 
         if (oldPosition == newPosition) {
             placeholder.removeAllViewsInLayout()
             placeholder.addView(newView)
+            titleView.text = newTitle
+
             return
         }
 
