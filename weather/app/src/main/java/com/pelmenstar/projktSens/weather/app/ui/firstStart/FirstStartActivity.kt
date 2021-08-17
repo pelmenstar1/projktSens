@@ -33,12 +33,13 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         get() = this
 
     private lateinit var screenTitleView: TextView
-    private lateinit var currentScreenPlaceholder: ViewGroup
+    private lateinit var screenPlaceholder: ViewGroup
     private lateinit var prevScreenButton: Button
     private lateinit var nextScreenButton: Button
     private var slideView: SlideBitmapView? = null
 
     private lateinit var presenter: FirstStartContract.Presenter
+    private var screenViews: Array<out View>? = null
 
     private var isFirstScreen = false
     private var isLastScreen = false
@@ -49,6 +50,9 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
     private var slideBitmapCanvas: Canvas? = null
 
     private var backgroundColor = 0
+    private var maxScreenHeight = 0
+
+    private var bitmapNeedsToBeInvalided = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,23 +69,23 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
             .appModule(AppModule(this))
             .build()
 
-        presenter = component.firstStartPresenter().also {
-            it.attach(this)
-            if(savedInstanceState != null) {
-                it.restoreState(savedInstanceState)
-            }
-            it.afterRestoredFromSavedState()
+        val p = component.firstStartPresenter()
+        presenter = p
+
+        p.attach(this)
+        if (savedInstanceState != null) {
+            p.restoreState(savedInstanceState)
         }
+
+        p.afterRestoredFromSavedState()
+
+        maxScreenHeight = computeMaxHeightOfScreens()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-        slideBitmap?.recycle()
-        slideBitmap = null
-
-        slideBitmapCanvas = null
-        slideView = null
+        bitmapNeedsToBeInvalided = true
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -92,7 +96,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
 
             MotionEvent.ACTION_UP -> {
                 val delta = event.x - lastTouchX
-                val slideMinDist = (currentScreenPlaceholder.width / 3).toFloat()
+                val slideMinDist = (screenPlaceholder.width / 3).toFloat()
 
                 if(delta > 0f && delta >= slideMinDist) {
                     presenter.previousScreen()
@@ -120,34 +124,89 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         presenter.detach()
     }
 
-    private fun initSlideComponentsIfNull() {
-        val placeholder = currentScreenPlaceholder
-
-        if(slideBitmap == null) {
-            val bitmapWidth = placeholder.width * 2
-            val bitmapHeight = placeholder.height
-
-            val bitmap = Bitmap.createBitmap(
-                bitmapWidth, bitmapHeight,
-                Bitmap.Config.RGB_565,
-            )
-
-            Log.i(
-                TAG,
-                "b.w=$bitmapWidth;b.h=$bitmapHeight;b.s=${bitmap.allocationByteCount}"
-            )
-
-            slideBitmap = bitmap
-            slideBitmapCanvas = Canvas(bitmap)
+    private fun getScreenViewsOrInflate(): Array<out View> {
+        var views = screenViews
+        if(views == null) {
+            views = presenter.inflateAllScreens()
+            screenViews = views
         }
 
-        if(slideView == null) {
-            slideView = SlideBitmapView(this).apply {
-                frameLayoutParams(MATCH_PARENT, MATCH_PARENT)
+        return views
+    }
 
-                bitmap = slideBitmap
+    private fun computeMaxHeightOfScreens(): Int {
+        val unspecified = View.MeasureSpec.makeMeasureSpec(
+            0,
+            View.MeasureSpec.UNSPECIFIED
+        )
+
+        val views = getScreenViewsOrInflate()
+
+        var maxHeight = -1
+        for(view in views) {
+            view.measure(unspecified, unspecified)
+
+            val height = view.measuredHeight
+            if(height > maxHeight) {
+                maxHeight = height
             }
         }
+
+        return maxHeight
+    }
+
+    private fun initSlideComponents() {
+        var sv = slideView
+        val sb = slideBitmap
+        val placeholder = screenPlaceholder
+
+        if(sv == null) {
+            sv = SlideBitmapView(this).apply {
+                frameLayoutParams(MATCH_PARENT, MATCH_PARENT)
+            }
+
+            slideView = sv
+        }
+
+        if(sb == null) {
+            initSlideBitmapThroughRecreating(placeholder.width * 2)
+        } else if(bitmapNeedsToBeInvalided) {
+            bitmapNeedsToBeInvalided = false
+
+            val oldWidth = sb.width
+            val newWidth = placeholder.width * 2
+
+            if(newWidth < oldWidth) {
+                initSlideBitmapThroughReconfiguring(newWidth)
+            } else {
+                initSlideBitmapThroughRecreating(newWidth)
+            }
+        }
+
+        sv.bitmap = slideBitmap
+    }
+
+    private fun initSlideBitmapThroughRecreating(newWidth: Int) {
+        slideBitmap?.recycle()
+        val bitmap = Bitmap.createBitmap(
+            newWidth, maxScreenHeight,
+            Bitmap.Config.RGB_565
+        )
+
+        logBitmapInfo(bitmap)
+
+        slideBitmap = bitmap
+        slideBitmapCanvas = Canvas(bitmap)
+    }
+
+    private fun initSlideBitmapThroughReconfiguring(newWidth: Int) {
+        val bitmap = slideBitmap ?: return
+
+        bitmap.reconfigure(newWidth, maxScreenHeight, Bitmap.Config.RGB_565)
+
+        logBitmapInfo(bitmap)
+
+        slideBitmapCanvas = Canvas(bitmap)
     }
 
     private fun createContent(): View {
@@ -171,9 +230,9 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
                     applyTextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline5)
                 }
 
-                currentScreenPlaceholder = FrameLayout {
+                screenPlaceholder = FrameLayout {
                     linearLayoutParams(MATCH_PARENT, MATCH_PARENT) {
-                        setMargins(resources.getDimensionPixelOffset(R.dimen.firstStartActivity_screenPadding))
+                        setMargins(res.getDimensionPixelOffset(R.dimen.firstStartActivity_screenPadding))
                     }
                 }
             }
@@ -210,14 +269,13 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         screenTitleView.text = title
     }
 
-    override fun setScreenView(view: View, oldPosition: Int, newPosition: Int) {
-        val oldView = currentScreenPlaceholder.getChildAt(0)
-        if(oldView != null) {
-            setScreenViewWithAnimation(oldView, view, oldPosition, newPosition)
-        } else {
-            currentScreenPlaceholder.removeAllViewsInLayout()
-            currentScreenPlaceholder.addView(view)
-        }
+    override fun setPosition(oldPosition: Int, newPosition: Int) {
+        val views = getScreenViewsOrInflate()
+
+        val oldView = views[oldPosition]
+        val newView = views[newPosition]
+
+        setScreenViewWithAnimation(oldView, newView, oldPosition, newPosition)
     }
 
     override fun setCurrentScreenFlags(first: Boolean, last: Boolean) {
@@ -256,7 +314,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         oldView: View, newView: View,
         oldPosition: Int, newPosition: Int
     ) {
-        val placeholder = currentScreenPlaceholder
+        val placeholder = screenPlaceholder
 
         if (oldPosition == newPosition) {
             placeholder.removeAllViewsInLayout()
@@ -264,23 +322,15 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
             return
         }
 
-        initSlideComponentsIfNull()
+        initSlideComponents()
         val slideView = slideView!!
 
         placeholder.removeAllViewsInLayout()
         placeholder.addView(slideView)
 
         val placeholderWidth = placeholder.width
-        val placeholderHeight = placeholder.height
 
-        val widthSpec = View.MeasureSpec.makeMeasureSpec(placeholderWidth, View.MeasureSpec.EXACTLY)
-        val heightSpec = View.MeasureSpec.makeMeasureSpec(placeholderHeight, View.MeasureSpec.EXACTLY)
-
-        oldView.measure(widthSpec, heightSpec)
-        newView.measure(widthSpec, heightSpec)
-
-        oldView.layout(0, 0, oldView.measuredWidth, oldView.measuredHeight)
-        newView.layout(0, 0, newView.measuredWidth, newView.measuredHeight)
+        newView.layout(0, 0, placeholderWidth, maxScreenHeight)
 
         val slideToLeft = newPosition > oldPosition
         updateSlideBitmap(oldView, newView, slideToLeft)
@@ -309,7 +359,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
                 override fun onAnimationRepeat(animation: Animator?) {}
 
             })
-            duration = 200
+            duration = 5000
 
             start()
         }
@@ -319,7 +369,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         oldView: View, newView: View,
         moveToLeft: Boolean
     ) {
-        val width = currentScreenPlaceholder.width
+        val width = screenPlaceholder.width
 
         val canvas = slideBitmapCanvas!!
 
@@ -342,6 +392,10 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
 
     companion object {
         private const val TAG = "FirstStartActivity"
+
+        private fun logBitmapInfo(b: Bitmap) {
+            Log.i(TAG, "b.w=${b.width};b.h=${b.height};b.size=${b.byteCount}")
+        }
 
         fun intent(context: Context): Intent {
             return Intent(context, FirstStartActivity::class.java)
