@@ -135,7 +135,6 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         return views
     }
 
-
     private fun getScreenTitlesOrCreate(): Array<out String> {
         var titles = screenTitles
         if(titles == null) {
@@ -172,11 +171,15 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         val sb = slideBitmap
         val placeholder = screenPlaceholder
 
+        var bitmapRefChanged = false
         if(sv == null) {
             sv = SlideBitmapView(this).apply {
                 frameLayoutParams(MATCH_PARENT, MATCH_PARENT)
+
+                slideCoefficient = 2
             }
 
+            bitmapRefChanged = true
             slideView = sv
         }
 
@@ -192,10 +195,13 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
                 initSlideBitmapThroughReconfiguring(newWidth)
             } else {
                 initSlideBitmapThroughRecreating(newWidth)
+                bitmapRefChanged = true
             }
         }
 
-        sv.bitmap = slideBitmap
+        if(bitmapRefChanged) {
+            sv.bitmap = slideBitmap
+        }
     }
 
     private fun initSlideBitmapThroughRecreating(newWidth: Int) {
@@ -347,6 +353,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
 
         val slideToLeft = newPosition > oldPosition
         updateSlideBitmap(oldView, newView, slideToLeft)
+        slideView.onBitmapChanged()
 
         val bitmapAnimationValues = if (slideToLeft) {
             floatArrayOf(0f, -placeholderWidth.toFloat())
@@ -376,12 +383,10 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         val width = screenPlaceholder.width
 
         val canvas = slideBitmapCanvas!!
-
         canvas.drawColor(backgroundColor)
 
         if(moveToLeft) {
             oldView.draw(canvas)
-
             canvas.withTranslation(x = width.toFloat()) {
                 newView.draw(canvas)
             }
