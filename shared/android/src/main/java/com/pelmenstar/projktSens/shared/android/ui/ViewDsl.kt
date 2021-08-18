@@ -269,23 +269,3 @@ inline fun<TView:View> ViewGroup.addApply(view: TView, block: TView.() -> Unit):
 
     return view
 }
-
-inline fun Activity.content(block: () -> View) {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-
-    setContentView(block())
-}
-
-inline fun AppCompatActivity.actionBar(block: ActionBar.() -> Unit) {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-
-    supportActionBar?.block()
-}
-
-inline fun AppCompatActivity.requireIntent(): Intent {
-    return intent ?: throw IllegalStateException("Intent is null")
-}

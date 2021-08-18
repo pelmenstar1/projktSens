@@ -60,8 +60,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
 
         actionBar { hide() }
 
-        val backgroundDrawable = window.decorView.background as ColorDrawable
-        backgroundColor = backgroundDrawable.color
+        backgroundColor = surfaceBackgroundColor
 
         setContentView(createContent())
 
