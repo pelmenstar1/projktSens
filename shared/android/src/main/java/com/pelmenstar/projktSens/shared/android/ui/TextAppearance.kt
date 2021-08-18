@@ -7,6 +7,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.Typeface
+import android.os.Build
 import android.text.method.TransformationMethod
 import android.util.Log
 import android.util.TypedValue
@@ -15,7 +16,6 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.StyleRes
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.os.ConfigurationCompat
 import com.pelmenstar.projktSens.shared.android.R
 import com.pelmenstar.projktSens.shared.android.obtainStyledAttributes
 import java.util.*
@@ -136,7 +136,17 @@ class TextAppearance(context: Context, @StyleRes id: Int) {
     }
 
     private class AllCapsTransformationMethod(context: Context) : TransformationMethod {
-        private val locale: Locale = ConfigurationCompat.getLocales(context.resources.configuration)[0]
+        private val locale: Locale
+
+        init {
+            val conf = context.resources.configuration
+
+            locale = if(Build.VERSION.SDK_INT >= 24) {
+                conf.locales[0]
+            } else {
+                conf.locale
+            }
+        }
 
         override fun getTransformation(source: CharSequence?, view: View?): CharSequence? {
             if(source == null) {
@@ -168,6 +178,6 @@ inline fun TextView.applyTextAppearance(a: TextAppearance) {
     a.apply(this)
 }
 
-inline fun TextView.applyTextAppearance(context: Context, @StyleRes id: Int) {
+inline fun TextView.applyTextAppearance(@StyleRes id: Int) {
     applyTextAppearance(TextAppearance(context, id))
 }

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -244,7 +243,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
                         topMargin = res.getDimensionPixelOffset(R.dimen.firstStartActivity_titleTopMargin)
                     }
 
-                    applyTextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline5)
+                    applyTextAppearance(R.style.TextAppearance_MaterialComponents_Headline5)
                 }
 
                 screenPlaceholder = FrameLayout {

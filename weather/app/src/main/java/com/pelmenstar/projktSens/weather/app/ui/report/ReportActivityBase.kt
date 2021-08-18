@@ -152,22 +152,19 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
     }
 
     private fun createNoDataView(): View {
-        val context = this
-
         return FrameLayout(this) {
             TextView {
                 frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
                     gravity = Gravity.CENTER_HORIZONTAL or Gravity.TOP
                 }
 
-                applyTextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline4)
+                applyTextAppearance(R.style.TextAppearance_MaterialComponents_Headline4)
                 text = resources.getText(R.string.noData)
             }
         }
     }
 
     private fun createErrorView(): View {
-        val context = this
         val res = resources
 
         val retryButtonSize = res.getDimensionPixelSize(R.dimen.reportActivity_errorView_retryButtonSize)
@@ -181,7 +178,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
 
-                applyTextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline5)
+                applyTextAppearance(R.style.TextAppearance_MaterialComponents_Headline5)
                 text = res.getText(R.string.errorOccurred)
             }
 

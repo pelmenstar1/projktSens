@@ -27,7 +27,7 @@ class ChooseServerContractScreen: FirstStartScreen<ChooseServerContractScreen.St
                     gravity = Gravity.START
                 }
 
-                applyTextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
+                applyTextAppearance(R.style.TextAppearance_MaterialComponents_Body1)
                 text = res.getText(R.string.serverContract)
             }
 

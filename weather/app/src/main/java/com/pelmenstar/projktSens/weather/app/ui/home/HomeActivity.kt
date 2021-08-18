@@ -122,7 +122,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                     bottomMargin = res.getDimensionPixelOffset(R.dimen.homeActivity_serverUnavailable_bottomMargin)
                 }
 
-                applyTextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
+                applyTextAppearance(R.style.TextAppearance_MaterialComponents_Body1)
                 visibility = View.GONE
                 text = res.getText(R.string.serverUnavailable)
             }
