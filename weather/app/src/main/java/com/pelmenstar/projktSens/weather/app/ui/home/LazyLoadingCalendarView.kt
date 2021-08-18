@@ -186,8 +186,8 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
     }
 
     private fun setCalendarMinMax(@ShortDateInt minDate: Int, @ShortDateInt maxDate: Int) {
-        calendarView.minDate = ShortDateTime.toEpochSecond(ShortDateTime.startOfDay(minDate)) * 1000
-        calendarView.maxDate = ShortDateTime.toEpochSecond(ShortDateTime.endOfDay(maxDate)) * 1000
+        calendarView.minDate = ShortDateTime.startOfDayToEpochSecond(minDate) * 1000
+        calendarView.maxDate = ShortDateTime.endOfDayToEpochSecond(maxDate) * 1000
     }
 
     private fun postSetCalendarMinMax(@ShortDateInt minDate: Int, @ShortDateInt maxDate: Int) {

@@ -179,13 +179,13 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
         }
 
         private fun createDayRangeQuery(range: ShortDateRange): String {
-            val startDateTime = ShortDateTime.toEpochSecond(ShortDateTime.startOfDay(range.start))
-            val endDateTime = ShortDateTime.toEpochSecond(ShortDateTime.endOfDay(range.endInclusive))
+            val startDateTime = ShortDateTime.startOfDayToEpochSecond(range.start)
+            val endDateTime = ShortDateTime.endOfDayToEpochSecond(range.endInclusive)
 
             return dateRangeQuery(startDateTime, endDateTime)
         }
 
-        private inline fun dateRangeQuery(startEpoch: Long, endEpoch: Long): String {
+        private fun dateRangeQuery(startEpoch: Long, endEpoch: Long): String {
             return "SELECT datetime_epoch,temperature,humidity,pressure FROM weather WHERE datetime_epoch BETWEEN $startEpoch AND $endEpoch"
         }
     }

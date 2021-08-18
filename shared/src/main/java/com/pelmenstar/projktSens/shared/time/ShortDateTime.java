@@ -158,14 +158,26 @@ public final class ShortDateTime {
      */
     @EpochSecondsLong
     public static long toEpochSecond(@ShortDateTimeLong long dateTime) {
-        if(!isValid(dateTime)) {
+        int time = getTime(dateTime);
+        // validate only time because date will be checked in ShortDate.toEpochDay
+        if(!ShortTime.isValid(time)) {
             throw new IllegalArgumentException("dateTime");
         }
 
-        long epochDay = ShortDate.toEpochDay(getDate(dateTime));
-
-        return epochDay * TimeConstants.SECONDS_IN_DAY + getTime(dateTime);
+        return (long)ShortDate.toEpochDay(getDate(dateTime)) * TimeConstants.SECONDS_IN_DAY + time;
     }
+
+    @EpochSecondsLong
+    public static long startOfDayToEpochSecond(@ShortDateInt int date) {
+        return (long)ShortDate.toEpochDay(date) * TimeConstants.SECONDS_IN_DAY;
+    }
+
+    @EpochSecondsLong
+    public static long endOfDayToEpochSecond(@ShortDateInt int date) {
+        final int endOfDay = TimeConstants.SECONDS_IN_DAY - 1;
+        return (long)ShortDate.toEpochDay(date) * TimeConstants.SECONDS_IN_DAY + endOfDay;
+    }
+
 
     /**
      * Returns random datetime-long.
