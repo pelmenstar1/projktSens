@@ -7,16 +7,16 @@ import android.os.Message
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Gravity
+import android.widget.Button
 import android.widget.CalendarView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import com.pelmenstar.projktSens.shared.android.Message
-import com.pelmenstar.projktSens.shared.android.ui.LinearColorTransition
-import com.pelmenstar.projktSens.shared.android.ui.ScrollableCalendarView
-import com.pelmenstar.projktSens.shared.android.ui.TransitionView
+import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.shared.time.ShortDateTime
@@ -38,60 +38,20 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
     var loadMinMaxHandler: LoadMinMaxHandler? = null
 
     private val calendarView: ScrollableCalendarView
-    private val transitionView: TransitionView
-    private val failedToLoadTextView: MaterialTextView
-    private val noDataTextView: MaterialTextView
-    private val retryButton: MaterialButton
+    private var transitionView: TransitionView? = null
+    private var failedToLoadTextView: TextView? = null
+    private var noDataTextView: TextView? = null
+    private var retryButton: Button? = null
 
     private val mainThread = MainThreadHandler(this)
 
     init {
-        val res = context.resources
-
         // for STATE_FAILED_TO_LOAD state.
         // another states have single view
         orientation = VERTICAL
 
         calendarView = ScrollableCalendarView(context).apply {
-            layoutParams = LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT
-            )
-        }
-        transitionView = TransitionView(context).apply {
-            val size = res.getDimensionPixelSize(R.dimen.lazyCalendar_transitionViewSize)
-            layoutParams = LayoutParams(size, size).apply {
-                gravity = Gravity.CENTER
-            }
-
-            transition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
-        }
-
-        val wrapContentCenterH = LayoutParams(
-            LayoutParams.WRAP_CONTENT,
-            LayoutParams.WRAP_CONTENT,
-        ).apply {
-            gravity = Gravity.CENTER_HORIZONTAL
-        }
-
-        failedToLoadTextView = MaterialTextView(context).apply {
-            layoutParams = wrapContentCenterH
-
-            setText(R.string.lazyLoadingCalendar_failedToLoad)
-        }
-
-        retryButton = MaterialButton(context).apply {
-            val size = res.getDimensionPixelSize(R.dimen.lazyCalendar_retryButtonSize)
-            layoutParams = LayoutParams(size, size).apply {
-                gravity = Gravity.CENTER_HORIZONTAL
-            }
-
-            setBackgroundResource(R.drawable.ic_retry)
-            setOnClickListener { loadMinMax() }
-        }
-        noDataTextView = MaterialTextView(context).apply {
-            layoutParams = wrapContentCenterH
-            setText(R.string.noData)
+            linearLayoutParams(MATCH_PARENT, MATCH_PARENT)
         }
     }
 
@@ -99,6 +59,49 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         loadMinMax()
+    }
+
+    private fun createTransitionView(): TransitionView {
+        return TransitionView(context).apply {
+            val size = resources.getDimensionPixelSize(R.dimen.lazyCalendar_transitionViewSize)
+            linearLayoutParams(size, size) {
+                gravity = Gravity.CENTER
+            }
+
+            transition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
+        }
+    }
+
+    private fun createFailedToLoadTextView(): TextView {
+        return MaterialTextView(context).apply {
+            linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
+                gravity = Gravity.CENTER_HORIZONTAL
+            }
+
+            setText(R.string.lazyLoadingCalendar_failedToLoad)
+        }
+    }
+
+    private fun createRetryButton(): Button {
+        return MaterialButton(context).apply {
+            val size = resources.getDimensionPixelSize(R.dimen.lazyCalendar_retryButtonSize)
+            linearLayoutParams(size, size) {
+                gravity = Gravity.CENTER_HORIZONTAL
+            }
+
+            setBackgroundResource(R.drawable.ic_retry)
+            setOnClickListener { loadMinMax() }
+        }
+    }
+
+    private fun createNoDataView(): TextView {
+        return MaterialTextView(context).apply {
+            linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
+                gravity = Gravity.CENTER_HORIZONTAL
+            }
+
+            setText(R.string.noData)
+        }
     }
 
     private fun loadMinMax() {
@@ -131,22 +134,45 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
     private fun setState(state: Int) {
         removeAllViewsInLayout()
         if (state != STATE_LOADING) {
-            transitionView.stopAnimation()
+            transitionView?.stopAnimation()
         }
 
         when (state) {
             STATE_LOADED -> {
+                transitionView = null
+                failedToLoadTextView = null
+                retryButton = null
+                noDataTextView = null
+
                 addView(calendarView)
             }
             STATE_LOADING -> {
-                transitionView.startAnimation()
-                addView(transitionView)
+                var tView = transitionView
+                if(tView == null) {
+                    tView = createTransitionView()
+                    transitionView = tView
+                }
+
+                tView.startAnimation()
+                addView(tView)
             }
             STATE_FAILED_TO_LOAD -> {
+                if(failedToLoadTextView == null) {
+                    failedToLoadTextView = createFailedToLoadTextView()
+                }
+
+                if(retryButton == null) {
+                    retryButton = createRetryButton()
+                }
+
                 addView(failedToLoadTextView)
                 addView(retryButton)
             }
             STATE_NO_DATA -> {
+                if(noDataTextView == null) {
+                    noDataTextView = createNoDataView()
+                }
+
                 addView(noDataTextView)
             }
         }
