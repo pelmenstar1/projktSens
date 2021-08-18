@@ -105,7 +105,7 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
 
-                textSize = res.getDimension(R.dimen.locationDependentActivity_errorTextSize)
+                applyTextAppearance(R.style.TextAppearance_MaterialComponents_Headline5)
                 setText(R.string.failedToGetLocation)
             }
 

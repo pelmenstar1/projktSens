@@ -37,7 +37,6 @@
     <dimen name="requestLocPerm_contentPadding">20dp</dimen>
     <dimen name="requestLocPerm_actionTopMargin">10dp</dimen>
 
-    <dimen name="locationDependentActivity_errorTextSize">16sp</dimen>
     <dimen name="locationDependentActivity_transitionViewSize">200dp</dimen>
     <dimen name="locationDependentActivity_retryButtonSize">40dp</dimen>
 
