@@ -43,7 +43,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
     private var noDataTextView: TextView? = null
     private var retryButton: Button? = null
 
-    private val mainThread = MainThreadHandler(this)
+    private val mainThread = MainThreadHandler()
 
     init {
         // for STATE_FAILED_TO_LOAD state.
@@ -181,6 +181,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
     private fun postSetState(state: Int) {
         mainThread.sendMessage(Message {
             what = MSG_SET_STATE
+            obj = this@LazyLoadingCalendarView
             arg1 = state
         })
     }
@@ -193,6 +194,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
     private fun postSetCalendarMinMax(@ShortDateInt minDate: Int, @ShortDateInt maxDate: Int) {
         mainThread.sendMessage(Message {
             what = MSG_SET_CALENDAR_MIN_MAX
+            obj = this@LazyLoadingCalendarView
             arg1 = minDate
             arg2 = maxDate
         })
@@ -202,15 +204,15 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
         calendarView.setOnDateChangeListener(listener)
     }
 
-    private class MainThreadHandler(@JvmField var view: LazyLoadingCalendarView?): Handler(Looper.getMainLooper()) {
+    private class MainThreadHandler: Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
-            val v = view ?: return
-
             when(msg.what) {
                 MSG_SET_STATE -> {
+                    val v = msg.obj as LazyLoadingCalendarView
                     v.setState(msg.arg1)
                 }
                 MSG_SET_CALENDAR_MIN_MAX -> {
+                    val v = msg.obj as LazyLoadingCalendarView
                     v.setCalendarMinMax(msg.arg1, msg.arg2)
                 }
             }
