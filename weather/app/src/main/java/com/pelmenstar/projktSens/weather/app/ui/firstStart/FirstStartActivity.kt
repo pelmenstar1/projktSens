@@ -20,7 +20,7 @@ import androidx.core.animation.addListener
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.withTranslation
 import androidx.core.view.setMargins
-import com.pelmenstar.projktSens.shared.android.SlideBitmapView
+import com.pelmenstar.projktSens.shared.android.ui.SlideBitmapView
 import com.pelmenstar.projktSens.shared.android.setFloatValuesArray
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.weather.app.R

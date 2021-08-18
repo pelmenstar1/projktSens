@@ -1,4 +1,4 @@
-package com.pelmenstar.projktSens.shared.android;
+package com.pelmenstar.projktSens.shared.android.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
