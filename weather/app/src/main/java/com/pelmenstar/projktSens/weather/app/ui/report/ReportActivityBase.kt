@@ -107,7 +107,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         this.status = status
 
         if(status != STATUS_LOADING) {
-            transitionView?.stopAnimation()
+            transitionView?.stopTransition()
         }
 
         when(status) {
@@ -116,7 +116,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                     loadingView = createLoadingView()
                 }
 
-                transitionView?.startAnimation()
+                transitionView?.startTransition()
                 setContentView(loadingView)
             }
             STATUS_NO_DATA -> {
@@ -206,7 +206,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                     gravity = Gravity.CENTER
                 }
 
-                transition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
+                colorTransition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
                 transitionView = this
             }
         }
@@ -232,7 +232,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         super.onDestroy()
 
         synchronized(lock) {
-            transitionView?.stopAnimation()
+            transitionView?.stopTransition()
         }
         loadReportJob?.cancel()
 

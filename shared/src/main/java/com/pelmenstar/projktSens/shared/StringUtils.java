@@ -7,7 +7,37 @@ import org.jetbrains.annotations.Nullable;
  * Represents a helper class that efficiently build strings
  */
 public final class StringUtils {
+    private static final char[] hexBuffer = new char[8];
+
     private StringUtils() {}
+
+    public static void appendHexColor(int value, @NotNull StringBuilder sb) {
+        sb.ensureCapacity(sb.length() + 9);
+        sb.append('#');
+        appendHex(value, sb);
+    }
+
+    public static void appendHex(int value, @NotNull StringBuilder sb) {
+        sb.ensureCapacity(sb.length() + 8);
+
+        synchronized (hexBuffer) {
+            writeHex(value, hexBuffer, 0);
+            sb.append(hexBuffer);
+        }
+    }
+
+    public static void writeHex(int value, char @NotNull [] buffer, int offset) {
+        for(int i = offset + 7; i >= offset; i--) {
+            int digit = (value & 0x0F);
+            int c = digit + '0';
+            if (c > '9') {
+                c += 0x27;
+            }
+
+            buffer[i] = (char)c;
+            value >>= 4;
+        }
+    }
 
     public static int parsePositiveInt(@NotNull CharSequence text) {
         int n = 0;

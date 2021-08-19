@@ -13,11 +13,4 @@
     <declare-styleable name="TimeTextView">
         <attr name="time"/>
     </declare-styleable>
-
-    <declare-styleable name="TransitionView">
-        <attr name="shape" format="enum">
-            <enum name="circle" value="0"/>
-            <enum name="rectangle" value="1"/>
-        </attr>
-    </declare-styleable>
 </resources>

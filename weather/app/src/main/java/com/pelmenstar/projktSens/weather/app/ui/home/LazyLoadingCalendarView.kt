@@ -68,7 +68,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
                 gravity = Gravity.CENTER
             }
 
-            transition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
+            colorTransition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
         }
     }
 
@@ -134,7 +134,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
     private fun setState(state: Int) {
         removeAllViewsInLayout()
         if (state != STATE_LOADING) {
-            transitionView?.stopAnimation()
+            transitionView?.stopTransition()
         }
 
         when (state) {
@@ -153,7 +153,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
                     transitionView = tView
                 }
 
-                tView.startAnimation()
+                tView.startTransition()
                 addView(tView)
             }
             STATE_FAILED_TO_LOAD -> {

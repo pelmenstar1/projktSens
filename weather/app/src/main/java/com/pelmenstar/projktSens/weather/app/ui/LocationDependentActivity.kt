@@ -90,7 +90,7 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
                     gravity = Gravity.CENTER
                 }
 
-                transition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
+                colorTransition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
             }
         }
     }
@@ -227,7 +227,7 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
 
     private fun setState(state: Int) {
         if(state != STATE_LOADING) {
-            transitionView?.stopAnimation()
+            transitionView?.stopTransition()
         }
 
         when(state) {
@@ -236,7 +236,7 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
                     loadingContent = createLoadingContent()
                 }
 
-                transitionView?.startAnimation()
+                transitionView?.startTransition()
                 setContentView(loadingContent)
             }
             STATE_FAILED_TO_GET -> {

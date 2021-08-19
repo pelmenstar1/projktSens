@@ -48,11 +48,6 @@ android {
         useIR = true
         freeCompilerArgs += ["-Xuse-experimental=kotlin.contracts.ExperimentalContracts"]
     }
-
-    afterEvaluate {
-        generateReleaseBuildConfig.enabled = false
-        generateDebugBuildConfig.enabled = false
-    }
 }
 
 dependencies {
