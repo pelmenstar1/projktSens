@@ -269,7 +269,7 @@ public class LineChart extends ViewGroup {
 
         if ((flags & AUTO_ANIMATE_COND) == AUTO_ANIMATE_COND) {
             flags &= ~FLAG_FIRST_RENDER;
-            animateX(1000);
+            animateX(500);
         }
     }
 

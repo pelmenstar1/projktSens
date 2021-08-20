@@ -1,38 +1,112 @@
 package com.pelmenstar.projktSens.chartLite;
 
-import android.animation.ValueAnimator;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
+import android.os.Build;
+import android.util.FloatProperty;
+import android.util.Property;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 import com.pelmenstar.projktSens.shared.MyMath;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Responsible for simple chart animations by axis
  */
 public final class SimpleChartAnimator {
     private static final float[] ANIMATOR_VALUES = new float[]{0f, 1f};
+
     @NotNull
-    private final View view;
-    @Nullable
-    private ValueAnimator.AnimatorUpdateListener _xUpdateListener;
-    @Nullable
-    private ValueAnimator.AnimatorUpdateListener _yUpdateListener;
+    private final View chart;
+
     private float phaseX = 1f;
     private float phaseY = 1f;
 
-    public SimpleChartAnimator(@NotNull View view) {
-        this.view = view;
+    private static final LinearInterpolator LINEAR_INTERPOLATOR = new LinearInterpolator();
+
+    @NotNull
+    public static final Property<SimpleChartAnimator, Float> PHASE_X;
+
+    @NotNull
+    public static final Property<SimpleChartAnimator, Float> PHASE_Y;
+
+    @NotNull
+    private static final PropertyValuesHolder VALUES_HOLDER;
+
+    static {
+        if(Build.VERSION.SDK_INT >= 24) {
+            PHASE_X = new FloatProperty<SimpleChartAnimator>("phaseX") {
+                @Override
+                public void setValue(@NotNull SimpleChartAnimator object, float value) {
+                    object.setPhaseX(value);
+                }
+
+                @Override
+                @NotNull
+                public Float get(@NotNull SimpleChartAnimator object) {
+                    return object.phaseX;
+                }
+            };
+            PHASE_Y = new FloatProperty<SimpleChartAnimator>("phaseY") {
+                @Override
+                public void setValue(@NotNull SimpleChartAnimator object, float value) {
+                    object.setPhaseY(value);
+                }
+
+                @Override
+                @NotNull
+                public Float get(@NotNull SimpleChartAnimator object) {
+                    return object.phaseY;
+                }
+            };
+        } else {
+            PHASE_X = new Property<SimpleChartAnimator, Float>(Float.class, "phaseX") {
+                @Override
+                public void set(@NotNull SimpleChartAnimator object, @NotNull Float value) {
+                    object.setPhaseX(value);
+                }
+
+                @Override
+                @NotNull
+                public Float get(@NotNull SimpleChartAnimator object) {
+                    return object.phaseX;
+                }
+            };
+            PHASE_Y = new Property<SimpleChartAnimator, Float>(Float.class, "phaseY") {
+                @Override
+                public void set(@NotNull SimpleChartAnimator object, @NotNull Float value) {
+                    object.setPhaseY(value);
+                }
+
+                @Override
+                @NotNull
+                public Float get(@NotNull SimpleChartAnimator object) {
+                    return object.phaseY;
+                }
+            };
+        }
+
+        VALUES_HOLDER =  PropertyValuesHolder.ofFloat((Property<?, Float>) null, ANIMATOR_VALUES);
     }
 
-    private static void animatorAxis(long duration, @NotNull ValueAnimator.AnimatorUpdateListener updateListener) {
-        ValueAnimator animator = new ValueAnimator();
+    public SimpleChartAnimator(@NotNull LineChart chart) {
+        this.chart = chart;
+    }
+
+    private void animateAxis(
+            long duration,
+            @NotNull Property<SimpleChartAnimator, Float> property
+    ) {
+        VALUES_HOLDER.setProperty(property);
+
+        ObjectAnimator animator = new ObjectAnimator();
+        animator.setTarget(this);
+        animator.setProperty(property);
         animator.setDuration(duration);
-        animator.setFloatValues(ANIMATOR_VALUES);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.addUpdateListener(updateListener);
+        animator.setValues(VALUES_HOLDER);
+        animator.setInterpolator(LINEAR_INTERPOLATOR);
         animator.start();
     }
 
@@ -42,6 +116,7 @@ public final class SimpleChartAnimator {
 
     public void setPhaseX(float phaseX) {
         this.phaseX = MyMath.clamp(phaseX, 0f, 1f);
+        chart.invalidate();
     }
 
     public float getPhaseY() {
@@ -50,37 +125,14 @@ public final class SimpleChartAnimator {
 
     public void setPhaseY(float phaseY) {
         this.phaseY = MyMath.clamp(phaseY, 0f, 1f);
+        chart.invalidate();
     }
 
     public void animateX(long duration) {
-        animatorAxis(duration, xUpdateListener());
+        animateAxis(duration, PHASE_X);
     }
 
     public void animateY(long duration) {
-        animatorAxis(duration, yUpdateListener());
-    }
-
-    @NotNull
-    private ValueAnimator.AnimatorUpdateListener xUpdateListener() {
-        if (_xUpdateListener == null) {
-            _xUpdateListener = animator -> {
-                phaseX = (Float) animator.getAnimatedValue();
-                view.invalidate();
-            };
-        }
-
-        return _xUpdateListener;
-    }
-
-    @NotNull
-    private ValueAnimator.AnimatorUpdateListener yUpdateListener() {
-        if (_yUpdateListener == null) {
-            _yUpdateListener = animator -> {
-                phaseY = (Float) animator.getAnimatedValue();
-                view.invalidate();
-            };
-        }
-
-        return _yUpdateListener;
+        animateAxis(duration, PHASE_Y);
     }
 }
