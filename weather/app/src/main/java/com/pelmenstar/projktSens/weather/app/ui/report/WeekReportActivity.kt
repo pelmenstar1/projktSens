@@ -10,8 +10,8 @@ import com.pelmenstar.projktSens.chartLite.data.DataSet
 import com.pelmenstar.projktSens.chartLite.data.Entry
 import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter
 import com.pelmenstar.projktSens.shared.StringUtils
-import com.pelmenstar.projktSens.shared.android.Intent
 import com.pelmenstar.projktSens.shared.android.charts.DateChartFormatter
+import com.pelmenstar.projktSens.shared.android.ext.Intent
 import com.pelmenstar.projktSens.shared.android.ui.actionBar
 import com.pelmenstar.projktSens.shared.android.ui.requireIntent
 import com.pelmenstar.projktSens.shared.time.ShortDate
@@ -117,7 +117,9 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
 
             val x = when (formatKind) {
                 FORMAT_KIND_DATE -> ShortDate.toEpochDay(date).toFloat()
-                FORMAT_KIND_MONTH_AND_DAY -> (ShortDate.getMonth(date) * 31 + ShortDate.getDayOfMonth(date)).toFloat()
+                FORMAT_KIND_MONTH_AND_DAY -> (ShortDate.getMonth(date) * 31 + ShortDate.getDayOfMonth(
+                    date
+                )).toFloat()
                 else -> ShortDate.getDayOfMonth(date).toFloat()
             }
 
@@ -203,7 +205,11 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
         private const val FORMAT_KIND_MONTH_AND_DAY = 1
         private const val FORMAT_KIND_DAY = 2
 
-        fun intent(context: Context, @ShortDateInt startDate: Int, @ShortDateInt endDate: Int): Intent {
+        fun intent(
+            context: Context,
+            @ShortDateInt startDate: Int,
+            @ShortDateInt endDate: Int
+        ): Intent {
             return Intent(context, WeekReportActivity::class.java) {
                 putExtra(EXTRA_START_DATE, startDate)
                 putExtra(EXTRA_END_DATE, endDate)

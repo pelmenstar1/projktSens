@@ -6,7 +6,8 @@ import org.jetbrains.annotations.NotNull;
  * Contains constant commands.
  */
 public final class Commands {
-    private Commands() {}
+    private Commands() {
+    }
 
     /**
      * Makes repo-server to return instance of day report
@@ -32,7 +33,7 @@ public final class Commands {
 
     private static final int MAX_COMMAND = GET_NEXT_WEATHER_TIME;
 
-    private static final String[] COMMAND_NAMES = new String[] {
+    private static final String[] COMMAND_NAMES = new String[]{
             "GET_DAY_REPORT",
             "GET_DAY_RANGE_REPORT",
             "GET_AVAILABLE_DATE_RANGE",
@@ -41,8 +42,8 @@ public final class Commands {
     };
 
     public static int fromString(@NotNull String commandName) {
-        for(int i = 0; i < COMMAND_NAMES.length; i++) {
-            if(COMMAND_NAMES[i].equalsIgnoreCase(commandName)) {
+        for (int i = 0; i < COMMAND_NAMES.length; i++) {
+            if (COMMAND_NAMES[i].equalsIgnoreCase(commandName)) {
                 return i + 1;
             }
         }
@@ -52,14 +53,14 @@ public final class Commands {
 
     /**
      * Returns string representation of command integer
+     *
      * @param command command
      * @return string representation of {@code command}
-     *
      * @throws IllegalArgumentException if {@code command} is invalid
      */
     @NotNull
     public static String toString(int command) {
-        if(command <= 0 || command > MAX_COMMAND) {
+        if (command <= 0 || command > MAX_COMMAND) {
             throw new IllegalArgumentException("command");
         }
 

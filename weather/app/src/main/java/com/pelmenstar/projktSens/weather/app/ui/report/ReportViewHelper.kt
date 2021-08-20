@@ -158,7 +158,8 @@ fun createChartView(
     val blockTopMargin = res.getDimensionPixelOffset(R.dimen.reportActivity_chartViewBlockTopMargin)
     val chartHeight = res.getDimensionPixelSize(R.dimen.reportActivity_chartHeight)
 
-    val headerAppearance = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline4)
+    val headerAppearance =
+        TextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline4)
     val paramAppearance = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
 
     val strings = ParameterStatsPrefixStrings(

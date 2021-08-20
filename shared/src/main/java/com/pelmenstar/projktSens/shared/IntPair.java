@@ -9,32 +9,32 @@ public final class IntPair {
      * - 64..32 bits | second <br/>
      * - 32..0 bits | first <br/>
      *
-     * @param first first int
+     * @param first  first int
      * @param second second int
      */
     public static long of(int first, int second) {
-        return ((long)second << 32) | ((long)first & 0xffffffffL);
+        return ((long) second << 32) | ((long) first & 0xffffffffL);
     }
 
     /**
      * Extracts first int of pair
      */
     public static int getFirst(long pair) {
-        return (int)(pair);
+        return (int) (pair);
     }
 
     /**
      * Extracts second int of pair
      */
     public static int getSecond(long pair) {
-        return (int)(pair >> 32);
+        return (int) (pair >> 32);
     }
 
     public static long withFirst(long pair, int value) {
-        return (pair & 0xffffffff00000000L) | ((long)value & 0xffffffffL);
+        return (pair & 0xffffffff00000000L) | ((long) value & 0xffffffffL);
     }
 
     public static long withSecond(long pair, int value) {
-        return (pair & 0x00000000ffffffffL) | ((long)value << 32);
+        return (pair & 0x00000000ffffffffL) | ((long) value << 32);
     }
 }

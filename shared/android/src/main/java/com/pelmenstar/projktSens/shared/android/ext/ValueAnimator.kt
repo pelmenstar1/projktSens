@@ -1,4 +1,4 @@
-package com.pelmenstar.projktSens.shared.android
+package com.pelmenstar.projktSens.shared.android.ext
 
 import android.animation.ValueAnimator
 

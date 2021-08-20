@@ -13,7 +13,7 @@ import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.formatters.MoonPhaseFormatter
 import com.pelmenstar.projktSens.weather.app.ui.MoonView
 
-class MoonCalendarActivity: HomeButtonSupportActivity(), MoonCalendarContract.View {
+class MoonCalendarActivity : HomeButtonSupportActivity(), MoonCalendarContract.View {
     override val context: Context
         get() = this
 
@@ -41,7 +41,8 @@ class MoonCalendarActivity: HomeButtonSupportActivity(), MoonCalendarContract.Vi
 
                 moonPhaseView = PrefixTextView {
                     linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
-                        leftMargin = res.getDimensionPixelOffset(R.dimen.moonCalendar_moonPhaseText_leftMargin)
+                        leftMargin =
+                            res.getDimensionPixelOffset(R.dimen.moonCalendar_moonPhaseText_leftMargin)
                     }
 
                     prefix = res.getString(R.string.moonPhase)
@@ -50,7 +51,8 @@ class MoonCalendarActivity: HomeButtonSupportActivity(), MoonCalendarContract.Vi
 
                 moonView = MoonView {
                     val size = res.getDimensionPixelSize(R.dimen.moonCalendar_moonSize)
-                    val topBottomMargin = res.getDimensionPixelOffset(R.dimen.moonCalendar_moonTopBottomMargin)
+                    val topBottomMargin =
+                        res.getDimensionPixelOffset(R.dimen.moonCalendar_moonTopBottomMargin)
 
                     linearLayoutParams(size, size) {
                         gravity = Gravity.CENTER_HORIZONTAL
@@ -79,7 +81,7 @@ class MoonCalendarActivity: HomeButtonSupportActivity(), MoonCalendarContract.Vi
         presenter = component.moonCalendarPresenter().also {
             it.attach(this)
 
-            if(savedInstanceState != null) {
+            if (savedInstanceState != null) {
                 it.restoreState(savedInstanceState)
             }
         }

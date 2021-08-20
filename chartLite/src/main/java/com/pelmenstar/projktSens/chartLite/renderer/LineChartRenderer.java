@@ -30,14 +30,11 @@ public final class LineChartRenderer {
 
     @NotNull
     private final SimpleChartAnimator animator;
-
+    private final RectF clipRect = new RectF();
     private float[] computedPoints = EmptyArray.FLOAT;
-
     @Nullable
     private ChartData computedPointsData;
-
     private long computedPointsVphHash = 0;
-
     private float computedPointsPhaseX;
     private float computedPointsPhaseY;
 
@@ -63,9 +60,9 @@ public final class LineChartRenderer {
 
         if (data == null || (
                 computedPointsData == data &&
-                computedPointsVphHash == vphHash &&
-                computedPointsPhaseX == phaseX &&
-                computedPointsPhaseY == phaseY
+                        computedPointsVphHash == vphHash &&
+                        computedPointsPhaseX == phaseX &&
+                        computedPointsPhaseY == phaseY
         )) {
             return;
         }
@@ -95,8 +92,6 @@ public final class LineChartRenderer {
 
         viewPortHandler.valuesToPixels(points);
     }
-
-    private final RectF clipRect = new RectF();
 
     public void draw(@NotNull Canvas c) {
         ChartData data = dataRef.value;
@@ -171,16 +166,16 @@ public final class LineChartRenderer {
                     if (drawCircles) {
                         Paint paint;
 
-                        if(eIndex == xMinIdx && xMinColor != SpecialColors.NONE) {
+                        if (eIndex == xMinIdx && xMinColor != SpecialColors.NONE) {
                             customCirclePaint.setColor(xMinColor);
                             paint = customCirclePaint;
-                        } else if(eIndex == xMaxIdx && xMaxColor != SpecialColors.NONE) {
+                        } else if (eIndex == xMaxIdx && xMaxColor != SpecialColors.NONE) {
                             customCirclePaint.setColor(xMaxColor);
                             paint = customCirclePaint;
-                        } else if(eIndex == yMinIdx && yMinColor != SpecialColors.NONE) {
+                        } else if (eIndex == yMinIdx && yMinColor != SpecialColors.NONE) {
                             customCirclePaint.setColor(yMinColor);
                             paint = customCirclePaint;
-                        } else if(eIndex == yMaxIdx && yMaxColor != SpecialColors.NONE) {
+                        } else if (eIndex == yMaxIdx && yMaxColor != SpecialColors.NONE) {
                             customCirclePaint.setColor(yMaxColor);
                             paint = customCirclePaint;
                         } else {

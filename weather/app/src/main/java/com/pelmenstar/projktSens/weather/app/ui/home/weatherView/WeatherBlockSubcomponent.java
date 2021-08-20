@@ -26,31 +26,24 @@ import org.jetbrains.annotations.NotNull;
 public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcomponent {
     private static final float TEMP_UNIT_MARGIN_L_DP = 4;
     private static final float TEXT_MARGIN_T_DP = 5;
-
+    private final Paint tempPaint;
+    private final Paint tempUnitPaint;
+    private final Paint humPressPaint;
+    private final int dayTextColor;
+    private final int nightTextColor;
+    private final float tempUnitMarginLeft;
+    private final float textMarginTop;
+    private final UnitFormatter unitFormatter;
+    private final Rect textSizeBuffer = new Rect();
+    private final AppPreferences preferences;
     private String tempUnitStr = "";
     private String tempStr = "";
     private String humStr = "";
     private String pressStr = "";
-
     private float tempStrY;
     private float humStrY;
     private float pressStrY;
     private long tempUnitStrPos;
-
-    private final Paint tempPaint;
-    private final Paint tempUnitPaint;
-    private final Paint humPressPaint;
-
-    private final int dayTextColor;
-    private final int nightTextColor;
-
-    private final float tempUnitMarginLeft;
-    private final float textMarginTop;
-
-    private final UnitFormatter unitFormatter;
-    private final Rect textSizeBuffer = new Rect();
-
-    private final AppPreferences preferences;
 
     public WeatherBlockSubcomponent(@NotNull Context context) {
         AppComponent appComponent = DaggerAppComponent
@@ -100,7 +93,7 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
     private static Typeface loadTextTypeface(@NotNull Context context) {
         Typeface notosans = ResourcesCompat.getFont(context, R.font.notosans_light);
 
-        if(notosans == null) {
+        if (notosans == null) {
             return Typeface.SANS_SERIF;
         }
 
@@ -139,7 +132,7 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
         humStrY = textMarginTop + tempStrHeight * 2;
 
         pressStrY = textMarginTop + humStrY + humStrHeight;
-        tempUnitStrPos = PointL.of( tempStrWidth + tempUnitMarginLeft, tempUnitStrHeight);
+        tempUnitStrPos = PointL.of(tempStrWidth + tempUnitMarginLeft, tempUnitStrHeight);
     }
 
     @Override

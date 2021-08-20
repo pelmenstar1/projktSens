@@ -9,15 +9,8 @@ import java.lang.reflect.Modifier;
  * does not meet requirements described in {@link ObjectSerializer}
  */
 public final class SerializerContractException extends RuntimeException {
-    public SerializerContractException() {
-    }
-
     public SerializerContractException(@NotNull String msg) {
         super(msg);
-    }
-
-    public SerializerContractException(@NotNull String msg, @NotNull Exception innerException) {
-        super(msg, innerException);
     }
 
     /**
@@ -50,6 +43,7 @@ public final class SerializerContractException extends RuntimeException {
     /**
      * Creates instance of {@link SerializerContractException} which signals that serializer of specified class
      * has illegal field modifiers
+     *
      * @param mods field modifiers of class
      */
     @NotNull
@@ -80,24 +74,22 @@ public final class SerializerContractException extends RuntimeException {
             }
         }
 
-        if((mods & Modifier.STATIC) != 0) {
+        if ((mods & Modifier.STATIC) != 0) {
             sb.append("final ");
         }
 
-        if((mods & Modifier.FINAL) != 0) {
+        if ((mods & Modifier.FINAL) != 0) {
             sb.append("final ");
         }
 
-        if((mods & Modifier.TRANSIENT) != 0) {
+        if ((mods & Modifier.TRANSIENT) != 0) {
             sb.append("transient ");
         }
 
-        if((mods & Modifier.VOLATILE) != 0) {
+        if ((mods & Modifier.VOLATILE) != 0) {
             sb.append("volatile ");
         }
 
         sb.deleteCharAt(sb.length() - 1);
     }
-
-
 }

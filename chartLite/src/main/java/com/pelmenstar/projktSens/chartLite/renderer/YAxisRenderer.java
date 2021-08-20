@@ -9,6 +9,7 @@ import com.pelmenstar.projktSens.shared.EmptyArray;
 import org.jetbrains.annotations.NotNull;
 
 public final class YAxisRenderer extends AxisRenderer<YAxis> {
+    private final float[] computeAxisValues = new float[4];
     private float[] computedPoints = EmptyArray.FLOAT;
     private long computedPointsAxisEntriesHash = 0;
     private long computedPointsVphHash = 0;
@@ -16,8 +17,6 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
     public YAxisRenderer(@NotNull ViewPortHandler viewPortHandler, @NotNull YAxis yAxis) {
         super(viewPortHandler, yAxis);
     }
-
-    private final float[] computeAxisValues = new float[4];
 
     @Override
     public void computeAxis() {
@@ -42,7 +41,7 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
         long vphHash = viewPortHandler.stateHashCode();
         long axisHash = axis.entriesHash;
 
-        if(computedPointsAxisEntriesHash == axisHash && computedPointsVphHash == vphHash) {
+        if (computedPointsAxisEntriesHash == axisHash && computedPointsVphHash == vphHash) {
             return;
         }
 
@@ -52,14 +51,14 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
 
         float[] entries = axis.entries;
         int pointsSize = entries.length * 2;
-        if(computedPoints.length != pointsSize){
+        if (computedPoints.length != pointsSize) {
             computedPoints = new float[pointsSize];
         }
 
         int pOffset = 1;
         int eOffset = 0;
 
-        while(eOffset < entries.length) {
+        while (eOffset < entries.length) {
             computedPoints[pOffset] = entries[eOffset];
 
             eOffset++;
@@ -71,7 +70,7 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
 
     @Override
     public void draw(@NotNull Canvas c) {
-        if(!axis.isEnabled()) {
+        if (!axis.isEnabled()) {
             return;
         }
 
@@ -86,13 +85,13 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
         boolean drawLabels = axis.isDrawLabelsEnabled();
         boolean drawGrid = axis.isDrawGridLinesEnabled();
 
-        if(drawLabels) {
+        if (drawLabels) {
             labelPaint.setTypeface(axis.getTypeface());
             labelPaint.setTextSize(axis.getTextSize());
             labelPaint.setColor(axis.getTextColor());
         }
 
-        if(drawGrid) {
+        if (drawGrid) {
             gridPaint.setColor(axis.getGridColor());
             gridPaint.setStrokeWidth(axis.getGridLineWidth());
         }
@@ -100,38 +99,38 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
         float contentLeft = viewPortHandler.contentLeft();
         float contentRight = viewPortHandler.contentRight();
 
-        if(axis.isDrawAxisLineEnabled()) {
+        if (axis.isDrawAxisLineEnabled()) {
             float contentTop = viewPortHandler.contentTop();
             float contentBottom = viewPortHandler.contentBottom();
 
             axisLinePaint.setColor(axis.getAxisLineColor());
             axisLinePaint.setStrokeWidth(axis.getAxisLineWidth());
 
-            if(pos == YAxis.POSITION_LEFT || pos == YAxis.POSITION_BOTH) {
+            if (pos == YAxis.POSITION_LEFT || pos == YAxis.POSITION_BOTH) {
                 c.drawLine(contentLeft, contentTop, contentLeft, contentBottom, axisLinePaint);
             }
 
-            if(pos == YAxis.POSITION_RIGHT || pos == YAxis.POSITION_BOTH) {
+            if (pos == YAxis.POSITION_RIGHT || pos == YAxis.POSITION_BOTH) {
                 c.drawLine(contentRight, contentTop, contentRight, contentBottom, axisLinePaint);
             }
         }
 
-        while(eOffset < entries.length) {
+        while (eOffset < entries.length) {
             float y = computedPoints[pOffset];
 
-            if(drawLabels) {
+            if (drawLabels) {
                 String label = labels[eOffset];
 
-                if(pos == YAxis.POSITION_LEFT || pos == YAxis.POSITION_BOTH) {
+                if (pos == YAxis.POSITION_LEFT || pos == YAxis.POSITION_BOTH) {
                     c.drawText(label, 0, label.length(), 1f, y, labelPaint);
                 }
 
-                if(pos == YAxis.POSITION_RIGHT || pos == YAxis.POSITION_BOTH) {
+                if (pos == YAxis.POSITION_RIGHT || pos == YAxis.POSITION_BOTH) {
                     c.drawText(label, 0, label.length(), contentRight + xOffset, y, labelPaint);
                 }
             }
 
-            if(drawGrid) {
+            if (drawGrid) {
                 c.drawLine(contentLeft, y, contentRight, y, gridPaint);
             }
 

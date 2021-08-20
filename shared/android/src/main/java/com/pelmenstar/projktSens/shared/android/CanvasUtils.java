@@ -11,11 +11,7 @@ public final class CanvasUtils {
     private CanvasUtils() {
     }
 
-    public static void drawText(@NotNull Canvas c, @NotNull String text, long pos, @NotNull Paint paint) {
-        c.drawText(text, 0, text.length(), PointL.getX(pos), PointL.getY(pos), paint);
-    }
-
-    public static void drawText(@NotNull Canvas c, @NotNull char[] text, long pos, @NotNull Paint paint) {
+    public static void drawText(@NotNull Canvas c, char @NotNull [] text, long pos, @NotNull Paint paint) {
         c.drawText(text, 0, text.length, PointL.getX(pos), PointL.getY(pos), paint);
     }
 }

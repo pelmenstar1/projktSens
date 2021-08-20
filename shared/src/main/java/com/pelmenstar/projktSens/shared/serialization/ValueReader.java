@@ -23,12 +23,13 @@ public final class ValueReader {
 
     /**
      * Initializes instance of {@link ValueReader} using byte array and initial position of cursor
-     * @param data byte array from which values will be read
+     *
+     * @param data   byte array from which values will be read
      * @param offset initial position of cursor
      * @throws IndexOutOfBoundsException if offset is less than 0 or greater than length of byte array
      */
     public ValueReader(byte @NotNull [] data, int offset) {
-        if(offset < 0 || offset > data.length) {
+        if (offset < 0 || offset > data.length) {
             throw new IndexOutOfBoundsException("offset");
         }
 
@@ -130,11 +131,11 @@ public final class ValueReader {
      * Reads byte array with specified size from the internal buffer and moves cursor for size of byte array.
      *
      * @param size size of data to read
-     * @throws IllegalArgumentException if size less or equals to 0
+     * @throws IllegalArgumentException  if size less or equals to 0
      * @throws IndexOutOfBoundsException if there are lack of data
      */
     public byte @NotNull [] readByteArray(int size) {
-        if(size <= 0) {
+        if (size <= 0) {
             throw new IllegalArgumentException("size=" + size);
         }
 

@@ -27,7 +27,7 @@ public final class WeatherBackgroundSubcomponent extends ComplexWeatherView.Subc
     public void draw(@NotNull Canvas c) {
         Drawable d;
 
-        if(getDayState() == ComplexWeatherView.STATE_DAY) {
+        if (getDayState() == ComplexWeatherView.STATE_DAY) {
             d = dayDrawable;
         } else {
             d = nightDrawable;
@@ -38,10 +38,10 @@ public final class WeatherBackgroundSubcomponent extends ComplexWeatherView.Subc
 
     @Override
     protected void onPositionChanged(float x, float y) {
-        int ix = (int)x;
-        int iy = (int)y;
-        int right = ix + (int)getWidth();
-        int bottom = iy + (int)getHeight();
+        int ix = (int) x;
+        int iy = (int) y;
+        int right = ix + (int) getWidth();
+        int bottom = iy + (int) getHeight();
 
         dayDrawable.setBounds(ix, iy, right, bottom);
         nightDrawable.setBounds(ix, iy, right, bottom);
@@ -49,10 +49,10 @@ public final class WeatherBackgroundSubcomponent extends ComplexWeatherView.Subc
 
     @Override
     protected void onSizeChanged(float width, float height) {
-        int left = (int)getX();
-        int top = (int)getY();
-        int right = left + (int)width;
-        int bottom = top + (int)height;
+        int left = (int) getX();
+        int top = (int) getY();
+        int right = left + (int) width;
+        int bottom = top + (int) height;
 
         dayDrawable.setBounds(left, top, right, bottom);
         nightDrawable.setBounds(left, top, right, bottom);

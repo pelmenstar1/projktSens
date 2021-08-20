@@ -98,11 +98,15 @@ suspend fun InputStream.readSuspendAndThrowIfNotEnough(buffer: ByteArray) {
  * @throws IOException if the length of data read from [InputStream] `!= [length]`,
  *                     or another IO error happened
  */
-suspend fun InputStream.readSuspendAndThrowIfNotEnough(buffer: ByteArray, offset: Int, length: Int) {
+suspend fun InputStream.readSuspendAndThrowIfNotEnough(
+    buffer: ByteArray,
+    offset: Int,
+    length: Int
+) {
     return suspendCoroutine { cont ->
         val bytesRead = read(buffer, offset, length)
 
-        val result = if(bytesRead != length) {
+        val result = if (bytesRead != length) {
             Result.failure(IOException("Cannot read data"))
         } else {
             UnitResult.SUCCESS
@@ -128,11 +132,11 @@ suspend fun InputStream.readNSuspend(size: Int): ByteArray {
 suspend fun InputStream.readNBufferedSuspend(size: Int, bufferSize: Int = 1024): ByteArray {
     val bytes = ByteArray(size)
 
-    if(size < bufferSize) {
+    if (size < bufferSize) {
         readSuspendAndThrowIfNotEnough(bytes)
     } else {
         var offset = 0
-        while(offset < size) {
+        while (offset < size) {
             val expectedToRead = min(size - offset, bufferSize)
             readSuspendAndThrowIfNotEnough(bytes, offset, expectedToRead)
             offset += expectedToRead

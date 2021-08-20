@@ -30,7 +30,7 @@ public class SlideBitmapView extends View {
     private RenderNode renderNode;
 
     static {
-        if(Build.VERSION.SDK_INT >= 24) {
+        if (Build.VERSION.SDK_INT >= 24) {
             OFFSET_X = new FloatProperty<SlideBitmapView>("offsetX") {
                 @Override
                 @NotNull
@@ -80,7 +80,7 @@ public class SlideBitmapView extends View {
         super(context, attrs, defStyleAttr, defStyleRes);
 
         setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        if(Build.VERSION.SDK_INT >= 29) {
+        if (Build.VERSION.SDK_INT >= 29) {
             renderNode = new RenderNode("slideBitmapView");
         }
     }
@@ -90,7 +90,7 @@ public class SlideBitmapView extends View {
     }
 
     public void setSlideCoefficient(int value) {
-        if(value <= 0) {
+        if (value <= 0) {
             throw new IllegalArgumentException("value");
         }
 
@@ -104,9 +104,9 @@ public class SlideBitmapView extends View {
     public void setOffsetX(float offsetX) {
         this.offsetX = offsetX;
 
-        if(Build.VERSION.SDK_INT >= 29) {
+        if (Build.VERSION.SDK_INT >= 29) {
             boolean needsToInvalidate = renderNode.setTranslationX(offsetX);
-            if(!needsToInvalidate) {
+            if (!needsToInvalidate) {
                 return;
             }
         }
@@ -122,7 +122,7 @@ public class SlideBitmapView extends View {
     public void setBitmap(@Nullable Bitmap bitmap) {
         this.bitmap = bitmap;
 
-        if(Build.VERSION.SDK_INT >= 29) {
+        if (Build.VERSION.SDK_INT >= 29) {
             invalidateRenderNode();
         }
 
@@ -130,7 +130,7 @@ public class SlideBitmapView extends View {
     }
 
     public void onBitmapChanged() {
-        if(Build.VERSION.SDK_INT >= 29) {
+        if (Build.VERSION.SDK_INT >= 29) {
             invalidateRenderNode();
             invalidate();
         }
@@ -140,9 +140,9 @@ public class SlideBitmapView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        if(Build.VERSION.SDK_INT >= 29) {
+        if (Build.VERSION.SDK_INT >= 29) {
             boolean needsToInvalidate = renderNode.setPosition(0, 0, w * slideCoefficient, h);
-            if(needsToInvalidate) {
+            if (needsToInvalidate) {
                 invalidateRenderNode();
 
                 invalidate();
@@ -168,7 +168,7 @@ public class SlideBitmapView extends View {
 
     @Override
     protected void onDraw(@NotNull Canvas c) {
-        if(Build.VERSION.SDK_INT >= 29 && c.isHardwareAccelerated()) {
+        if (Build.VERSION.SDK_INT >= 29 && c.isHardwareAccelerated()) {
             c.drawRenderNode(renderNode);
         } else {
             Bitmap b = bitmap;

@@ -13,7 +13,7 @@ public final class MoonPhaseFormatter {
 
     @NotNull
     public String format(float phase) {
-        int phaseIndex = (int)(phase * 8f);
+        int phaseIndex = (int) (phase * 8f);
         String phaseStr = moonPhases[phaseIndex];
 
         //noinspection StringBufferReplaceableByString

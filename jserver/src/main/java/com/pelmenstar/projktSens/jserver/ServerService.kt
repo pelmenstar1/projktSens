@@ -45,11 +45,15 @@ class ServerService : Service() {
     }
 
     private fun createNotificationChannel() {
-        if(Build.VERSION.SDK_INT >= 26) {
+        if (Build.VERSION.SDK_INT >= 26) {
             val name = getString(R.string.serverNotification_channelName)
             val description = getString(R.string.serverNotification_channelDescription)
 
-            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT).apply {
+            val channel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                name,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
                 setDescription(description)
             }
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -65,7 +69,7 @@ class ServerService : Service() {
         }
 
         var pendingIntentFlags = PendingIntent.FLAG_UPDATE_CURRENT
-        if(Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= 23) {
             pendingIntentFlags = pendingIntentFlags or PendingIntent.FLAG_IMMUTABLE
         }
 
@@ -91,7 +95,8 @@ class ServerService : Service() {
 
     companion object {
         private const val NOTIFICATION_ID = 10000
-        private const val NOTIFICATION_CHANNEL_ID = "com.pelmenstar.projktSens.server.serverNotification"
+        private const val NOTIFICATION_CHANNEL_ID =
+            "com.pelmenstar.projktSens.server.serverNotification"
 
         fun intent(context: Context): Intent {
             return Intent(context, ServerService::class.java)

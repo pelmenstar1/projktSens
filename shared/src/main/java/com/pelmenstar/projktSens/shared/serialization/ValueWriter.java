@@ -23,13 +23,12 @@ public final class ValueWriter {
     /**
      * Initializes instance of {@link ValueWriter} using byte array and offset
      *
-     * @param data byte array for reading values
+     * @param data   byte array for reading values
      * @param offset primary position of cursor
-     *
      * @throws IndexOutOfBoundsException if offset is less than 0 or greater than size of data
      */
     public ValueWriter(byte @NotNull [] data, int offset) {
-        if(offset < 0 || offset > data.length) {
+        if (offset < 0 || offset > data.length) {
             throw new IndexOutOfBoundsException("offset");
         }
 
@@ -119,7 +118,7 @@ public final class ValueWriter {
     /**
      * Writes specified array and moves cursor for given array valuesLength
      *
-     *  @throws IndexOutOfBoundsException if cursor is in {@code size() - array.valuesLength - 1} position or further
+     * @throws IndexOutOfBoundsException if cursor is in {@code size() - array.valuesLength - 1} position or further
      */
     public void emitByteArray(byte @NotNull [] array) {
         System.arraycopy(array, 0, data, position, array.length);

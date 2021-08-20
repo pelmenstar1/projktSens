@@ -7,7 +7,8 @@ import org.jetbrains.annotations.Nullable;
  * The exception that may be thrown in {@link WeatherDataSource}
  */
 public final class DataSourceException extends Exception {
-    public DataSourceException() {}
+    public DataSourceException() {
+    }
 
     public DataSourceException(@NotNull String msg) {
         super(msg);

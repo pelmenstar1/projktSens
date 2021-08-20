@@ -9,8 +9,8 @@ import com.pelmenstar.projktSens.chartLite.LineChart
 import com.pelmenstar.projktSens.chartLite.data.ChartData
 import com.pelmenstar.projktSens.chartLite.data.DataSet
 import com.pelmenstar.projktSens.chartLite.data.Entry
-import com.pelmenstar.projktSens.shared.android.Intent
 import com.pelmenstar.projktSens.shared.android.charts.TimeChartFormatter
+import com.pelmenstar.projktSens.shared.android.ext.Intent
 import com.pelmenstar.projktSens.shared.android.ui.actionBar
 import com.pelmenstar.projktSens.shared.android.ui.requireIntent
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
@@ -92,14 +92,23 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
             pressEntries[i] = Entry.of(x, press)
         }
 
-        val tempDataSet = DataSet(tempEntries, tempChartValueFormatter).
-            customizeOptions(colorPrimary, minColor, maxColor)
+        val tempDataSet = DataSet(tempEntries, tempChartValueFormatter).customizeOptions(
+            colorPrimary,
+            minColor,
+            maxColor
+        )
 
-        val humDataSet = DataSet(humEntries, humChartValueFormatter).
-            customizeOptions(colorPrimary, minColor, maxColor)
+        val humDataSet = DataSet(humEntries, humChartValueFormatter).customizeOptions(
+            colorPrimary,
+            minColor,
+            maxColor
+        )
 
-        val pressDataSet = DataSet(pressEntries, pressChartValueFormatter).
-            customizeOptions(colorPrimary, minColor, maxColor)
+        val pressDataSet = DataSet(pressEntries, pressChartValueFormatter).customizeOptions(
+            colorPrimary,
+            minColor,
+            maxColor
+        )
 
         val tempData = ChartData(tempDataSet)
         val humData = ChartData(humDataSet)

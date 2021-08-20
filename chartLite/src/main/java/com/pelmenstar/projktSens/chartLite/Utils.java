@@ -18,10 +18,11 @@ public final class Utils {
     private static int minFlingVelocity;
     private static int maxFlingVelocity;
 
-    private Utils() {}
+    private Utils() {
+    }
 
     static void init(@NotNull Context context) {
-        if(!initialized.compareAndSet(0, 1)) {
+        if (!initialized.compareAndSet(0, 1)) {
             return;
         }
 
@@ -42,7 +43,7 @@ public final class Utils {
         if (Float.isInfinite(number) || Float.isNaN(number) || number == 0f) {
             return 0f;
         }
-        
+
         float d = (float) Math.ceil(Math.log10(Math.abs(number)));
         int pw = 1 - (int) d;
         float magnitude = (float) Math.pow(10, pw);
@@ -76,6 +77,7 @@ public final class Utils {
     public static int getMinimumFlingVelocity() {
         return minFlingVelocity;
     }
+
     public static int getMaximumFlingVelocity() {
         return maxFlingVelocity;
     }

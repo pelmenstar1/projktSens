@@ -13,8 +13,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.pelmenstar.projktSens.shared.EmptyArray
 import com.pelmenstar.projktSens.shared.add
-import com.pelmenstar.projktSens.shared.android.Intent
 import com.pelmenstar.projktSens.shared.android.R
+import com.pelmenstar.projktSens.shared.android.ext.Intent
+import com.pelmenstar.projktSens.shared.android.ext.getIntArrayNotNull
+import com.pelmenstar.projktSens.shared.android.ext.getParcelableExtraNotNull
 import com.pelmenstar.projktSens.shared.android.ui.requireIntent
 
 class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_permissions) {
@@ -38,13 +40,14 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
         initViews()
 
         val intent = requireIntent()
-        val permContext = intent.getParcelableExtra<RequestPermissionsContext>(EXTRA_PERM_CONTEXT) ?: throw NullPointerException("$EXTRA_PERM_CONTEXT in intent is null")
-        this.permContext = permContext
+        permContext = intent.getParcelableExtraNotNull(EXTRA_PERM_CONTEXT)
 
         if (savedInstanceState != null) {
             currentPermissionIndex = savedInstanceState.getInt(STATE_PERMISSION_INDEX, 0)
-            grantedPermissionIndices = savedInstanceState.getIntArray(STATE_GRANTED_PERMISSION_INDICES)!!
-            deniedPermissionIndices = savedInstanceState.getIntArray(STATE_DENIED_PERMISSION_INDICES)!!
+            grantedPermissionIndices =
+                savedInstanceState.getIntArrayNotNull(STATE_GRANTED_PERMISSION_INDICES)
+            deniedPermissionIndices =
+                savedInstanceState.getIntArrayNotNull(STATE_DENIED_PERMISSION_INDICES)
         }
 
         currentPermission = permContext[currentPermissionIndex]
@@ -89,7 +92,10 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
             throw RuntimeException("Sdk int < 23")
         }
 
-        requestPermissions(currentPermission.modePermissions.androidPermissions, PERMISSION_REQUEST_CODE)
+        requestPermissions(
+            currentPermission.modePermissions.androidPermissions,
+            PERMISSION_REQUEST_CODE
+        )
     }
 
     private fun nextPermission() {
@@ -162,12 +168,17 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
         private const val TAG = "RequestPermsActivity"
         private const val EXTRA_PERM_CONTEXT = "RequestPermissionsActivity:permContext"
 
-        const val RETURN_DATA_GRANTED_PERMISSION_INDICES = "RequestPermissionsActivity.returnData.grantedPermissions"
-        const val RETURN_DATA_DENIED_PERMISSION_INDICES = "RequestPermissionsActivity.returnData.deniedPermissions"
+        const val RETURN_DATA_GRANTED_PERMISSION_INDICES =
+            "RequestPermissionsActivity.returnData.grantedPermissions"
+        const val RETURN_DATA_DENIED_PERMISSION_INDICES =
+            "RequestPermissionsActivity.returnData.deniedPermissions"
 
-        private const val STATE_PERMISSION_INDEX = "RequestPermissionsActivity:state_permission_index"
-        private const val STATE_GRANTED_PERMISSION_INDICES = "RequestPermissionsActivity:state_grantedPermissionIndices"
-        private const val STATE_DENIED_PERMISSION_INDICES = "RequestPermissionsActivity:state_deniedPermissionIndices"
+        private const val STATE_PERMISSION_INDEX =
+            "RequestPermissionsActivity:state_permission_index"
+        private const val STATE_GRANTED_PERMISSION_INDICES =
+            "RequestPermissionsActivity:state_grantedPermissionIndices"
+        private const val STATE_DENIED_PERMISSION_INDICES =
+            "RequestPermissionsActivity:state_deniedPermissionIndices"
 
         private const val PERMISSION_REQUEST_CODE = 2
 
@@ -185,7 +196,7 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
             val pid = Process.myPid()
             val uid = Process.myUid()
 
-            for(i in 0 until permContext.count) {
+            for (i in 0 until permContext.count) {
                 if (shouldRequestPermission(context, permContext[i], pid, uid)) {
                     return true
                 }
@@ -194,7 +205,10 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
             return false
         }
 
-        private fun shouldRequestPermission(context: Context, permission: RequestPermissionInfo): Boolean {
+        private fun shouldRequestPermission(
+            context: Context,
+            permission: RequestPermissionInfo
+        ): Boolean {
             return shouldRequestPermission(context, permission, Process.myPid(), Process.myUid())
         }
 
@@ -206,10 +220,15 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
         ): Boolean {
             val modePermissions = permission.modePermissions
 
-            when(val action = modePermissions.mode) {
+            when (val action = modePermissions.mode) {
                 ModePermissionArray.MODE_EVERY -> {
                     for (s in modePermissions.androidPermissions) {
-                        if (context.checkPermission(s, pid, uid) == PackageManager.PERMISSION_DENIED) {
+                        if (context.checkPermission(
+                                s,
+                                pid,
+                                uid
+                            ) == PackageManager.PERMISSION_DENIED
+                        ) {
                             return true
                         }
                     }
@@ -219,7 +238,12 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
 
                 ModePermissionArray.MODE_ANY -> {
                     for (s in modePermissions.androidPermissions) {
-                        if (context.checkPermission(s, pid, uid) == PackageManager.PERMISSION_GRANTED) {
+                        if (context.checkPermission(
+                                s,
+                                pid,
+                                uid
+                            ) == PackageManager.PERMISSION_GRANTED
+                        ) {
                             return false
                         }
                     }

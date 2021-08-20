@@ -8,7 +8,6 @@ import androidx.annotation.ColorInt;
 import com.pelmenstar.projktSens.chartLite.SpecialColors;
 import com.pelmenstar.projktSens.chartLite.formatter.FloatValueFormatter;
 import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
-import com.pelmenstar.projktSens.shared.EmptyArray;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,51 +16,36 @@ public final class DataSet {
     public static final int FLAG_VISIBLE = 1;
     public static final int FLAG_DRAW_VALUES = 1 << 1;
     public static final int FLAG_DRAW_CIRCLES = 1 << 2;
-
-    private int flags = FLAG_VISIBLE | FLAG_DRAW_VALUES | FLAG_DRAW_CIRCLES;
-
+    @NotNull
+    public final String[] labels;
     private final long[] entries;
     //private long[] customEntryColors = EmptyArray.LONG;
-
+    @NotNull
+    private final ValueFormatter valueFormatter;
+    private int flags = FLAG_VISIBLE | FLAG_DRAW_VALUES | FLAG_DRAW_CIRCLES;
     private int xMaxIndex;
     private int xMaxColor = SpecialColors.NONE;
     private float xMax = Float.MIN_VALUE;
-
     private int xMinIndex;
     private int xMinColor = SpecialColors.NONE;
     private float xMin = Float.MAX_VALUE;
-
     private int yMaxIndex;
     private int yMaxColor = SpecialColors.NONE;
     private float yMax = Float.MIN_VALUE;
-
     private int yMinIndex;
     private int yMinColor = SpecialColors.NONE;
     private float yMin = Float.MAX_VALUE;
-
     @ColorInt
     private int color = Color.BLACK;
-
     @ColorInt
     private int valueTextColor = Color.BLACK;
-
     private float valueTextSize = 17f;
-
-    @NotNull
-    private final ValueFormatter valueFormatter;
-
     @Nullable
     private Typeface valueTypeface;
-
     private float lineWidth = 2.5f;
-
     @ColorInt
     private int circleColor = Color.BLACK;
-
     private float circleRadius = 8f;
-
-    @NotNull
-    public final String[] labels;
 
     public DataSet(@NotNull long[] entries, @Nullable ValueFormatter formatter) {
         this.entries = entries;
@@ -170,12 +154,12 @@ public final class DataSet {
         }
     }
 
-    public void setCircleRadius(float radius) {
-        circleRadius = radius;
-    }
-
     public float getCircleRadius() {
         return circleRadius;
+    }
+
+    public void setCircleRadius(float radius) {
+        circleRadius = radius;
     }
 
     public void setDrawCircles(boolean enabled) {
@@ -195,16 +179,16 @@ public final class DataSet {
         circleColor = color;
     }
 
+    public float getLineWidth() {
+        return lineWidth;
+    }
+
     public void setLineWidth(float width) {
-        if(width <= 0f) {
+        if (width <= 0f) {
             throw new IllegalArgumentException("width=" + width);
         }
 
         lineWidth = width;
-    }
-
-    public float getLineWidth() {
-        return lineWidth;
     }
 
     public int count() {
@@ -217,7 +201,7 @@ public final class DataSet {
         StringBuilder buffer = new StringBuilder();
         buffer.append(toSimpleString());
 
-        for(long e: entries) {
+        for (long e : entries) {
             buffer.append(Entry.toString(e)).append(' ');
         }
 
@@ -246,8 +230,8 @@ public final class DataSet {
     }
 
     public int indexOf(long e) {
-        for(int i = 0; i < entries.length; i++) {
-            if(entries[i] == e) {
+        for (int i = 0; i < entries.length; i++) {
+            if (entries[i] == e) {
                 return i;
             }
         }
@@ -269,13 +253,13 @@ public final class DataSet {
         return valueTextColor;
     }
 
+    public void setValueTextColor(@ColorInt int valueColor) {
+        this.valueTextColor = valueColor;
+    }
+
     @ColorInt
     public int getColor() {
         return color;
-    }
-
-    public void setValueTextColor(@ColorInt int valueColor) {
-        this.valueTextColor = valueColor;
     }
 
     public void setColor(@ColorInt int color) {
@@ -287,21 +271,21 @@ public final class DataSet {
         return valueFormatter;
     }
 
-    public void setValueTypeface(@Nullable Typeface tf) {
-        valueTypeface = tf;
-    }
-
-    public void setValueTextSize(float size) {
-        valueTextSize = size;
-    }
-
     @Nullable
     public Typeface getValueTypeface() {
         return valueTypeface;
     }
 
+    public void setValueTypeface(@Nullable Typeface tf) {
+        valueTypeface = tf;
+    }
+
     public float getValueTextSize() {
         return valueTextSize;
+    }
+
+    public void setValueTextSize(float size) {
+        valueTextSize = size;
     }
 
     public void setDrawValues(boolean enabled) {
@@ -312,17 +296,17 @@ public final class DataSet {
         return isFlagEnabled(FLAG_DRAW_VALUES);
     }
 
-    public void setVisible(boolean enabled) {
-        setFlag(FLAG_VISIBLE, enabled);
-    }
-
     public boolean isVisible() {
         return isFlagEnabled(FLAG_VISIBLE);
     }
 
+    public void setVisible(boolean enabled) {
+        setFlag(FLAG_VISIBLE, enabled);
+    }
+
     public boolean contains(long e) {
-        for(long entry: entries) {
-            if(e == entry) {
+        for (long entry : entries) {
+            if (e == entry) {
                 return true;
             }
         }

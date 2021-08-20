@@ -17,7 +17,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.StyleRes
 import androidx.core.content.res.ResourcesCompat
 import com.pelmenstar.projktSens.shared.android.R
-import com.pelmenstar.projktSens.shared.android.obtainStyledAttributes
+import com.pelmenstar.projktSens.shared.android.ext.obtainStyledAttributes
 import java.util.*
 
 class TextAppearance(context: Context, @StyleRes id: Int) {
@@ -39,7 +39,8 @@ class TextAppearance(context: Context, @StyleRes id: Int) {
         val theme = context.theme
 
         theme.obtainStyledAttributes(id, R.styleable.TextAppearance) { a ->
-            textSize = a.getDimensionPixelOffset(R.styleable.TextAppearance_android_textSize, 0).toFloat()
+            textSize =
+                a.getDimensionPixelOffset(R.styleable.TextAppearance_android_textSize, 0).toFloat()
             textColor = a.getColorStateList(R.styleable.TextAppearance_android_textColor)
             textColorHint = a.getColorStateList(R.styleable.TextAppearance_android_textColorHint)
             textColorLink = a.getColorStateList(R.styleable.TextAppearance_android_textColorLink)
@@ -50,13 +51,17 @@ class TextAppearance(context: Context, @StyleRes id: Int) {
                 null
             }
 
-            shadowColor = a.getColor(R.styleable.TextAppearance_android_shadowColor, Color.TRANSPARENT)
+            shadowColor =
+                a.getColor(R.styleable.TextAppearance_android_shadowColor, Color.TRANSPARENT)
             shadowDx = a.getFloat(R.styleable.TextAppearance_android_shadowDx, 0f)
             shadowDy = a.getFloat(R.styleable.TextAppearance_android_shadowDy, 0f)
             shadowRadius = a.getFloat(R.styleable.TextAppearance_android_shadowRadius, 0f)
 
             theme.obtainStyledAttributes(id, R.styleable.MaterialTextAppearance) { materialAttrs ->
-                letterSpacing = materialAttrs.getFloat(R.styleable.MaterialTextAppearance_android_letterSpacing, Float.NaN)
+                letterSpacing = materialAttrs.getFloat(
+                    R.styleable.MaterialTextAppearance_android_letterSpacing,
+                    Float.NaN
+                )
             }
 
             val fontFamilyIndex = if (a.hasValue(R.styleable.TextAppearance_fontFamily))
@@ -70,7 +75,7 @@ class TextAppearance(context: Context, @StyleRes id: Int) {
             val textStyle = a.getInt(R.styleable.TextAppearance_android_textStyle, Typeface.NORMAL)
 
             var font: Typeface? = null
-            if(fontFamilyResourceId != 0) {
+            if (fontFamilyResourceId != 0) {
                 try {
                     val family = ResourcesCompat.getFont(context, fontFamilyResourceId)
 
@@ -90,12 +95,14 @@ class TextAppearance(context: Context, @StyleRes id: Int) {
             if (font == null) {
                 val typeface = a.getInt(R.styleable.TextAppearance_android_typeface, TYPEFACE_SANS)
 
-                font = Typeface.create(when (typeface) {
-                    TYPEFACE_SANS -> Typeface.SANS_SERIF
-                    TYPEFACE_SERIF -> Typeface.SERIF
-                    TYPEFACE_MONOSPACE -> Typeface.MONOSPACE
-                    else -> Typeface.DEFAULT
-                }, textStyle)
+                font = Typeface.create(
+                    when (typeface) {
+                        TYPEFACE_SANS -> Typeface.SANS_SERIF
+                        TYPEFACE_SERIF -> Typeface.SERIF
+                        TYPEFACE_MONOSPACE -> Typeface.MONOSPACE
+                        else -> Typeface.DEFAULT
+                    }, textStyle
+                )
             }
 
             this.font = font
@@ -141,7 +148,7 @@ class TextAppearance(context: Context, @StyleRes id: Int) {
         init {
             val conf = context.resources.configuration
 
-            locale = if(Build.VERSION.SDK_INT >= 24) {
+            locale = if (Build.VERSION.SDK_INT >= 24) {
                 conf.locales[0]
             } else {
                 conf.locale
@@ -149,7 +156,7 @@ class TextAppearance(context: Context, @StyleRes id: Int) {
         }
 
         override fun getTransformation(source: CharSequence?, view: View?): CharSequence? {
-            if(source == null) {
+            if (source == null) {
                 return null
             }
 

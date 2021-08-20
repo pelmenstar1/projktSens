@@ -11,48 +11,52 @@ import java.lang.reflect.Modifier;
  * Contains useful method related to Java reflection
  */
 public final class ReflectionUtils {
-    private ReflectionUtils() {}
+    private ReflectionUtils() {
+    }
 
     /**
      * Creates instance of T invoking public constructor with no parameters
+     *
      * @param name name of class
-     * @param <T> result type
+     * @param <T>  result type
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    public static<T> T createFromEmptyConstructor(@NotNull String name) throws ClassNotFoundException {
-        Class<T> c = (Class<T>)Class.forName(name);
+    public static <T> T createFromEmptyConstructor(@NotNull String name) throws ClassNotFoundException {
+        Class<T> c = (Class<T>) Class.forName(name);
         return createFromEmptyConstructor(c);
     }
 
     /**
      * Creates instance of T invoking public constructor with no parameters
-     * @param name name of class
-     * @param initialize determines whether class should be initialized after lookup
+     *
+     * @param name        name of class
+     * @param initialize  determines whether class should be initialized after lookup
      * @param classLoader {@link ClassLoader} to load class from
-     * @param <T> result type
+     * @param <T>         result type
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    public static<T> T createFromEmptyConstructor(
+    public static <T> T createFromEmptyConstructor(
             @NotNull String name,
             boolean initialize,
             @NotNull ClassLoader classLoader
     ) throws ClassNotFoundException {
-        Class<T> c = (Class<T>)Class.forName(name, initialize, classLoader);
+        Class<T> c = (Class<T>) Class.forName(name, initialize, classLoader);
         return createFromEmptyConstructor(c);
     }
 
     /**
      * Creates instance of T invoking public constructor with no parameters
-     * @param c class of instance which will be created
+     *
+     * @param c   class of instance which will be created
      * @param <T> result type
      */
     @SuppressWarnings("deprecation")
     @NotNull
-    public static<T> T createFromEmptyConstructor(@NotNull Class<T> c) {
+    public static <T> T createFromEmptyConstructor(@NotNull Class<T> c) {
         int mods = c.getModifiers();
-        if((mods & Modifier.ABSTRACT) != 0) {
+        if ((mods & Modifier.ABSTRACT) != 0) {
             throw new RuntimeException("Class " + c.getName() + " is abstract");
         }
 
@@ -62,8 +66,8 @@ public final class ReflectionUtils {
             throw new RuntimeException("Class has constructor with no parameters, but it can't be accessed (not public)", e);
         } catch (InstantiationException e) {
             Throwable cause = e.getCause();
-            if(cause != null) {
-                 throw new RuntimeException("Constructor threw exception", cause);
+            if (cause != null) {
+                throw new RuntimeException("Constructor threw exception", cause);
             } else {
                 throw new RuntimeException("Class has no public constructor with no parameters", e);
             }
@@ -77,12 +81,12 @@ public final class ReflectionUtils {
      * If any of choices succeed, it throws {@link RuntimeException}.
      *
      * @param name name of class
-     * @param <T> result type
+     * @param <T>  result type
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    public static<T> T createFromEmptyConstructorOrInstance(@NotNull String name) throws ClassNotFoundException {
-        Class<T> c = (Class<T>)Class.forName(name);
+    public static <T> T createFromEmptyConstructorOrInstance(@NotNull String name) throws ClassNotFoundException {
+        Class<T> c = (Class<T>) Class.forName(name);
         return createFromEmptyConstructorOrInstance(c);
     }
 
@@ -92,19 +96,19 @@ public final class ReflectionUtils {
      * Field INSTANCE is required to be the same type with top class (argument)
      * If any of choices succeed, it throws {@link RuntimeException}.
      *
-     * @param name name of class
-     * @param initialize determines whether class should be initialized after lookup
+     * @param name        name of class
+     * @param initialize  determines whether class should be initialized after lookup
      * @param classLoader {@link ClassLoader} to load class from
-     * @param <T> result type
+     * @param <T>         result type
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    public static<T> T createFromEmptyConstructorOrInstance(
+    public static <T> T createFromEmptyConstructorOrInstance(
             @NotNull String name,
             boolean initialize,
             @NotNull ClassLoader classLoader
-    ) throws ClassNotFoundException  {
-        Class<T> c = (Class<T>)Class.forName(name, initialize, classLoader);
+    ) throws ClassNotFoundException {
+        Class<T> c = (Class<T>) Class.forName(name, initialize, classLoader);
         return createFromEmptyConstructorOrInstance(c);
     }
 
@@ -114,12 +118,12 @@ public final class ReflectionUtils {
      * Field INSTANCE is required to be the same type with top class (argument).
      * If any of choices succeed, it throws {@link RuntimeException}.
      *
-     * @param c class of instance which will be returned
+     * @param c   class of instance which will be returned
      * @param <T> result type
      */
     @SuppressWarnings({"unchecked"})
     @NotNull
-    public static<T> T createFromEmptyConstructorOrInstance(@NotNull Class<T> c) {
+    public static <T> T createFromEmptyConstructorOrInstance(@NotNull Class<T> c) {
         int classMods = c.getModifiers();
 
         // No need to find constructor and lookup INSTANCE field if class is abstract.

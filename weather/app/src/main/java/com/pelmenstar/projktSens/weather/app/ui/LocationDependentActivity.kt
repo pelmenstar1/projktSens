@@ -9,7 +9,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
-import com.pelmenstar.projktSens.shared.android.Message
+import com.pelmenstar.projktSens.shared.android.ext.Message
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider
 import com.pelmenstar.projktSens.weather.app.AppPreferences
@@ -22,7 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-abstract class LocationDependentActivity: HomeButtonSupportActivity() {
+abstract class LocationDependentActivity : HomeButtonSupportActivity() {
     private var transitionView: TransitionView? = null
     private var loadingContent: View? = null
     private var failedToGetContent: View? = null
@@ -41,7 +41,7 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
 
         // No sense to detect whether app-details activity exists
         // if this information isn't in use.
-        if(Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= 23) {
             isAppDetailsInfoSettingExists = detectAppDetailsSettingsExists()
         }
 
@@ -50,8 +50,8 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
         locationProvider = component.geolocationProvider()
 
         val location = GeolocationCache.get()
-        if(location == null) {
-            if(Build.VERSION.SDK_INT < 23 || PermissionUtils.isLocationGranted(this)) {
+        if (location == null) {
+            if (Build.VERSION.SDK_INT < 23 || PermissionUtils.isLocationGranted(this)) {
                 startLoadingLocation()
             } else {
                 setState(STATE_GPS_NOT_GRANTED)
@@ -71,12 +71,12 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
 
     override fun onResume() {
         super.onResume()
-        
-        if(Build.VERSION.SDK_INT >= 23) {
+
+        if (Build.VERSION.SDK_INT >= 23) {
             // In the case of 'Never show again', an user should go to the settings to manually enable location
             // permission.
             // So after the user returns, we need to check whether the user actually changes access to location
-            if(PermissionUtils.isLocationGranted(this)) {
+            if (PermissionUtils.isLocationGranted(this)) {
                 startLoadingLocation()
             }
         }
@@ -85,12 +85,14 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
     private fun createLoadingContent(): View {
         return FrameLayout(this) {
             transitionView = TransitionView {
-                val size = resources.getDimensionPixelSize(R.dimen.locationDependentActivity_transitionViewSize)
+                val size =
+                    resources.getDimensionPixelSize(R.dimen.locationDependentActivity_transitionViewSize)
                 frameLayoutParams(size, size) {
                     gravity = Gravity.CENTER
                 }
 
-                colorTransition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
+                colorTransition =
+                    LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
             }
         }
     }
@@ -110,7 +112,8 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
             }
 
             Button {
-                val size = res.getDimensionPixelSize(R.dimen.locationDependentActivity_retryButtonSize)
+                val size =
+                    res.getDimensionPixelSize(R.dimen.locationDependentActivity_retryButtonSize)
                 linearLayoutParams(size, size) {
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
@@ -164,7 +167,7 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
                 setText(R.string.locDependentActivity_requestLocPerm_gpsNeverShowAgain)
             }
 
-            if(isAppDetailsInfoSettingExists) {
+            if (isAppDetailsInfoSettingExists) {
                 Button(R.attr.materialButtonOutlinedStyle) {
                     layoutParams = params
 
@@ -186,7 +189,7 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
     private fun detectAppDetailsSettingsExists(): Boolean {
         val intent = createAppDetailsSettingsIntent()
 
-        val resolveFlags = if(Build.VERSION.SDK_INT >= 24) {
+        val resolveFlags = if (Build.VERSION.SDK_INT >= 24) {
             PackageManager.MATCH_SYSTEM_ONLY
         } else {
             PackageManager.MATCH_DEFAULT_ONLY
@@ -203,7 +206,7 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
     }
 
     private fun goToSettingPermissions() {
-        if(isAppDetailsInfoSettingExists) {
+        if (isAppDetailsInfoSettingExists) {
             val intent = createAppDetailsSettingsIntent()
             startActivity(intent)
         }
@@ -226,13 +229,13 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
     }
 
     private fun setState(state: Int) {
-        if(state != STATE_LOADING) {
+        if (state != STATE_LOADING) {
             transitionView?.stopTransition()
         }
 
-        when(state) {
+        when (state) {
             STATE_LOADING -> {
-                if(loadingContent == null) {
+                if (loadingContent == null) {
                     loadingContent = createLoadingContent()
                 }
 
@@ -240,31 +243,31 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
                 setContentView(loadingContent)
             }
             STATE_FAILED_TO_GET -> {
-                if(failedToGetContent == null) {
+                if (failedToGetContent == null) {
                     failedToGetContent = createFailedToGetContent()
                 }
 
                 setContentView(failedToGetContent)
             }
             STATE_GPS_NOT_GRANTED -> {
-                if(Build.VERSION.SDK_INT < 23) {
+                if (Build.VERSION.SDK_INT < 23) {
                     Log.e(TAG, "setState(STATE_GPS_NOT_GRANTED) was called, but SDK < 23")
                     return
                 }
 
-                if(gpsNotGrantedContent == null) {
+                if (gpsNotGrantedContent == null) {
                     gpsNotGrantedContent = createGpsNotGrantedContent()
                 }
 
                 setContentView(gpsNotGrantedContent)
             }
             STATE_GPS_NEVER_SHOW_AGAIN -> {
-                if(Build.VERSION.SDK_INT < 23) {
+                if (Build.VERSION.SDK_INT < 23) {
                     Log.e(TAG, "setState(STATE_GPS_NEVER_SHOW_AGAIN) was called, but SDK < 23")
                     return
                 }
 
-                if(gpsNeverShowAgainContent == null) {
+                if (gpsNeverShowAgainContent == null) {
                     gpsNeverShowAgainContent = createGpsNeverShowAgainContent()
                 }
 
@@ -303,17 +306,17 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if(Build.VERSION.SDK_INT < 23) {
+        if (Build.VERSION.SDK_INT < 23) {
             Log.e(TAG, "Sdk < 23")
             return
         }
 
-        if(grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
+        if (grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
             // now gps isn't denied
             prefs.isGpsPermissionDenied = false
 
             startLoadingLocation()
-        } else if(PermissionUtils.isNeverShowAgainOnLocation(this)) {
+        } else if (PermissionUtils.isNeverShowAgainOnLocation(this)) {
             setState(STATE_GPS_NEVER_SHOW_AGAIN)
         }
     }
@@ -323,11 +326,11 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
 
     private class MainThreadHandler(
         @JvmField var activity: LocationDependentActivity?
-    ): Handler(Looper.getMainLooper()) {
+    ) : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             val a = activity ?: return
 
-            when(msg.what) {
+            when (msg.what) {
                 MSG_SET_STATE -> {
                     a.setState(msg.arg1)
                 }
@@ -337,6 +340,7 @@ abstract class LocationDependentActivity: HomeButtonSupportActivity() {
             }
         }
     }
+
     companion object {
         private const val TAG = "LocationDepActivity"
 

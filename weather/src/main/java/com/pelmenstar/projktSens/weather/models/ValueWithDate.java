@@ -2,11 +2,11 @@ package com.pelmenstar.projktSens.weather.models;
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
 import com.pelmenstar.projktSens.shared.MyMath;
-import com.pelmenstar.projktSens.shared.serialization.ValueReader;
-import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer;
 import com.pelmenstar.projktSens.shared.serialization.Serializable;
 import com.pelmenstar.projktSens.shared.serialization.ValidationException;
+import com.pelmenstar.projktSens.shared.serialization.ValueReader;
+import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 import com.pelmenstar.projktSens.shared.time.ShortDateTime;
 import com.pelmenstar.projktSens.shared.time.ShortDateTimeLong;
 
@@ -43,7 +43,7 @@ public final class ValueWithDate extends AppendableToStringBuilder {
     }
 
     public ValueWithDate(long dateTime, float value) {
-        if(!ShortDateTime.isValid(dateTime)) {
+        if (!ShortDateTime.isValid(dateTime)) {
             throw new IllegalArgumentException("dateTime");
         }
 
@@ -108,7 +108,7 @@ public final class ValueWithDate extends AppendableToStringBuilder {
             long dateTime = reader.readInt40();
             float value = reader.readFloat();
 
-            if(!ShortDateTime.isValid(dateTime)) {
+            if (!ShortDateTime.isValid(dateTime)) {
                 throw ValidationException.invalidValue("dateTime", dateTime);
             }
 

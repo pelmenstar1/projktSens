@@ -51,8 +51,8 @@ public final class MoonView extends View {
 
     @Override
     protected void onDraw(@NotNull Canvas c) {
-        float w = (float)getWidth();
-        float h = (float)getHeight();
+        float w = (float) getWidth();
+        float h = (float) getHeight();
 
         int checkpoint = c.save();
         c.clipPath(invisiblePartPath, Region.Op.DIFFERENCE);
@@ -64,7 +64,7 @@ public final class MoonView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        if(w != 0 && h != 0) {
+        if (w != 0 && h != 0) {
             float fw = (float) w;
             float fh = (float) h;
 

@@ -17,28 +17,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class ComplexWeatherView extends View {
-    private static final float WEATHER_BLOCK_MARGIN_T_DP = 5;
-    private static final float WEATHER_BLOCK_MARGIN_L_DP = 5;
-
-    private static final float MOON_RATIO_X = 0.438095f;
-    private static final float MOON_RATIO_Y = 0.0434782f;
-
-    private static final int DEFAULT_SUNRISE_TIME = 6 * TimeConstants.SECONDS_IN_HOUR;
-    private static final int DEFAULT_SUNSET_TIME = 21 * TimeConstants.SECONDS_IN_HOUR;
-
     public static final int STATE_DAY = 0;
     public static final int STATE_NIGHT = 1;
-
-    // if we left it zero, in constructor setState() would fail,
-    // because 0 is STATE_DAY
-    private int state = -1;
-
-    private boolean isLocationLoaded;
-    private boolean canLoadLocation = true;
-
+    private static final float WEATHER_BLOCK_MARGIN_T_DP = 5;
+    private static final float WEATHER_BLOCK_MARGIN_L_DP = 5;
+    private static final float MOON_RATIO_X = 0.438095f;
+    private static final float MOON_RATIO_Y = 0.0434782f;
+    private static final int DEFAULT_SUNRISE_TIME = 6 * TimeConstants.SECONDS_IN_HOUR;
+    private static final int DEFAULT_SUNSET_TIME = 21 * TimeConstants.SECONDS_IN_HOUR;
     private final float weatherBlockMarginTop;
     private final float sunriseSunsetArcHeight;
-
     private final WeatherBlockSubcomponent weatherBlockSubcomponent;
     private final WeatherBackgroundSubcomponent weatherBackgroundSubcomponent;
     private final MoonSubcomponent moonSubcomponent;
@@ -46,6 +34,11 @@ public final class ComplexWeatherView extends View {
     private final RequestLocationSubcomponent requestLocationSubcomponent;
     private final SunriseSunsetArcSubcomponent sunriseSunsetArcSubcomponent;
     private final Subcomponent[] subcomponents;
+    // if we left it zero, in constructor setState() would fail,
+    // because 0 is STATE_DAY
+    private int state = -1;
+    private boolean isLocationLoaded;
+    private boolean canLoadLocation = true;
 
     public ComplexWeatherView(@NotNull Context context) {
         this(context, null, 0, 0);
@@ -83,7 +76,7 @@ public final class ComplexWeatherView extends View {
         float requestGpsSize = res.getDimension(R.dimen.weatherView_retrySize);
         requestLocationSubcomponent.setSize(requestGpsSize, requestGpsSize);
 
-        subcomponents = new Subcomponent[] {
+        subcomponents = new Subcomponent[]{
                 weatherBackgroundSubcomponent, // background must be on bottom
                 weatherBlockSubcomponent,
                 moonSubcomponent,
@@ -96,10 +89,10 @@ public final class ComplexWeatherView extends View {
     }
 
     private void setState(int state) {
-        if(this.state != state) {
+        if (this.state != state) {
             this.state = state;
 
-            for(Subcomponent sc: subcomponents) {
+            for (Subcomponent sc : subcomponents) {
                 sc.setDayState(state);
             }
 
@@ -145,7 +138,7 @@ public final class ComplexWeatherView extends View {
         int alignedSunrise = ShortTime.defaultIfNone(sunrise, DEFAULT_SUNRISE_TIME);
         int alignedSunset = ShortTime.defaultIfNone(sunset, DEFAULT_SUNSET_TIME);
 
-        if(time >= alignedSunrise && time <= alignedSunset) {
+        if (time >= alignedSunrise && time <= alignedSunset) {
             setState(STATE_DAY);
         } else {
             setState(STATE_NIGHT);
@@ -175,7 +168,7 @@ public final class ComplexWeatherView extends View {
     }
 
     private void invalidateLocRelVisibility() {
-        if(canLoadLocation) {
+        if (canLoadLocation) {
             requestLocationSubcomponent.setVisible(false);
             retryGetLocationSubcomponent.setVisible(!isLocationLoaded);
         } else {
@@ -190,7 +183,7 @@ public final class ComplexWeatherView extends View {
     }
 
     public void setOnRetryGetLocationListener(@Nullable RetryGetLocationSubcomponent.OnRetryGetLocationListener listener) {
-       retryGetLocationSubcomponent.setOnRetryGetLocationListener(listener);
+        retryGetLocationSubcomponent.setOnRetryGetLocationListener(listener);
     }
 
     @Nullable
@@ -218,7 +211,7 @@ public final class ComplexWeatherView extends View {
         weatherBackgroundSubcomponent.setSize(w, wbHeight);
         sunriseSunsetArcSubcomponent.setWidth(w);
 
-        if(state == STATE_DAY) {
+        if (state == STATE_DAY) {
             weatherBackgroundSubcomponent.setY(sunriseSunsetArcHeight);
             sunriseSunsetArcSubcomponent.setY(0f);
             weatherBlockSubcomponent.setY(sunriseSunsetArcHeight + weatherBlockMarginTop);
@@ -241,8 +234,8 @@ public final class ComplexWeatherView extends View {
 
         updateComponentPositionsAffectedByDayState(w, h);
 
-        float moonX = MOON_RATIO_X * (float)w;
-        float moonY = MOON_RATIO_Y * ((float)h - sunriseSunsetArcHeight);
+        float moonX = MOON_RATIO_X * (float) w;
+        float moonY = MOON_RATIO_Y * ((float) h - sunriseSunsetArcHeight);
         moonSubcomponent.setPosition(moonX, moonY);
     }
 
@@ -250,8 +243,8 @@ public final class ComplexWeatherView extends View {
     protected void onDraw(@NotNull Canvas c) {
         super.onDraw(c);
 
-        for(Subcomponent sc: subcomponents) {
-            if(sc.isVisible) {
+        for (Subcomponent sc : subcomponents) {
+            if (sc.isVisible) {
                 sc.draw(c);
             }
         }
@@ -267,8 +260,8 @@ public final class ComplexWeatherView extends View {
             float x = event.getX();
             float y = event.getY();
 
-            for(Subcomponent sc: subcomponents) {
-                if(sc.isVisible) {
+            for (Subcomponent sc : subcomponents) {
+                if (sc.isVisible) {
                     float scLeft = sc.x;
                     float scTop = sc.y;
                     float scRight = scLeft + sc.width;
@@ -366,9 +359,13 @@ public final class ComplexWeatherView extends View {
         }
 
         public abstract void draw(@NotNull Canvas canvas);
+
         protected abstract void onSizeChanged(float width, float height);
+
         protected abstract void onPositionChanged(float x, float y);
+
         protected abstract void onDayStateChanged(int newState);
+
         protected abstract void onClick();
     }
 }

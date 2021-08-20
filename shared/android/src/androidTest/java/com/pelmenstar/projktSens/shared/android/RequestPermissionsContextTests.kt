@@ -12,10 +12,10 @@ class RequestPermissionsContextTests {
             RequestPermissionsContext(
                 arrayOf(
                     RequestPermissionInfo(
-                        "123", ModePermissionArray.anyOf("548", "554")
+                        43, 545, ModePermissionArray.anyOf("548", "554")
                     ),
                     RequestPermissionInfo(
-                        "2754", ModePermissionArray.anyOf("4334", "324")
+                        4356, 437438, ModePermissionArray.anyOf("4334", "324")
                     )
                 ),
             ),

@@ -44,7 +44,7 @@ public final class Errors {
      */
     public static final int INVALID_RESPONSE = 6;
 
-    private static final String[] ERROR_NAMES = new String[] {
+    private static final String[] ERROR_NAMES = new String[]{
             "NONE",
             "UNKNOWN",
             "INVALID_ARGUMENTS",
@@ -73,8 +73,8 @@ public final class Errors {
     }
 
     public static int fromString(@NotNull String name) {
-        for(int i = 0; i < ERROR_NAMES.length; i++) {
-            if(ERROR_NAMES[i].equalsIgnoreCase(name)) {
+        for (int i = 0; i < ERROR_NAMES.length; i++) {
+            if (ERROR_NAMES[i].equalsIgnoreCase(name)) {
                 return i;
             }
         }
@@ -89,7 +89,7 @@ public final class Errors {
      */
     @NotNull
     public static String toString(int error) {
-        if(error < 0 || error >= ERROR_NAMES.length) {
+        if (error < 0 || error >= ERROR_NAMES.length) {
             throw new IllegalArgumentException("error");
         }
 

@@ -10,11 +10,11 @@ public final class ValueUnitsPacked {
     public static final int CELSIUS_MM_OF_MERCURY = ValueUnit.CELSIUS << 8 | ValueUnit.MM_OF_MERCURY;
 
     public static int create(int tempUnit, int pressUnit) {
-        if(!ValueUnit.isTemperatureUnit(tempUnit)) {
+        if (!ValueUnit.isTemperatureUnit(tempUnit)) {
             throw new IllegalArgumentException("tempUnit");
         }
 
-        if(!ValueUnit.isPressureUnit(pressUnit)) {
+        if (!ValueUnit.isPressureUnit(pressUnit)) {
             throw new IllegalArgumentException("pressUnit");
         }
 

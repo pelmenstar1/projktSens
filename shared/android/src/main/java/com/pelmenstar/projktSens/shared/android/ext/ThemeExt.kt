@@ -1,4 +1,4 @@
-package com.pelmenstar.projktSens.shared.android
+package com.pelmenstar.projktSens.shared.android.ext
 
 import android.content.Context
 import android.content.res.Resources
@@ -10,7 +10,11 @@ import androidx.annotation.StyleableRes
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-inline fun Context.obtainStyledAttributes(@StyleRes resId: Int, @AttrRes attr: Int, block: (TypedArray) -> Unit) {
+inline fun Context.obtainStyledAttributes(
+    @StyleRes resId: Int,
+    @AttrRes attr: Int,
+    block: (TypedArray) -> Unit
+) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -18,7 +22,11 @@ inline fun Context.obtainStyledAttributes(@StyleRes resId: Int, @AttrRes attr: I
     theme.obtainStyledAttributes(resId, attr, block)
 }
 
-inline fun Resources.Theme.obtainStyledAttributes(@StyleRes resId: Int, @AttrRes attr: Int, block: (TypedArray) -> Unit) {
+inline fun Resources.Theme.obtainStyledAttributes(
+    @StyleRes resId: Int,
+    @AttrRes attr: Int,
+    block: (TypedArray) -> Unit
+) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -26,7 +34,11 @@ inline fun Resources.Theme.obtainStyledAttributes(@StyleRes resId: Int, @AttrRes
     obtainStyledAttributes(resId, intArrayOf(attr), block)
 }
 
-inline fun Context.obtainStyledAttributes(@StyleRes resId: Int, @StyleableRes attrs: IntArray, block: (TypedArray) -> Unit) {
+inline fun Context.obtainStyledAttributes(
+    @StyleRes resId: Int,
+    @StyleableRes attrs: IntArray,
+    block: (TypedArray) -> Unit
+) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -39,7 +51,11 @@ inline fun Context.obtainStyledAttributes(@StyleRes resId: Int, @StyleableRes at
  * [TypedArray] can be used in [block].
  * [TypedArray] is automatically recycles after executing [block] (even if exception occurred while executing last one)
  */
-inline fun Resources.Theme.obtainStyledAttributes(@StyleRes resId: Int, @StyleableRes attrs: IntArray, block: (TypedArray) -> Unit) {
+inline fun Resources.Theme.obtainStyledAttributes(
+    @StyleRes resId: Int,
+    @StyleableRes attrs: IntArray,
+    block: (TypedArray) -> Unit
+) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -58,7 +74,8 @@ inline fun Context.obtainStyledAttributes(
     @StyleableRes attrs: IntArray,
     @AttrRes defStyleAttr: Int,
     @StyleRes defStyleRes: Int,
-    block: (TypedArray) -> Unit) {
+    block: (TypedArray) -> Unit
+) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -71,7 +88,8 @@ inline fun Resources.Theme.obtainStyledAttributes(
     @StyleableRes attrs: IntArray,
     @AttrRes defStyleAttr: Int,
     @StyleRes defStyleRes: Int,
-    block: (TypedArray) -> Unit) {
+    block: (TypedArray) -> Unit
+) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }

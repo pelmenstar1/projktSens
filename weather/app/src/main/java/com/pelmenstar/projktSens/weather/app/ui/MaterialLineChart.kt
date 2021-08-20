@@ -10,7 +10,7 @@ import com.pelmenstar.projktSens.chartLite.LineChart
 import com.pelmenstar.projktSens.chartLite.components.XAxis
 import com.pelmenstar.projktSens.chartLite.components.YAxis
 import com.pelmenstar.projktSens.chartLite.data.ChartData
-import com.pelmenstar.projktSens.shared.android.obtainStyledAttributes
+import com.pelmenstar.projktSens.shared.android.ext.obtainStyledAttributes
 import com.pelmenstar.projktSens.weather.app.R
 
 class MaterialLineChart @JvmOverloads constructor(

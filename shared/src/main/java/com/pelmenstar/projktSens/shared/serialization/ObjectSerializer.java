@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * - The same object must have the same raw byte valuesLength. <br/>
  * - Class must have: public static final ObjectSerializer<YourClass> SERIALIZER = new ...
  * - Written and read byte valuesLength on same object must be the same and equal to
- *   {@link ObjectSerializer#getSerializedObjectSize(T)}
+ * {@link ObjectSerializer#getSerializedObjectSize(T)}
  */
 public interface ObjectSerializer<T> {
     int getSerializedObjectSize(@NotNull T value);

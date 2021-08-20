@@ -13,7 +13,7 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
 
-class SensorWeatherProvider: WeatherInfoProvider {
+class SensorWeatherProvider : WeatherInfoProvider {
     private val address = InetSocketAddress(InetAddress.getLoopbackAddress(), 10001)
 
     override suspend fun getWeather(): WeatherInfo {

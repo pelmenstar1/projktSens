@@ -13,11 +13,11 @@ public final class UnitValueWithDate extends AppendableToStringBuilder {
     public final long value;
 
     public UnitValueWithDate(@ShortDateTimeLong long dateTime, long value) {
-        if(!ShortDateTime.isValid(dateTime)) {
+        if (!ShortDateTime.isValid(dateTime)) {
             throw ValidationException.invalidValue("dateTime", dateTime);
         }
 
-        if(!UnitValue.isValid(value)) {
+        if (!UnitValue.isValid(value)) {
             throw ValidationException.invalidValue("value", value);
         }
 

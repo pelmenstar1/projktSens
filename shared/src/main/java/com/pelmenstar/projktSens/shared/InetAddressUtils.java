@@ -42,7 +42,7 @@ public class InetAddressUtils {
 
         int bufferLength = b4Index + b4Length;
         char[] buffer;
-        if(bufferLength == text.length) {
+        if (bufferLength == text.length) {
             buffer = text;
         } else {
             buffer = new char[bufferLength];
@@ -88,17 +88,17 @@ public class InetAddressUtils {
         int strByteStartIndex = 0;
 
         int maxIdx = str.length() - 1;
-        for(int i = 0; i < str.length(); i++) {
+        for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
 
-            if(c >= '0' && c <= '9') {
+            if (c >= '0' && c <= '9') {
                 currentByte = currentByte * 10 + (c - '0');
 
-                if(currentByte > 255) {
+                if (currentByte > 255) {
                     return IP_ERROR;
                 }
-            } else if(c == '.') {
-                if(byteIndex == 4 || i == maxIdx || i == strByteStartIndex) {
+            } else if (c == '.') {
+                if (byteIndex == 4 || i == maxIdx || i == strByteStartIndex) {
                     return IP_ERROR;
                 }
 
@@ -112,7 +112,7 @@ public class InetAddressUtils {
             }
         }
 
-        if(byteIndex != 3) {
+        if (byteIndex != 3) {
             return IP_ERROR;
         }
 
@@ -126,17 +126,17 @@ public class InetAddressUtils {
         int strByteStartIndex = 0;
 
         int maxIdx = buffer.length - 1;
-        for(int i = 0; i < buffer.length; i++) {
+        for (int i = 0; i < buffer.length; i++) {
             char c = buffer[i];
 
-            if(c >= '0' && c <= '9') {
+            if (c >= '0' && c <= '9') {
                 currentByte = currentByte * 10 + (c - '0');
 
-                if(currentByte > 255) {
+                if (currentByte > 255) {
                     return IP_ERROR;
                 }
-            } else if(c == '.') {
-                if(byteIndex == 4 || i == maxIdx || i == strByteStartIndex) {
+            } else if (c == '.') {
+                if (byteIndex == 4 || i == maxIdx || i == strByteStartIndex) {
                     return IP_ERROR;
                 }
 
@@ -150,7 +150,7 @@ public class InetAddressUtils {
             }
         }
 
-        if(byteIndex != 3) {
+        if (byteIndex != 3) {
             return IP_ERROR;
         }
 
@@ -165,7 +165,7 @@ public class InetAddressUtils {
     @Nullable
     public static InetAddress parseNumericalIpv4OrNull(@NotNull String str) {
         int ip = parseNumericalIpv4ToInt(str);
-        if(ip == IP_ERROR) {
+        if (ip == IP_ERROR) {
             return null;
         }
 

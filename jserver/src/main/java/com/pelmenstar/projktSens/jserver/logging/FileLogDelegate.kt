@@ -5,7 +5,7 @@ import android.content.Context
 class FileLogDelegate(
     private val context: Context,
     private val fileName: String
-): LogDelegate {
+) : LogDelegate {
     override fun print(level: Int, message: String) {
         val msgEncoded = message.toByteArray(Charsets.UTF_8)
 

@@ -1,13 +1,12 @@
 package com.pelmenstar.projktSens.weather.models;
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
-import com.pelmenstar.projktSens.shared.MyMath;
 import com.pelmenstar.projktSens.shared.RandomUtils;
-import com.pelmenstar.projktSens.shared.serialization.ValueReader;
-import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer;
 import com.pelmenstar.projktSens.shared.serialization.Serializable;
 import com.pelmenstar.projktSens.shared.serialization.ValidationException;
+import com.pelmenstar.projktSens.shared.serialization.ValueReader;
+import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 import com.pelmenstar.projktSens.shared.time.ShortDateTime;
 import com.pelmenstar.projktSens.shared.time.ShortDateTimeLong;
 
@@ -48,23 +47,23 @@ public final class WeatherInfo extends AppendableToStringBuilder {
     }
 
     public WeatherInfo(int units, @ShortDateTimeLong long dateTime, float temperature, float humidity, float pressure) {
-        if(!ValueUnitsPacked.isValid(units)) {
+        if (!ValueUnitsPacked.isValid(units)) {
             throw ValidationException.invalidValue("units", units);
         }
 
-        if(!ShortDateTime.isValid(dateTime)) {
+        if (!ShortDateTime.isValid(dateTime)) {
             throw ValidationException.invalidValue("dateTime", dateTime);
         }
 
-        if(!UnitValue.isValid(temperature, ValueUnitsPacked.getTemperatureUnit(units))) {
+        if (!UnitValue.isValid(temperature, ValueUnitsPacked.getTemperatureUnit(units))) {
             throw ValidationException.invalidValue("temperature", temperature);
         }
 
-        if(!UnitValue.isValid(humidity, ValueUnit.HUMIDITY)) {
+        if (!UnitValue.isValid(humidity, ValueUnit.HUMIDITY)) {
             throw ValidationException.invalidValue("humidity", humidity);
         }
 
-        if(!UnitValue.isValid(pressure, ValueUnitsPacked.getPressureUnit(units))) {
+        if (!UnitValue.isValid(pressure, ValueUnitsPacked.getPressureUnit(units))) {
             throw ValidationException.invalidValue("pressure", pressure);
         }
 
@@ -91,7 +90,7 @@ public final class WeatherInfo extends AppendableToStringBuilder {
 
     @Override
     public int hashCode() {
-        int result = (int)(dateTime ^ (dateTime >>> 32));
+        int result = (int) (dateTime ^ (dateTime >>> 32));
         result = 31 * result + Float.floatToIntBits(temperature);
         result = 31 * result + Float.floatToIntBits(humidity);
         result = 31 * result + Float.floatToIntBits(pressure);

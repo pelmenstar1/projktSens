@@ -102,7 +102,7 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
 
     @Override
     public boolean getBoolean(int id) {
-        if(id == IS_GPS_PERMISSION_DENIED) {
+        if (id == IS_GPS_PERMISSION_DENIED) {
             return isGpsPermissionDenied();
         }
 
@@ -134,7 +134,7 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
 
     @Override
     public void setBoolean(int id, boolean value) {
-        if(id == IS_GPS_PERMISSION_DENIED) {
+        if (id == IS_GPS_PERMISSION_DENIED) {
             setGpsPermissionDenied(value);
         }
 
@@ -149,7 +149,7 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
     }
 
     public void setUnits(int units) {
-        if(!ValueUnitsPacked.isValid(units)) {
+        if (!ValueUnitsPacked.isValid(units)) {
             throw new IllegalArgumentException("units");
         }
 
@@ -171,7 +171,7 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
     }
 
     public void setContractType(int contractType) {
-        if(!ContractType.isValid(contractType)) {
+        if (!ContractType.isValid(contractType)) {
             throw new IllegalArgumentException("contractType");
         }
 

@@ -12,7 +12,8 @@ import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.ui.LocationDependentActivity
 
-class SunriseSunsetCalendarActivity: LocationDependentActivity(), SunriseSunsetCalendarContract.View {
+class SunriseSunsetCalendarActivity : LocationDependentActivity(),
+    SunriseSunsetCalendarContract.View {
     override val context: Context
         get() = this
 
@@ -40,7 +41,7 @@ class SunriseSunsetCalendarActivity: LocationDependentActivity(), SunriseSunsetC
 
         presenter = component.sunriseSunsetCalendarPresenter().also {
             it.attach(this)
-            if(savedInstanceState != null) {
+            if (savedInstanceState != null) {
                 it.restoreState(savedInstanceState)
             }
         }
@@ -84,7 +85,8 @@ class SunriseSunsetCalendarActivity: LocationDependentActivity(), SunriseSunsetC
 
             ScrollableCalendarView {
                 linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
-                    topMargin = res.getDimensionPixelOffset(R.dimen.sunriseSunsetCalendar_calendarTopMargin)
+                    topMargin =
+                        res.getDimensionPixelOffset(R.dimen.sunriseSunsetCalendar_calendarTopMargin)
                 }
 
                 setOnDateChangeListener { _, year, month, dayOfMonth ->
@@ -114,7 +116,7 @@ class SunriseSunsetCalendarActivity: LocationDependentActivity(), SunriseSunsetC
     }
 
     override fun setSunriseTime(sunrise: Int) {
-       sunriseTimeView.time = sunrise
+        sunriseTimeView.time = sunrise
     }
 
     override fun setSunsetTime(sunset: Int) {

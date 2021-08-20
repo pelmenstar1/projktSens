@@ -8,14 +8,17 @@ import android.view.Gravity
 import android.view.View
 import android.widget.GridLayout
 import androidx.core.widget.addTextChangedListener
-import com.pelmenstar.projktSens.shared.*
+import com.pelmenstar.projktSens.shared.EmptyArray
+import com.pelmenstar.projktSens.shared.InetAddressUtils
+import com.pelmenstar.projktSens.shared.StringUtils
 import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ui.*
+import com.pelmenstar.projktSens.shared.equalsPattern
 import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.R
 
-class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.State>() {
-    class State: IncompleteState {
+class ChooseAddressAndPortScreen : FirstStartScreen<ChooseAddressAndPortScreen.State>() {
+    class State : IncompleteState {
         private var _hostBuffer = EmptyArray.CHAR
         var hostBuffer: CharArray
             get() = _hostBuffer
@@ -23,7 +26,7 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
                 _hostBuffer = value
 
                 val ipInt = InetAddressUtils.parseNumericalIpv4ToInt(value)
-                if(ipInt != InetAddressUtils.IP_ERROR) {
+                if (ipInt != InetAddressUtils.IP_ERROR) {
                     _isHostValid = true
                     _hostInt = ipInt
 
@@ -69,7 +72,7 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
 
         internal fun setHost(text: Editable) {
             val textLength = text.length
-            val buffer = if(_hostBuffer.size == textLength) {
+            val buffer = if (_hostBuffer.size == textLength) {
                 _hostBuffer
             } else {
                 CharArray(textLength)
@@ -134,12 +137,12 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
                 val initialHost = state.hostBuffer
                 setText(initialHost, 0, initialHost.size)
 
-                if(!state.isHostValid) {
+                if (!state.isHostValid) {
                     error = invalidAddressStr
                 }
 
                 addTextChangedListener { text ->
-                    if(text != null) {
+                    if (text != null) {
                         val state = state
                         state.setHost(text)
                         if (!state.isHostValid) {
@@ -181,7 +184,7 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
                     if (text != null) {
                         val state = state
                         val port = StringUtils.parsePositiveInt(text)
-                        if(port != -1) {
+                        if (port != -1) {
                             state.port = port
                             setErrorIfInvalidPort(port)
                         } else {
@@ -200,9 +203,9 @@ class ChooseAddressAndPortScreen: FirstStartScreen<ChooseAddressAndPortScreen.St
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
         val hostBuffer = bundle.getCharArray(STATE_HOST_STRING)
-        if(hostBuffer != null) {
+        if (hostBuffer != null) {
             val port = bundle.get(STATE_PORT)
-            if(port != null) {
+            if (port != null) {
                 state = State(hostBuffer, port as Int)
                 return true
             }

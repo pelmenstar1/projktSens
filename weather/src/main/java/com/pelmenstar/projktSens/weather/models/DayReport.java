@@ -138,7 +138,7 @@ public final class DayReport extends AppendableToStringBuilder {
     @NotNull
     public static DayReport create(@NotNull WeatherPropertyIterable data) {
         int size = data.size();
-        if(size == 0) {
+        if (size == 0) {
             throw new IllegalArgumentException("Data is empty");
         }
 
@@ -171,7 +171,7 @@ public final class DayReport extends AppendableToStringBuilder {
         float maxPressValue = Float.MIN_VALUE;
         long maxPressDt = ShortDateTime.NONE;
 
-        while(data.moveNext()) {
+        while (data.moveNext()) {
             int units = data.getUnits();
             int tempUnit = ValueUnitsPacked.getTemperatureUnit(units);
             int pressUnit = ValueUnitsPacked.getPressureUnit(units);
@@ -191,32 +191,32 @@ public final class DayReport extends AppendableToStringBuilder {
             humSum += hum;
             pressSum += press;
 
-            if(temp < minTempValue) {
+            if (temp < minTempValue) {
                 minTempValue = temp;
                 minTempDt = dateTime;
             }
 
-            if(temp > maxTempValue) {
+            if (temp > maxTempValue) {
                 maxTempValue = temp;
                 maxTempDt = dateTime;
             }
 
-            if(hum < minHumValue) {
+            if (hum < minHumValue) {
                 minHumValue = hum;
                 minHumDt = dateTime;
             }
 
-            if(hum > maxHumValue) {
+            if (hum > maxHumValue) {
                 maxHumValue = hum;
                 maxHumDt = dateTime;
             }
 
-            if(press < minPressValue) {
+            if (press < minPressValue) {
                 minPressValue = press;
                 minPressDt = dateTime;
             }
 
-            if(press > maxPressValue) {
+            if (press > maxPressValue) {
                 maxPressValue = press;
                 maxPressDt = dateTime;
             }
@@ -238,7 +238,7 @@ public final class DayReport extends AppendableToStringBuilder {
         float medianPress;
 
         int mid = size / 2;
-        if(mid * 2 == size) {
+        if (mid * 2 == size) {
             medianTemp = (tempValues[mid] + tempValues[mid + 1]) * 0.5f;
             medianHum = (humValues[mid] + humValues[mid + 1]) * 0.5f;
             medianPress = (pressValues[mid] + pressValues[mid + 1]) * 0.5f;
@@ -284,9 +284,9 @@ public final class DayReport extends AppendableToStringBuilder {
         @Override
         public void writeObject(@NotNull DayReport value, @NotNull ValueWriter writer) {
             ReportStats.SERIALIZER.writeObject(value.stats, writer);
-            writer.emitInt16((short)value.entries.length);
+            writer.emitInt16((short) value.entries.length);
 
-            for(Entry e: value.entries) {
+            for (Entry e : value.entries) {
                 writer.emitInt24(e.time);
                 writer.emitFloat(e.temperature);
                 writer.emitFloat(e.humidity);
@@ -305,25 +305,25 @@ public final class DayReport extends AppendableToStringBuilder {
             int entriesLength = reader.readInt16();
             Entry[] entries = new Entry[entriesLength];
 
-            for(int i = 0; i < entriesLength; i++) {
+            for (int i = 0; i < entriesLength; i++) {
                 int time = reader.readInt24();
                 float temp = reader.readFloat();
                 float hum = reader.readFloat();
                 float press = reader.readFloat();
 
-                if(!ShortTime.isValid(time)) {
+                if (!ShortTime.isValid(time)) {
                     throw ValidationException.invalidValue("time", time);
                 }
 
-                if(!UnitValue.isValid(temp, tempUnit)) {
+                if (!UnitValue.isValid(temp, tempUnit)) {
                     throw ValidationException.invalidValue("temperature", temp);
                 }
 
-                if(!UnitValue.isValid(hum, ValueUnit.HUMIDITY)) {
+                if (!UnitValue.isValid(hum, ValueUnit.HUMIDITY)) {
                     throw ValidationException.invalidValue("humidity", hum);
                 }
 
-                if(!UnitValue.isValid(press, pressUnit)) {
+                if (!UnitValue.isValid(press, pressUnit)) {
                     throw ValidationException.invalidValue("pressure", press);
                 }
 

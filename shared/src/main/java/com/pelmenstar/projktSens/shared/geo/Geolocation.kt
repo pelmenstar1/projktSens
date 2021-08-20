@@ -17,11 +17,11 @@ class Geolocation(latitude: Float, longitude: Float) {
     val longitude: Float
 
     init {
-        if(latitude !in -90f..90f) {
+        if (latitude !in -90f..90f) {
             throw IllegalArgumentException("latitude=$latitude")
         }
 
-        if(longitude !in -180f..180f) {
+        if (longitude !in -180f..180f) {
             throw IllegalArgumentException("longitude=$longitude")
         }
 

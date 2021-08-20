@@ -12,12 +12,13 @@ import org.jetbrains.annotations.Nullable;
 import java.net.InetAddress;
 
 public final class DeviceInetUtils {
-    private DeviceInetUtils() {}
+    private DeviceInetUtils() {
+    }
 
     @Nullable
     public static InetAddress getInetAddress(@NotNull Context context) {
         Context appContext = context.getApplicationContext();
-        if(appContext == null) {
+        if (appContext == null) {
             appContext = context;
         }
 

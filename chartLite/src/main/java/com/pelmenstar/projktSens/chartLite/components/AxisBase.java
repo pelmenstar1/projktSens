@@ -1,4 +1,3 @@
-
 package com.pelmenstar.projktSens.chartLite.components;
 
 import android.graphics.Color;
@@ -17,7 +16,6 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Base-class of all axes (previously called labels).
- *
  */
 public abstract class AxisBase {
     protected static final int FLAG_GRANULARITY_ENABLED = 1;
@@ -28,49 +26,35 @@ public abstract class AxisBase {
     protected static final int FLAG_CUSTOM_AXIS_MIN = 1 << 5;
     protected static final int FLAG_CUSTOM_AXIS_MAX = 1 << 6;
     protected static final int FLAG_ENABLED = 1 << 7;
-
-    private int flags = FLAG_ENABLED | FLAG_DRAW_GRID_LINES | FLAG_DRAW_AXIS_LINE | FLAG_DRAW_LABELS;
-
-    @NotNull
-    protected ValueFormatter valueFormatter = FloatValueFormatter.INSTANCE;
-
-    @ColorInt
-    private int gridColor = Color.GRAY;
-    private float gridLineWidth = 1f;
-
-    @ColorInt
-    private int axisLineColor = Color.GRAY;
-    private float axisLineWidth = 1f;
-
     @NotNull
     public float[] entries = EmptyArray.FLOAT;
     public long entriesHash = 0;
-
-    private int labelCount = 6;
-
+    @NotNull
+    public String[] labels = EmptyArray.STRING;
+    @NotNull
+    protected ValueFormatter valueFormatter = FloatValueFormatter.INSTANCE;
     protected float granularity = 1f;
     protected float spaceMin = 0f;
     protected float spaceMax = 0f;
-
     protected float min = 0f;
     protected float max = 0f;
-
-    private int minLabels = 2;
-    private int maxLabels = 25;
-
-    @NotNull
-    public String[] labels = EmptyArray.STRING;
-
     protected float xOffset;
     protected float yOffset;
-
     @Nullable
     protected Typeface typeface = null;
-
     protected float textSize;
-
     @ColorInt
     protected int textColor = Color.BLACK;
+    private int flags = FLAG_ENABLED | FLAG_DRAW_GRID_LINES | FLAG_DRAW_AXIS_LINE | FLAG_DRAW_LABELS;
+    @ColorInt
+    private int gridColor = Color.GRAY;
+    private float gridLineWidth = 1f;
+    @ColorInt
+    private int axisLineColor = Color.GRAY;
+    private float axisLineWidth = 1f;
+    private int labelCount = 6;
+    private int minLabels = 2;
+    private int maxLabels = 25;
 
     public AxisBase() {
         this.textSize = Utils.dpToPx(10f);
@@ -103,6 +87,10 @@ public abstract class AxisBase {
         typeface = tf;
     }
 
+    public float getTextSize() {
+        return textSize;
+    }
+
     public void setTextSize(float size) {
         if (size > 24f)
             size = 24f;
@@ -112,25 +100,21 @@ public abstract class AxisBase {
         textSize = size;
     }
 
-    public float getTextSize() {
-        return textSize;
+    @ColorInt
+    public int getTextColor() {
+        return textColor;
     }
 
     public void setTextColor(@ColorInt int color) {
         textColor = color;
     }
 
-    @ColorInt
-    public int getTextColor() {
-        return textColor;
+    public boolean isEnabled() {
+        return isFlagEnabled(FLAG_ENABLED);
     }
 
     public void setEnabled(boolean enabled) {
         setFlag(FLAG_ENABLED, enabled);
-    }
-
-    public boolean isEnabled() {
-        return isFlagEnabled(FLAG_ENABLED);
     }
 
     public float getMin() {
@@ -146,7 +130,7 @@ public abstract class AxisBase {
     }
 
     protected void setFlag(int flag, boolean state) {
-        if(state) {
+        if (state) {
             flags |= flag;
         } else {
             flags &= ~flag;
@@ -185,38 +169,38 @@ public abstract class AxisBase {
         return isFlagEnabled(FLAG_DRAW_AXIS_LINE);
     }
 
-    public void setGridColor(@ColorInt int color) {
-        gridColor = color;
-    }
-
     @ColorInt
     public int getGridColor() {
         return gridColor;
     }
 
-    public void setAxisLineWidth(float width) {
-        axisLineWidth = width;
+    public void setGridColor(@ColorInt int color) {
+        gridColor = color;
     }
 
     public float getAxisLineWidth() {
         return axisLineWidth;
     }
 
-    public void setGridLineWidth(float width) {
-        gridLineWidth = width;
+    public void setAxisLineWidth(float width) {
+        axisLineWidth = width;
     }
 
     public float getGridLineWidth() {
         return gridLineWidth;
     }
 
-    public void setAxisLineColor(@ColorInt int color) {
-        axisLineColor = color;
+    public void setGridLineWidth(float width) {
+        gridLineWidth = width;
     }
 
     @ColorInt
     public int getAxisLineColor() {
         return axisLineColor;
+    }
+
+    public void setAxisLineColor(@ColorInt int color) {
+        axisLineColor = color;
     }
 
     public void setDrawLabels(boolean enabled) {
@@ -225,12 +209,6 @@ public abstract class AxisBase {
 
     public boolean isDrawLabelsEnabled() {
         return isFlagEnabled(FLAG_DRAW_LABELS);
-    }
-
-    public void setLabelCount(int count) {
-        labelCount = MyMath.clamp(count, minLabels, maxLabels);
-
-        flags &= ~FLAG_FORCE_LABELS;
     }
 
     public void setLabelCount(int count, boolean force) {
@@ -245,6 +223,12 @@ public abstract class AxisBase {
 
     public int getLabelCount() {
         return labelCount;
+    }
+
+    public void setLabelCount(int count) {
+        labelCount = MyMath.clamp(count, minLabels, maxLabels);
+
+        flags &= ~FLAG_FORCE_LABELS;
     }
 
     public boolean isGranularityEnabled() {
@@ -266,10 +250,15 @@ public abstract class AxisBase {
         flags |= FLAG_GRANULARITY_ENABLED;
     }
 
+    @NotNull
+    public ValueFormatter getValueFormatter() {
+        return valueFormatter;
+    }
+
     public void setValueFormatter(@NotNull ValueFormatter f) {
         valueFormatter = f;
 
-        if(labels.length != entries.length) {
+        if (labels.length != entries.length) {
             labels = new String[entries.length];
         }
 
@@ -278,18 +267,22 @@ public abstract class AxisBase {
         }
     }
 
-
-    @NotNull
-    public ValueFormatter getValueFormatter() {
-        return valueFormatter;
-    }
-
     public float getAxisMaximum() {
         return max;
     }
 
+    public void setAxisMaximum(float max) {
+        this.max = max;
+        flags |= FLAG_CUSTOM_AXIS_MAX;
+    }
+
     public float getAxisMinimum() {
         return min;
+    }
+
+    public void setAxisMinimum(float min) {
+        this.min = min;
+        flags |= FLAG_CUSTOM_AXIS_MIN;
     }
 
     public void resetAxisMaximum() {
@@ -306,16 +299,6 @@ public abstract class AxisBase {
 
     public boolean isAxisMinCustom() {
         return isFlagEnabled(FLAG_CUSTOM_AXIS_MIN);
-    }
-
-    public void setAxisMinimum(float min) {
-        this.min = min;
-        flags |= FLAG_CUSTOM_AXIS_MIN;
-    }
-
-    public void setAxisMaximum(float max) {
-        this.max = max;
-        flags |= FLAG_CUSTOM_AXIS_MAX;
     }
 
     public float getSpaceMin() {

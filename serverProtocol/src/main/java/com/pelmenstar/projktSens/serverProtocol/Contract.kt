@@ -29,13 +29,13 @@ interface Contract {
      *
      * @param valueClass expected class of data stored in [Request]
      */
-    suspend fun<T:Any> readResponse(input: InputStream, valueClass: Class<T>): Response
+    suspend fun <T : Any> readResponse(input: InputStream, valueClass: Class<T>): Response
 }
 
 /**
  * Reads [Response] from [input]. Note that generic parameter [T] is marked as reified, so
  * actual class of [T] should be known in compile-time
  */
-suspend inline fun<reified T:Any> Contract.readResponse(input: InputStream): Response {
+suspend inline fun <reified T : Any> Contract.readResponse(input: InputStream): Response {
     return readResponse(input, T::class.java)
 }

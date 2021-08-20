@@ -18,23 +18,23 @@ public final class ShortTime {
 
     /**
      * Creates seconds of day using hour, minute, second
-     * @param hour hour, in range of [0; 24)
+     *
+     * @param hour   hour, in range of [0; 24)
      * @param minute minute, in range of [0; 60)
      * @param second second, in range of [0; 60)
-     *
      * @throws IllegalArgumentException if hour, minute or second are invalid
      */
     @TimeInt
     public static int create(int hour, int minute, int second) {
-        if(hour < 0 || hour >= 24) {
+        if (hour < 0 || hour >= 24) {
             throw new IllegalArgumentException("hour");
         }
 
-        if(minute < 0 || minute >= 60) {
+        if (minute < 0 || minute >= 60) {
             throw new IllegalArgumentException("minute");
         }
 
-        if(second < 0 || second >= 60) {
+        if (second < 0 || second >= 60) {
             throw new IllegalArgumentException("seconds");
         }
 
@@ -58,7 +58,7 @@ public final class ShortTime {
      */
     @TimeInt
     public static int now() {
-        return (int)(TimeUtils.currentLocalTimeMillis() % TimeConstants.MILLIS_IN_DAY) / 1000;
+        return (int) (TimeUtils.currentLocalTimeMillis() % TimeConstants.MILLIS_IN_DAY) / 1000;
     }
 
     /**
@@ -80,7 +80,7 @@ public final class ShortTime {
      * @throws IllegalArgumentException if time is invalid
      */
     public static void writeToCharBuffer(@TimeInt int time, char @NotNull [] buffer, int offset) {
-        if(!isValid(time)) {
+        if (!isValid(time)) {
             throw new IllegalArgumentException("time");
         }
 
@@ -102,7 +102,7 @@ public final class ShortTime {
      * @throws IllegalArgumentException if time is not valid
      */
     public static void append(@TimeInt int time, @NotNull StringBuilder sb) {
-        if(!isValid(time)) {
+        if (!isValid(time)) {
             throw new IllegalArgumentException("time");
         }
 

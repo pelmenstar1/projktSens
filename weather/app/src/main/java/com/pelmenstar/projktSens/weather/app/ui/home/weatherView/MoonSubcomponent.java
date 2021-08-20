@@ -32,7 +32,7 @@ public final class MoonSubcomponent extends ComplexWeatherView.Subcomponent {
         Resources.Theme theme = context.getTheme();
 
         int moonDiameter = res.getDimensionPixelSize(R.dimen.weatherView_moonDiameter);
-        this.moonDiameter = (float)moonDiameter;
+        this.moonDiameter = (float) moonDiameter;
 
         int moonVisibleColor = ResourcesCompat.getColor(res, R.color.moonVisibleColor, theme);
 

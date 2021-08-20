@@ -8,8 +8,8 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
-import com.pelmenstar.projktSens.shared.android.Message
 import com.pelmenstar.projktSens.shared.android.SerializableParcelWrapper
+import com.pelmenstar.projktSens.shared.android.ext.Message
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
 import com.pelmenstar.projktSens.weather.app.R
@@ -18,7 +18,8 @@ import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.models.WeatherDataSource
 import kotlinx.coroutines.*
 
-abstract class ReportActivityBase<TReport : Any> protected constructor(private val serializer: ObjectSerializer<TReport>) : HomeButtonSupportActivity() {
+abstract class ReportActivityBase<TReport : Any> protected constructor(private val serializer: ObjectSerializer<TReport>) :
+    HomeButtonSupportActivity() {
     @Volatile
     private var report: TReport? = null
 
@@ -39,12 +40,15 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        run try_load_from_saved_state@ {
+        run try_load_from_saved_state@{
             if (savedInstanceState != null) {
                 status = savedInstanceState.getByte(STATE_STATUS).toInt()
 
                 if (status == STATUS_OK) {
-                    val wrapper = savedInstanceState.getParcelable<SerializableParcelWrapper<TReport>>(STATE_REPORT)
+                    val wrapper =
+                        savedInstanceState.getParcelable<SerializableParcelWrapper<TReport>>(
+                            STATE_REPORT
+                        )
                     if (wrapper == null) {
                         Log.e(TAG, "Invalid saved state. STATE_REPORT property is null")
 
@@ -62,7 +66,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
     }
 
     private fun startLoadingReport() {
-        if(loadReportJob != null) {
+        if (loadReportJob != null) {
             Log.e(TAG, "loadReportJob is still running")
             return
         }
@@ -106,13 +110,13 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
     private fun setStatus(status: Int) {
         this.status = status
 
-        if(status != STATUS_LOADING) {
+        if (status != STATUS_LOADING) {
             transitionView?.stopTransition()
         }
 
-        when(status) {
+        when (status) {
             STATUS_LOADING -> {
-                if(loadingView == null) {
+                if (loadingView == null) {
                     loadingView = createLoadingView()
                 }
 
@@ -120,14 +124,14 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                 setContentView(loadingView)
             }
             STATUS_NO_DATA -> {
-                if(noDataView == null) {
+                if (noDataView == null) {
                     noDataView = createNoDataView()
                 }
 
                 setContentView(noDataView)
             }
             STATUS_ERROR -> {
-                if(errorView == null) {
+                if (errorView == null) {
                     errorView = createErrorView()
                 }
 
@@ -135,7 +139,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
             }
             STATUS_OK -> {
                 val r = report
-                if(r == null) {
+                if (r == null) {
                     Log.e(TAG, "setStatus(STATUS_OK), but report is null")
                     return
                 }
@@ -167,8 +171,10 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
     private fun createErrorView(): View {
         val res = resources
 
-        val retryButtonSize = res.getDimensionPixelSize(R.dimen.reportActivity_errorView_retryButtonSize)
-        val retryButtonTopMargin = res.getDimensionPixelSize(R.dimen.reportActivity_errorView_retryButtonTopMargin)
+        val retryButtonSize =
+            res.getDimensionPixelSize(R.dimen.reportActivity_errorView_retryButtonSize)
+        val retryButtonTopMargin =
+            res.getDimensionPixelSize(R.dimen.reportActivity_errorView_retryButtonTopMargin)
 
         return LinearLayout(this) {
             orientation = android.widget.LinearLayout.VERTICAL
@@ -206,7 +212,8 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                     gravity = Gravity.CENTER
                 }
 
-                colorTransition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
+                colorTransition =
+                    LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
                 transitionView = this
             }
         }
@@ -243,15 +250,16 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
     protected abstract fun createChartView(report: TReport): View
     protected abstract suspend fun loadReport(dataSource: WeatherDataSource): TReport?
 
-    private class MainThreadHandler(@JvmField var activity: ReportActivityBase<*>?): Handler(Looper.getMainLooper()) {
+    private class MainThreadHandler(@JvmField var activity: ReportActivityBase<*>?) :
+        Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             val activity = activity
-            if(activity == null) {
+            if (activity == null) {
                 Log.e(TAG, "activity in MainThreadHandler is null")
                 return
             }
 
-            when(msg.what) {
+            when (msg.what) {
                 MSG_SET_STATUS -> {
                     activity.setStatus(msg.arg1)
                 }

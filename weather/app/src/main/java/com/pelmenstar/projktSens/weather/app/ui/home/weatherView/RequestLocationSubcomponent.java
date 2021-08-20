@@ -14,17 +14,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class RequestLocationSubcomponent extends ComplexWeatherView.Subcomponent {
-    @FunctionalInterface
-    public interface RequestLocationPermissionHandler {
-        void request();
-    }
-
-    private RequestLocationPermissionHandler requestLocationPermissionHandler;
     private final Drawable icon;
-
     private final int dayIconTint;
     private final int nightIconTint;
-
+    private RequestLocationPermissionHandler requestLocationPermissionHandler;
     public RequestLocationSubcomponent(@NotNull Context context) {
         Resources res = context.getResources();
         Resources.Theme theme = context.getTheme();
@@ -33,7 +26,7 @@ public class RequestLocationSubcomponent extends ComplexWeatherView.Subcomponent
         nightIconTint = ResourcesCompat.getColor(res, R.color.weatherView_iconTint_night, theme);
 
         icon = ResourcesCompat.getDrawable(res, R.drawable.ic_error, theme);
-        if(icon == null) throw new NullPointerException();
+        if (icon == null) throw new NullPointerException();
 
         DrawableCompat.setTint(icon, dayIconTint);
     }
@@ -54,23 +47,23 @@ public class RequestLocationSubcomponent extends ComplexWeatherView.Subcomponent
 
     @Override
     protected void onPositionChanged(float x, float y) {
-        int ix = (int)x;
-        int iy = (int)y;
+        int ix = (int) x;
+        int iy = (int) y;
 
-        icon.setBounds(ix, iy, ix + (int)getWidth(), iy + (int)getHeight());
+        icon.setBounds(ix, iy, ix + (int) getWidth(), iy + (int) getHeight());
     }
 
     @Override
     protected void onSizeChanged(float width, float height) {
-        int x = (int)getX();
-        int y = (int)getY();
+        int x = (int) getX();
+        int y = (int) getY();
 
-        icon.setBounds(x, y, x + (int)width, y + (int)height);
+        icon.setBounds(x, y, x + (int) width, y + (int) height);
     }
 
     @Override
     protected void onDayStateChanged(int newState) {
-        if(newState == ComplexWeatherView.STATE_DAY) {
+        if (newState == ComplexWeatherView.STATE_DAY) {
             DrawableCompat.setTint(icon, dayIconTint);
         } else {
             DrawableCompat.setTint(icon, nightIconTint);
@@ -80,8 +73,13 @@ public class RequestLocationSubcomponent extends ComplexWeatherView.Subcomponent
     @Override
     protected void onClick() {
         RequestLocationPermissionHandler handler = requestLocationPermissionHandler;
-        if(handler != null) {
+        if (handler != null) {
             handler.request();
         }
+    }
+
+    @FunctionalInterface
+    public interface RequestLocationPermissionHandler {
+        void request();
     }
 }

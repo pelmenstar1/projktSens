@@ -14,7 +14,7 @@ public final class EmptyArray {
     /**
      * Empty {@link String} array
      */
-    public static final @NotNull String  @NotNull [] STRING = new String[0];
+    public static final @NotNull String @NotNull [] STRING = new String[0];
 
     /**
      * Empty char array
@@ -27,14 +27,10 @@ public final class EmptyArray {
     public static final float @NotNull [] FLOAT = new float[0];
 
     /**
-     * Empty long array
-     */
-    public static final long @NotNull [] LONG = new long[0];
-
-    /**
      * Empty int array
      */
     public static final int @NotNull [] INT = new int[0];
 
-    private EmptyArray() {}
+    private EmptyArray() {
+    }
 }

@@ -6,11 +6,11 @@ import com.pelmenstar.projktSens.shared.equalsPattern
 /**
  * Represents all possible types of response
  */
-sealed class Response: AppendableToStringBuilder() {
+sealed class Response : AppendableToStringBuilder() {
     /**
      * Empty response
      */
-    object Empty: Response() {
+    object Empty : Response() {
         override fun append(sb: StringBuilder) {
             sb.append("{Empty}")
         }
@@ -23,7 +23,7 @@ sealed class Response: AppendableToStringBuilder() {
      * Response with error.
      * This class has private constructor, so static methods [Companion.error] should be used
      */
-    class Error internal constructor(val error: Int): Response() {
+    class Error internal constructor(val error: Int) : Response() {
         override fun append(sb: StringBuilder) {
             sb.append("{Error=")
             sb.append(Errors.toString(error))
@@ -31,9 +31,9 @@ sealed class Response: AppendableToStringBuilder() {
         }
 
         override fun equals(other: Any?): Boolean {
-           return equalsPattern(other) { o ->
-               error == o.error
-           }
+            return equalsPattern(other) { o ->
+                error == o.error
+            }
         }
 
         override fun hashCode(): Int = error
@@ -43,7 +43,7 @@ sealed class Response: AppendableToStringBuilder() {
      * Response with value paired with its class.
      * This class has private constructor, so static methods [Companion.ok] should be used
      */
-    class Ok<T:Any> internal constructor(val value: T): Response() {
+    class Ok<T : Any> internal constructor(val value: T) : Response() {
         override fun append(sb: StringBuilder) {
             sb.append("{ Value=")
             sb.append(value)
@@ -87,7 +87,7 @@ sealed class Response: AppendableToStringBuilder() {
          *
          * @param value value of response
          */
-        fun<T:Any> ok(value: T): Ok<T> {
+        fun <T : Any> ok(value: T): Ok<T> {
             return Ok(value)
         }
 
@@ -96,8 +96,8 @@ sealed class Response: AppendableToStringBuilder() {
          * Note that generic parameter of this method is marked as reified,
          * so type of [value] should be known in compile-time
          */
-        fun<T:Any> okOrEmpty(value: T?): Response {
-            return if(value != null) Ok(value) else Empty
+        fun <T : Any> okOrEmpty(value: T?): Response {
+            return if (value != null) Ok(value) else Empty
         }
     }
 }

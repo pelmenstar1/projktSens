@@ -1,11 +1,11 @@
 package com.pelmenstar.projktSens.weather.models;
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
-import com.pelmenstar.projktSens.shared.serialization.ValueReader;
-import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer;
 import com.pelmenstar.projktSens.shared.serialization.Serializable;
 import com.pelmenstar.projktSens.shared.serialization.ValidationException;
+import com.pelmenstar.projktSens.shared.serialization.ValueReader;
+import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -100,7 +100,7 @@ public final class ReportStats extends AppendableToStringBuilder {
         @Override
         public ReportStats readObject(@NotNull ValueReader reader) throws ValidationException {
             int units = reader.readInt32();
-            if(!ValueUnitsPacked.isValid(units)) {
+            if (!ValueUnitsPacked.isValid(units)) {
                 throw ValidationException.invalidValue("units", units);
             }
 
@@ -112,41 +112,41 @@ public final class ReportStats extends AppendableToStringBuilder {
             ParameterStats press = ParameterStats.SERIALIZER.readObject(reader);
 
             // validate temperature
-            if(!UnitValue.isValid(temp.min.value, tempUnit)) {
+            if (!UnitValue.isValid(temp.min.value, tempUnit)) {
                 throw ValidationException.invalidValue("min temperature", temp.min.value);
             }
 
-            if(!UnitValue.isValid(temp.max.value, tempUnit)) {
+            if (!UnitValue.isValid(temp.max.value, tempUnit)) {
                 throw ValidationException.invalidValue("max temperature", temp.max.value);
             }
 
-            if(!UnitValue.isValid(temp.avg, tempUnit)) {
+            if (!UnitValue.isValid(temp.avg, tempUnit)) {
                 throw ValidationException.invalidValue("avg temperature", temp.avg);
             }
 
             // validate humidity
-            if(!UnitValue.isValid(hum.min.value, ValueUnit.HUMIDITY)) {
+            if (!UnitValue.isValid(hum.min.value, ValueUnit.HUMIDITY)) {
                 throw ValidationException.invalidValue("min humidity", hum.min.value);
             }
 
-            if(!UnitValue.isValid(hum.max.value, ValueUnit.HUMIDITY)) {
+            if (!UnitValue.isValid(hum.max.value, ValueUnit.HUMIDITY)) {
                 throw ValidationException.invalidValue("max humidity", hum.max.value);
             }
 
-            if(!UnitValue.isValid(hum.avg, ValueUnit.HUMIDITY)) {
+            if (!UnitValue.isValid(hum.avg, ValueUnit.HUMIDITY)) {
                 throw ValidationException.invalidValue("avg humidity", hum.avg);
             }
 
             // validate pressure
-            if(!UnitValue.isValid(press.min.value, pressUnit)) {
+            if (!UnitValue.isValid(press.min.value, pressUnit)) {
                 throw ValidationException.invalidValue("min pressure", press.min.value);
             }
 
-            if(!UnitValue.isValid(press.max.value, pressUnit)) {
+            if (!UnitValue.isValid(press.max.value, pressUnit)) {
                 throw ValidationException.invalidValue("max pressure", press.max.value);
             }
 
-            if(!UnitValue.isValid(press.avg, pressUnit)) {
+            if (!UnitValue.isValid(press.avg, pressUnit)) {
                 throw ValidationException.invalidValue("avg pressure", press.avg);
             }
 

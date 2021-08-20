@@ -35,7 +35,7 @@ fun Activity.requireIntent(): Intent {
 val Activity.surfaceBackgroundColor: Int
     get() {
         val window = window
-        if(window != null) {
+        if (window != null) {
             val background = window.decorView.background
             if (background is ColorDrawable) {
                 return background.color

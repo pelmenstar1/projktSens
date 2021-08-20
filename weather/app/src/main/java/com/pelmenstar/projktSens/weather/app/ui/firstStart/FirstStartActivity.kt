@@ -20,9 +20,9 @@ import androidx.core.animation.addListener
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.withTranslation
 import androidx.core.view.setMargins
-import com.pelmenstar.projktSens.shared.android.ui.SlideBitmapView
-import com.pelmenstar.projktSens.shared.android.setFloatValuesArray
+import com.pelmenstar.projktSens.shared.android.ext.setFloatValuesArray
 import com.pelmenstar.projktSens.shared.android.ui.*
+import com.pelmenstar.projktSens.shared.android.ui.SlideBitmapView
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
@@ -88,7 +88,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        when(event.actionMasked) {
+        when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 lastTouchX = event.x
             }
@@ -97,9 +97,9 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
                 val delta = event.x - lastTouchX
                 val slideMinDist = (screenPlaceholder.width / 3).toFloat()
 
-                if(delta > 0f && delta >= slideMinDist) {
+                if (delta > 0f && delta >= slideMinDist) {
                     presenter.previousScreen()
-                } else if(delta < 0f && -delta >= slideMinDist) {
+                } else if (delta < 0f && -delta >= slideMinDist) {
                     nextScreenOrFinish()
                 }
             }
@@ -125,7 +125,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
 
     private fun getScreenViewsOrInflate(): Array<out View> {
         var views = screenViews
-        if(views == null) {
+        if (views == null) {
             views = presenter.inflateAllScreens()
             screenViews = views
         }
@@ -135,7 +135,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
 
     private fun getScreenTitlesOrCreate(): Array<out String> {
         var titles = screenTitles
-        if(titles == null) {
+        if (titles == null) {
             titles = presenter.getScreenTitles()
             screenTitles = titles
         }
@@ -152,11 +152,11 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         val views = getScreenViewsOrInflate()
 
         var maxHeight = -1
-        for(view in views) {
+        for (view in views) {
             view.measure(unspecified, unspecified)
 
             val height = view.measuredHeight
-            if(height > maxHeight) {
+            if (height > maxHeight) {
                 maxHeight = height
             }
         }
@@ -170,7 +170,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         val placeholder = screenPlaceholder
 
         var bitmapRefChanged = false
-        if(sv == null) {
+        if (sv == null) {
             sv = SlideBitmapView(this).apply {
                 frameLayoutParams(MATCH_PARENT, MATCH_PARENT)
 
@@ -181,15 +181,15 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
             slideView = sv
         }
 
-        if(sb == null) {
+        if (sb == null) {
             initSlideBitmapThroughRecreating(placeholder.width * 2)
-        } else if(bitmapNeedsToBeInvalided) {
+        } else if (bitmapNeedsToBeInvalided) {
             bitmapNeedsToBeInvalided = false
 
             val oldWidth = sb.width
             val newWidth = placeholder.width * 2
 
-            if(newWidth < oldWidth) {
+            if (newWidth < oldWidth) {
                 initSlideBitmapThroughReconfiguring(newWidth)
             } else {
                 initSlideBitmapThroughRecreating(newWidth)
@@ -197,7 +197,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
             }
         }
 
-        if(bitmapRefChanged) {
+        if (bitmapRefChanged) {
             sv.bitmap = slideBitmap
         }
     }
@@ -231,8 +231,10 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         val theme = theme
 
         return FrameLayout(context) {
-            val actionButtonMargin = res.getDimensionPixelOffset(R.dimen.firstStartActivity_actionButtonMargin)
-            val actionButtonSize = res.getDimensionPixelSize(R.dimen.firstStartActivity_actionButtonSize)
+            val actionButtonMargin =
+                res.getDimensionPixelOffset(R.dimen.firstStartActivity_actionButtonMargin)
+            val actionButtonSize =
+                res.getDimensionPixelSize(R.dimen.firstStartActivity_actionButtonSize)
 
             LinearLayout {
                 orientation = LinearLayout.VERTICAL
@@ -240,7 +242,8 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
                 screenTitleView = TextView {
                     linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
                         gravity = Gravity.CENTER_HORIZONTAL
-                        topMargin = res.getDimensionPixelOffset(R.dimen.firstStartActivity_titleTopMargin)
+                        topMargin =
+                            res.getDimensionPixelOffset(R.dimen.firstStartActivity_titleTopMargin)
                     }
 
                     applyTextAppearance(R.style.TextAppearance_MaterialComponents_Headline5)
@@ -303,7 +306,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
 
     private fun nextScreenOrFinish() {
         val p = presenter
-        if(isLastScreen) {
+        if (isLastScreen) {
             p.onFinish()
             setResult(RESULT_OK)
             finish()
@@ -314,7 +317,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
 
     private fun previousScreenOrFinish() {
         val p = presenter
-        if(isFirstScreen) {
+        if (isFirstScreen) {
             setResult(RESULT_CANCELED)
             finish()
         } else {
@@ -383,7 +386,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         val canvas = slideBitmapCanvas!!
         canvas.drawColor(backgroundColor)
 
-        if(moveToLeft) {
+        if (moveToLeft) {
             oldView.draw(canvas)
             canvas.withTranslation(x = width.toFloat()) {
                 newView.draw(canvas)

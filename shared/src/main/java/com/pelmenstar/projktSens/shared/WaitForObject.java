@@ -14,17 +14,11 @@ public final class WaitForObject<T> {
     private final Object lock = new Object();
     private final Object waitLock = new Object();
 
-    public boolean hasValue() {
-        synchronized (lock) {
-            return value != null;
-        }
-    }
-
     @NotNull
     public T get() {
         synchronized (lock) {
             T v = value;
-            if(v != null) {
+            if (v != null) {
                 return v;
             }
         }
@@ -48,7 +42,7 @@ public final class WaitForObject<T> {
             this.value = value;
         }
 
-        if(isLocked.compareAndSet(1, 0)) {
+        if (isLocked.compareAndSet(1, 0)) {
             synchronized (waitLock) {
                 waitLock.notifyAll();
             }

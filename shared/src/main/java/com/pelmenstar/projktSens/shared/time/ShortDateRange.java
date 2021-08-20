@@ -1,11 +1,11 @@
 package com.pelmenstar.projktSens.shared.time;
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
-import com.pelmenstar.projktSens.shared.serialization.ValueReader;
-import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer;
 import com.pelmenstar.projktSens.shared.serialization.Serializable;
 import com.pelmenstar.projktSens.shared.serialization.ValidationException;
+import com.pelmenstar.projktSens.shared.serialization.ValueReader;
+import com.pelmenstar.projktSens.shared.serialization.ValueWriter;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,11 +43,11 @@ public final class ShortDateRange extends AppendableToStringBuilder {
 
     /**
      * Initializes instance of {@link ShortDateRange} using start and end date-ints
-     * @param start start of range, represented in date-int
-     * @param endInclusive end of range, represented in date-int
      *
+     * @param start        start of range, represented in date-int
+     * @param endInclusive end of range, represented in date-int
      * @throws ValidationException if start or endInclusive are invalid.
-     * Also if start is greater than endInclusive.
+     *                             Also if start is greater than endInclusive.
      */
     public ShortDateRange(@ShortDateInt int start, @ShortDateInt int endInclusive) {
         if (!ShortDate.isValid(start)) {
@@ -65,13 +65,6 @@ public final class ShortDateRange extends AppendableToStringBuilder {
 
         this.start = start;
         this.endInclusive = endInclusive;
-    }
-
-    /**
-     * Determines whether range includes specified date-int
-     */
-    public boolean contains(@ShortDateInt int date) {
-        return date >= start && date <= endInclusive;
     }
 
     @Override

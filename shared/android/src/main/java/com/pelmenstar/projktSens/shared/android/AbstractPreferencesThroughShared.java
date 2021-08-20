@@ -22,7 +22,7 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
 
     public AbstractPreferencesThroughShared() {
         int count = getPreferenceValuesCount();
-        if(count < 0) {
+        if (count < 0) {
             count = 0;
         }
 
@@ -31,7 +31,7 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
 
     @Override
     public final void initialize(@NotNull Context context) {
-        if(!isInitialized) {
+        if (!isInitialized) {
             isInitialized = true;
 
             preferences = context.getSharedPreferences(getPreferencesName(), Context.MODE_PRIVATE);
@@ -43,7 +43,7 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
     @SuppressLint("CommitPrefEdits")
     @Override
     public final void beginModifying() {
-        if(sessionEditor != null) {
+        if (sessionEditor != null) {
             Log.e(tag, "endModifying() wasn't called");
         } else {
             sessionEditor = preferences.edit();
@@ -52,7 +52,7 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
 
     @Override
     public final void endModifying() {
-        if(sessionEditor == null) {
+        if (sessionEditor == null) {
             Log.e(tag, "startModifying() wasn't called");
             return;
         }
@@ -63,9 +63,9 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
     }
 
     protected final int safeGetInt(@NotNull String key, int id, int defaultValue) {
-        if(sessionEditor != null) {
+        if (sessionEditor != null) {
             int keyIndex = sessionModifiedInts.indexOfKey(id);
-            if(keyIndex >= 0) {
+            if (keyIndex >= 0) {
                 return sessionModifiedInts.valueAt(keyIndex);
             }
         }
@@ -74,7 +74,7 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
     }
 
     public final void safePutInt(@NotNull String key, int id, int value) {
-        if(sessionEditor != null) {
+        if (sessionEditor != null) {
             sessionEditor.putInt(key, value);
             sessionModifiedInts.put(id, value);
         } else {
@@ -83,9 +83,9 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
     }
 
     protected final boolean safeGetBoolean(@NotNull String key, int id, boolean defaultValue) {
-        if(sessionEditor != null) {
+        if (sessionEditor != null) {
             int keyIndex = sessionModifiedInts.indexOfKey(id);
-            if(keyIndex >= 0) {
+            if (keyIndex >= 0) {
                 return sessionModifiedInts.valueAt(keyIndex) == 1;
             }
         }
@@ -95,7 +95,7 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
 
 
     protected final void safePutBoolean(@NotNull String key, int id, boolean value) {
-        if(sessionEditor != null) {
+        if (sessionEditor != null) {
             sessionEditor.putBoolean(key, value);
             sessionModifiedInts.put(id, value ? 1 : 0);
         } else {

@@ -19,11 +19,11 @@ import com.pelmenstar.projktSens.weather.app.di.AppComponent
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
+import com.pelmenstar.projktSens.weather.app.ui.APP_SETTING_CLASS_NAMES
 import com.pelmenstar.projktSens.weather.app.ui.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.LazyLoadingCalendarView
 import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarActivity
-import com.pelmenstar.projktSens.weather.app.ui.APP_SETTING_CLASS_NAMES
 import com.pelmenstar.projktSens.weather.app.ui.sunriseSunset.SunriseSunsetCalendarActivity
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
 
@@ -49,15 +49,20 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
     private var presenter: HomeContract.Presenter? = null
 
-    private val startSettingActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        val data = it.data
-        if(data == null || data.getBooleanExtra(SettingsActivity.RETURN_DATA_STATE_CHANGED, true)) {
-            val intent = intent
-            finish()
-            overridePendingTransition(0, 0)
-            startActivity(intent)
+    private val startSettingActivity =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val data = it.data
+            if (data == null || data.getBooleanExtra(
+                    SettingsActivity.RETURN_DATA_STATE_CHANGED,
+                    true
+                )
+            ) {
+                val intent = intent
+                finish()
+                overridePendingTransition(0, 0)
+                startActivity(intent)
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -94,8 +99,10 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
     }
 
     private class GoToButtonContext(context: Context) {
-        @JvmField val layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
-            val sideMargin = context.resources.getDimensionPixelOffset(R.dimen.homeActivity_goToButton_sideMargin)
+        @JvmField
+        val layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+            val sideMargin =
+                context.resources.getDimensionPixelOffset(R.dimen.homeActivity_goToButton_sideMargin)
 
             leftMargin = sideMargin
             rightMargin = sideMargin
@@ -113,13 +120,16 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                 linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
                     gravity = Gravity.CENTER_HORIZONTAL
 
-                    val sideMargin = res.getDimensionPixelOffset(R.dimen.homeActivity_serverUnavailable_sideMargin)
+                    val sideMargin =
+                        res.getDimensionPixelOffset(R.dimen.homeActivity_serverUnavailable_sideMargin)
 
                     leftMargin = sideMargin
                     rightMargin = sideMargin
 
-                    topMargin = res.getDimensionPixelOffset(R.dimen.homeActivity_serverUnavailable_topMargin)
-                    bottomMargin = res.getDimensionPixelOffset(R.dimen.homeActivity_serverUnavailable_bottomMargin)
+                    topMargin =
+                        res.getDimensionPixelOffset(R.dimen.homeActivity_serverUnavailable_topMargin)
+                    bottomMargin =
+                        res.getDimensionPixelOffset(R.dimen.homeActivity_serverUnavailable_bottomMargin)
                 }
 
                 applyTextAppearance(R.style.TextAppearance_MaterialComponents_Body1)
@@ -134,7 +144,8 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
                     orientation = LinearLayout.VERTICAL
 
                     weatherView = ComplexWeatherView {
-                        val height = res.getDimensionPixelSize(R.dimen.homeActivity_weatherViewHeight)
+                        val height =
+                            res.getDimensionPixelSize(R.dimen.homeActivity_weatherViewHeight)
                         linearLayoutParams(MATCH_PARENT, height)
                     }
 
@@ -169,7 +180,8 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
                     LazyLoadingCalendarView {
                         linearLayoutParams(MATCH_PARENT, WRAP_CONTENT) {
-                            topMargin = res.getDimensionPixelOffset(R.dimen.homeActivity_lazyLoadingCalendar_topMargin)
+                            topMargin =
+                                res.getDimensionPixelOffset(R.dimen.homeActivity_lazyLoadingCalendar_topMargin)
                         }
 
                         setOnDateChangeListener { _, year, month, dayOfMonth ->
@@ -304,8 +316,9 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
         val suView = serverUnavailableView
 
-        if(suView.background == null) {
-            suView.background = ResourcesCompat.getDrawable(resources, R.drawable.server_unavailable_bg, theme)
+        if (suView.background == null) {
+            suView.background =
+                ResourcesCompat.getDrawable(resources, R.drawable.server_unavailable_bg, theme)
         }
 
         suView.visibility = View.VISIBLE

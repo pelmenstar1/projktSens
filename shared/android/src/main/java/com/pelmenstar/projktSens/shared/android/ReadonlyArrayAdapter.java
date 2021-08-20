@@ -81,7 +81,7 @@ public final class ReadonlyArrayAdapter<T> extends BaseAdapter implements Themed
 
     @Override
     @NotNull
-    public View getDropDownView(int position, @Nullable View convertView, @NotNull  ViewGroup parent) {
+    public View getDropDownView(int position, @Nullable View convertView, @NotNull ViewGroup parent) {
         LayoutInflater inf = dropDownInflater != null ? dropDownInflater : inflater;
 
         return createViewFromResource(inf, position, convertView, parent, dropDownResource);
@@ -105,7 +105,7 @@ public final class ReadonlyArrayAdapter<T> extends BaseAdapter implements Themed
         TextView textView;
 
         try {
-            textView = (TextView)view;
+            textView = (TextView) view;
         } catch (ClassCastException e) {
             throw new IllegalStateException("ArrayAdapter requires the resource ID to be a TextView");
         }

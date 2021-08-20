@@ -7,10 +7,9 @@ import android.view.VelocityTracker;
 import org.jetbrains.annotations.NotNull;
 
 public final class ChartTouchListener {
-    private static final int ZOOM_BIT = 1 << 31;
-
     public static final int TOUCH_MODE_NONE = 0;
     public static final int TOUCH_MODE_DRAG = 1;
+    private static final int ZOOM_BIT = 1 << 31;
     public static final int TOUCH_MODE_X_ZOOM = 2 | ZOOM_BIT;
     public static final int TOUCH_MODE_Y_ZOOM = 3 | ZOOM_BIT;
     public static final int TOUCH_MODE_XY_ZOOM = 4 | ZOOM_BIT;
@@ -18,36 +17,27 @@ public final class ChartTouchListener {
 
     private final Matrix matrix;
     private final Matrix savedMatrix = new Matrix();
-
-    private int touchMode = TOUCH_MODE_NONE;
-
     @NotNull
     private final LineChart chart;
-
-    private float touchStartX;
-    private float touchStartY;
-
-    private float touchCenterX;
-    private float touchCenterY;
-
-    private float savedXDist = 1f;
-    private float savedYDist = 1f;
-    private float savedDist = 1f;
-
     @NotNull
     private final VelocityTracker velocityTracker;
-
-    private long decelerationLastTime = 0;
-
-    //private float decCurrentPointX;
-    //private float decCurrentPointY;
-
-    private float decVelocityX;
-    private float decVelocityY;
-
     private final float dragTriggerDist;
     private final float minScalePointerDist;
     private final ViewPortHandler viewPortHandler;
+    private int touchMode = TOUCH_MODE_NONE;
+    private float touchStartX;
+    private float touchStartY;
+    private float touchCenterX;
+    private float touchCenterY;
+    private float savedXDist = 1f;
+
+    //private float decCurrentPointX;
+    //private float decCurrentPointY;
+    private float savedYDist = 1f;
+    private float savedDist = 1f;
+    private long decelerationLastTime = 0;
+    private float decVelocityX;
+    private float decVelocityY;
 
     public ChartTouchListener(@NotNull LineChart chart) {
         this.chart = chart;
@@ -122,24 +112,24 @@ public final class ChartTouchListener {
                 float ex0 = event.getX();
                 float ey0 = event.getY();
 
-                if(touchMode == TOUCH_MODE_DRAG) {
+                if (touchMode == TOUCH_MODE_DRAG) {
                     chart.disableScroll();
 
-                    if(chart.isDragEnabled()) {
+                    if (chart.isDragEnabled()) {
                         float dx = 0f;
                         float dy = 0f;
 
-                        if(chart.isDragXEnabled()) {
+                        if (chart.isDragXEnabled()) {
                             dx = ex0 - touchStartX;
                         }
 
-                        if(chart.isDragYEnabled()) {
+                        if (chart.isDragYEnabled()) {
                             dy = ey0 - touchStartY;
                         }
 
                         performDrag(dx, dy);
                     }
-                } else if(touchMode == TOUCH_MODE_NONE) {
+                } else if (touchMode == TOUCH_MODE_NONE) {
                     if (chart.isDragEnabled() && !chart.isFullyZoomedOut()) {
                         float distX = Math.abs(ex0 - touchStartX);
                         float distY = Math.abs(ey0 - touchStartY);
@@ -153,7 +143,7 @@ public final class ChartTouchListener {
                             }
                         }
                     }
-                } else if(isZoomTouchMode() && chart.isScaleEnabled() && event.getPointerCount() >= 2) {
+                } else if (isZoomTouchMode() && chart.isScaleEnabled() && event.getPointerCount() >= 2) {
                     chart.disableScroll();
 
                     float distX = Math.abs(ex0 - event.getX(1));
@@ -226,7 +216,7 @@ public final class ChartTouchListener {
 
             //case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
-                if(touchMode == TOUCH_MODE_DRAG && chart.isDragDecelerationEnabled()) {
+                if (touchMode == TOUCH_MODE_DRAG && chart.isDragDecelerationEnabled()) {
                     int pointerId = event.getPointerId(0);
                     velocityTracker.computeCurrentVelocity(1, Utils.getMaximumFlingVelocity());
 
@@ -296,7 +286,7 @@ public final class ChartTouchListener {
         }
 
         long currentTime = System.currentTimeMillis();
-        float timeInterval = (float)(currentTime - decelerationLastTime);
+        float timeInterval = (float) (currentTime - decelerationLastTime);
 
         float distanceX = decVelocityX * timeInterval;
         float distanceY = decVelocityY * timeInterval;
@@ -304,7 +294,7 @@ public final class ChartTouchListener {
         //decCurrentPointX += distanceX;
         //decCurrentPointY += distanceY;
 
-        float dragDistanceX = chart.isDragXEnabled() ? distanceX - touchStartX: 0f;
+        float dragDistanceX = chart.isDragXEnabled() ? distanceX - touchStartX : 0f;
         float dragDistanceY = chart.isDragYEnabled() ? distanceY - touchStartY : 0f;
 
         performDrag(dragDistanceX, dragDistanceY);

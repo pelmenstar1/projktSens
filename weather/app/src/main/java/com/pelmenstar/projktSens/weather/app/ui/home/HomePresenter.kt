@@ -6,7 +6,7 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
-import com.pelmenstar.projktSens.shared.android.Message
+import com.pelmenstar.projktSens.shared.android.ext.Message
 import com.pelmenstar.projktSens.shared.android.mvp.BasePresenter
 import com.pelmenstar.projktSens.shared.geo.Geolocation
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider
@@ -28,7 +28,6 @@ import com.pelmenstar.projktSens.weather.models.WeatherInfo
 import com.pelmenstar.projktSens.weather.models.astro.MoonInfoProvider
 import com.pelmenstar.projktSens.weather.models.astro.SunInfoProvider
 import kotlinx.coroutines.*
-import kotlin.math.max
 
 class HomePresenter(
     private val sunInfoProvider: SunInfoProvider,
@@ -63,13 +62,13 @@ class HomePresenter(
 
     override fun getRequestLocationPermissionHandler(): RequestLocationSubcomponent.RequestLocationPermissionHandler {
         return RequestLocationSubcomponent.RequestLocationPermissionHandler {
-            if(Build.VERSION.SDK_INT < 23) {
+            if (Build.VERSION.SDK_INT < 23) {
                 return@RequestLocationPermissionHandler
             }
 
             val dialog = RequestLocationPermissionDialog()
             dialog.onDismissCallback = {
-                if(dialog.isLocationPermissionGranted) {
+                if (dialog.isLocationPermissionGranted) {
                     view.setCanLoadLocation(true)
                     startLoadingLocation()
                 }
@@ -83,7 +82,7 @@ class HomePresenter(
 
         connectToWeatherChannel()
 
-        if(Build.VERSION.SDK_INT < 23 || PermissionUtils.isLocationGranted(view.context)) {
+        if (Build.VERSION.SDK_INT < 23 || PermissionUtils.isLocationGranted(view.context)) {
             startLoadingLocation()
         } else {
             view.setCanLoadLocation(false)
@@ -119,12 +118,12 @@ class HomePresenter(
     private fun postSetLocationLoaded(state: Boolean) {
         mainThread.sendMessage(Message {
             what = MSG_SET_LOCATION_LOADED
-            arg1 = if(state) 1 else 0
+            arg1 = if (state) 1 else 0
         })
     }
 
     private fun startRefreshingAstro() {
-        if(refreshAstroJob != null) {
+        if (refreshAstroJob != null) {
             Log.w(TAG, "refreshAstro is already started")
             return
         }
@@ -132,14 +131,14 @@ class HomePresenter(
         val location = lastGeolocation ?: throw NullPointerException("lastGeolocation")
 
         refreshAstroJob = scope.launch {
-            while(isActive) {
+            while (isActive) {
                 val nowDateTime = ShortDateTime.now()
                 val nowDate = ShortDateTime.getDate(nowDateTime)
                 val nowTime = ShortDateTime.getTime(nowDateTime)
 
                 postSetCurrentTime(nowTime)
 
-                if(nowDate != lastAstroRefreshedDate) {
+                if (nowDate != lastAstroRefreshedDate) {
                     lastAstroRefreshedDate = nowDate
 
                     val dayOfYear = ShortDate.getDayOfYear(nowDate)
@@ -191,20 +190,20 @@ class HomePresenter(
                 val interval = weatherChannelInfoProvider.receiveInterval
                 val nextTime = weatherChannelInfoProvider.getNextWeatherTime()
                 val waitTime = nextTime - System.currentTimeMillis()
-                if(waitTime > 0) {
+                if (waitTime > 0) {
                     delay(waitTime)
                 }
 
                 while (isActive) {
                     val value = dataSource.getLastWeather()
-                    if(value != null) {
+                    if (value != null) {
                         postOnWeatherReceived(value)
                     }
 
                     delay(interval)
                 }
             } catch (e: Exception) {
-                if(isActive) {
+                if (isActive) {
                     Log.e(TAG, "in weather channel", e)
                     postOnServerUnavailable()
                 }
@@ -307,7 +306,8 @@ class HomePresenter(
         view.onServerUnavailable()
     }
 
-    private class MainThreadHandler(@JvmField @Volatile var presenter: HomePresenter?) : Handler(Looper.getMainLooper()) {
+    private class MainThreadHandler(@JvmField @Volatile var presenter: HomePresenter?) :
+        Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             val p = presenter
             if (p == null) {
@@ -335,7 +335,7 @@ class HomePresenter(
                     p.view.setMoonPhase(msg.arg1.intBitsToFloat())
                 }
                 MSG_SET_LOCATION_LOADED -> {
-                    p.view.setLocationLoaded( msg.arg1 == 1)
+                    p.view.setLocationLoaded(msg.arg1 == 1)
                 }
             }
         }

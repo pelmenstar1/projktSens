@@ -26,7 +26,7 @@ public abstract class PrettyDateFormatter {
      * Appends date-time to specified {@link StringBuilder}.
      *
      * @param dateTime date-time long.
-     * @param sb {@link StringBuilder} to append date-time.
+     * @param sb       {@link StringBuilder} to append date-time.
      */
     public final void appendPrettyDateTime(@ShortDateTimeLong long dateTime, @NotNull StringBuilder sb) {
         appendPrettyDate(ShortDateTime.getDate(dateTime), sb);
@@ -46,7 +46,7 @@ public abstract class PrettyDateFormatter {
      * Appends date to specified {@link StringBuilder}.
      *
      * @param date date int.
-     * @param sb {@link StringBuilder} to append date.
+     * @param sb   {@link StringBuilder} to append date.
      */
     public final void appendPrettyDate(@ShortDateInt int date, @NotNull StringBuilder sb) {
         int nowEpochDay = ShortDate.nowEpochDay();
@@ -82,7 +82,6 @@ public abstract class PrettyDateFormatter {
      * Returns pretty view of specified date, represented in {@link String}.
      *
      * @param date date int.
-     *
      * @implNote internally it allocates instance of {@link StringBuilder}.
      */
     @NotNull
@@ -97,7 +96,7 @@ public abstract class PrettyDateFormatter {
     /**
      * Returns pretty view of year and month, represented in {@link String}.
      *
-     * @param year year, in range of [0; 9999].
+     * @param year  year, in range of [0; 9999].
      * @param month month, in range of [1; 12].
      */
     @NotNull
@@ -105,7 +104,7 @@ public abstract class PrettyDateFormatter {
         String monthString = getMonthString(month);
         int monthStrLength = monthString.length();
 
-        int bufferLength = monthStrLength + /* whitespace */ 1 + /* year */ + 4;
+        int bufferLength = monthStrLength + /* whitespace */ 1 + /* year */ +4;
         char[] buffer = new char[bufferLength];
         monthString.getChars(0, monthStrLength, buffer, 0);
         buffer[monthStrLength] = ' ';

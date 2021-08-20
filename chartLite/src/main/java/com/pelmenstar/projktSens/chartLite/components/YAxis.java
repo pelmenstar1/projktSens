@@ -57,20 +57,20 @@ public final class YAxis extends AxisBase {
         xLabelOffset = xOffset;
     }
 
-    public void setSpaceTop(float percent) {
-        spacePercentTop = percent;
-    }
-
     public float getSpaceTop() {
         return spacePercentTop;
     }
 
-    public void setSpaceBottom(float percent) {
-        spacePercentBottom = percent;
+    public void setSpaceTop(float percent) {
+        spacePercentTop = percent;
     }
 
     public float getSpaceBottom() {
         return spacePercentBottom;
+    }
+
+    public void setSpaceBottom(float percent) {
+        spacePercentBottom = percent;
     }
 
     public float getRequiredWidthSpace(@NotNull Paint p) {

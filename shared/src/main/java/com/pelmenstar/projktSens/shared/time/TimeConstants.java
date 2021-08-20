@@ -32,5 +32,6 @@ public final class TimeConstants {
     public static final int DAYS_PER_CYCLE = 146097;
     public static final int DAYS_0000_TO_1970 = (DAYS_PER_CYCLE * 5) - (30 * 365 + 7);
 
-    private TimeConstants() {}
+    private TimeConstants() {
+    }
 }

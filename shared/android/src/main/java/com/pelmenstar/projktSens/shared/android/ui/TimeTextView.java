@@ -39,11 +39,11 @@ public final class TimeTextView extends MaterialTextView {
     public TimeTextView(@NotNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr, @StyleRes int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        if(attrs != null) {
+        if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TimeTextView, defStyleAttr, defStyleRes);
 
             int time = a.getInt(R.styleable.TimePrefixTextView_prefix, 0);
-            if(!ShortTime.isValid(time)) {
+            if (!ShortTime.isValid(time)) {
                 throw new IllegalStateException("Invalid attributes");
             }
 
@@ -69,11 +69,11 @@ public final class TimeTextView extends MaterialTextView {
      * @throws IllegalArgumentException if {@code time} is invalid ({@code time < 0 || time >= TimeConstants.SECONDS_IN_DAY})
      */
     public void setTime(@TimeInt int time) {
-        if(this.time == time) {
+        if (this.time == time) {
             return; // no sense to rewrite the same time to text buffer
         }
 
-        if(!ShortTime.isValid(time)) {
+        if (!ShortTime.isValid(time)) {
             throw new IllegalArgumentException("time");
         }
 

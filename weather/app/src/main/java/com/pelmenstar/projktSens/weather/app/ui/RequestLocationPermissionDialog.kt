@@ -19,14 +19,14 @@ import com.pelmenstar.projktSens.weather.app.PermissionUtils
 import com.pelmenstar.projktSens.weather.app.R
 
 @RequiresApi(23)
-class RequestLocationPermissionDialog: DialogFragment() {
+class RequestLocationPermissionDialog : DialogFragment() {
     private lateinit var content: LinearLayout
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
-        if(result.any { it.value }) {
+        if (result.any { it.value }) {
             dismissWithLocationGranted()
-        } else if(PermissionUtils.isNeverShowAgainOnLocation(this)) {
+        } else if (PermissionUtils.isNeverShowAgainOnLocation(this)) {
             setState(STATE_NEVER_SHOW_AGAIN)
         }
     }
@@ -53,7 +53,7 @@ class RequestLocationPermissionDialog: DialogFragment() {
         val context = requireContext()
 
         defTextAppearance = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
-        if(!PermissionUtils.isLocationGranted(context)) {
+        if (!PermissionUtils.isLocationGranted(context)) {
             setState(STATE_NOT_GRANTED)
         } else {
             dismissWithLocationGranted()
@@ -63,9 +63,9 @@ class RequestLocationPermissionDialog: DialogFragment() {
     private fun setState(state: Int) {
         content.removeAllViews()
 
-        when(state) {
+        when (state) {
             STATE_NOT_GRANTED -> {
-                if(notGrantedContent == null) {
+                if (notGrantedContent == null) {
                     notGrantedContent = createNotGrantedContent()
                 }
 
@@ -73,7 +73,7 @@ class RequestLocationPermissionDialog: DialogFragment() {
             }
 
             STATE_NEVER_SHOW_AGAIN -> {
-                if(neverShowAgainContent == null) {
+                if (neverShowAgainContent == null) {
                     neverShowAgainContent = createNeverShowAgainContent()
                 }
 
@@ -168,7 +168,7 @@ class RequestLocationPermissionDialog: DialogFragment() {
         // In the case of 'Never show again', an user should go to the settings to manually enable location
         // permission.
         // So after the user returns, we need to check whether the user actually changes access to location
-        if(PermissionUtils.isLocationGranted(requireContext())) {
+        if (PermissionUtils.isLocationGranted(requireContext())) {
             dismissWithLocationGranted()
         }
     }

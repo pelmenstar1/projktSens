@@ -8,7 +8,7 @@ import com.pelmenstar.projktSens.weather.models.astro.MoonInfoProvider
 
 class MoonCalendarPresenter(
     private val moonInfoProvider: MoonInfoProvider
-): MoonCalendarContract.Presenter, BasePresenter<MoonCalendarContract.View>() {
+) : MoonCalendarContract.Presenter, BasePresenter<MoonCalendarContract.View>() {
     @ShortDateInt
     private var selectedDate: Int = ShortDate.NONE
 
@@ -23,9 +23,9 @@ class MoonCalendarPresenter(
     }
 
     override fun restoreState(state: Bundle) {
-        val date = state.getInt(STATE_SELECTED_DATE, ShortDate.NONE)
+        val date = state.get(STATE_SELECTED_DATE) as Int?
 
-        if(date != ShortDate.NONE) {
+        if (date != null) {
             onDateSelected(date)
         }
     }

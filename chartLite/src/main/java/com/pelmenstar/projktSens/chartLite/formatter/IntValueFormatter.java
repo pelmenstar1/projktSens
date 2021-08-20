@@ -11,11 +11,12 @@ public final class IntValueFormatter implements ValueFormatter {
     @NotNull
     public static final IntValueFormatter INSTANCE = new IntValueFormatter();
 
-    private IntValueFormatter() {}
+    private IntValueFormatter() {
+    }
 
     @Override
     @NotNull
     public String format(float value) {
-        return Integer.toString((int)value);
+        return Integer.toString((int) value);
     }
 }

@@ -12,7 +12,7 @@ import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.R
 
-class ChooseServerContractScreen: FirstStartScreen<ChooseServerContractScreen.State>() {
+class ChooseServerContractScreen : FirstStartScreen<ChooseServerContractScreen.State>() {
     class State(@JvmField var contractType: Int)
 
     override fun getTitleId(): Int = R.string.firstStart_chooseServerContractTitle
@@ -44,20 +44,22 @@ class ChooseServerContractScreen: FirstStartScreen<ChooseServerContractScreen.St
                     setDropDownResource(android.R.layout.simple_spinner_dropdown_item)
                 }
 
-                setSelection(when(state.contractType) {
-                    ContractType.RAW -> 0
-                    ContractType.JSON -> 1
-                    else -> throw RuntimeException()
-                })
+                setSelection(
+                    when (state.contractType) {
+                        ContractType.RAW -> 0
+                        ContractType.JSON -> 1
+                        else -> throw RuntimeException()
+                    }
+                )
 
-                onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(
                         parent: AdapterView<*>?,
                         view: View?,
                         position: Int,
                         id: Long
                     ) {
-                        state.contractType = when(position) {
+                        state.contractType = when (position) {
                             0 -> ContractType.RAW
                             1 -> ContractType.JSON
                             else -> throw RuntimeException()
@@ -77,7 +79,7 @@ class ChooseServerContractScreen: FirstStartScreen<ChooseServerContractScreen.St
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
         val type = bundle.get(STATE_CONTRACT)
-        return if(type != null) {
+        return if (type != null) {
             state = State(type as Int)
             true
         } else {

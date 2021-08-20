@@ -15,7 +15,7 @@ abstract class BasePresenter<TView : DefaultContract.View> : DefaultContract.Pre
         get() = _viewRef.get() ?: throw RuntimeException("Presenter is not attached to any view")
 
     override fun attach(view: TView) {
-        if(!_viewRef.compareAndSet(null, view)) {
+        if (!_viewRef.compareAndSet(null, view)) {
             throw IllegalStateException("Presenter already has attached view")
         }
     }

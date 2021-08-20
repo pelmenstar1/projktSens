@@ -19,7 +19,7 @@ abstract class FirstStartScreen<TState> {
                 val oldValue = field
                 field = value
 
-                if(value != oldValue) {
+                if (value != oldValue) {
                     onValidChanged?.onChanged(value)
                 }
             }

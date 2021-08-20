@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Baseclass of all axis renderers.
- *
  */
 public abstract class AxisRenderer<TAxis extends AxisBase> {
     @NotNull
@@ -97,12 +96,12 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
             }
 
             // Normalize interval
-            float intervalMagnitude = Utils.roundToNextSignificant((float)Math.pow(10, (int) Math.log10(interval)));
+            float intervalMagnitude = Utils.roundToNextSignificant((float) Math.pow(10, (int) Math.log10(interval)));
             int intervalSigDigit = (int) (interval / intervalMagnitude);
             if (intervalSigDigit > 5) {
                 // Use one order of magnitude higher, to avoid intervals like 0.9 or 90
                 // if it's 0.0 after floor(), we use the old value
-                float im = (float)Math.floor(10f * intervalMagnitude);
+                float im = (float) Math.floor(10f * intervalMagnitude);
 
                 interval = im == 0f ? interval : im;
             }
@@ -122,7 +121,7 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
             if (last != first) {
                 float f = first;
 
-                while(f <= last) {
+                while (f <= last) {
                     n++;
                     f += interval;
                 }
@@ -145,7 +144,7 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
             int i = 0;
             long hash = 0;
 
-            while(i < n) {
+            while (i < n) {
                 entries[i] = v;
                 hash = hash * 31 + Float.floatToIntBits(v);
                 labels[i] = valueFormatter.format(v);

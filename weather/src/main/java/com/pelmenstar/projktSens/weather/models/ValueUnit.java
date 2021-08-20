@@ -22,16 +22,15 @@ public final class ValueUnit {
     /**
      * Valid temperature units
      */
-    @NotNull
-    public static final int[] TEMPERATURE_UNITS = new int[] { CELSIUS, KELVIN, FAHRENHEIT };
+    public static final int @NotNull [] TEMPERATURE_UNITS = new int[]{CELSIUS, KELVIN, FAHRENHEIT};
 
     /**
      * Valid pressure units
      */
-    @NotNull
-    public static final int[] PRESSURE_UNITS = new int[] { MM_OF_MERCURY, PASCAL };
+    public static final int @NotNull [] PRESSURE_UNITS = new int[]{MM_OF_MERCURY, PASCAL};
 
-    private ValueUnit() {}
+    private ValueUnit() {
+    }
 
     /**
      * Returns whether unit is temperature-related
@@ -62,15 +61,22 @@ public final class ValueUnit {
     @NotNull
     public static String toString(int unit) {
         switch (unit) {
-            case CELSIUS: return "CELSIUS";
-            case KELVIN: return "KELVIN";
-            case FAHRENHEIT: return "FAHRENHEIT";
+            case CELSIUS:
+                return "CELSIUS";
+            case KELVIN:
+                return "KELVIN";
+            case FAHRENHEIT:
+                return "FAHRENHEIT";
 
-            case HUMIDITY: return "HUMIDITY";
+            case HUMIDITY:
+                return "HUMIDITY";
 
-            case MM_OF_MERCURY: return "MM_OF_MERCURY";
-            case PASCAL: return "PASCAL";
-            default: throw new IllegalArgumentException("unit");
+            case MM_OF_MERCURY:
+                return "MM_OF_MERCURY";
+            case PASCAL:
+                return "PASCAL";
+            default:
+                throw new IllegalArgumentException("unit");
         }
     }
 }

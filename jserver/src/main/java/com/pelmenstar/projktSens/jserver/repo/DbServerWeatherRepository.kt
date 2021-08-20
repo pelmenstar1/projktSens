@@ -7,23 +7,18 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.core.database.sqlite.transaction
-import com.pelmenstar.projktSens.shared.android.executeInsertSuspend
-import com.pelmenstar.projktSens.shared.android.executeUpdateDeleteSuspend
-import com.pelmenstar.projktSens.shared.android.querySuspend
+import com.pelmenstar.projktSens.shared.android.ext.executeInsertSuspend
+import com.pelmenstar.projktSens.shared.android.ext.executeUpdateDeleteSuspend
+import com.pelmenstar.projktSens.shared.android.ext.querySuspend
 import com.pelmenstar.projktSens.shared.serialization.ValidationException
 import com.pelmenstar.projktSens.shared.time.*
 import com.pelmenstar.projktSens.weather.models.*
-import com.pelmenstar.projktSens.weather.models.ValueUnit
-import java.util.*
-import kotlin.Boolean
-import kotlin.Int
-import kotlin.Long
-import kotlin.String
 
 /**
  * Weather repository implementation that stores data in database
  */
-class DbServerWeatherRepository private constructor(private val db: SQLiteDatabase) : WeatherRepository {
+class DbServerWeatherRepository private constructor(private val db: SQLiteDatabase) :
+    WeatherRepository {
     override suspend fun clear() {
         db.compileStatement("DELETE FROM weather").use { statement ->
             statement.executeUpdateDeleteSuspend()
@@ -32,7 +27,7 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
 
     override suspend fun putMany(values: Array<WeatherInfo>) {
         db.transaction {
-            for(weather in values) {
+            for (weather in values) {
                 put(weather)
             }
         }
@@ -68,7 +63,7 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
     }
 
     override suspend fun getDayReport(@ShortDateInt date: Int): DayReport? {
-        if(!ShortDate.isValid(date)) {
+        if (!ShortDate.isValid(date)) {
             throw ValidationException.invalidValue("date", date)
         }
 
@@ -128,7 +123,8 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
         }
     }
 
-    private class OpenHelper(context: Context, name: String?) : SQLiteOpenHelper(context, name, null, 1) {
+    private class OpenHelper(context: Context, name: String?) :
+        SQLiteOpenHelper(context, name, null, 1) {
         override fun onCreate(db: SQLiteDatabase) {
             db.execSQL("CREATE TABLE weather (datetime_epoch BIGINT,temperature FLOAT,humidity FLOAT,pressure FLOAT)")
         }
@@ -136,7 +132,8 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
     }
 
-    private class CursorWeatherPropertyIterable(private val cursor: Cursor): WeatherPropertyIterable {
+    private class CursorWeatherPropertyIterable(private val cursor: Cursor) :
+        WeatherPropertyIterable {
         override fun size(): Int = cursor.count
 
         override fun getUnits(): Int = ValueUnitsPacked.CELSIUS_MM_OF_MERCURY
@@ -175,7 +172,7 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
             val startDateTime = dayEpoch * TimeConstants.SECONDS_IN_DAY
             val endDateTime = startDateTime + (TimeConstants.SECONDS_IN_DAY - 1)
 
-           return dateRangeQuery(startDateTime, endDateTime)
+            return dateRangeQuery(startDateTime, endDateTime)
         }
 
         private fun createDayRangeQuery(range: ShortDateRange): String {

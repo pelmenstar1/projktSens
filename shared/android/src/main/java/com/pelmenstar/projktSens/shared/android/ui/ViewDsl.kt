@@ -2,17 +2,12 @@
 
 package com.pelmenstar.projktSens.shared.android.ui
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.ActionBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatSpinner
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import kotlin.contracts.InvocationKind
@@ -32,7 +27,11 @@ inline fun frameLayoutParams(width: Int, height: Int): FrameLayout.LayoutParams 
     return FrameLayout.LayoutParams(width, height)
 }
 
-inline fun frameLayoutParams(width: Int, height: Int, block: FrameLayout.LayoutParams.() -> Unit): FrameLayout.LayoutParams {
+inline fun frameLayoutParams(
+    width: Int,
+    height: Int,
+    block: FrameLayout.LayoutParams.() -> Unit
+): FrameLayout.LayoutParams {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -44,7 +43,11 @@ inline fun View.frameLayoutParams(width: Int, height: Int) {
     layoutParams = FrameLayout.LayoutParams(width, height)
 }
 
-inline fun View.frameLayoutParams(width: Int, height: Int, block: FrameLayout.LayoutParams.() -> Unit) {
+inline fun View.frameLayoutParams(
+    width: Int,
+    height: Int,
+    block: FrameLayout.LayoutParams.() -> Unit
+) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -56,7 +59,11 @@ inline fun linearLayoutParams(width: Int, height: Int): LinearLayout.LayoutParam
     return LinearLayout.LayoutParams(width, height)
 }
 
-inline fun linearLayoutParams(width: Int, height: Int, block: LinearLayout.LayoutParams.() -> Unit): LinearLayout.LayoutParams {
+inline fun linearLayoutParams(
+    width: Int,
+    height: Int,
+    block: LinearLayout.LayoutParams.() -> Unit
+): LinearLayout.LayoutParams {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -68,24 +75,16 @@ inline fun View.linearLayoutParams(width: Int, height: Int) {
     layoutParams = LinearLayout.LayoutParams(width, height)
 }
 
-inline fun View.linearLayoutParams(width: Int, height: Int, block: LinearLayout.LayoutParams.() -> Unit) {
+inline fun View.linearLayoutParams(
+    width: Int,
+    height: Int,
+    block: LinearLayout.LayoutParams.() -> Unit
+) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
     layoutParams = LinearLayout.LayoutParams(width, height).apply(block)
-}
-
-inline fun View.coordinatorLayoutParams(width: Int, height: Int) {
-    layoutParams = CoordinatorLayout.LayoutParams(width, height)
-}
-
-inline fun View.coordinatorLayoutParams(width: Int, height: Int, block: CoordinatorLayout.LayoutParams.() -> Unit) {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-
-    layoutParams = CoordinatorLayout.LayoutParams(width, height).apply(block)
 }
 
 inline fun View.gridLayoutParams(rowSpec: GridLayout.Spec, columnSpec: GridLayout.Spec) {
@@ -95,7 +94,8 @@ inline fun View.gridLayoutParams(rowSpec: GridLayout.Spec, columnSpec: GridLayou
 inline fun View.gridLayoutParams(
     rowSpec: GridLayout.Spec,
     columnSpec: GridLayout.Spec,
-    block: GridLayout.LayoutParams.() -> Unit) {
+    block: GridLayout.LayoutParams.() -> Unit
+) {
     layoutParams = GridLayout.LayoutParams(rowSpec, columnSpec).apply(block)
 }
 
@@ -105,14 +105,6 @@ inline fun ViewGroup.View(block: View.() -> Unit): View {
     }
 
     return addApply(View(context), block)
-}
-
-inline fun ViewGroup.CoordinatorLayout(block: CoordinatorLayout.() -> Unit): CoordinatorLayout {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-
-    return addApply(CoordinatorLayout(context), block)
 }
 
 inline fun ViewGroup.ScrollableCalendarView(block: ScrollableCalendarView.() -> Unit): ScrollableCalendarView {
@@ -259,7 +251,7 @@ inline fun EditText(context: Context, block: AppCompatEditText.() -> Unit): AppC
     return AppCompatEditText(context).apply(block)
 }
 
-inline fun<TView:View> ViewGroup.addApply(view: TView, block: TView.() -> Unit): TView {
+inline fun <TView : View> ViewGroup.addApply(view: TView, block: TView.() -> Unit): TView {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }

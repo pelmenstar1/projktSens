@@ -96,7 +96,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
      * The transition will be put to the cache.
      *
      * @param start start color
-     * @param end end color
+     * @param end   end color
      */
     @NotNull
     public static LinearColorTransition biColor(@ColorInt int start, @ColorInt int end) {
@@ -112,8 +112,8 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
      * Creates transition between two colors.
      * The transition will put to the cache.
      *
-     * @param start start color
-     * @param end end color
+     * @param start      start color
+     * @param end        end color
      * @param putToCache determines whether transition should be put to the cache
      */
     @NotNull
@@ -125,7 +125,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
         int hash = 31 * (31 + start) + end;
 
         CacheEntry cacheEntry = transitionCacheByHash.get(hash, null);
-        if(cacheEntry != null) {
+        if (cacheEntry != null) {
             return new LinearColorTransition(cacheEntry.colors, cacheEntry.framesPerColor);
         }
 
@@ -133,7 +133,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
 
         biColorInternal(start, end, tColors, 0, frames);
 
-        if(putToCache) {
+        if (putToCache) {
             transitionCacheByHash.put(hash, new CacheEntry(tColors, frames));
         }
 
@@ -151,17 +151,17 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
         int sb = Color.blue(start);
 
         float invFrames = 1f / frames;
-        float mr = (float)(Color.red(end) - sr) * invFrames;
-        float mg = (float)(Color.green(end) - sg) * invFrames;
-        float mb = (float)(Color.blue(end) - sb) * invFrames;
+        float mr = (float) (Color.red(end) - sr) * invFrames;
+        float mg = (float) (Color.green(end) - sg) * invFrames;
+        float mb = (float) (Color.blue(end) - sb) * invFrames;
 
         float result_r = sr;
         float result_g = sg;
         float result_b = sb;
 
         int endIdx = index + frames;
-        for(int i = index; i < endIdx; i++) {
-            int c = Color.rgb((int)result_r, (int)result_g, (int)result_b);
+        for (int i = index; i < endIdx; i++) {
+            int c = Color.rgb((int) result_r, (int) result_g, (int) result_b);
 
             result_r += mr;
             result_g += mg;
@@ -200,17 +200,17 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
             int framesPerColor,
             boolean putToCache
     ) {
-        if(colors.length <= 1) {
+        if (colors.length <= 1) {
             throw new IllegalArgumentException("Colors valuesLength must be > 1");
         }
 
-        if(colors.length == 2) {
+        if (colors.length == 2) {
             return biColor(colors[0], colors[1], framesPerColor, putToCache);
         }
 
         int hash = Arrays.hashCode(colors);
         CacheEntry cacheEntry = transitionCacheByHash.get(hash, null);
-        if(cacheEntry != null) {
+        if (cacheEntry != null) {
             return new LinearColorTransition(cacheEntry.colors, cacheEntry.framesPerColor);
         }
 
@@ -221,7 +221,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
 
         int i = 0;
 
-        while(i < maxColors) {
+        while (i < maxColors) {
             int start = colors[i];
             i++;
             int end = colors[i];
@@ -230,7 +230,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
             idx += framesPerColor;
         }
 
-        if(putToCache) {
+        if (putToCache) {
             transitionCacheByResId.put(hash, new CacheEntry(tColors, framesPerColor));
         }
 
@@ -258,14 +258,14 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
             int frames,
             boolean putToCache) {
         CacheEntry cacheEntry = transitionCacheByResId.get(colorsRes, null);
-        if(cacheEntry != null) {
+        if (cacheEntry != null) {
             return new LinearColorTransition(cacheEntry.colors, cacheEntry.framesPerColor);
         }
 
         int[] colors = context.getResources().getIntArray(colorsRes);
         LinearColorTransition transition = multiple(colors, frames, putToCache);
 
-        if(putToCache) {
+        if (putToCache) {
             transitionCacheByResId.put(
                     colorsRes,
                     new CacheEntry(transition.transColors, transition.framesPerColor)
@@ -281,7 +281,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
     @ColorInt
     public int nextColor() {
         int s = step;
-        if(index == limit) {
+        if (index == limit) {
             int newMask = ~forwardLimitMask;
             limit = forwardLimit & newMask;
 
@@ -321,7 +321,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
     public void append(@NotNull StringBuilder sb) {
         sb.append("{ resultColors=[");
         int maxIdx = transColors.length - 1;
-        for(int i = 0; i < maxIdx; i++) {
+        for (int i = 0; i < maxIdx; i++) {
             StringUtils.appendHexColor(transColors[i], sb);
             sb.append(',');
         }

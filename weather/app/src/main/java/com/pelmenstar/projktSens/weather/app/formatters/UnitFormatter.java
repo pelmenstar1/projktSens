@@ -4,7 +4,6 @@ import com.pelmenstar.projktSens.shared.MyMath;
 import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter;
 import com.pelmenstar.projktSens.weather.models.UnitValue;
-import com.pelmenstar.projktSens.weather.models.UnitValueWithDate;
 import com.pelmenstar.projktSens.weather.models.ValueWithDate;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +33,7 @@ public final class UnitFormatter {
     @NotNull
     public StringBuilder formatValueToBuilder(float value, int unit) {
         String unitString = getUnitString(unit);
-        int sbLength = unitString.length() + MyMath.decimalDigitCount((int)value) + 2;
+        int sbLength = unitString.length() + MyMath.decimalDigitCount((int) value) + 2;
 
         StringBuilder sb = new StringBuilder(sbLength);
         sb.append(MyMath.round(value));
@@ -73,7 +72,7 @@ public final class UnitFormatter {
         float value = UnitValue.getValue(vd.value, currentUnit, prefUnit);
         String unitString = getUnitString(prefUnit);
 
-        int sbLength = MyMath.decimalDigitCount((int)value) +
+        int sbLength = MyMath.decimalDigitCount((int) value) +
                 unitString.length() + dateFormatter.approximatePrettyDateTimeLength(dateTime) + 5;
 
         StringBuilder sb = new StringBuilder(sbLength);

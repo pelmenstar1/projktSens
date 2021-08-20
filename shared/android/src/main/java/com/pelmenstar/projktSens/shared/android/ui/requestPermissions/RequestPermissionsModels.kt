@@ -6,7 +6,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.StringRes
 import com.pelmenstar.projktSens.shared.add
-import com.pelmenstar.projktSens.shared.android.readNonNullString
+import com.pelmenstar.projktSens.shared.android.ext.readNonNullString
 import com.pelmenstar.projktSens.shared.appendArray
 import com.pelmenstar.projktSens.shared.equalsPattern
 
@@ -50,12 +50,14 @@ class ModePermissionArray : Parcelable {
     override fun toString(): String {
         return buildString {
             append("{mode=")
-            append(when(mode) {
-                MODE_ANY -> "ANY"
-                MODE_EVERY -> "EVERY"
+            append(
+                when (mode) {
+                    MODE_ANY -> "ANY"
+                    MODE_EVERY -> "EVERY"
 
-                else -> ""
-            })
+                    else -> ""
+                }
+            )
 
             append(", androidPermissions=")
             appendArray(androidPermissions)
@@ -150,7 +152,7 @@ class RequestPermissionInfo : Parcelable {
     }
 }
 
-class RequestPermissionsContext: Parcelable {
+class RequestPermissionsContext : Parcelable {
     private val permissions: Array<out RequestPermissionInfo>
     val count: Int
         get() = permissions.size
@@ -187,7 +189,7 @@ class RequestPermissionsContext: Parcelable {
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeInt(permissions.size)
 
-        for(perm in permissions) {
+        for (perm in permissions) {
             perm.writeToParcel(dest, 0)
         }
     }
@@ -196,7 +198,7 @@ class RequestPermissionsContext: Parcelable {
 
     companion object {
         @JvmField
-        val CREATOR = object: Parcelable.Creator<RequestPermissionsContext> {
+        val CREATOR = object : Parcelable.Creator<RequestPermissionsContext> {
             override fun createFromParcel(source: Parcel) = RequestPermissionsContext(source)
             override fun newArray(size: Int) = arrayOfNulls<RequestPermissionsContext>(size)
         }
@@ -208,6 +210,7 @@ class RequestPermissionsContextBuilder {
         fun anyOf(vararg permissions: String): ModePermissionArray {
             return ModePermissionArray.anyOfArray(permissions)
         }
+
         fun everyOf(vararg permissions: String): ModePermissionArray {
             return ModePermissionArray.everyOfArray(permissions)
         }

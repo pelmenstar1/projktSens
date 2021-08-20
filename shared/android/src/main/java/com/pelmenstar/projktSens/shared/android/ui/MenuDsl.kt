@@ -2,8 +2,6 @@
 
 package com.pelmenstar.projktSens.shared.android.ui
 
-import android.content.Context
-import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.view.Menu
 import android.view.MenuItem
@@ -16,28 +14,30 @@ class MenuBuilder(private val menu: Menu) {
         @StringRes titleRes: Int,
         showsAsAction: Int,
         @DrawableRes iconRes: Int = 0,
-        onClick: MenuItem.OnMenuItemClickListener) {
+        onClick: MenuItem.OnMenuItemClickListener
+    ) {
         menu.add(0, id, 0, titleRes).apply {
             setOnMenuItemClickListener(onClick)
             setShowAsAction(showsAsAction)
 
-            if(iconRes != 0) {
+            if (iconRes != 0) {
                 setIcon(iconRes)
             }
         }
     }
 
     fun item(
-            id: Int = 0,
-            title: CharSequence,
-            showsAsAction: Int,
-            icon: Drawable? = null,
-            onClick: MenuItem.OnMenuItemClickListener) {
+        id: Int = 0,
+        title: CharSequence,
+        showsAsAction: Int,
+        icon: Drawable? = null,
+        onClick: MenuItem.OnMenuItemClickListener
+    ) {
         menu.add(0, id, 0, title).apply {
             setOnMenuItemClickListener(onClick)
             setShowAsAction(showsAsAction)
 
-            if(icon != null) {
+            if (icon != null) {
                 setIcon(icon)
             }
         }

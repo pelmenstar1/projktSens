@@ -12,7 +12,7 @@ suspend fun WeatherRepository.debugGenDb(startDate: Int, hours: Int) {
 
     repeat(hours) {
         put(WeatherInfo.random(random, current))
-        current =  ShortDateTime.plusSeconds(current, TimeConstants.SECONDS_IN_HOUR.toLong())
+        current = ShortDateTime.plusSeconds(current, TimeConstants.SECONDS_IN_HOUR.toLong())
     }
 
 }

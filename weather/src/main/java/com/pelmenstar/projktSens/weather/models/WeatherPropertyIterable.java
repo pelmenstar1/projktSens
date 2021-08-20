@@ -9,8 +9,11 @@ public interface WeatherPropertyIterable {
 
     @ShortDateTimeLong
     long getDateTime();
+
     float getTemperature();
+
     float getHumidity();
+
     float getPressure();
 
     boolean moveNext();

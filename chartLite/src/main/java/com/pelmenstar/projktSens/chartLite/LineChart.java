@@ -38,32 +38,23 @@ public class LineChart extends ViewGroup {
     private static final int FLAG_OFFSETS_CALCULATED = 1 << 11;
     private static final int FLAG_FIRST_RENDER = 1 << 12;
     private static final int AUTO_ANIMATE_COND = FLAG_AUTO_ANIMATED | FLAG_FIRST_RENDER;
-
+    @NotNull
+    protected final DataRef dataRef;
+    protected final ChartTouchListener chartTouchListener;
+    @NotNull
+    protected final LineChartRenderer renderer;
+    protected final ViewPortHandler viewPortHandler;
+    protected final XAxis xAxis;
+    protected final YAxis yAxis;
+    protected final XAxisRenderer xAxisRenderer;
+    protected final YAxisRenderer yAxisRenderer;
+    protected final SimpleChartAnimator animator;
     protected int flags =
             FLAG_TOUCH_ENABLED |
                     FLAG_DRAG_X_ENABLED | FLAG_DRAG_Y_ENABLED |
                     FLAG_SCALE_X_ENABLED | FLAG_SCALE_Y_ENABLED |
                     FLAG_CLIP_DATA_TO_CONTENT | FLAG_DRAG_DECELERATION_ENABLED | FLAG_FIRST_RENDER;
-
-    @NotNull
-    protected final DataRef dataRef;
-
-    protected final ChartTouchListener chartTouchListener;
-
-    @NotNull
-    protected final LineChartRenderer renderer;
-
-    protected final ViewPortHandler viewPortHandler;
-
     protected float minOffset = 15f;
-
-    protected final XAxis xAxis;
-    protected final YAxis yAxis;
-
-    protected final XAxisRenderer xAxisRenderer;
-    protected final YAxisRenderer yAxisRenderer;
-
-    protected final SimpleChartAnimator animator;
 
     public LineChart(@NotNull Context context) {
         this(context, null, 0, 0);
@@ -127,6 +118,14 @@ public class LineChart extends ViewGroup {
     }
 
     /**
+     * Gets structured data of chart, can be null
+     */
+    @Nullable
+    public ChartData getData() {
+        return dataRef.value;
+    }
+
+    /**
      * Sets structured data for chart
      */
     public void setData(@Nullable ChartData data) {
@@ -135,14 +134,6 @@ public class LineChart extends ViewGroup {
 
         // let the chart know there is new data
         notifyDataChanged();
-    }
-
-    /**
-     * Gets structured data of chart, can be null
-     */
-    @Nullable
-    public ChartData getData() {
-        return dataRef.value;
     }
 
     /**
@@ -276,7 +267,7 @@ public class LineChart extends ViewGroup {
         yAxisRenderer.draw(c);
         renderer.draw(c);
 
-        if((flags & AUTO_ANIMATE_COND) == AUTO_ANIMATE_COND) {
+        if ((flags & AUTO_ANIMATE_COND) == AUTO_ANIMATE_COND) {
             flags &= ~FLAG_FIRST_RENDER;
             animateX(1000);
         }
@@ -391,6 +382,7 @@ public class LineChart extends ViewGroup {
 
     /**
      * Sets scale minimum for each axis
+     *
      * @param scaleX min scale of x-axis
      * @param scaleY max scale of y-axis
      */
@@ -400,37 +392,37 @@ public class LineChart extends ViewGroup {
     }
 
     /**
-     * Sets state of allowing dragging of chart
-     */
-    public void setDragEnabled(boolean enabled) {
-        if(enabled) {
-            flags |= (FLAG_DRAG_X_ENABLED | FLAG_DRAG_Y_ENABLED);
-        } else {
-            flags &= ~(FLAG_DRAG_X_ENABLED | FLAG_DRAG_Y_ENABLED);
-        }
-    }
-
-    /**
      * Determines whether dragging enabled
      */
     public boolean isDragEnabled() {
         return (flags & (FLAG_DRAG_X_ENABLED | FLAG_DRAG_Y_ENABLED)) != 0;
     }
 
-    public void setDragXEnabled(boolean enabled) {
-        setFlag(FLAG_DRAG_X_ENABLED, enabled);
+    /**
+     * Sets state of allowing dragging of chart
+     */
+    public void setDragEnabled(boolean enabled) {
+        if (enabled) {
+            flags |= (FLAG_DRAG_X_ENABLED | FLAG_DRAG_Y_ENABLED);
+        } else {
+            flags &= ~(FLAG_DRAG_X_ENABLED | FLAG_DRAG_Y_ENABLED);
+        }
     }
 
     public boolean isDragXEnabled() {
         return isFlagEnabled(FLAG_DRAG_X_ENABLED);
     }
 
-    public void setDragYEnabled(boolean enabled) {
-        setFlag(FLAG_DRAG_Y_ENABLED, enabled);
+    public void setDragXEnabled(boolean enabled) {
+        setFlag(FLAG_DRAG_X_ENABLED, enabled);
     }
 
     public boolean isDragYEnabled() {
         return isFlagEnabled(FLAG_DRAG_Y_ENABLED);
+    }
+
+    public void setDragYEnabled(boolean enabled) {
+        setFlag(FLAG_DRAG_Y_ENABLED, enabled);
     }
 
     public boolean isScaleEnabled() {
@@ -438,27 +430,27 @@ public class LineChart extends ViewGroup {
     }
 
     public void setScaleEnabled(boolean enabled) {
-        if(enabled) {
+        if (enabled) {
             flags |= (FLAG_SCALE_X_ENABLED | FLAG_SCALE_Y_ENABLED);
         } else {
             flags &= ~(FLAG_SCALE_X_ENABLED | FLAG_SCALE_Y_ENABLED);
         }
     }
 
-    public void setScaleXEnabled(boolean enabled) {
-        setFlag(FLAG_SCALE_X_ENABLED, enabled);
-    }
-
-    public void setScaleYEnabled(boolean enabled) {
-        setFlag(FLAG_SCALE_Y_ENABLED, enabled);
-    }
-
     public boolean isScaleXEnabled() {
         return isFlagEnabled(FLAG_SCALE_X_ENABLED);
     }
 
+    public void setScaleXEnabled(boolean enabled) {
+        setFlag(FLAG_SCALE_X_ENABLED, enabled);
+    }
+
     public boolean isScaleYEnabled() {
         return isFlagEnabled(FLAG_SCALE_Y_ENABLED);
+    }
+
+    public void setScaleYEnabled(boolean enabled) {
+        setFlag(FLAG_SCALE_Y_ENABLED, enabled);
     }
 
     public void setClipValuesToContent(boolean enabled) {

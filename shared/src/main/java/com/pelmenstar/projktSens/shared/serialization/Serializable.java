@@ -1,4 +1,4 @@
- package com.pelmenstar.projktSens.shared.serialization;
+package com.pelmenstar.projktSens.shared.serialization;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
- /**
+/**
  * Helper class that simplify work with classes that can be serialized
  */
 public final class Serializable {
@@ -14,7 +14,8 @@ public final class Serializable {
 
     private static final HashMap<Class<?>, ObjectSerializer<?>> cachedSerializers = new HashMap<>();
 
-    private Serializable() {}
+    private Serializable() {
+    }
 
     static {
         // common serializers
@@ -26,14 +27,14 @@ public final class Serializable {
      * Gets a serializer for specified {@link Class}. Requirements for class is described in {@link ObjectSerializer}
      *
      * @throws SerializerContractException if given class doesn't meet requirements described in {@link ObjectSerializer}
-     * @throws NullPointerException if specified class is null
+     * @throws NullPointerException        if specified class is null
      */
     @NotNull
-    public static<T> ObjectSerializer<T> getSerializer(@NotNull Class<T> c) {
+    public static <T> ObjectSerializer<T> getSerializer(@NotNull Class<T> c) {
         //noinspection unchecked
-        ObjectSerializer<T> s = (ObjectSerializer<T>)cachedSerializers.get(c);
+        ObjectSerializer<T> s = (ObjectSerializer<T>) cachedSerializers.get(c);
 
-        if(s == null) {
+        if (s == null) {
             s = getSerializerReflection(c);
 
             cachedSerializers.put(c, s);
@@ -51,14 +52,14 @@ public final class Serializable {
      *
      * @throws NullPointerException if either given class or serializer is null
      */
-    public static<T> void registerSerializer(@NotNull Class<T> c, @NotNull ObjectSerializer<T> serializer) {
-        if(!cachedSerializers.containsKey(c)) {
+    public static <T> void registerSerializer(@NotNull Class<T> c, @NotNull ObjectSerializer<T> serializer) {
+        if (!cachedSerializers.containsKey(c)) {
             cachedSerializers.put(c, serializer);
         }
     }
 
     @NotNull
-    private static<T> ObjectSerializer<T> getSerializerReflection(@NotNull Class<T> c) throws SerializerContractException {
+    private static <T> ObjectSerializer<T> getSerializerReflection(@NotNull Class<T> c) throws SerializerContractException {
         Field serializerField;
 
         try {
@@ -70,7 +71,7 @@ public final class Serializable {
         serializerField.setAccessible(true);
 
         int mods = serializerField.getModifiers();
-        if((mods & REQUIRED_SERIALIZER_MODS) != REQUIRED_SERIALIZER_MODS) {
+        if ((mods & REQUIRED_SERIALIZER_MODS) != REQUIRED_SERIALIZER_MODS) {
             throw SerializerContractException.illegalModifiers(mods);
         }
 
@@ -82,14 +83,14 @@ public final class Serializable {
             throw new RuntimeException("Static constructor of" + c.toString() + " throws an exception", e);
         }
 
-        if(serializerRawValue == null) {
+        if (serializerRawValue == null) {
             throw SerializerContractException.serializerIsNull(c);
         }
 
         try {
             // if serializerRawValue is not instance of ObjectSerializer, ClassCastException will be caught
             //noinspection unchecked
-            return (ObjectSerializer<T>)serializerRawValue;
+            return (ObjectSerializer<T>) serializerRawValue;
         } catch (ClassCastException e) {
             throw SerializerContractException.serializerDoesntExtendObjectSerializer(c);
         }
@@ -98,21 +99,23 @@ public final class Serializable {
 
     /**
      * Deserializes raw data to object of type {@link <T>}
+     *
      * @param data some valid raw data
-     * @param c {@linkplain Class<T>}
+     * @param c    {@linkplain Class<T>}
      */
     @NotNull
-    public static<T> T ofByteArray(@NotNull byte[] data, @NotNull Class<T> c) {
+    public static <T> T ofByteArray(byte @NotNull [] data, @NotNull Class<T> c) {
         return ofByteArray(data, getSerializer(c));
     }
 
     /**
      * Deserializes raw data to object of type {@link <T>}
-     * @param data some valid raw data
+     *
+     * @param data       some valid raw data
      * @param serializer serializer that will be used to parse data
      */
     @NotNull
-    public static<T> T ofByteArray(byte @NotNull [] data, @NotNull ObjectSerializer<T> serializer) {
+    public static <T> T ofByteArray(byte @NotNull [] data, @NotNull ObjectSerializer<T> serializer) {
         ValueReader reader = new ValueReader(data);
 
         return serializer.readObject(reader);
@@ -120,19 +123,21 @@ public final class Serializable {
 
     /**
      * Converts specified object to raw byte data
+     *
      * @param obj some object
-     * @param c class of specified object
+     * @param c   class of specified object
      */
-    public static<T> byte @NotNull [] toByteArray(@NotNull T obj, @NotNull Class<T> c) {
+    public static <T> byte @NotNull [] toByteArray(@NotNull T obj, @NotNull Class<T> c) {
         return toByteArray(obj, getSerializer(c));
     }
 
     /**
      * Converts specified object to raw byte data
-     * @param obj some object
+     *
+     * @param obj        some object
      * @param serializer serializer that will be used to serialize given value
      */
-    public static<T> byte @NotNull [] toByteArray(@NotNull T obj, @NotNull ObjectSerializer<T> serializer) {
+    public static <T> byte @NotNull [] toByteArray(@NotNull T obj, @NotNull ObjectSerializer<T> serializer) {
         byte[] buffer = new byte[serializer.getSerializedObjectSize(obj)];
         ValueWriter writer = new ValueWriter(buffer);
 

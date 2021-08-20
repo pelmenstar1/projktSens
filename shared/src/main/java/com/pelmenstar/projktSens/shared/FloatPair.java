@@ -9,7 +9,7 @@ public final class FloatPair {
      * - 64..32 bits | second <br/>
      * - 32..0 bits | first <br/>
      *
-     * @param first first float
+     * @param first  first float
      * @param second second float
      */
     public static long of(float first, float second) {

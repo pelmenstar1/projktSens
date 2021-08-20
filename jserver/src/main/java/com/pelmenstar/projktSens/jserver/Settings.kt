@@ -86,7 +86,7 @@ class ServerPortSetting : Setting<ServerPortSetting.State>() {
                     val state = state
 
                     val port = StringUtils.parsePositiveInt(text)
-                    if(port != -1) {
+                    if (port != -1) {
                         state.port = port
 
                         setErrorIfInvalidPort(port)
@@ -241,7 +241,7 @@ class WeatherSendIntervalSetting : Setting<WeatherSendIntervalSetting.State>() {
                     val state = state
 
                     val interval = StringUtils.parsePositiveInt(text)
-                    if(interval != -1) {
+                    if (interval != -1) {
                         state.interval = interval
 
                         if (interval <= 0) {

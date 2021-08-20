@@ -29,7 +29,7 @@ public final class PrefixTextView extends MaterialTextView {
     private StringBuilder valueSb;
 
     public PrefixTextView(@NotNull Context context) {
-        this(context, null,  android.R.attr.textViewStyle, 0);
+        this(context, null, android.R.attr.textViewStyle, 0);
     }
 
     public PrefixTextView(@NotNull Context context, @Nullable AttributeSet attrs) {
@@ -43,7 +43,7 @@ public final class PrefixTextView extends MaterialTextView {
     public PrefixTextView(@NotNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr, @StyleRes int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        if(attrs != null) {
+        if (attrs != null) {
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PrefixTextView, defStyleAttr, defStyleRes);
 
             String tempPrefix = a.getString(R.styleable.PrefixTextView_prefix);
@@ -124,7 +124,7 @@ public final class PrefixTextView extends MaterialTextView {
 
         int prefixLength = prefix.length();
         int valueLength;
-        if(valueSb != null) {
+        if (valueSb != null) {
             valueLength = valueSb.length();
         } else {
             valueLength = value.length();
@@ -134,7 +134,7 @@ public final class PrefixTextView extends MaterialTextView {
         int textLength = valueBegin + valueLength;
         char[] buffer;
 
-        if(textCache.length == textLength) {
+        if (textCache.length == textLength) {
             buffer = textCache;
         } else {
             buffer = new char[textLength];
@@ -145,7 +145,7 @@ public final class PrefixTextView extends MaterialTextView {
         buffer[prefixLength] = ':';
         buffer[prefixLength + 1] = ' ';
 
-        if(valueSb != null) {
+        if (valueSb != null) {
             valueSb.getChars(0, valueLength, buffer, valueBegin);
             this.valueSb = null;
         } else {

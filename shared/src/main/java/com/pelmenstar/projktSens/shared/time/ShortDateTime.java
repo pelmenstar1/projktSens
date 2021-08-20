@@ -13,22 +13,23 @@ public final class ShortDateTime {
      */
     public static final long NONE = 0;
 
-    private ShortDateTime() {}
+    private ShortDateTime() {
+    }
 
     /**
      * Creates datetime-long using specified date-int and time
+     *
      * @param date valid date-int
      * @param time seconds of day, in range of [0; 86400)
-     *
      * @throws IllegalArgumentException if date or time are invalid
      */
     @ShortDateTimeLong
     public static long of(@ShortDateInt int date, @TimeInt int time) {
-        if(!ShortDate.isValid(date)) {
+        if (!ShortDate.isValid(date)) {
             throw new IllegalArgumentException("date");
         }
 
-        if(!ShortTime.isValid(time)) {
+        if (!ShortTime.isValid(time)) {
             throw new IllegalArgumentException("time");
         }
 
@@ -37,16 +38,16 @@ public final class ShortDateTime {
 
     /**
      * Creates datetime-long using year, month, day of month and time.
-     * @param year year, in range of [0; 9999]
-     * @param month month, in range of [1; 12]
-     * @param day day of month, in range of [1; *days in month*]
-     * @param time seconds of day, in range of [0; 86400)
      *
+     * @param year  year, in range of [0; 9999]
+     * @param month month, in range of [1; 12]
+     * @param day   day of month, in range of [1; *days in month*]
+     * @param time  seconds of day, in range of [0; 86400)
      * @throws IllegalArgumentException if year, month, day of month or time are invalid
      */
     @ShortDateTimeLong
     public static long of(int year, int month, int day, @TimeInt int time) {
-        if(!ShortTime.isValid(time)) {
+        if (!ShortTime.isValid(time)) {
             throw new IllegalArgumentException("time");
         }
 
@@ -54,18 +55,18 @@ public final class ShortDateTime {
     }
 
     private static long ofInternal(@ShortDateInt int date, @TimeInt int time) {
-        return ((long)(date & 0x7FFFFF) << 17) | ((long)time & 0x1FFFF);
+        return ((long) (date & 0x7FFFFF) << 17) | ((long) time & 0x1FFFF);
     }
 
     /**
      * Creates datetime-long from date, time is set to 0 (start of day)
-     * @param date valid date-int
      *
+     * @param date valid date-int
      * @throws IllegalArgumentException if date is invalid
      */
     @ShortDateTimeLong
     public static long startOfDay(@ShortDateInt int date) {
-        if(!ShortDate.isValid(date)) {
+        if (!ShortDate.isValid(date)) {
             throw new IllegalArgumentException("date");
         }
 
@@ -74,13 +75,13 @@ public final class ShortDateTime {
 
     /**
      * Creates datetime-long from date, time is set to 86399 (end of day)
-     * @param date valid date-int
      *
+     * @param date valid date-int
      * @throws IllegalArgumentException if date is invalid
      */
     @ShortDateTimeLong
     public static long endOfDay(@ShortDateInt int date) {
-        if(!ShortDate.isValid(date)) {
+        if (!ShortDate.isValid(date)) {
             throw new IllegalArgumentException("date");
         }
 
@@ -100,7 +101,7 @@ public final class ShortDateTime {
      */
     public static boolean isValid(@ShortDateTimeLong long dateTime) {
         // unused bits should be clear
-        if((dateTime & 0xFFFFFF0000000000L) != 0) {
+        if ((dateTime & 0xFFFFFF0000000000L) != 0) {
             return false;
         }
 
@@ -112,7 +113,7 @@ public final class ShortDateTime {
      */
     @ShortDateInt
     public static int getDate(@ShortDateTimeLong long dateTime) {
-        return (int)(dateTime >> 17);
+        return (int) (dateTime >> 17);
     }
 
     /**
@@ -120,7 +121,7 @@ public final class ShortDateTime {
      */
     @TimeInt
     public static int getTime(@ShortDateTimeLong long dateTime) {
-        return (int)dateTime & 0x1FFFF;
+        return (int) dateTime & 0x1FFFF;
     }
 
     /**
@@ -130,12 +131,12 @@ public final class ShortDateTime {
      */
     @ShortDateTimeLong
     public static long ofEpochSecond(@EpochSecondsLong long epochSecond) {
-        if(epochSecond < 0) {
+        if (epochSecond < 0) {
             throw new IllegalArgumentException("epochSecond");
         }
 
-        int epochDay = (int)(epochSecond / TimeConstants.SECONDS_IN_DAY);
-        int secsOfDay = (int)(epochSecond - epochDay * TimeConstants.SECONDS_IN_DAY);
+        int epochDay = (int) (epochSecond / TimeConstants.SECONDS_IN_DAY);
+        int secsOfDay = (int) (epochSecond - epochDay * TimeConstants.SECONDS_IN_DAY);
 
         return ofInternal(ShortDate.ofEpochDay(epochDay), secsOfDay);
     }
@@ -144,7 +145,7 @@ public final class ShortDateTime {
      * Adds specified seconds to particular datetime-long and returns the last one.
      *
      * @throws IllegalArgumentException If datetime-long is invalid. Also if seconds is negative and is less than epoch seconds
-     * of datetime-long. It can happen in very rare cases, so that is not reason to worry about.
+     *                                  of datetime-long. It can happen in very rare cases, so that is not reason to worry about.
      */
     @ShortDateTimeLong
     public static long plusSeconds(@ShortDateTimeLong long dateTime, long seconds) {
@@ -160,22 +161,22 @@ public final class ShortDateTime {
     public static long toEpochSecond(@ShortDateTimeLong long dateTime) {
         int time = getTime(dateTime);
         // validate only time because date will be checked in ShortDate.toEpochDay
-        if(!ShortTime.isValid(time)) {
+        if (!ShortTime.isValid(time)) {
             throw new IllegalArgumentException("dateTime");
         }
 
-        return (long)ShortDate.toEpochDay(getDate(dateTime)) * TimeConstants.SECONDS_IN_DAY + time;
+        return (long) ShortDate.toEpochDay(getDate(dateTime)) * TimeConstants.SECONDS_IN_DAY + time;
     }
 
     @EpochSecondsLong
     public static long startOfDayToEpochSecond(@ShortDateInt int date) {
-        return (long)ShortDate.toEpochDay(date) * TimeConstants.SECONDS_IN_DAY;
+        return (long) ShortDate.toEpochDay(date) * TimeConstants.SECONDS_IN_DAY;
     }
 
     @EpochSecondsLong
     public static long endOfDayToEpochSecond(@ShortDateInt int date) {
         final int endOfDay = TimeConstants.SECONDS_IN_DAY - 1;
-        return (long)ShortDate.toEpochDay(date) * TimeConstants.SECONDS_IN_DAY + endOfDay;
+        return (long) ShortDate.toEpochDay(date) * TimeConstants.SECONDS_IN_DAY + endOfDay;
     }
 
 
@@ -208,11 +209,11 @@ public final class ShortDateTime {
     /**
      * Writes datetime-long to specified char buffer starting from particular offset
      *
-     * @throws IllegalArgumentException if datetime-long isn't valid
+     * @throws IllegalArgumentException  if datetime-long isn't valid
      * @throws IndexOutOfBoundsException if offset is less than 0 or greater than {@code buffer.length - 20}.
      */
     public static void writeToString(@ShortDateTimeLong long dateTime, char @NotNull [] buffer, int offset) {
-        if(!isValid(dateTime)) {
+        if (!isValid(dateTime)) {
             throw new IllegalArgumentException("dateTime");
         }
 
@@ -227,7 +228,7 @@ public final class ShortDateTime {
      * @throws IllegalArgumentException if datetime-long is invalid
      */
     public static void append(@ShortDateTimeLong long dateTime, @NotNull StringBuilder sb) {
-        if(!isValid(dateTime)) {
+        if (!isValid(dateTime)) {
             throw new IllegalArgumentException("dateTime");
         }
 

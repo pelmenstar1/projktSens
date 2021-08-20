@@ -14,11 +14,11 @@ public final class UnitValue {
      * - 32...0 bits # value <br/>
      */
     public static long of(float value, int unit) {
-        if(!ValueUnit.isValidUnit(unit)) {
+        if (!ValueUnit.isValidUnit(unit)) {
             throw new IllegalArgumentException("unit");
         }
 
-        return ((long)(unit & 0xff) << 32) | ((long)Float.floatToIntBits(value) & 0xffffffffL);
+        return ((long) (unit & 0xff) << 32) | ((long) Float.floatToIntBits(value) & 0xffffffffL);
     }
 
     /**
@@ -27,7 +27,7 @@ public final class UnitValue {
      * @implNote returns 64...32 bits of long
      */
     public static int getUnit(long unitValue) {
-        return (int)(unitValue >> 32) & 0xff;
+        return (int) (unitValue >> 32) & 0xff;
     }
 
     /**
@@ -36,7 +36,7 @@ public final class UnitValue {
      * @implNote returns 32...0 bits of long
      */
     public static float getAbsoluteValue(long unitValue) {
-        return Float.intBitsToFloat((int)unitValue);
+        return Float.intBitsToFloat((int) unitValue);
     }
 
     /**
@@ -55,27 +55,27 @@ public final class UnitValue {
 
     /**
      * Gets value of unit-value
-     * @param value current value
-     * @param currentUnit unit of value
-     * @param unit new unit
      *
+     * @param value       current value
+     * @param currentUnit unit of value
+     * @param unit        new unit
      * @throws IllegalArgumentException if currentUnit or unit are invalid
      */
     public static float getValue(float value, int currentUnit, int unit) {
-        if(ValueUnit.isTemperatureUnit(currentUnit)) {
-            if(!ValueUnit.isTemperatureUnit(unit)) {
+        if (ValueUnit.isTemperatureUnit(currentUnit)) {
+            if (!ValueUnit.isTemperatureUnit(unit)) {
                 throw new IllegalArgumentException("unit");
             }
 
             return fromCelsius(toCelsius(value, currentUnit), unit);
-        } else if(ValueUnit.isPressureUnit(currentUnit)) {
-            if(!ValueUnit.isPressureUnit(unit)) {
+        } else if (ValueUnit.isPressureUnit(currentUnit)) {
+            if (!ValueUnit.isPressureUnit(unit)) {
                 throw new IllegalArgumentException("unit");
             }
 
             return fromMmOfMercury(toMmOfMercury(value, currentUnit), unit);
         } else {
-            if(!(unit == ValueUnit.HUMIDITY && currentUnit == ValueUnit.HUMIDITY)) {
+            if (!(unit == ValueUnit.HUMIDITY && currentUnit == ValueUnit.HUMIDITY)) {
                 throw new IllegalArgumentException("unit");
             }
 
@@ -85,9 +85,9 @@ public final class UnitValue {
 
     /**
      * Gets value from unit-value converted to newUnit
-     * @param unitValue unit-value
-     * @param newUnit unit of returned value
      *
+     * @param unitValue unit-value
+     * @param newUnit   unit of returned value
      * @throws IllegalArgumentException if newUnit or unit-value are invalid
      */
     public static float getValue(long unitValue, int newUnit) {
@@ -96,8 +96,9 @@ public final class UnitValue {
 
     /**
      * Returns unit-value with newUnit
+     *
      * @param unitValue current unit-value
-     * @param newUnit new unit of new unit-value
+     * @param newUnit   new unit of new unit-value
      */
     public static long withUnit(long unitValue, int newUnit) {
         return of(getValue(unitValue, newUnit), newUnit);
@@ -115,55 +116,77 @@ public final class UnitValue {
 
     /**
      * Returns whether value is valid
+     *
      * @param value some value
-     * @param unit unit of value
+     * @param unit  unit of value
      */
     public static boolean isValid(float value, int unit) {
         switch (unit) {
-            case ValueUnit.CELSIUS: return value >= -100 && value <= 100;
-            case ValueUnit.FAHRENHEIT: return value >= -148 && value <= 212;
-            case ValueUnit.KELVIN: return value >= 173 && value <= 373;
+            case ValueUnit.CELSIUS:
+                return value >= -100 && value <= 100;
+            case ValueUnit.FAHRENHEIT:
+                return value >= -148 && value <= 212;
+            case ValueUnit.KELVIN:
+                return value >= 173 && value <= 373;
 
-            case ValueUnit.HUMIDITY: return value >= 0 && value <= 100;
+            case ValueUnit.HUMIDITY:
+                return value >= 0 && value <= 100;
 
-            case ValueUnit.MM_OF_MERCURY: return value >= 0 && value <= 1000;
-            case ValueUnit.PASCAL: return value >= 0 && value <= 133322;
+            case ValueUnit.MM_OF_MERCURY:
+                return value >= 0 && value <= 1000;
+            case ValueUnit.PASCAL:
+                return value >= 0 && value <= 133322;
 
-            default: return false;
+            default:
+                return false;
         }
     }
 
     private static float toCelsius(float value, int unit) {
         switch (unit) {
-            case ValueUnit.CELSIUS: return value;
-            case ValueUnit.KELVIN: return value - 273;
-            case ValueUnit.FAHRENHEIT: return (value - 32f) * 1.8f;
-            default: throw new IllegalArgumentException("unit");
+            case ValueUnit.CELSIUS:
+                return value;
+            case ValueUnit.KELVIN:
+                return value - 273;
+            case ValueUnit.FAHRENHEIT:
+                return (value - 32f) * 1.8f;
+            default:
+                throw new IllegalArgumentException("unit");
         }
     }
 
     private static float fromCelsius(float c, int unit) {
         switch (unit) {
-            case ValueUnit.CELSIUS: return c;
-            case ValueUnit.KELVIN: return c + 273f;
-            case ValueUnit.FAHRENHEIT: return (c / 1.8f) + 32;
-            default: throw new IllegalArgumentException("unit");
+            case ValueUnit.CELSIUS:
+                return c;
+            case ValueUnit.KELVIN:
+                return c + 273f;
+            case ValueUnit.FAHRENHEIT:
+                return (c / 1.8f) + 32;
+            default:
+                throw new IllegalArgumentException("unit");
         }
     }
 
     private static float toMmOfMercury(float value, int unit) {
         switch (unit) {
-            case ValueUnit.MM_OF_MERCURY: return value;
-            case ValueUnit.PASCAL: return value / 133;
-            default: throw new IllegalArgumentException("unit");
+            case ValueUnit.MM_OF_MERCURY:
+                return value;
+            case ValueUnit.PASCAL:
+                return value / 133;
+            default:
+                throw new IllegalArgumentException("unit");
         }
     }
 
     private static float fromMmOfMercury(float value, int unit) {
         switch (unit) {
-            case ValueUnit.MM_OF_MERCURY: return value;
-            case ValueUnit.PASCAL: return value * 133;
-            default: throw new IllegalArgumentException("unit");
+            case ValueUnit.MM_OF_MERCURY:
+                return value;
+            case ValueUnit.PASCAL:
+                return value * 133;
+            default:
+                throw new IllegalArgumentException("unit");
         }
     }
 
@@ -177,8 +200,9 @@ public final class UnitValue {
 
     /**
      * Appends string representation of unit-value to {@link StringBuilder}
+     *
      * @param unitValue unit-value to append
-     * @param sb {@link StringBuilder} to append string representation
+     * @param sb        {@link StringBuilder} to append string representation
      */
     public static void appendString(long unitValue, @NotNull StringBuilder sb) {
         sb.append("{value=");

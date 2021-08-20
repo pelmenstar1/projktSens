@@ -15,18 +15,15 @@ public final class ViewPortHandler {
     private final Matrix invCvtMatrix = new Matrix();
 
     private final RectF content = new RectF();
-
+    private final float[] matrixBuffer = new float[9];
     private float chartWidth = 0f;
     private float chartHeight = 0f;
     private float minScaleY = 1f;
     private float maxScaleY = Float.MAX_VALUE;
-
     private float minScaleX = 1f;
     private float maxScaleX = Float.MAX_VALUE;
-
     private float scaleX = 1f;
     private float scaleY = 1f;
-
     private float transX = 0f;
     private float transY = 0f;
 
@@ -117,8 +114,6 @@ public final class ViewPortHandler {
         limitMatrixValues();
         newMatrix.set(matrixTouch);
     }
-
-    private final float[] matrixBuffer = new float[9];
 
     private void limitMatrixValues() {
         matrixTouch.getValues(matrixBuffer);

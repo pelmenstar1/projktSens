@@ -10,9 +10,10 @@ import org.jetbrains.annotations.NotNull;
 public final class TextUtils {
     private static final Rect textBoundsCache = new Rect();
 
-    private TextUtils() {}
+    private TextUtils() {
+    }
 
-    public static long getTextSize(@NotNull char[] text, @NotNull Paint paint) {
+    public static long getTextSize(char @NotNull [] text, @NotNull Paint paint) {
         Rect bounds = textBoundsCache;
 
         paint.getTextBounds(text, 0, text.length, bounds);

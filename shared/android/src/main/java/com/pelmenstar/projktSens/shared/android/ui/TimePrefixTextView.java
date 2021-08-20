@@ -43,15 +43,15 @@ public final class TimePrefixTextView extends MaterialTextView {
     public TimePrefixTextView(@NotNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr, @StyleRes int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        if(attrs != null) {
+        if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TimePrefixTextView, defStyleAttr, defStyleRes);
             String prefix = a.getString(R.styleable.TimePrefixTextView_prefix);
-            if(prefix != null) {
+            if (prefix != null) {
                 setPrefix(prefix);
             }
 
             int time = a.getInt(R.styleable.TimePrefixTextView_time, 0);
-            if(!ShortTime.isValid(time)) {
+            if (!ShortTime.isValid(time)) {
                 throw new IllegalStateException("Invalid attributes");
             }
 
@@ -74,7 +74,7 @@ public final class TimePrefixTextView extends MaterialTextView {
      */
     public void setPrefix(@NotNull String prefix) {
         String oldPrefix = this.prefix;
-        if(oldPrefix.length() != prefix.length()) {
+        if (oldPrefix.length() != prefix.length()) {
             textCache = new char[prefix.length() + 10];
             char[] text = textCache;
 
@@ -103,18 +103,18 @@ public final class TimePrefixTextView extends MaterialTextView {
      * @throws IllegalArgumentException if {@code time} is invalid ({@code time < 0 || time >= TimeConstants.SECONDS_IN_DAY})
      */
     public void setTime(@TimeInt int time) {
-        if(this.time == time) {
+        if (this.time == time) {
             return;
         }
 
-        if(!ShortTime.isValid(time)) {
+        if (!ShortTime.isValid(time)) {
             throw new IllegalArgumentException("time");
         }
 
         setTimeInternal(time);
     }
 
-    private void setTimeInternal(@TimeInt int time)  {
+    private void setTimeInternal(@TimeInt int time) {
         this.time = time;
 
         char[] text = textCache;

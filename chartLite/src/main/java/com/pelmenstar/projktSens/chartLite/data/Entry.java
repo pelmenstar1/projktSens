@@ -8,7 +8,8 @@ import org.jetbrains.annotations.NotNull;
  * Responsible for packing X and Y coordinate to long and obtaining it back
  */
 public final class Entry {
-    private Entry() {}
+    private Entry() {
+    }
 
     /**
      * Packs given x and y value to long.

@@ -3,14 +3,12 @@ package com.pelmenstar.projktSens.serverProtocol
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.google.gson.JsonPrimitive
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
-import com.pelmenstar.projktSens.shared.*
-import java.io.*
-import kotlin.coroutines.suspendCoroutine
+import com.pelmenstar.projktSens.shared.readString
+import com.pelmenstar.projktSens.shared.writeString
+import java.io.InputStream
+import java.io.OutputStream
 
-object JsonContract: Contract {
+object JsonContract : Contract {
     private const val BUFFER_SIZE = 1024
     private val gson = Gson()
 
@@ -22,7 +20,7 @@ object JsonContract: Contract {
             append(Commands.toString(request.command))
             append('"')
 
-            if(arg != null) {
+            if (arg != null) {
                 append(",argClass=\"")
                 append(arg.javaClass.name)
                 append("\",arg=")
@@ -42,7 +40,7 @@ object JsonContract: Contract {
             val commandName = root.get("command").asString
             val command = Commands.fromString(commandName)
 
-            return if(root.has("argClass") && root.has("arg")) {
+            return if (root.has("argClass") && root.has("arg")) {
                 val argClassString = root.get("argClass").asString
                 val argClass = Class.forName(argClassString)
                 val argElement = root.get("arg")
@@ -58,7 +56,7 @@ object JsonContract: Contract {
     }
 
     override suspend fun writeResponse(response: Response, output: OutputStream) {
-        val json = when(response) {
+        val json = when (response) {
             Response.Empty -> "{}"
             is Response.Error -> "{error=${Errors.toString(response.error)}}"
             is Response.Ok<*> -> gson.toJson(response.value)
@@ -75,7 +73,7 @@ object JsonContract: Contract {
 
         try {
             val root = JsonParser.parseString(json)
-            if(root is JsonObject) {
+            if (root is JsonObject) {
                 if (root.size() == 0) {
                     return Response.Empty
                 }

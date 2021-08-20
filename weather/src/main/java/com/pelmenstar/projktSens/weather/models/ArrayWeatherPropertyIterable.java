@@ -43,7 +43,7 @@ public final class ArrayWeatherPropertyIterable implements WeatherPropertyIterab
 
     @Override
     public boolean moveNext() {
-        if(index < values.length) {
+        if (index < values.length) {
             current = values[index++];
 
             return true;

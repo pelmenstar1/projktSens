@@ -2,13 +2,9 @@ package com.pelmenstar.projktSens.shared.android.ui.settings
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
 import android.view.View
 import androidx.annotation.StringRes
-import com.pelmenstar.projktSens.shared.ReflectionUtils
 import com.pelmenstar.projktSens.shared.android.Preferences
-import com.pelmenstar.projktSens.shared.android.readNonNullString
 
 /**
  * Describes the required information to create setting, save and load state of it.
@@ -39,7 +35,7 @@ abstract class Setting<TState : Any> {
                 val oldValue = field
                 field = value
 
-                if(value != oldValue) {
+                if (value != oldValue) {
                     onValidChanged?.onChanged(value)
                 }
             }

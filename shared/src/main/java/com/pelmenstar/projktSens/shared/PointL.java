@@ -6,6 +6,7 @@ package com.pelmenstar.projktSens.shared;
 public final class PointL {
     /**
      * Creates 2D point
+     *
      * @param x x-axis value
      * @param y y-axis value
      */
@@ -25,13 +26,5 @@ public final class PointL {
      */
     public static float getY(long p) {
         return FloatPair.getSecond(p);
-    }
-
-    public static long withX(long p, float x) {
-        return FloatPair.withFirst(p, x);
-    }
-
-    public static long withY(long p, float y) {
-        return FloatPair.withSecond(p, y);
     }
 }

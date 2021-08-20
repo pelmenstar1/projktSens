@@ -99,7 +99,7 @@ class Logger(val area: String, val config: LoggerConfig) {
      * Prints message with specified [LogLevel]. Message is created through [messageBuilder]
      */
     inline fun log(level: Int, messageBuilder: StringBuilder.() -> Unit) {
-        if(level >= config.minLogLevel) {
+        if (level >= config.minLogLevel) {
             val message = buildString(6 + area.length) {
                 appendFinalMessageHeader(level)
                 messageBuilder()

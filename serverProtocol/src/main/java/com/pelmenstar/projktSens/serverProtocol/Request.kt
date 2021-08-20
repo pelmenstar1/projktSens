@@ -15,7 +15,7 @@ class Request(val command: Int, val argument: Any? = null) : AppendableToStringB
 
     override fun hashCode(): Int {
         var result = command
-        if(argument != null) {
+        if (argument != null) {
             result = 31 * result + argument.hashCode()
         }
 

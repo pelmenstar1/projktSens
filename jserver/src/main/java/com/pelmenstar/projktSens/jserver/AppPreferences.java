@@ -50,7 +50,7 @@ public final class AppPreferences extends AbstractPreferencesThroughShared imple
         int serverContract = prefs.getInt(KEY_SERVER_CONTRACT, -1);
         int weatherSendInterval = prefs.getInt(KEY_WEATHER_SEND_INTERVAL, -1);
 
-        if((serverPort | serverContract | weatherSendInterval) < 0) {
+        if ((serverPort | serverContract | weatherSendInterval) < 0) {
             writeDefault();
         }
     }
@@ -117,7 +117,7 @@ public final class AppPreferences extends AbstractPreferencesThroughShared imple
     }
 
     public void setServerContract(int contractType) {
-        if(!ContractType.isValid(contractType)) {
+        if (!ContractType.isValid(contractType)) {
             throw new IllegalArgumentException("contractType");
         }
 

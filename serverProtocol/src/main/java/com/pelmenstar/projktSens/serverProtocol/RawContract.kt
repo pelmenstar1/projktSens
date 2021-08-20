@@ -12,7 +12,7 @@ import java.io.OutputStream
 /**
  * Writes and reads [Request], [Response] in raw non-human readable compact binary form.
  */
-object RawContract: Contract {
+object RawContract : Contract {
     internal const val RESPONSE_BUFFER_SIZE = 1024
     private const val STATUS_EMPTY: Byte = 0
     private const val STATUS_ERROR: Byte = 1
@@ -75,7 +75,7 @@ object RawContract: Contract {
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun writeResponse(response: Response, output: OutputStream) {
-        when(response) {
+        when (response) {
             Response.Empty -> {
                 output.writeSuspend(RESPONSE_STATE_EMPTY_BUFFER)
             }
@@ -89,13 +89,15 @@ object RawContract: Contract {
 
             is Response.Ok<*> -> {
                 val value = response.value
-                val serializer = Serializable.getSerializer(value.javaClass) as ObjectSerializer<Any>
+                val serializer =
+                    Serializable.getSerializer(value.javaClass) as ObjectSerializer<Any>
                 val objectSize = serializer.getSerializedObjectSize(response.value)
 
                 output.writeSuspend(buildByteArray(objectSize + 3) {
                     this[0] = STATUS_OK
                     writeShort(1, objectSize.toShort())
-                    serializer.writeObject(value,
+                    serializer.writeObject(
+                        value,
                         ValueWriter(
                             this,
                             3
@@ -106,10 +108,13 @@ object RawContract: Contract {
         }
     }
 
-    override suspend fun <T:Any> readResponse(input: InputStream, valueClass: Class<T>): Response {
+    override suspend fun <T : Any> readResponse(
+        input: InputStream,
+        valueClass: Class<T>
+    ): Response {
         val stateBuffer = input.readNSuspend(1)
 
-        return when(val state = stateBuffer[0]) {
+        return when (val state = stateBuffer[0]) {
             STATUS_EMPTY -> Response.Empty
             STATUS_ERROR -> {
                 val errorBuffer = input.readNSuspend(4)

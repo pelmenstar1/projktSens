@@ -1,4 +1,3 @@
-
 package com.pelmenstar.projktSens.chartLite.data;
 
 import org.jetbrains.annotations.NotNull;
@@ -6,21 +5,19 @@ import org.jetbrains.annotations.Nullable;
 
 public final class ChartData {
     private static final DataSet[] EMPTY_DS = new DataSet[0];
-
+    @NotNull
+    private final DataSet[] dataSets;
     private float yMax = Float.MIN_VALUE;
     private float yMin = Float.MAX_VALUE;
     private float xMax = Float.MIN_VALUE;
     private float xMin = Float.MAX_VALUE;
-
-    @NotNull
-    private final DataSet[] dataSets;
 
     public ChartData() {
         dataSets = EMPTY_DS;
     }
 
     public ChartData(@NotNull DataSet dataSet) {
-        this(new DataSet[] { dataSet });
+        this(new DataSet[]{dataSet});
     }
 
     public ChartData(@NotNull DataSet... dataSets) {
@@ -33,19 +30,19 @@ public final class ChartData {
             float dyMin = set.getYMin();
             float dyMax = set.getYMax();
 
-            if(dxMin < xMin) {
+            if (dxMin < xMin) {
                 xMin = dxMin;
             }
 
-            if(dxMax > xMax) {
+            if (dxMax > xMax) {
                 xMax = dxMax;
             }
 
-            if(dyMin < yMin) {
+            if (dyMin < yMin) {
                 yMin = dyMin;
             }
 
-            if(dyMax > yMax) {
+            if (dyMax > yMax) {
                 yMax = dyMax;
             }
         }
@@ -92,8 +89,8 @@ public final class ChartData {
     }
 
     public boolean contains(@Nullable DataSet dataSet) {
-        for(DataSet set: dataSets) {
-            if(set.equals(dataSet)) {
+        for (DataSet set : dataSets) {
+            if (set.equals(dataSet)) {
                 return true;
             }
         }
@@ -112,8 +109,8 @@ public final class ChartData {
     }
 
     public boolean isContainsAnyEntry() {
-        for(DataSet set: dataSets) {
-            if(set.count() > 0) {
+        for (DataSet set : dataSets) {
+            if (set.count() > 0) {
                 return true;
             }
         }

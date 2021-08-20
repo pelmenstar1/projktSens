@@ -11,14 +11,15 @@ public final class TimeChartFormatter implements ValueFormatter {
 
     private final char[] textCache = new char[5];
 
-    private TimeChartFormatter() {}
+    private TimeChartFormatter() {
+    }
 
     @NotNull
     @Override
     public String format(float value) {
         char[] text = textCache;
 
-        int time = (int)value;
+        int time = (int) value;
         int hour = time / 3600;
         int minute = (time - (hour * 3600)) / 60;
 

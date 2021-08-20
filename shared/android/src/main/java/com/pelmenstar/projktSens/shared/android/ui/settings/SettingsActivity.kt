@@ -10,10 +10,12 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
+import android.widget.GridLayout
 import com.pelmenstar.projktSens.shared.ReflectionUtils
-import com.pelmenstar.projktSens.shared.android.Intent
-import com.pelmenstar.projktSens.shared.android.Preferences
-import com.pelmenstar.projktSens.shared.android.R
+import com.pelmenstar.projktSens.shared.android.*
+import com.pelmenstar.projktSens.shared.android.ext.Intent
+import com.pelmenstar.projktSens.shared.android.ext.getStringArrayNotNull
+import com.pelmenstar.projktSens.shared.android.ext.getStringNotNull
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.getChars
 
@@ -44,12 +46,12 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     private fun initFromIntentExtra() {
         val intent = requireIntent()
-        val settingClassNames = intent.getStringArrayExtra(EXTRA_SETTINGS)!!
+        val settingClassNames = intent.getStringArrayNotNull(EXTRA_SETTINGS)
         settings = Array(settingClassNames.size) { i ->
             ReflectionUtils.createFromEmptyConstructor(settingClassNames[i])
         }
 
-        val prefsName = intent.getStringExtra(EXTRA_PREFERENCES)!!
+        val prefsName = intent.getStringNotNull(EXTRA_PREFERENCES)
         prefs = ReflectionUtils.createFromEmptyConstructorOrInstance<Preferences>(prefsName).also {
             it.initialize(this)
         }
@@ -57,9 +59,9 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     private fun loadStates(savedInstanceState: Bundle?) {
         settings.forEach {
-            if(savedInstanceState != null) {
+            if (savedInstanceState != null) {
                 val success = it.loadStateFromBundle(savedInstanceState)
-                if(success) {
+                if (success) {
                     return@forEach
                 }
             }
@@ -69,7 +71,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     private fun computeHashOrGetFromBundle(savedInstanceState: Bundle?) {
         val savedHash = savedInstanceState?.get(STATE_INITIAL_STATE_HASH)
-        initialStateHash = if(savedHash != null) {
+        initialStateHash = if (savedHash != null) {
             savedHash as Long
         } else {
             computeCurrentStateHash()
@@ -79,7 +81,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
     private fun computeCurrentStateHash(): Long {
         val settings = settings
         var result: Long = 1
-        for(setting in settings) {
+        for (setting in settings) {
             result = result * 31 + setting.state.hashCode()
         }
 
@@ -95,10 +97,10 @@ class SettingsActivity : HomeButtonSupportActivity() {
             // after state is loaded
             val state = it.state
 
-            if(state is Setting.IncompleteState) {
+            if (state is Setting.IncompleteState) {
                 state.onValidChanged = onValidChangedListener
                 // isValid can already be false, so update saveButton
-                if(!state.isValid) {
+                if (!state.isValid) {
                     saveButton.isEnabled = false
                 }
             }
@@ -122,13 +124,13 @@ class SettingsActivity : HomeButtonSupportActivity() {
                 columnCount = 2
                 rowCount = settings.size
 
-                val settingNameSpec = android.widget.GridLayout.spec(0, android.widget.GridLayout.START)
-                val viewSpec = android.widget.GridLayout.spec(1, android.widget.GridLayout.END)
+                val settingNameSpec = GridLayout.spec(0, GridLayout.START)
+                val viewSpec = GridLayout.spec(1, GridLayout.END)
 
-                for(i in settings.indices) {
+                for (i in settings.indices) {
                     val setting = settings[i]
 
-                    val rowSpec =  android.widget.GridLayout.spec(i)
+                    val rowSpec = GridLayout.spec(i)
                     TextView {
                         gridLayoutParams(
                             rowSpec,
@@ -173,7 +175,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
                         val recomputedHash: Long = computeCurrentStateHash()
                         val changed = recomputedHash != initialStateHash
 
-                        if(changed) {
+                        if (changed) {
                             prefs.beginModifying()
                             settings.forEach {
                                 it.saveStateToPrefs(prefs)

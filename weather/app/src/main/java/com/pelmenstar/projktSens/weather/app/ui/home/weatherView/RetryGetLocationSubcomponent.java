@@ -17,32 +17,20 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subcomponent {
-    @FunctionalInterface
-    public interface OnRetryGetLocationListener {
-        void onRetry();
-    }
-
     private static final float FAILED_GET_LOCATION_MARGIN_T_DP = 3;
     private static final float FAILED_GET_LOCATION_MARGIN_R_DP = 7;
-
     private final Drawable retryIcon;
-
-    private OnRetryGetLocationListener onRetryGetLocationListener;
-
     private final String failedGetLocationStr;
     private final Paint failedGetLocationPaint;
-    private float failedGetLocationY;
     private final float failedGetLocationHeight;
     private final float failedGetLocationMarginTop;
-
     private final float retrySize;
-
     private final int dayTextColor;
     private final int dayIconTint;
-
     private final int nightTextColor;
     private final int nightIconTint;
-
+    private OnRetryGetLocationListener onRetryGetLocationListener;
+    private float failedGetLocationY;
     public RetryGetLocationSubcomponent(@NotNull Context context) {
         Resources res = context.getResources();
         Resources.Theme theme = context.getTheme();
@@ -50,7 +38,7 @@ public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subco
 
         retrySize = res.getDimension(R.dimen.weatherView_retrySize);
         retryIcon = ResourcesCompat.getDrawable(res, R.drawable.ic_retry, theme);
-        if(retryIcon == null) throw new NullPointerException();
+        if (retryIcon == null) throw new NullPointerException();
 
         failedGetLocationStr = res.getString(R.string.failedToGetLocation);
 
@@ -93,7 +81,7 @@ public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subco
     private Typeface loadDefaultTextTypeface(@NotNull Context context) {
         Typeface notosans = ResourcesCompat.getFont(context, R.font.notosans_light);
 
-        if(notosans == null) {
+        if (notosans == null) {
             return Typeface.SANS_SERIF;
         }
 
@@ -121,10 +109,10 @@ public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subco
 
     @Override
     protected void onPositionChanged(float x, float y) {
-        int ix = (int)x;
-        int iy = (int)y;
-        int width = (int)getWidth();
-        int iRetrySize = (int)retrySize;
+        int ix = (int) x;
+        int iy = (int) y;
+        int width = (int) getWidth();
+        int iRetrySize = (int) retrySize;
         int right = ix + width;
 
         retryIcon.setBounds(right - iRetrySize, iy, right, iy + iRetrySize);
@@ -133,7 +121,7 @@ public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subco
 
     @Override
     protected void onDayStateChanged(int newState) {
-        if(newState == ComplexWeatherView.STATE_DAY) {
+        if (newState == ComplexWeatherView.STATE_DAY) {
             failedGetLocationPaint.setColor(dayTextColor);
             DrawableCompat.setTint(retryIcon, dayIconTint);
         } else {
@@ -148,5 +136,10 @@ public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subco
         if (listener != null) {
             listener.onRetry();
         }
+    }
+
+    @FunctionalInterface
+    public interface OnRetryGetLocationListener {
+        void onRetry();
     }
 }

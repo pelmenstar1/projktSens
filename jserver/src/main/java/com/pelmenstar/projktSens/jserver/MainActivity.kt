@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val intent = requireIntent()
-        if(intent.hasExtra(EXTRA_SERVER_STARTED)) {
+        if (intent.hasExtra(EXTRA_SERVER_STARTED)) {
             val isStarted = intent.getBooleanExtra(EXTRA_SERVER_STARTED, false)
             setServerStarted(isStarted)
         } else {
@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setServerStarted(state: Boolean) {
-        if(state) {
+        if (state) {
             startButton.isEnabled = false
             stopButton.isEnabled = true
         } else {
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
     private fun postSetServerStarted(state: Boolean) {
         mainThread.sendMessage(Message.obtain().apply {
             what = MSG_SET_SERVER_STARTED
-            arg1 = if(state) 1 else 0
+            arg1 = if (state) 1 else 0
         })
     }
 
@@ -135,11 +135,12 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private class MainThreadHandler(@JvmField var activity: MainActivity?): Handler(Looper.getMainLooper()) {
+    private class MainThreadHandler(@JvmField var activity: MainActivity?) :
+        Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             val a = activity ?: return
 
-            when(msg.what) {
+            when (msg.what) {
                 MSG_SET_SERVER_STARTED -> {
                     a.setServerStarted(msg.arg1 == 1)
                 }
@@ -150,7 +151,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private val scope = CoroutineScope(Dispatchers.Default + CoroutineName("MainActivity"))
 
-        private const val EXTRA_SERVER_STARTED = "com.pelmenstar.projktSens.server.MainActivity.serverStarted"
+        private const val EXTRA_SERVER_STARTED =
+            "com.pelmenstar.projktSens.server.MainActivity.serverStarted"
 
         private const val MSG_SET_SERVER_STARTED = 0
 

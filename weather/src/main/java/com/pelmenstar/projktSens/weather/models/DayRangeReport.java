@@ -46,8 +46,8 @@ public final class DayRangeReport extends AppendableToStringBuilder {
 
         public Entry(@ShortDateInt int date,
                      float minTemperature, float maxTemperature,
-                     float minHumidity,    float maxHumidity,
-                     float minPressure,    float maxPressure) {
+                     float minHumidity, float maxHumidity,
+                     float minPressure, float maxPressure) {
             this.date = date;
             this.minTemperature = minTemperature;
             this.maxTemperature = maxTemperature;
@@ -164,7 +164,7 @@ public final class DayRangeReport extends AppendableToStringBuilder {
     @NotNull
     public static DayRangeReport create(@NotNull WeatherPropertyIterable data) {
         int length = data.size();
-        if(length == 0) {
+        if (length == 0) {
             throw new IllegalArgumentException("Data is empty");
         }
 
@@ -210,7 +210,7 @@ public final class DayRangeReport extends AppendableToStringBuilder {
         float[] pressValues = new float[length];
 
         int i = 0;
-        while(data.moveNext()) {
+        while (data.moveNext()) {
             int units = data.getUnits();
             int tempUnit = ValueUnitsPacked.getTemperatureUnit(units);
             int pressUnit = ValueUnitsPacked.getPressureUnit(units);
@@ -281,32 +281,32 @@ public final class DayRangeReport extends AppendableToStringBuilder {
             }
 
             // general min-max
-            if(temp < minTempValue) {
+            if (temp < minTempValue) {
                 minTempValue = temp;
                 minTempDt = dateTime;
             }
 
-            if(temp > maxTempValue) {
+            if (temp > maxTempValue) {
                 maxTempValue = temp;
                 maxTempDt = dateTime;
             }
 
-            if(hum < minHumValue) {
+            if (hum < minHumValue) {
                 minHumValue = hum;
                 minHumDt = dateTime;
             }
 
-            if(hum > maxHumValue) {
+            if (hum > maxHumValue) {
                 maxHumValue = hum;
                 maxHumDt = dateTime;
             }
 
-            if(press < minPressValue) {
+            if (press < minPressValue) {
                 minPressValue = press;
                 minPressDt = dateTime;
             }
 
-            if(press > maxPressValue) {
+            if (press > maxPressValue) {
                 maxPressValue = press;
                 maxPressDt = dateTime;
             }
@@ -332,7 +332,7 @@ public final class DayRangeReport extends AppendableToStringBuilder {
         float medianPress;
 
         int mid = length / 2;
-        if(mid * 2 == length) {
+        if (mid * 2 == length) {
             medianTemp = (tempValues[mid] + tempValues[mid + 1]) * 0.5f;
             medianHum = (humValues[mid] + humValues[mid + 1]) * 0.5f;
             medianPress = (pressValues[mid] + pressValues[mid + 1]) * 0.5f;
@@ -378,9 +378,9 @@ public final class DayRangeReport extends AppendableToStringBuilder {
         @Override
         public void writeObject(@NotNull DayRangeReport value, @NotNull ValueWriter writer) {
             ReportStats.SERIALIZER.writeObject(value.stats, writer);
-            writer.emitInt16((short)value.entries.length);
+            writer.emitInt16((short) value.entries.length);
 
-            for(Entry e: value.entries) {
+            for (Entry e : value.entries) {
                 writer.emitInt24(e.date);
 
                 writer.emitFloat(e.minTemperature);
@@ -404,7 +404,7 @@ public final class DayRangeReport extends AppendableToStringBuilder {
             int entriesLength = reader.readInt16();
             Entry[] data = new Entry[entriesLength];
 
-            for(int i = 0; i < entriesLength; i++) {
+            for (int i = 0; i < entriesLength; i++) {
                 int date = reader.readInt24();
 
                 float minTemp = reader.readFloat();
@@ -416,31 +416,31 @@ public final class DayRangeReport extends AppendableToStringBuilder {
                 float minPress = reader.readFloat();
                 float maxPress = reader.readFloat();
 
-                if(!ShortDate.isValid(date)) {
+                if (!ShortDate.isValid(date)) {
                     throw ValidationException.invalidValue("date", date);
                 }
 
-                if(!UnitValue.isValid(minTemp, tempUnit)) {
+                if (!UnitValue.isValid(minTemp, tempUnit)) {
                     throw ValidationException.invalidValue("minTemp", minTemp);
                 }
 
-                if(!UnitValue.isValid(maxTemp, tempUnit)) {
+                if (!UnitValue.isValid(maxTemp, tempUnit)) {
                     throw ValidationException.invalidValue("maxTemp", maxTemp);
                 }
 
-                if(!UnitValue.isValid(minHum, ValueUnit.HUMIDITY)) {
+                if (!UnitValue.isValid(minHum, ValueUnit.HUMIDITY)) {
                     throw ValidationException.invalidValue("minHum", minHum);
                 }
 
-                if(!UnitValue.isValid(maxHum, ValueUnit.HUMIDITY)) {
+                if (!UnitValue.isValid(maxHum, ValueUnit.HUMIDITY)) {
                     throw ValidationException.invalidValue("maxHum", maxHum);
                 }
 
-                if(!UnitValue.isValid(minPress, pressUnit)) {
+                if (!UnitValue.isValid(minPress, pressUnit)) {
                     throw ValidationException.invalidValue("minPress", minPress);
                 }
 
-                if(!UnitValue.isValid(maxPress, pressUnit)) {
+                if (!UnitValue.isValid(maxPress, pressUnit)) {
                     throw ValidationException.invalidValue("maxPress", maxPress);
                 }
 

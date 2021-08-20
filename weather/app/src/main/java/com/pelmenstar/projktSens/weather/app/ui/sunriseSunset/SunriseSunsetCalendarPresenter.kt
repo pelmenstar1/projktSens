@@ -9,14 +9,14 @@ import com.pelmenstar.projktSens.weather.models.astro.SunInfoProvider
 
 class SunriseSunsetCalendarPresenter(
     private val sunInfoProvider: SunInfoProvider
-): BasePresenter<SunriseSunsetCalendarContract.View>(),
+) : BasePresenter<SunriseSunsetCalendarContract.View>(),
     SunriseSunsetCalendarContract.Presenter {
     private var selectedDayOfYear: Int = -1
     private var location: Geolocation? = null
 
     override fun onLocationPresent() {
         location = GeolocationCache.get()
-        if(location == null) {
+        if (location == null) {
             throw IllegalStateException("GeolocationCache.get() is null")
         }
 
@@ -30,9 +30,9 @@ class SunriseSunsetCalendarPresenter(
     }
 
     override fun restoreState(state: Bundle) {
-        val dayOfYear = state.getInt(STATE_SELECTED_DAY, -1)
+        val dayOfYear = state.get(STATE_SELECTED_DAY) as Int?
 
-        if(dayOfYear != -1) {
+        if (dayOfYear != null) {
             onDaySelected(dayOfYear)
         }
     }
@@ -42,7 +42,7 @@ class SunriseSunsetCalendarPresenter(
 
         val location = location
 
-        if(location != null) {
+        if (location != null) {
             val sunrise = sunInfoProvider.getSunriseTime(dayOfYear, location)
             val sunset = sunInfoProvider.getSunsetTime(dayOfYear, location)
             val dayLength = sunset - sunrise

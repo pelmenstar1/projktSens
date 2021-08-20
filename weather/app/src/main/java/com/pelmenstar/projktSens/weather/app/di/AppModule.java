@@ -2,9 +2,9 @@ package com.pelmenstar.projktSens.weather.app.di;
 
 import android.content.Context;
 
+import com.pelmenstar.projktSens.serverProtocol.ContractType;
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig;
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfigImpl;
-import com.pelmenstar.projktSens.serverProtocol.ContractType;
 import com.pelmenstar.projktSens.shared.InetAddressUtils;
 import com.pelmenstar.projktSens.shared.geo.ConstGeolocationProvider;
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider;
@@ -113,7 +113,7 @@ public final class AppModule {
     @Provides
     @NotNull
     public UnitFormatter unitFormatter() {
-        if(unitFormatter == null) {
+        if (unitFormatter == null) {
             String[] units = context.getResources().getStringArray(R.array.units);
             unitFormatter = new UnitFormatter(units, prettyDateFormatter());
         }
@@ -124,7 +124,7 @@ public final class AppModule {
     @Provides
     @NotNull
     public MoonPhaseFormatter moonPhaseFormatter() {
-        if(moonPhaseFormatter == null) {
+        if (moonPhaseFormatter == null) {
             String[] moonPhases = context.getResources().getStringArray(R.array.moonPhases);
             moonPhaseFormatter = new MoonPhaseFormatter(moonPhases);
         }

@@ -5,7 +5,7 @@ import android.util.Log
 /**
  * Implementation of [LogDelegate] which prints message using [Log]
  */
-object AndroidLogDelegate: LogDelegate {
+object AndroidLogDelegate : LogDelegate {
     private val ANDROID_LOG_MAP = intArrayOf(
         Log.DEBUG,
         Log.INFO,

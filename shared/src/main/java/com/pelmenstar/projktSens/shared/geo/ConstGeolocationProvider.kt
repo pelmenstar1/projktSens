@@ -3,7 +3,7 @@ package com.pelmenstar.projktSens.shared.geo
 /**
  * Implementation of [GeolocationProvider] that returns only one, constant [Geolocation]
  */
-class ConstGeolocationProvider: GeolocationProvider {
+class ConstGeolocationProvider : GeolocationProvider {
     private val location: Geolocation
 
     /**

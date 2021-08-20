@@ -9,8 +9,8 @@ import android.graphics.RectF;
 
 import androidx.core.content.res.ResourcesCompat;
 
-import com.pelmenstar.projktSens.shared.PointL;
 import com.pelmenstar.projktSens.shared.PackedSizeF;
+import com.pelmenstar.projktSens.shared.PointL;
 import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.android.CanvasUtils;
 import com.pelmenstar.projktSens.shared.android.TextUtils;
@@ -22,28 +22,21 @@ import com.pelmenstar.projktSens.weather.app.R;
 import org.jetbrains.annotations.NotNull;
 
 public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subcomponent {
-    private int sunrise = ShortTime.NONE;
-    private int sunset = ShortTime.NONE;
-    private int time = ShortTime.NONE;
-
-    private float overArcAngle;
-
     private final Paint dashedArcPaint;
     private final Paint overArcPaint;
     private final Paint textPaint;
-
     private final float primaryPadding;
-
-    private long sunrisePos;
-    private long sunsetPos;
-
     private final char[] sunriseText;
     private final char[] sunsetText;
-
+    private final RectF arcBounds = new RectF();
+    private int sunrise = ShortTime.NONE;
+    private int sunset = ShortTime.NONE;
+    private int time = ShortTime.NONE;
+    private float overArcAngle;
+    private long sunrisePos;
+    private long sunsetPos;
     private long sunriseTextSize;
     private long sunsetTextSize;
-
-    private final RectF arcBounds = new RectF();
 
     public SunriseSunsetArcSubcomponent(@NotNull Context context) {
         sunriseText = new char[5];
@@ -63,7 +56,7 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
         dashedArcPaint.setColor(ResourcesCompat.getColor(res, R.color.sunriseSunsetArc_dashedArcColor, theme));
         dashedArcPaint.setStrokeWidth(res.getDimension(R.dimen.sunriseSunsetArc_dashedArcThickness));
         dashedArcPaint.setStyle(Paint.Style.STROKE);
-        dashedArcPaint.setPathEffect(new DashPathEffect(new float[] { 10f, 5f }, 5f));
+        dashedArcPaint.setPathEffect(new DashPathEffect(new float[]{10f, 5f}, 5f));
 
         overArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         overArcPaint.setColor(ResourcesCompat.getColor(res, R.color.sunriseSunsetArc_overArcColor, theme));
@@ -77,6 +70,16 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
         setVisible(false);
     }
 
+    private static void writeTime(@TimeInt int time, @NotNull char[] outText) {
+        int hour = time / TimeConstants.SECONDS_IN_HOUR;
+        time -= hour * TimeConstants.SECONDS_IN_HOUR;
+        int minute = time / 60;
+
+        // colon is set in constructor implicitly, so we need only write hour & minute
+        StringUtils.writeTwoDigits(outText, 0, hour);
+        StringUtils.writeTwoDigits(outText, 3, minute);
+    }
+
     @TimeInt
     public int getSunrise() {
         return sunrise;
@@ -88,15 +91,15 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
     }
 
     public void setSunriseSunset(@TimeInt int sunrise, @TimeInt int sunset) {
-        if(!ShortTime.isValid(sunrise)) {
+        if (!ShortTime.isValid(sunrise)) {
             throw new IllegalArgumentException("sunrise");
         }
 
-        if(!ShortTime.isValid(sunset)) {
+        if (!ShortTime.isValid(sunset)) {
             throw new IllegalArgumentException("sunset");
         }
 
-        if(sunrise >= sunset) {
+        if (sunrise >= sunset) {
             throw new IllegalArgumentException("sunrise >= sunset");
         }
 
@@ -112,7 +115,7 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
         updateSunriseSunsetPositions();
         updateArcBounds();
 
-        if(time != ShortTime.NONE) {
+        if (time != ShortTime.NONE) {
             updateOverArcAngle();
         }
 
@@ -125,13 +128,13 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
     }
 
     public void setTime(@TimeInt int time) {
-        if(!ShortTime.isValid(time)) {
+        if (!ShortTime.isValid(time)) {
             throw new IllegalArgumentException("time");
         }
 
         this.time = time;
 
-        if(sunrise != ShortTime.NONE) {
+        if (sunrise != ShortTime.NONE) {
             updateOverArcAngle();
         }
     }
@@ -140,14 +143,14 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
         // 1. (a / b) * k => (k * a) / b.
         //    multiplication of integer is faster than float.
         // 2. sunset != sunset by condition in setSunriseSunset(), so there can't be division by 0.
-        if(getDayState() == ComplexWeatherView.STATE_DAY) {
+        if (getDayState() == ComplexWeatherView.STATE_DAY) {
             overArcAngle = (float) (180 * (time - sunrise)) / (float) (sunset - sunrise);
         } else {
             // (relTime / diff) * 180 => (180 * relTime) / diff
 
-            float diff = (float)(TimeConstants.SECONDS_IN_DAY - (sunset - sunrise));
+            float diff = (float) (TimeConstants.SECONDS_IN_DAY - (sunset - sunrise));
             int relTime;
-            if(time > sunset) {
+            if (time > sunset) {
                 relTime = time - sunset;
             } else {
                 relTime = (TimeConstants.SECONDS_IN_DAY - sunset) + time;
@@ -155,7 +158,7 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
 
             relTime *= 180;
 
-            overArcAngle = (float)relTime / diff;
+            overArcAngle = (float) relTime / diff;
         }
     }
 
@@ -176,7 +179,7 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
 
         float textOnRightX = width - PackedSizeF.getWidth(sunriseTextSize) - primaryPadding;
 
-        if(getDayState() == ComplexWeatherView.STATE_DAY) {
+        if (getDayState() == ComplexWeatherView.STATE_DAY) {
             sunriseX = primaryPadding;
             sunriseY = height - sunriseHeight - primaryPadding;
 
@@ -206,7 +209,7 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
 
         float maxTextHeight = Math.max(PackedSizeF.getHeight(sunriseTextSize), PackedSizeF.getHeight(sunsetTextSize));
 
-        if(getDayState() == ComplexWeatherView.STATE_DAY) {
+        if (getDayState() == ComplexWeatherView.STATE_DAY) {
             top = y + primaryPadding;
             bottom = (y + height) - primaryPadding - maxTextHeight;
         } else {
@@ -217,21 +220,11 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
         arcBounds.set(left, top, right, bottom);
     }
 
-    private static void writeTime(@TimeInt int time, @NotNull char[] outText) {
-        int hour = time / TimeConstants.SECONDS_IN_HOUR;
-        time -= hour * TimeConstants.SECONDS_IN_HOUR;
-        int minute = time / 60;
-
-        // colon is set in constructor implicitly, so we need only write hour & minute
-        StringUtils.writeTwoDigits(outText, 0, hour);
-        StringUtils.writeTwoDigits(outText, 3, minute);
-    }
-
     @Override
     public void draw(@NotNull Canvas c) {
         float invOverArcAngle = Math.abs(180f - overArcAngle);
 
-        if(getDayState() == ComplexWeatherView.STATE_DAY) {
+        if (getDayState() == ComplexWeatherView.STATE_DAY) {
             c.drawArc(arcBounds, 0f, -invOverArcAngle, false, dashedArcPaint);
             c.drawArc(arcBounds, 180f, overArcAngle, false, overArcPaint);
         } else {

@@ -11,19 +11,19 @@ class Client(config: ProtoConfig) {
     private val contract = config.contract
     private val address = config.socketAddress
 
-    suspend inline fun<T:Any> request(command: Int, responseValueClass: Class<T>): T? {
+    suspend inline fun <T : Any> request(command: Int, responseValueClass: Class<T>): T? {
         return request(Request(command), responseValueClass)
     }
 
-    suspend inline fun<T:Any> request(command: Int, arg: Any, responseValueClass: Class<T>): T? {
+    suspend inline fun <T : Any> request(command: Int, arg: Any, responseValueClass: Class<T>): T? {
         return request(Request(command, arg), responseValueClass)
     }
 
-    suspend inline fun<reified T:Any> request(command: Int): T? {
+    suspend inline fun <reified T : Any> request(command: Int): T? {
         return request(command, T::class.java)
     }
 
-    suspend inline fun<reified T:Any> request(command: Int, arg: Any): T? {
+    suspend inline fun <reified T : Any> request(command: Int, arg: Any): T? {
         return request(command, arg, T::class.java)
     }
 
@@ -32,7 +32,7 @@ class Client(config: ProtoConfig) {
      * but type parameter [T] have to be known in compile-time ([T] marked as reified).
      * Additionally, it is more readable because actual class of [T] don't need to be passed
      */
-    suspend inline fun <reified T:Any> request(request: Request): T? {
+    suspend inline fun <reified T : Any> request(request: Request): T? {
         return request(request, T::class.java)
     }
 
@@ -48,7 +48,7 @@ class Client(config: ProtoConfig) {
      * @throws IOException if IO error happened while exchanging data through network
      */
     @Suppress("UNCHECKED_CAST")
-    suspend fun <T:Any> request(request: Request, responseValueClass: Class<T>): T? {
+    suspend fun <T : Any> request(request: Request, responseValueClass: Class<T>): T? {
         return when (val response = requestRawResponse(request, responseValueClass)) {
             Response.Empty -> null
             is Response.Error -> throw ServerException(response.error)
@@ -58,11 +58,11 @@ class Client(config: ProtoConfig) {
         }
     }
 
-    suspend inline fun<reified T:Any> requestRawResponse(command: Int): Response {
+    suspend inline fun <reified T : Any> requestRawResponse(command: Int): Response {
         return requestRawResponse(command, T::class.java)
     }
 
-    suspend inline fun<reified T:Any> requestRawResponse(command: Int, arg: Any): Response {
+    suspend inline fun <reified T : Any> requestRawResponse(command: Int, arg: Any): Response {
         return requestRawResponse(command, arg, T::class.java)
     }
 
@@ -70,7 +70,11 @@ class Client(config: ProtoConfig) {
         return requestRawResponse(Request(command), responseValueClass)
     }
 
-    suspend inline fun requestRawResponse(command: Int, arg: Any, responseValueClass: Class<*>): Response {
+    suspend inline fun requestRawResponse(
+        command: Int,
+        arg: Any,
+        responseValueClass: Class<*>
+    ): Response {
         return requestRawResponse(Request(command, arg), responseValueClass)
     }
 

@@ -24,7 +24,7 @@ class StartupActivity : Activity() {
         prefs = component.preferences()
 
         val permContext = RequestPermissionsContext {
-            if(!prefs.isGpsPermissionDenied) {
+            if (!prefs.isGpsPermissionDenied) {
                 permission(
                     userDescriptionId = R.string.permissionGps_userDescription,
                     whyTextId = R.string.permissionGps_whyText
@@ -36,7 +36,7 @@ class StartupActivity : Activity() {
                 }
             }
         }
-        
+
         if (RequestPermissionsActivity.shouldStartActivity(this, permContext)) {
             val intent = RequestPermissionsActivity.intent(this, permContext)
 
@@ -49,11 +49,11 @@ class StartupActivity : Activity() {
     }
 
     private fun onPermissionsRequested() {
-        if(prefs.isFirstStart) {
+        if (prefs.isFirstStart) {
             val intent = FirstStartActivity.intent(this)
             startActivityForResult(intent, REQUEST_CODE_FIRST_START, null)
         } else {
-           startHomeActivityAndFinish()
+            startHomeActivityAndFinish()
         }
     }
 
@@ -65,7 +65,7 @@ class StartupActivity : Activity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(requestCode == REQUEST_CODE_PERMISSIONS) {
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (data != null && !prefs.isGpsPermissionDenied) {
                 val deniedPermissions =
                     data.getIntArrayExtra(RequestPermissionsActivity.RETURN_DATA_DENIED_PERMISSION_INDICES)
@@ -75,8 +75,8 @@ class StartupActivity : Activity() {
             }
 
             onPermissionsRequested()
-        } else if(requestCode == REQUEST_CODE_FIRST_START) {
-            if(resultCode == RESULT_OK) {
+        } else if (requestCode == REQUEST_CODE_FIRST_START) {
+            if (resultCode == RESULT_OK) {
                 startHomeActivityAndFinish()
             } else {
                 finish()

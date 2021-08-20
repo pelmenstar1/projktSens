@@ -10,14 +10,15 @@ public final class DateChartFormatter implements ValueFormatter {
     public static final DateChartFormatter INSTANCE = new DateChartFormatter();
     private final char[] textCache = new char[10];
 
-    private DateChartFormatter() {}
+    private DateChartFormatter() {
+    }
 
     @NotNull
     @Override
     public String format(float value) {
         char[] text = textCache;
 
-        int epochDay = (int)value;
+        int epochDay = (int) value;
         ShortDate.writeToCharBuffer(ShortDate.ofEpochDay(epochDay), text, 0);
 
         return new String(text, 0, 10);

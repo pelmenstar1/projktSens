@@ -78,7 +78,7 @@ public final class TransitionView extends View {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        if(transitionStoppedByDetaching) {
+        if (transitionStoppedByDetaching) {
             transitionStoppedByDetaching = false;
             startTransition();
         }
@@ -98,7 +98,7 @@ public final class TransitionView extends View {
 
         float oldShapeSize = shapeSize;
         shapeSize = Math.max(w, h);
-        if(oldShapeSize != shapeSize) {
+        if (oldShapeSize != shapeSize) {
             refreshShapePath();
         }
     }
@@ -119,13 +119,13 @@ public final class TransitionView extends View {
                 // Then we connect all the points together and we get perfect shape.
                 // To determine position of point on circle, we use trigonometry.
                 // There is pre-computed table for some shapes which contains pre-computed values of sin, cos.
-                if(Shape.trigTableIncludesShape(angles)) {
+                if (Shape.trigTableIncludesShape(angles)) {
                     long[] table = Shape.TRIG_TABLE_FOR_EQUILATERAL;
                     byte[] indices = Shape.TRIG_TABLES_INDICES;
 
                     int startIdx = indices[angles];
 
-                    for(int i = 0; i < angles; i++) {
+                    for (int i = 0; i < angles; i++) {
                         long packed = table[startIdx + i];
 
                         float sin = FloatPair.getFirst(packed);
@@ -183,7 +183,7 @@ public final class TransitionView extends View {
 
     public void setShape(int shape) {
         int oldShape = this.shape;
-        if(Shape.isEquilateral(oldShape) || oldShape == Shape.RHOMBUS) {
+        if (Shape.isEquilateral(oldShape) || oldShape == Shape.RHOMBUS) {
             shapePath.rewind();
         }
 
@@ -205,7 +205,7 @@ public final class TransitionView extends View {
     }
 
     public void startTransition() {
-        if(!transitionRunning.compareAndSet(0, 1)) {
+        if (!transitionRunning.compareAndSet(0, 1)) {
             Log.e(TAG, "Transition is already running");
             return;
         }
@@ -232,7 +232,7 @@ public final class TransitionView extends View {
         LinearColorTransition transition;
         synchronized (colorTransitionLock) {
             transition = colorTransition;
-            if(transition == null) {
+            if (transition == null) {
                 Log.w(TAG, "Transition object is null, but animation was started");
                 return;
             }
@@ -240,10 +240,10 @@ public final class TransitionView extends View {
 
         long minTimeBetweenFrames = 1_000_000_000 / transition.getFramesPerColor();
         long lastFrameTime = System.nanoTime();
-        while(transitionRunning.get() == 1) {
+        while (transitionRunning.get() == 1) {
             long currentTime = System.nanoTime();
 
-            if((currentTime - lastFrameTime) >= minTimeBetweenFrames) {
+            if ((currentTime - lastFrameTime) >= minTimeBetweenFrames) {
                 int color = transition.nextColor();
                 shapePaint.setColor(color);
 
@@ -260,7 +260,7 @@ public final class TransitionView extends View {
     }
 
     private static void startTransitionThreadIfNot() {
-        if(isHandlerThreadStarted.compareAndSet(0, 1)) {
+        if (isHandlerThreadStarted.compareAndSet(0, 1)) {
             new TransitionThread().start();
         }
     }
@@ -281,7 +281,7 @@ public final class TransitionView extends View {
             }
         }
 
-        if(Shape.isEquilateral(s) || shape == Shape.RHOMBUS) {
+        if (Shape.isEquilateral(s) || shape == Shape.RHOMBUS) {
             c.drawPath(shapePath, shapePaint);
         }
     }
@@ -299,7 +299,7 @@ public final class TransitionView extends View {
         public static final int HEPTAGON = EQUILATERAL_SHAPE_BIT | 7;
         public static final int OCTAGON = EQUILATERAL_SHAPE_BIT | 8;
 
-        private static final int[] COMMON = new int[] {
+        private static final int[] COMMON = new int[]{
                 RECT,
                 CIRCLE,
                 PENTAGON,
@@ -319,7 +319,7 @@ public final class TransitionView extends View {
         // First three elements is sin, cos of angles which are needed to draw triangle
         // Then goes sin, cos for pentagon (shape with 5 sides), then goes values for hexagon (6 sides) and so on,
         // until octagon (8 sides)
-        private static final long[] TRIG_TABLE_FOR_EQUILATERAL = new long[] {
+        private static final long[] TRIG_TABLE_FOR_EQUILATERAL = new long[]{
                 0x3fc000003feed9ecL,
                 0x3f7fffffL,
                 0x3fbfffff3e0930a0L,
@@ -354,8 +354,8 @@ public final class TransitionView extends View {
         // Represents start index in TRIG_TABLE_FOR_EQUILATERAL for shape.
         // Index in the array represents amount of angles.
         // For instance, if you want to get start index for triangle, you call TRIG_TABLES_INDICES[3]
-        private static final byte[] TRIG_TABLES_INDICES = new byte[] {
-                -1,-1,-1,0,-1,3,8,14,21,
+        private static final byte[] TRIG_TABLES_INDICES = new byte[]{
+                -1, -1, -1, 0, -1, 3, 8, 14, 21,
         };
 
         private static boolean trigTableIncludesShape(int angles) {
@@ -363,7 +363,7 @@ public final class TransitionView extends View {
         }
 
         public static int createEquilateralShape(int angles) {
-            if(angles < 3 || angles == 4) {
+            if (angles < 3 || angles == 4) {
                 throw new IllegalArgumentException("angles");
             }
 
@@ -371,7 +371,7 @@ public final class TransitionView extends View {
         }
 
         public static int getAnglesInEquilateralShape(int shape) {
-            if(!isEquilateral(shape)) {
+            if (!isEquilateral(shape)) {
                 throw new IllegalArgumentException("shape is not equilateral");
             }
 
@@ -406,7 +406,7 @@ public final class TransitionView extends View {
 
         @Override
         public void handleMessage(@NonNull Message msg) {
-            if(msg.what == MSG_START_TRANS_ON_CURRENT_THREAD) {
+            if (msg.what == MSG_START_TRANS_ON_CURRENT_THREAD) {
                 TransitionView v = (TransitionView) msg.obj;
                 v.startTransitionOnCurrentThread();
             }

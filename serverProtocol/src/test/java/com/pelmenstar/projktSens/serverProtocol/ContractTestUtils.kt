@@ -18,7 +18,7 @@ object ContractTestUtils {
         }
     }
 
-    inline fun<reified T:Any> test(contract: Contract, response: Response) {
+    inline fun <reified T : Any> test(contract: Contract, response: Response) {
         runBlocking {
             val output = ByteArrayOutputStream()
             contract.writeResponse(response, output)

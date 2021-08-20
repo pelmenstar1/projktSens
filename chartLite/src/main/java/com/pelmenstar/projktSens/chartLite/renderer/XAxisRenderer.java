@@ -11,6 +11,9 @@ import com.pelmenstar.projktSens.shared.EmptyArray;
 import org.jetbrains.annotations.NotNull;
 
 public final class XAxisRenderer extends AxisRenderer<XAxis> {
+    private final float[] computeAxisValues = new float[4];
+    private final Paint.FontMetrics labelFontMetrics = new Paint.FontMetrics();
+    private final Rect labelBounds = new Rect();
     private float[] computedPoints = EmptyArray.FLOAT;
     private long computedPointsAxisEntriesHash = 0;
     private long computedPointsVphHash = 0;
@@ -20,8 +23,6 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
 
         labelPaint.setTextAlign(Paint.Align.CENTER);
     }
-
-    private final float[] computeAxisValues = new float[4];
 
     @Override
     public void computeAxis() {
@@ -46,7 +47,7 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
         long vphHash = viewPortHandler.stateHashCode();
         long axisHash = axis.entriesHash;
 
-        if(computedPointsAxisEntriesHash == axisHash && computedPointsVphHash == vphHash) {
+        if (computedPointsAxisEntriesHash == axisHash && computedPointsVphHash == vphHash) {
             return;
         }
 
@@ -55,14 +56,14 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
 
         float[] entries = axis.entries;
         int pointsSize = entries.length * 2;
-        if(computedPoints.length != pointsSize) {
+        if (computedPoints.length != pointsSize) {
             computedPoints = new float[pointsSize];
         }
 
         int eOffset = 0;
         int pOffset = 0;
 
-        while(eOffset < entries.length) {
+        while (eOffset < entries.length) {
             computedPoints[pOffset] = entries[eOffset];
 
             pOffset += 2;
@@ -72,12 +73,9 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
         viewPortHandler.valuesToPixels(computedPoints);
     }
 
-    private final Paint.FontMetrics labelFontMetrics = new Paint.FontMetrics();
-    private final Rect labelBounds = new Rect();
-
     @Override
     public void draw(@NotNull Canvas c) {
-        if(!axis.isEnabled()) {
+        if (!axis.isEnabled()) {
             return;
         }
 
@@ -92,7 +90,7 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
         float contentTop = viewPortHandler.contentTop();
         float contentBottom = viewPortHandler.contentBottom();
 
-        if(axis.isDrawAxisLineEnabled()) {
+        if (axis.isDrawAxisLineEnabled()) {
             axisLinePaint.setColor(axis.getAxisLineColor());
             axisLinePaint.setStrokeWidth(axis.getAxisLineWidth());
 
@@ -111,21 +109,21 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
         boolean drawLabels = axis.isDrawLabelsEnabled();
         boolean drawGrid = axis.isDrawGridLinesEnabled();
 
-        if(drawLabels) {
+        if (drawLabels) {
             labelPaint.setTypeface(axis.getTypeface());
             labelPaint.setTextSize(axis.getTextSize());
             labelPaint.setColor(axis.getTextColor());
         }
 
-        if(drawGrid) {
+        if (drawGrid) {
             gridPaint.setColor(axis.getGridColor());
             gridPaint.setStrokeWidth(axis.getGridLineWidth());
         }
 
-        while(eOffset < entries.length) {
+        while (eOffset < entries.length) {
             float x = computedPoints[pOffset];
 
-            if(drawLabels) {
+            if (drawLabels) {
                 String label = labels[eOffset];
 
                 float lineHeight = labelPaint.getFontMetrics(labelFontMetrics);
@@ -133,20 +131,20 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
                 float textX = -labelBounds.left - labelBounds.width() * 0.5f + x;
                 float textYOffset = -labelFontMetrics.ascent;
 
-                if(pos == XAxis.POSITION_TOP || pos == XAxis.POSITION_BOTH_SIDED) {
+                if (pos == XAxis.POSITION_TOP || pos == XAxis.POSITION_BOTH_SIDED) {
                     float textY = textYOffset + contentTop - yOffset;
 
                     c.drawText(label, 0, label.length(), x, textY, labelPaint);
                 }
 
-                if(pos == XAxis.POSITION_BOTTOM || pos == XAxis.POSITION_BOTH_SIDED) {
+                if (pos == XAxis.POSITION_BOTTOM || pos == XAxis.POSITION_BOTH_SIDED) {
                     float textY = textYOffset + contentBottom + yOffset;
 
                     c.drawText(label, 0, label.length(), x, textY, labelPaint);
                 }
             }
 
-            if(drawGrid) {
+            if (drawGrid) {
                 c.drawLine(x, contentTop, x, contentBottom, gridPaint);
             }
 

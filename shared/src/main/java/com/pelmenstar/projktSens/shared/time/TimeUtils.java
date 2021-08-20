@@ -6,7 +6,8 @@ import java.util.TimeZone;
  * Helper class that make it easier to work with date and time
  */
 public final class TimeUtils {
-    private TimeUtils() {}
+    private TimeUtils() {
+    }
 
     // Pretty strange constant but, nevertheless, it's not randomized
     // If you look at days in month of a year, you may notice that minimum is 28, meanwhile, maximum is 31.
@@ -19,7 +20,7 @@ public final class TimeUtils {
     // Than if we convert these to binary and take it from end, convert it to hex, we get exactly this constant:
     // 11 00 11 10 11 10 11 11 10 11 10 11 = 0xEEFBB3
     private static final int daysInMonthBitTable = 0xEEFBB3;
-    private static final short[] firstDayOfMonth = new short[] {
+    private static final short[] firstDayOfMonth = new short[]{
             1,
             32,
             60,
@@ -62,7 +63,7 @@ public final class TimeUtils {
     public static int getFirstDayOfMonth(int year, int month) {
         int firstDay = firstDayOfMonth[month - 1];
 
-        if(isLeapYear(year) && month > 2) {
+        if (isLeapYear(year) && month > 2) {
             return firstDay + 1;
         }
 

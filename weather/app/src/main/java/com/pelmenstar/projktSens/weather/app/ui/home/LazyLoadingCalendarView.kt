@@ -15,7 +15,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
-import com.pelmenstar.projktSens.shared.android.Message
+import com.pelmenstar.projktSens.shared.android.ext.Message
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
@@ -68,7 +68,8 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
                 gravity = Gravity.CENTER
             }
 
-            colorTransition = LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
+            colorTransition =
+                LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
         }
     }
 
@@ -148,7 +149,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
             }
             STATE_LOADING -> {
                 var tView = transitionView
-                if(tView == null) {
+                if (tView == null) {
                     tView = createTransitionView()
                     transitionView = tView
                 }
@@ -157,11 +158,11 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
                 addView(tView)
             }
             STATE_FAILED_TO_LOAD -> {
-                if(failedToLoadTextView == null) {
+                if (failedToLoadTextView == null) {
                     failedToLoadTextView = createFailedToLoadTextView()
                 }
 
-                if(retryButton == null) {
+                if (retryButton == null) {
                     retryButton = createRetryButton()
                 }
 
@@ -169,7 +170,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
                 addView(retryButton)
             }
             STATE_NO_DATA -> {
-                if(noDataTextView == null) {
+                if (noDataTextView == null) {
                     noDataTextView = createNoDataView()
                 }
 
@@ -204,9 +205,9 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
         calendarView.setOnDateChangeListener(listener)
     }
 
-    private class MainThreadHandler: Handler(Looper.getMainLooper()) {
+    private class MainThreadHandler : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
-            when(msg.what) {
+            when (msg.what) {
                 MSG_SET_STATE -> {
                     val v = msg.obj as LazyLoadingCalendarView
                     v.setState(msg.arg1)

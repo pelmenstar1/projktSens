@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package com.pelmenstar.projktSens.shared.android
+package com.pelmenstar.projktSens.shared.android.ext
 
 import android.os.Parcel
 

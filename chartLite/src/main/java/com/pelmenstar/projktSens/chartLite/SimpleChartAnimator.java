@@ -13,22 +13,27 @@ import org.jetbrains.annotations.Nullable;
  * Responsible for simple chart animations by axis
  */
 public final class SimpleChartAnimator {
-    private static final float[] ANIMATOR_VALUES = new float[] { 0f, 1f };
-
+    private static final float[] ANIMATOR_VALUES = new float[]{0f, 1f};
+    @NotNull
+    private final View view;
     @Nullable
     private ValueAnimator.AnimatorUpdateListener _xUpdateListener;
-
     @Nullable
     private ValueAnimator.AnimatorUpdateListener _yUpdateListener;
-
     private float phaseX = 1f;
     private float phaseY = 1f;
 
-    @NotNull
-    private final View view;
-
     public SimpleChartAnimator(@NotNull View view) {
         this.view = view;
+    }
+
+    private static void animatorAxis(long duration, @NotNull ValueAnimator.AnimatorUpdateListener updateListener) {
+        ValueAnimator animator = new ValueAnimator();
+        animator.setDuration(duration);
+        animator.setFloatValues(ANIMATOR_VALUES);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.addUpdateListener(updateListener);
+        animator.start();
     }
 
     public float getPhaseX() {
@@ -48,7 +53,7 @@ public final class SimpleChartAnimator {
     }
 
     public void animateX(long duration) {
-       animatorAxis(duration, xUpdateListener());
+        animatorAxis(duration, xUpdateListener());
     }
 
     public void animateY(long duration) {
@@ -57,9 +62,9 @@ public final class SimpleChartAnimator {
 
     @NotNull
     private ValueAnimator.AnimatorUpdateListener xUpdateListener() {
-        if(_xUpdateListener == null) {
+        if (_xUpdateListener == null) {
             _xUpdateListener = animator -> {
-                phaseX = (Float)animator.getAnimatedValue();
+                phaseX = (Float) animator.getAnimatedValue();
                 view.invalidate();
             };
         }
@@ -69,22 +74,13 @@ public final class SimpleChartAnimator {
 
     @NotNull
     private ValueAnimator.AnimatorUpdateListener yUpdateListener() {
-        if(_yUpdateListener == null) {
+        if (_yUpdateListener == null) {
             _yUpdateListener = animator -> {
-                phaseY = (Float)animator.getAnimatedValue();
+                phaseY = (Float) animator.getAnimatedValue();
                 view.invalidate();
             };
         }
 
         return _yUpdateListener;
-    }
-
-    private static void animatorAxis(long duration, @NotNull ValueAnimator.AnimatorUpdateListener updateListener) {
-        ValueAnimator animator = new ValueAnimator();
-        animator.setDuration(duration);
-        animator.setFloatValues(ANIMATOR_VALUES);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.addUpdateListener(updateListener);
-        animator.start();
     }
 }

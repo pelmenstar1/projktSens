@@ -2,7 +2,6 @@ package com.pelmenstar.projktSens.shared;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.io.Writer;
 
 public final class StringBuilderWriter extends Writer {
@@ -13,29 +12,29 @@ public final class StringBuilderWriter extends Writer {
     }
 
     @Override
-    public void write(char @NotNull [] chars, int off, int len) throws IOException {
+    public void write(char @NotNull [] chars, int off, int len) {
         sb.append(chars, off, len);
     }
 
     @Override
-    public void write(@NotNull String str, int off, int len) throws IOException {
+    public void write(@NotNull String str, int off, int len) {
         sb.append(str, off, len);
     }
 
     @Override
-    public Writer append(char c) throws IOException {
+    public Writer append(char c) {
         sb.append(c);
         return this;
     }
 
     @Override
-    public Writer append(CharSequence csq) throws IOException {
+    public Writer append(CharSequence csq) {
         sb.append(csq);
         return this;
     }
 
     @Override
-    public Writer append(CharSequence csq, int start, int end) throws IOException {
+    public Writer append(CharSequence csq, int start, int end) {
         sb.append(csq, start, end);
         return this;
     }

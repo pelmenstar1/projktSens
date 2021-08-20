@@ -1,13 +1,14 @@
 package com.pelmenstar.projktSens.shared;
 
 public final class MyMath {
-    private MyMath() {}
+    private MyMath() {
+    }
 
     /**
      * Rounds particular number for 1 decimal place
      */
     public static float round(float number) {
-        return (int)(number * 10f) / 10f;
+        return (int) (number * 10f) / 10f;
     }
 
     /**
@@ -36,9 +37,9 @@ public final class MyMath {
      * Forces specified value in range represented by min and max
      */
     public static int clamp(int value, int min, int max) {
-        if(value < min) {
+        if (value < min) {
             return min;
-        } else if(value > max) {
+        } else if (value > max) {
             return max;
         }
 
@@ -49,9 +50,9 @@ public final class MyMath {
      * Forces specified value in range represented by min and max
      */
     public static float clamp(float value, float min, float max) {
-        if(value < min) {
+        if (value < min) {
             return min;
-        } else if(value > max) {
+        } else if (value > max) {
             return max;
         }
 
@@ -59,23 +60,23 @@ public final class MyMath {
     }
 
     public static int decimalDigitCount(int value) {
-        if(value < 10) {
+        if (value < 10) {
             return 1;
-        } else if(value < 100) {
+        } else if (value < 100) {
             return 2;
-        } else if(value < 1000) {
+        } else if (value < 1000) {
             return 3;
-        } else if(value < 10000) {
+        } else if (value < 10000) {
             return 4;
-        } else if(value < 100000) {
+        } else if (value < 100000) {
             return 5;
-        } else if(value < 1000000) {
+        } else if (value < 1000000) {
             return 6;
-        } else if(value < 10000000) {
+        } else if (value < 10000000) {
             return 7;
-        } else if(value < 100000000) {
+        } else if (value < 100000000) {
             return 8;
-        } else if(value < 1000000000) {
+        } else if (value < 1000000000) {
             return 9;
         } else {
             return 10;

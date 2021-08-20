@@ -1,7 +1,6 @@
 package com.pelmenstar.projktSens.chartLite.formatter;
 
 import com.pelmenstar.projktSens.shared.MyMath;
-import com.pelmenstar.projktSens.shared.StringUtils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -17,13 +16,14 @@ public final class FloatValueFormatter implements ValueFormatter {
     @NotNull
     public static final FloatValueFormatter INSTANCE = new FloatValueFormatter();
 
-    private FloatValueFormatter() {}
+    private FloatValueFormatter() {
+    }
 
     @NotNull
     @Override
     public String format(float value) {
-        int i = (int)value;
-        if(i == value) {
+        int i = (int) value;
+        if (i == value) {
             return Integer.toString(i);
         }
 

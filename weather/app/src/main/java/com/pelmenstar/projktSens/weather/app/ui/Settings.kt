@@ -111,12 +111,12 @@ abstract class ValueUnitSetting : Setting<ValueUnitSetting.State>() {
             val className = c.name
             val dotIndex = className.lastIndexOf('.')
             var reservedLength = className.length + 10
-            if(dotIndex >= 0) {
+            if (dotIndex >= 0) {
                 reservedLength -= dotIndex
             }
 
             return buildString(reservedLength) {
-                if(dotIndex < 0) {
+                if (dotIndex < 0) {
                     append(className)
                 } else {
                     append(className, dotIndex, className.length)

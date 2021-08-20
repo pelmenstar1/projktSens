@@ -13,10 +13,10 @@ class RequestPermissionInfoTests {
         val perms = arrayOf("1", "2", "3")
 
         ParcelTestUtils.read_write(
-            RequestPermissionInfo("123", ModePermissionArray.anyOf(*perms)),
+            RequestPermissionInfo(0, 1, ModePermissionArray.anyOf(*perms)),
             RequestPermissionInfo.CREATOR)
         ParcelTestUtils.read_write(
-            RequestPermissionInfo("123", ModePermissionArray.everyOf(*perms)),
+            RequestPermissionInfo(34, 547, ModePermissionArray.everyOf(*perms)),
             RequestPermissionInfo.CREATOR
         )
     }
