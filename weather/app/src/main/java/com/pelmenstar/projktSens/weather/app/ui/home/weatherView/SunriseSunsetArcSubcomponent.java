@@ -9,8 +9,8 @@ import android.graphics.RectF;
 
 import androidx.core.content.res.ResourcesCompat;
 
-import com.pelmenstar.projktSens.shared.PackedSizeF;
-import com.pelmenstar.projktSens.shared.PointL;
+import com.pelmenstar.projktSens.shared.PackedSize;
+import com.pelmenstar.projktSens.shared.PackedPointF;
 import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.android.CanvasUtils;
 import com.pelmenstar.projktSens.shared.android.TextUtils;
@@ -70,7 +70,7 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
         setVisible(false);
     }
 
-    private static void writeTime(@TimeInt int time, @NotNull char[] outText) {
+    private static void writeTime(@TimeInt int time, char @NotNull [] outText) {
         int hour = time / TimeConstants.SECONDS_IN_HOUR;
         time -= hour * TimeConstants.SECONDS_IN_HOUR;
         int minute = time / 60;
@@ -174,10 +174,10 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
         float sunsetX;
         float sunsetY;
 
-        float sunriseHeight = PackedSizeF.getHeight(sunriseTextSize);
-        float sunsetHeight = PackedSizeF.getHeight(sunsetTextSize);
+        float sunriseHeight = PackedSize.getHeight(sunriseTextSize);
+        float sunsetHeight = PackedSize.getHeight(sunsetTextSize);
 
-        float textOnRightX = width - PackedSizeF.getWidth(sunriseTextSize) - primaryPadding;
+        float textOnRightX = width - PackedSize.getWidth(sunriseTextSize) - primaryPadding;
 
         if (getDayState() == ComplexWeatherView.STATE_DAY) {
             sunriseX = primaryPadding;
@@ -193,8 +193,8 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
             sunsetY = sunsetHeight + primaryPadding;
         }
 
-        sunrisePos = PointL.of(x + sunriseX, y + sunriseY);
-        sunsetPos = PointL.of(x + sunsetX, y + sunsetY);
+        sunrisePos = PackedPointF.of(x + sunriseX, y + sunriseY);
+        sunsetPos = PackedPointF.of(x + sunsetX, y + sunsetY);
     }
 
     private void updateArcBounds() {
@@ -202,12 +202,15 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
         float y = getY();
         float height = getHeight();
 
-        float left = x + primaryPadding + PackedSizeF.getWidth(sunriseTextSize) * 0.5f;
+        float halfSunriseWidth = (float) (PackedSize.getWidth(sunriseTextSize) / 2);
+        float halfSunsetHeight = (float) (PackedSize.getWidth(sunsetTextSize) / 2);
+
+        float left = x + primaryPadding + halfSunriseWidth;
         float top;
-        float right = (x + getWidth()) - primaryPadding - PackedSizeF.getWidth(sunsetTextSize) * 0.5f;
+        float right = (x + getWidth()) - primaryPadding - halfSunsetHeight;
         float bottom;
 
-        float maxTextHeight = Math.max(PackedSizeF.getHeight(sunriseTextSize), PackedSizeF.getHeight(sunsetTextSize));
+        float maxTextHeight = Math.max(PackedSize.getHeight(sunriseTextSize), PackedSize.getHeight(sunsetTextSize));
 
         if (getDayState() == ComplexWeatherView.STATE_DAY) {
             top = y + primaryPadding;

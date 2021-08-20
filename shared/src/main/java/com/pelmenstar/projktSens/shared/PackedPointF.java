@@ -3,7 +3,7 @@ package com.pelmenstar.projktSens.shared;
 /**
  * Static class that responsible for creating 2D points represented in long and extracting coordinates back
  */
-public final class PointL {
+public final class PackedPointF {
     /**
      * Creates 2D point
      *

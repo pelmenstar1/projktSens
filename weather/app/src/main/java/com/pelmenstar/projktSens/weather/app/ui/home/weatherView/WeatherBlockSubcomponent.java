@@ -10,7 +10,7 @@ import android.graphics.Typeface;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.pelmenstar.projktSens.shared.EmptyArray;
-import com.pelmenstar.projktSens.shared.PointL;
+import com.pelmenstar.projktSens.shared.PackedPointF;
 import com.pelmenstar.projktSens.weather.app.AppPreferences;
 import com.pelmenstar.projktSens.weather.app.R;
 import com.pelmenstar.projktSens.weather.app.di.AppComponent;
@@ -139,7 +139,7 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
         humStrY = textMarginTop + tempStrHeight * 2;
 
         pressStrY = textMarginTop + humStrY + humStrHeight;
-        tempUnitStrPos = PointL.of(tempStrWidth + tempUnitMarginLeft, tempUnitStrHeight);
+        tempUnitStrPos = PackedPointF.of(tempStrWidth + tempUnitMarginLeft, tempUnitStrHeight);
     }
 
     @Override
@@ -148,7 +148,7 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
         float y = getY();
 
         c.drawText(tempStr, x, y + tempStrY, tempPaint);
-        c.drawText(tempUnitStr, x + PointL.getX(tempUnitStrPos), y + PointL.getY(tempUnitStrPos), tempUnitPaint);
+        c.drawText(tempUnitStr, x + PackedPointF.getX(tempUnitStrPos), y + PackedPointF.getY(tempUnitStrPos), tempUnitPaint);
         c.drawText(humStr, 0, humStr.length, x, y + humStrY, humPressPaint);
         c.drawText(pressStr, 0, pressStr.length, x, y + pressStrY, humPressPaint);
     }
