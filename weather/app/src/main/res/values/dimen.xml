@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="homeActivity_weatherViewHeight">200dp</dimen>
+    <dimen name="homeActivity_weatherViewHeight">250dp</dimen>
     <dimen name="homeActivity_serverUnavailable_sideMargin">3dp</dimen>
     <dimen name="homeActivity_serverUnavailable_topMargin">1dp</dimen>
     <dimen name="homeActivity_serverUnavailable_bottomMargin">10dp</dimen>
     <dimen name="homeActivity_lazyLoadingCalendar_topMargin">10dp</dimen>
-    <dimen name="homeActivity_goToButton_sideMargin">5dp</dimen>
+    <dimen name="homeActivity_goToButton_sideMargin">8dp</dimen>
 
     <dimen name="reportActivity_chartHeight">240dp</dimen>
     <dimen name="reportActivity_errorView_retryButtonSize">35dp</dimen>
     <dimen name="reportActivity_errorView_retryButtonTopMargin">10dp</dimen>
     <dimen name="reportActivity_transitionViewSize">80dp</dimen>
     <dimen name="reportActivity_chartViewTextLeftMargin">5dp</dimen>
-    <dimen name="reportActivity_chartViewSideMargin">3dp</dimen>
+    <dimen name="reportActivity_chartViewSideMargin">7dp</dimen>
     <dimen name="reportActivity_chartViewBlockTopMargin">10dp</dimen>
 
     <dimen name="materialChart_textSize">8sp</dimen>
