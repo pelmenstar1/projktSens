@@ -25,8 +25,7 @@ public final class PrefixTextView extends MaterialTextView {
     @NotNull
     private String value = "";
 
-    @Nullable
-    private StringBuilder valueSb;
+    private char @NotNull [] valueBuffer = EmptyArray.CHAR;
 
     public PrefixTextView(@NotNull Context context) {
         this(context, null, android.R.attr.textViewStyle, 0);
@@ -64,28 +63,12 @@ public final class PrefixTextView extends MaterialTextView {
     }
 
     /**
-     * Gets prefix
-     */
-    @NotNull
-    public String getPrefix() {
-        return prefix;
-    }
-
-    /**
      * Sets prefix
      */
     public void setPrefix(@NotNull String prefix) {
         this.prefix = prefix;
 
         invalidateText();
-    }
-
-    /**
-     * Gets value
-     */
-    @NotNull
-    public String getValue() {
-        return value;
     }
 
     /**
@@ -97,8 +80,8 @@ public final class PrefixTextView extends MaterialTextView {
         invalidateText();
     }
 
-    public void setValue(@NotNull StringBuilder inSb) {
-        valueSb = inSb;
+    public void setValue(char @NotNull [] valueBuffer) {
+        this.valueBuffer = valueBuffer;
 
         invalidateText();
     }
@@ -110,9 +93,9 @@ public final class PrefixTextView extends MaterialTextView {
         invalidateText();
     }
 
-    public void setPrefixAndValue(@NotNull String prefix, @NotNull StringBuilder valueSb) {
+    public void setPrefixAndValue(@NotNull String prefix, char @NotNull [] valueBuffer) {
         this.prefix = prefix;
-        this.valueSb = valueSb;
+        this.valueBuffer = valueBuffer;
 
         invalidateText();
     }
@@ -120,12 +103,12 @@ public final class PrefixTextView extends MaterialTextView {
     private char[] textCache = EmptyArray.CHAR;
 
     private void invalidateText() {
-        StringBuilder valueSb = this.valueSb;
+        char[] valueBuffer = this.valueBuffer;
 
         int prefixLength = prefix.length();
         int valueLength;
-        if (valueSb != null) {
-            valueLength = valueSb.length();
+        if (valueBuffer.length > 0) {
+            valueLength = valueBuffer.length;
         } else {
             valueLength = value.length();
         }
@@ -137,17 +120,15 @@ public final class PrefixTextView extends MaterialTextView {
         if (textCache.length == textLength) {
             buffer = textCache;
         } else {
-            buffer = new char[textLength];
-            textCache = buffer;
+            textCache = buffer = new char[textLength];
         }
 
         prefix.getChars(0, prefixLength, buffer, 0);
         buffer[prefixLength] = ':';
         buffer[prefixLength + 1] = ' ';
 
-        if (valueSb != null) {
-            valueSb.getChars(0, valueLength, buffer, valueBegin);
-            this.valueSb = null;
+        if (valueBuffer.length > 0) {
+            System.arraycopy(valueBuffer, 0, buffer, valueBegin, valueBuffer.length);
         } else {
             value.getChars(0, valueLength, buffer, valueBegin);
         }

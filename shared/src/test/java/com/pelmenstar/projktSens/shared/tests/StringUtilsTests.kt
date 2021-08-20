@@ -47,17 +47,23 @@ class StringUtilsTests  {
     }
 
     @Test
-    fun toStringRound1() {
+    fun writeFloatRounded1() {
         val random = Random(0)
 
         repeat(100) {
-            var n = random.nextFloat() * 10000
+            var number = random.nextFloat() * 10_000
             if(random.nextBoolean()) {
-                n = -n
+                number = -number
             }
 
-            val actual = StringUtils.toStringRound1(n)
-            val expected = n.round().toString()
+            val buffer = CharArray(2 + StringUtils.getBufferSizeForRoundedFloat(number))
+            buffer[0] = 'a'
+            buffer[1] = 'b'
+
+            StringUtils.writeFloatRound1(number, buffer, 2)
+
+            val expected = "ab${number.round()}"
+            val actual = String(buffer)
 
             assertEquals(expected, actual)
         }

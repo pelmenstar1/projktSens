@@ -66,8 +66,8 @@ private fun ViewGroup.ValueParamView(
     PrefixTextView {
         layoutParams = c.layoutParams
 
-        val valueSb = c.unitFormatter.formatValueWithDateToBuilder(vd, c.statsUnit, c.prefUnit)
-        setPrefixAndValue(prefix, valueSb)
+        val value = c.unitFormatter.formatValueWithDate(vd, c.statsUnit, c.prefUnit)
+        setPrefixAndValue(prefix, value)
 
         applyTextAppearance(c.textAppearance)
     }
@@ -80,12 +80,12 @@ private fun ViewGroup.ValueParamView(
     PrefixTextView {
         layoutParams = c.layoutParams
 
-        val valueSb = c.unitFormatter.formatValueToBuilder(
+        val valueBuffer = c.unitFormatter.formatValueToCharBuffer(
             UnitValue.getValue(value, c.statsUnit, c.prefUnit),
             c.prefUnit
         )
 
-        setPrefixAndValue(prefix, valueSb)
+        setPrefixAndValue(prefix, valueBuffer)
 
         applyTextAppearance(c.textAppearance)
     }

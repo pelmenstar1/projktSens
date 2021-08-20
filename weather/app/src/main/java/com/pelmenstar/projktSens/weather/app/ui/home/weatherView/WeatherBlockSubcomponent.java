@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 
 import androidx.core.content.res.ResourcesCompat;
 
+import com.pelmenstar.projktSens.shared.EmptyArray;
 import com.pelmenstar.projktSens.shared.PointL;
 import com.pelmenstar.projktSens.weather.app.AppPreferences;
 import com.pelmenstar.projktSens.weather.app.R;
@@ -26,20 +27,26 @@ import org.jetbrains.annotations.NotNull;
 public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcomponent {
     private static final float TEMP_UNIT_MARGIN_L_DP = 4;
     private static final float TEXT_MARGIN_T_DP = 5;
+
     private final Paint tempPaint;
     private final Paint tempUnitPaint;
     private final Paint humPressPaint;
+
     private final int dayTextColor;
     private final int nightTextColor;
+
     private final float tempUnitMarginLeft;
     private final float textMarginTop;
+
     private final UnitFormatter unitFormatter;
     private final Rect textSizeBuffer = new Rect();
     private final AppPreferences preferences;
+
     private String tempUnitStr = "";
     private String tempStr = "";
-    private String humStr = "";
-    private String pressStr = "";
+    private char[] humStr = EmptyArray.CHAR;
+    private char[] pressStr = EmptyArray.CHAR;
+
     private float tempStrY;
     private float humStrY;
     private float pressStrY;
@@ -111,8 +118,8 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
 
         tempUnitStr = unitFormatter.getUnitString(prefTempUnit);
         tempStr = Float.toString(UnitValue.getValue(value.temperature, valueTempUnit, prefTempUnit));
-        humStr = unitFormatter.formatValue(value.humidity, ValueUnit.HUMIDITY);
-        pressStr = unitFormatter.formatValue(UnitValue.getValue(value.pressure, valuePressUnit, prefPressUnit), prefPressUnit);
+        humStr = unitFormatter.formatValueToCharBuffer(value.humidity, ValueUnit.HUMIDITY);
+        pressStr = unitFormatter.formatValueToCharBuffer(UnitValue.getValue(value.pressure, valuePressUnit, prefPressUnit), prefPressUnit);
 
         invalidatePositions();
     }
@@ -125,7 +132,7 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
         tempUnitPaint.getTextBounds(tempUnitStr, 0, tempUnitStr.length(), textSizeBuffer);
         float tempUnitStrHeight = textSizeBuffer.height();
 
-        humPressPaint.getTextBounds(humStr, 0, humStr.length(), textSizeBuffer);
+        humPressPaint.getTextBounds(humStr, 0, humStr.length, textSizeBuffer);
         float humStrHeight = textSizeBuffer.height();
 
         tempStrY = tempStrHeight;
@@ -142,8 +149,8 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
 
         c.drawText(tempStr, x, y + tempStrY, tempPaint);
         c.drawText(tempUnitStr, x + PointL.getX(tempUnitStrPos), y + PointL.getY(tempUnitStrPos), tempUnitPaint);
-        c.drawText(humStr, x, y + humStrY, humPressPaint);
-        c.drawText(pressStr, x, y + pressStrY, humPressPaint);
+        c.drawText(humStr, 0, humStr.length, x, y + humStrY, humPressPaint);
+        c.drawText(pressStr, 0, pressStr.length, x, y + pressStrY, humPressPaint);
     }
 
     @Override

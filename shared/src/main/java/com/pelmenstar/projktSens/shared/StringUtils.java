@@ -7,6 +7,37 @@ import org.jetbrains.annotations.Nullable;
  * Represents a helper class that efficiently build strings
  */
 public final class StringUtils {
+    private static final byte[] digits = {
+            '0' , '1' , '2' , '3' , '4' , '5' ,
+            '6' , '7' , '8' , '9'
+    };
+
+    private static final byte [] DigitTens = {
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+            '1', '1', '1', '1', '1', '1', '1', '1', '1', '1',
+            '2', '2', '2', '2', '2', '2', '2', '2', '2', '2',
+            '3', '3', '3', '3', '3', '3', '3', '3', '3', '3',
+            '4', '4', '4', '4', '4', '4', '4', '4', '4', '4',
+            '5', '5', '5', '5', '5', '5', '5', '5', '5', '5',
+            '6', '6', '6', '6', '6', '6', '6', '6', '6', '6',
+            '7', '7', '7', '7', '7', '7', '7', '7', '7', '7',
+            '8', '8', '8', '8', '8', '8', '8', '8', '8', '8',
+            '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
+    } ;
+
+    private static final byte [] DigitOnes = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    } ;
+
     private static final char[] hexBuffer = new char[8];
 
     private StringUtils() {
@@ -120,33 +151,6 @@ public final class StringUtils {
         }
     }
 
-    /**
-     * Appends given array of bytes to the end of {@link StringBuilder} in format: <br/>
-     * - if specified array is null, appends 'null' string
-     * - otherwise, appends [$1st element$, $2nd element$, $3rd element$, ...]
-     *
-     * @param array array to append to {@link StringBuilder}
-     * @param sb    receiver
-     */
-    public static void appendArray(byte @Nullable [] array, @NotNull StringBuilder sb) {
-        if (array == null) {
-            appendNull(sb);
-        } else {
-            sb.append('[');
-            if (array.length > 0) {
-                int endIdx = array.length - 1;
-
-                for (int i = 0; i < endIdx; i++) {
-                    sb.append(array[i]);
-                    sb.append(',');
-                }
-
-                sb.append(array[endIdx]);
-            }
-            sb.append(']');
-        }
-    }
-
     private static void appendNull(@NotNull StringBuilder sb) {
         sb.ensureCapacity(sb.length() + 4);
         sb.append('n');
@@ -155,26 +159,68 @@ public final class StringUtils {
         sb.append('l');
     }
 
-    /**
-     * Returns string representation of specified float number, that will be previously rounded to 1 decimal place
-     */
-    @NotNull
-    public static String toStringRound1(float number) {
-        StringBuilder sb = new StringBuilder();
-        if (number < 0) {
-            number = -number;
-            sb.append('-');
+    public static int getBufferSizeForRoundedFloat(float number) {
+        int intPart = (int)number;
+        int sign = 0;
+        if(intPart < 0) {
+            sign = 1;
+            intPart = -intPart;
         }
 
-        int i = (int) number;
-        int fr1 = (int) ((number - i) * 10f);
+        return MyMath.decimalDigitCount(intPart) + sign + 2;
+    }
 
-        sb.append(i);
+    public static int getBufferSizeForSignedRoundedFloat(float number) {
+       return MyMath.decimalDigitCount((int)number) + 3;
+    }
 
-        sb.append('.');
-        sb.append((char) ('0' + fr1));
+    public static void writeSignedFloatRound1(float number, char @NotNull [] buffer, int offset) {
+        buffer[offset] = number >= 0 ? '+' : '-';
+        writeAbsoluteFloatRound1(Math.abs(number), buffer, offset + 1);
+    }
 
-        return sb.toString();
+    public static void writeFloatRound1(float number, char @NotNull [] buffer, int offset) {
+        if(number < 0) {
+            buffer[offset++] = '-';
+        }
+
+        writeAbsoluteFloatRound1(Math.abs(number), buffer, offset);
+    }
+
+    private static void writeAbsoluteFloatRound1(float number, char @NotNull [] buffer, int offset) {
+        int intPart = (int)number;
+        int frDigit = (int)((number - intPart) * 10f);
+
+        int digitCount = MyMath.decimalDigitCount(intPart);
+        int intPartLastIndex = offset + digitCount;
+        getCharsForPositive(intPart, buffer, intPartLastIndex);
+        buffer[intPartLastIndex] = '.';
+        buffer[intPartLastIndex + 1] = (char)('0' + frDigit);
+    }
+
+    // Stolen from Android 30 source
+    private static void getCharsForPositive(int i, char @NotNull [] buffer, int bIndex) {
+        int q, r;
+        int charPos = bIndex;
+
+        // Generate two digits per iteration
+        while (i >= 65536) {
+            q = i / 100;
+            // really: r = i - (q * 100);
+            r = i - ((q << 6) + (q << 5) + (q << 2));
+            i = q;
+            buffer [--charPos] = (char)DigitOnes[r];
+            buffer [--charPos] = (char)DigitTens[r];
+        }
+
+        // Fall thru to fast mode for smaller numbers
+        // assert(i <= 65536, i);
+        do {
+            q = (i * 52429) >>> (16 + 3);
+            r = i - ((q << 3) + (q << 1));  // r = i-(q*10) ...
+            buffer[--charPos] = (char)digits[r];
+            i = q;
+        } while (i != 0);
     }
 
     /**

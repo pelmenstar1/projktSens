@@ -45,7 +45,7 @@ class MoonCalendarActivity : HomeButtonSupportActivity(), MoonCalendarContract.V
                             res.getDimensionPixelOffset(R.dimen.moonCalendar_moonPhaseText_leftMargin)
                     }
 
-                    prefix = res.getString(R.string.moonPhase)
+                    setPrefix(res.getString(R.string.moonPhase))
                     applyTextAppearance(body1)
                 }
 
@@ -102,7 +102,7 @@ class MoonCalendarActivity : HomeButtonSupportActivity(), MoonCalendarContract.V
 
     override fun setMoonPhase(phase: Float) {
         moonView.moonPhase = phase
-        moonPhaseView.value = moonPhaseFormatter.format(phase)
+        moonPhaseView.setValue(moonPhaseFormatter.format(phase))
     }
 
     companion object {

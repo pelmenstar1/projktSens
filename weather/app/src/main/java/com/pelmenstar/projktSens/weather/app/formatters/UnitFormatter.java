@@ -27,35 +27,46 @@ public final class UnitFormatter {
 
     @NotNull
     public String formatValue(float value, int unit) {
-        return formatValueToBuilder(value, unit).toString();
+        return new String(formatValueToCharBuffer(value, unit));
     }
 
-    @NotNull
-    public StringBuilder formatValueToBuilder(float value, int unit) {
+    public char @NotNull [] formatValueToCharBuffer(float value, int unit) {
         String unitString = getUnitString(unit);
-        int sbLength = unitString.length() + MyMath.decimalDigitCount((int) value) + 2;
+        int valueLength = StringUtils.getBufferSizeForRoundedFloat(value);
+        int bufferLength = unitString.length() + valueLength;
 
-        StringBuilder sb = new StringBuilder(sbLength);
-        sb.append(MyMath.round(value));
-        sb.append(unitString);
+        char[] buffer = new char[bufferLength];
 
-        return sb;
+        StringUtils.writeFloatRound1(value, buffer, 0);
+        unitString.getChars(0, unitString.length(), buffer, valueLength);
+
+        return buffer;
     }
 
     @NotNull
     public String formatValueAndDelta(float value, float delta, int unit) {
+        return new String(formatValueAndDeltaToCharBuffer(value, delta, unit));
+    }
+
+    public char @NotNull [] formatValueAndDeltaToCharBuffer(float value, float delta, int unit) {
         String unitStr = getUnitString(unit);
-        StringBuilder sb = new StringBuilder();
+        int valueLength = StringUtils.getBufferSizeForRoundedFloat(value);
+        int deltaLength = StringUtils.getBufferSizeForSignedRoundedFloat(delta);
 
-        sb.append(MyMath.round(value));
-        sb.append(unitStr);
-        sb.append(' ');
-        sb.append('(');
-        StringUtils.appendSigned(MyMath.round(delta), sb);
-        sb.append(unitStr);
-        sb.append(')');
+        int bufferLength = valueLength + deltaLength + unitStr.length() * 2 + 3;
+        char[] buffer = new char[bufferLength];
 
-        return sb.toString();
+        StringUtils.writeFloatRound1(value, buffer, 0);
+        unitStr.getChars(0, unitStr.length(), buffer, valueLength);
+        int valueAndUnitPos = valueLength + unitStr.length();
+        buffer[valueAndUnitPos] = ' ';
+        buffer[valueAndUnitPos + 1] = '(';
+        StringUtils.writeSignedFloatRound1(delta, buffer, valueAndUnitPos + 2);
+        int deltaEndPos = valueAndUnitPos + deltaLength + 2;
+        unitStr.getChars(0, unitStr.length(), buffer, deltaEndPos);
+        buffer[deltaEndPos + unitStr.length()] = ')';
+
+        return buffer;
     }
 
     @NotNull
@@ -64,7 +75,7 @@ public final class UnitFormatter {
     }
 
     @NotNull
-    public StringBuilder formatValueWithDateToBuilder(
+    private StringBuilder formatValueWithDateToBuilder(
             @NotNull ValueWithDate vd,
             int currentUnit, int prefUnit
     ) {
