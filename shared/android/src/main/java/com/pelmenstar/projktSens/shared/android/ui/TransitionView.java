@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.AttrRes;
@@ -103,6 +104,21 @@ public final class TransitionView extends View {
         }
     }
 
+    @Override
+    public boolean onTouchEvent(@NotNull MotionEvent event) {
+        if(event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            performClick();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean performClick() {
+        super.performClick();
+        setNextShapeInSequence();
+        return true;
+    }
+
     private void refreshShapePath() {
         float size = shapeSize;
         if (size > 0) {
@@ -189,6 +205,11 @@ public final class TransitionView extends View {
 
         this.shape = shape;
         refreshShapePath();
+    }
+
+    private void setNextShapeInSequence() {
+        setShape(Shape.COMMON[creationCounter % Shape.COMMON.length]);
+        creationCounter++;
     }
 
     @Nullable
