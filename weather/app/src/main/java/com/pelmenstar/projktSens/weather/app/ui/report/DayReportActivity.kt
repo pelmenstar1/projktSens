@@ -54,8 +54,6 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
         val res = resources
 
         val colorPrimary = ResourcesCompat.getColor(res, R.color.colorPrimary, theme)
-        val minColor = ResourcesCompat.getColor(res, R.color.chartMinColor, theme)
-        val maxColor = ResourcesCompat.getColor(res, R.color.chartMaxColor, theme)
 
         val ac = appComponent
         val unitFormatter = ac.unitFormatter()
@@ -92,23 +90,9 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
             pressEntries[i] = Entry.of(x, press)
         }
 
-        val tempDataSet = DataSet(tempEntries, tempChartValueFormatter).customizeOptions(
-            colorPrimary,
-            minColor,
-            maxColor
-        )
-
-        val humDataSet = DataSet(humEntries, humChartValueFormatter).customizeOptions(
-            colorPrimary,
-            minColor,
-            maxColor
-        )
-
-        val pressDataSet = DataSet(pressEntries, pressChartValueFormatter).customizeOptions(
-            colorPrimary,
-            minColor,
-            maxColor
-        )
+        val tempDataSet = DataSet(tempEntries, tempChartValueFormatter).customizeOptions(colorPrimary)
+        val humDataSet = DataSet(humEntries, humChartValueFormatter).customizeOptions(colorPrimary)
+        val pressDataSet = DataSet(pressEntries, pressChartValueFormatter).customizeOptions(colorPrimary)
 
         val tempData = ChartData(tempDataSet)
         val humData = ChartData(humDataSet)
@@ -117,12 +101,9 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
         return createChartView(this, report.stats, tempData, humData, pressData, CHART_OPTIONS)
     }
 
-    private fun DataSet.customizeOptions(colorPrimary: Int, minColor: Int, maxColor: Int): DataSet {
+    private fun DataSet.customizeOptions(colorPrimary: Int): DataSet {
         circleColor = colorPrimary
         color = colorPrimary
-
-        yMinColor = minColor
-        yMaxColor = maxColor
 
         return this
     }

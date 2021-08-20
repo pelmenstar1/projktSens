@@ -126,9 +126,8 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
             if (drawLabels) {
                 String label = labels[eOffset];
 
-                float lineHeight = labelPaint.getFontMetrics(labelFontMetrics);
+                labelPaint.getFontMetrics(labelFontMetrics);
 
-                float textX = -labelBounds.left - labelBounds.width() * 0.5f + x;
                 float textYOffset = -labelFontMetrics.ascent;
 
                 if (pos == XAxis.POSITION_TOP || pos == XAxis.POSITION_BOTH_SIDED) {

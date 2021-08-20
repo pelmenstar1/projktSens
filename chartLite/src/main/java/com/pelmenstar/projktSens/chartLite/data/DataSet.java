@@ -19,22 +19,17 @@ public final class DataSet {
     @NotNull
     public final String[] labels;
     private final long[] entries;
-    //private long[] customEntryColors = EmptyArray.LONG;
+
     @NotNull
     private final ValueFormatter valueFormatter;
     private int flags = FLAG_VISIBLE | FLAG_DRAW_VALUES | FLAG_DRAW_CIRCLES;
-    private int xMaxIndex;
-    private int xMaxColor = SpecialColors.NONE;
+
     private float xMax = Float.MIN_VALUE;
-    private int xMinIndex;
-    private int xMinColor = SpecialColors.NONE;
     private float xMin = Float.MAX_VALUE;
-    private int yMaxIndex;
-    private int yMaxColor = SpecialColors.NONE;
+
     private float yMax = Float.MIN_VALUE;
-    private int yMinIndex;
-    private int yMinColor = SpecialColors.NONE;
     private float yMin = Float.MAX_VALUE;
+
     @ColorInt
     private int color = Color.BLACK;
     @ColorInt
@@ -47,7 +42,7 @@ public final class DataSet {
     private int circleColor = Color.BLACK;
     private float circleRadius = 8f;
 
-    public DataSet(@NotNull long[] entries, @Nullable ValueFormatter formatter) {
+    public DataSet(long @NotNull [] entries, @Nullable ValueFormatter formatter) {
         this.entries = entries;
 
         if (formatter == null) {
@@ -65,77 +60,21 @@ public final class DataSet {
 
             if (ex < xMin) {
                 xMin = ex;
-                xMinIndex = i;
             }
             if (ex > xMax) {
                 xMax = ex;
-                xMaxIndex = i;
             }
 
             if (ey < yMin) {
                 yMin = ey;
-                yMinIndex = i;
             }
 
             if (ey > yMax) {
                 yMax = ey;
-                yMaxIndex = i;
             }
 
             labels[i] = formatter.format(ey);
         }
-    }
-
-    public int getXMinIndex() {
-        return xMinIndex;
-    }
-
-    @ColorInt
-    public int getXMinColor() {
-        return xMinColor;
-    }
-
-    public void setXMinColor(@ColorInt int color) {
-        xMinColor = color;
-    }
-
-    public int getXMaxIndex() {
-        return xMaxIndex;
-    }
-
-    @ColorInt
-    public int getXMaxColor() {
-        return xMaxColor;
-    }
-
-    public void setXMaxColor(@ColorInt int color) {
-        xMaxColor = color;
-    }
-
-    public int getYMinIndex() {
-        return yMinIndex;
-    }
-
-    @ColorInt
-    public int getYMinColor() {
-        return yMinColor;
-    }
-
-    public void setYMinColor(@ColorInt int color) {
-        this.yMinColor = color;
-    }
-
-    public int getYMaxIndex() {
-        return yMaxIndex;
-    }
-
-    @ColorInt
-    public int getYMaxColor() {
-        return yMaxColor;
-    }
-
-    public void setYMaxColor(@ColorInt int color) {
-        yMaxColor = color;
     }
 
     public int getFlags() {
@@ -239,8 +178,7 @@ public final class DataSet {
         return -1;
     }
 
-    @NotNull
-    public long[] getEntries() {
+    public long @NotNull [] getEntries() {
         return entries;
     }
 

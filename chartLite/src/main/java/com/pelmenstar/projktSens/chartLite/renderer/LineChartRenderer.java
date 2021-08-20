@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 public final class LineChartRenderer {
     private final Paint linePaint;
     private final Paint circlePaint;
-    private final Paint customCirclePaint;
     private final Paint labelPaint;
 
     @NotNull
@@ -45,7 +44,6 @@ public final class LineChartRenderer {
 
         linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        customCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         labelPaint.setTextAlign(Paint.Align.CENTER);
@@ -127,16 +125,6 @@ public final class LineChartRenderer {
 
                 String[] labels = dataSet.labels;
 
-                int xMinIdx = dataSet.getXMinIndex();
-                int xMaxIdx = dataSet.getXMaxIndex();
-                int yMinIdx = dataSet.getYMinIndex();
-                int yMaxIdx = dataSet.getYMaxIndex();
-
-                int xMinColor = dataSet.getXMinColor();
-                int xMaxColor = dataSet.getXMaxColor();
-                int yMinColor = dataSet.getYMinColor();
-                int yMaxColor = dataSet.getYMaxColor();
-
                 long[] entries = dataSet.getEntries();
                 int eIndex = 0;
 
@@ -164,30 +152,12 @@ public final class LineChartRenderer {
                     }
 
                     if (drawCircles) {
-                        Paint paint;
-
-                        if (eIndex == xMinIdx && xMinColor != SpecialColors.NONE) {
-                            customCirclePaint.setColor(xMinColor);
-                            paint = customCirclePaint;
-                        } else if (eIndex == xMaxIdx && xMaxColor != SpecialColors.NONE) {
-                            customCirclePaint.setColor(xMaxColor);
-                            paint = customCirclePaint;
-                        } else if (eIndex == yMinIdx && yMinColor != SpecialColors.NONE) {
-                            customCirclePaint.setColor(yMinColor);
-                            paint = customCirclePaint;
-                        } else if (eIndex == yMaxIdx && yMaxColor != SpecialColors.NONE) {
-                            customCirclePaint.setColor(yMaxColor);
-                            paint = customCirclePaint;
-                        } else {
-                            paint = circlePaint;
-                        }
-
                         c.drawOval(
                                 x - circleRadius,
                                 y - circleRadius,
                                 x + circleRadius,
                                 y + circleRadius,
-                                paint
+                                circlePaint
                         );
                     }
 
