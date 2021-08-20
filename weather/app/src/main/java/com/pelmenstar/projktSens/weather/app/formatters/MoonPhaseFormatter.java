@@ -18,7 +18,7 @@ public final class MoonPhaseFormatter {
 
         //noinspection StringBufferReplaceableByString
         StringBuilder sb = new StringBuilder(phaseStr.length() + 8);
-        sb.append(MyMath.round(phase));
+        sb.append(MyMath.round(phase * 100f));
         sb.append('%');
         sb.append(' ');
         sb.append('(');
