@@ -48,11 +48,11 @@ public final class ViewPortHandler {
         invCvtMatrix.invert(invCvtMatrix);
     }
 
-    public void valuesToPixels(@NotNull float[] pts) {
+    public void valuesToPixels(float @NotNull [] pts) {
         cvtMatrix.mapPoints(pts, 0, pts, 0, pts.length >> 1);
     }
 
-    public void pixelsToValues(@NotNull float[] pixels) {
+    public void pixelsToValues(float @NotNull [] pixels) {
         invCvtMatrix.mapPoints(pixels, 0, pixels, 0, pixels.length >> 1);
     }
 

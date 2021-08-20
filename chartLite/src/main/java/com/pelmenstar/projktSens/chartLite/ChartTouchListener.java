@@ -31,8 +31,6 @@ public final class ChartTouchListener {
     private float touchCenterY;
     private float savedXDist = 1f;
 
-    //private float decCurrentPointX;
-    //private float decCurrentPointY;
     private float savedYDist = 1f;
     private float savedDist = 1f;
     private long decelerationLastTime = 0;
@@ -290,9 +288,6 @@ public final class ChartTouchListener {
 
         float distanceX = decVelocityX * timeInterval;
         float distanceY = decVelocityY * timeInterval;
-
-        //decCurrentPointX += distanceX;
-        //decCurrentPointY += distanceY;
 
         float dragDistanceX = chart.isDragXEnabled() ? distanceX - touchStartX : 0f;
         float dragDistanceY = chart.isDragYEnabled() ? distanceY - touchStartY : 0f;
