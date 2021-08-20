@@ -109,7 +109,7 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
         int valueTempUnit = ValueUnitsPacked.getTemperatureUnit(valueUnits);
         int valuePressUnit = ValueUnitsPacked.getPressureUnit(valueUnits);
 
-        tempUnitStr = unitFormatter.getUnitString(valueTempUnit);
+        tempUnitStr = unitFormatter.getUnitString(prefTempUnit);
         tempStr = Float.toString(UnitValue.getValue(value.temperature, valueTempUnit, prefTempUnit));
         humStr = unitFormatter.formatValue(value.humidity, ValueUnit.HUMIDITY);
         pressStr = unitFormatter.formatValue(UnitValue.getValue(value.pressure, valuePressUnit, prefPressUnit), prefPressUnit);
