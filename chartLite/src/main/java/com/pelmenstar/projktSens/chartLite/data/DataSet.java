@@ -5,7 +5,6 @@ import android.graphics.Typeface;
 
 import androidx.annotation.ColorInt;
 
-import com.pelmenstar.projktSens.chartLite.SpecialColors;
 import com.pelmenstar.projktSens.chartLite.formatter.FloatValueFormatter;
 import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
 
@@ -16,8 +15,9 @@ public final class DataSet {
     public static final int FLAG_VISIBLE = 1;
     public static final int FLAG_DRAW_VALUES = 1 << 1;
     public static final int FLAG_DRAW_CIRCLES = 1 << 2;
-    @NotNull
-    public final String[] labels;
+
+    public final @NotNull String @Nullable [] cachedStringLabels;
+
     private final long[] entries;
 
     @NotNull
@@ -50,7 +50,14 @@ public final class DataSet {
         }
 
         valueFormatter = formatter;
-        labels = new String[entries.length];
+
+        boolean formatToStringImplemented = !formatter.supportsFormattingToCharArray();
+
+        if(formatToStringImplemented) {
+            cachedStringLabels = new String[entries.length];
+        } else {
+            cachedStringLabels = null;
+        }
 
         for (int i = 0; i < entries.length; i++) {
             long e = entries[i];
@@ -73,7 +80,9 @@ public final class DataSet {
                 yMax = ey;
             }
 
-            labels[i] = formatter.format(ey);
+            if(formatToStringImplemented) {
+                cachedStringLabels[i] = formatter.formatToString(ey);
+            }
         }
     }
 

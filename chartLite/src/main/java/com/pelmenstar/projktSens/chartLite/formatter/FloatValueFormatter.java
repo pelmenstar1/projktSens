@@ -12,16 +12,17 @@ import org.jetbrains.annotations.NotNull;
  * <br/> <br/>
  * This class is singleton. Can be accessed through {@link FloatValueFormatter#INSTANCE}
  */
-public final class FloatValueFormatter implements ValueFormatter {
+public final class FloatValueFormatter extends ValueFormatter {
     @NotNull
     public static final FloatValueFormatter INSTANCE = new FloatValueFormatter();
 
     private FloatValueFormatter() {
+        super(false);
     }
 
     @NotNull
     @Override
-    public String format(float value) {
+    public String formatToString(float value) {
         int i = (int) value;
         if (i == value) {
             return Integer.toString(i);

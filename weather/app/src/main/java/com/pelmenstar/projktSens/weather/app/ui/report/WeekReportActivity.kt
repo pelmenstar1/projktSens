@@ -170,22 +170,23 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
         return this
     }
 
-    private object DayChartFormatter : ValueFormatter {
+    private object DayChartFormatter : ValueFormatter(true) {
         private val textCache = CharArray(2)
 
-        override fun format(value: Float): String {
+        override fun formatToCharArray(value: Float): CharArray {
             val text = textCache
 
             val day = value.toInt()
             StringUtils.writeTwoDigits(text, 0, day)
-            return String(text, 0, 2)
+
+            return text
         }
     }
 
-    private object DayMonthChartFormatter : ValueFormatter {
+    private object DayMonthChartFormatter : ValueFormatter(true) {
         private val textCache = CharArray(5)
 
-        override fun format(value: Float): String {
+        override fun formatToCharArray(value: Float): CharArray {
             val text = textCache
 
             val month = (value / 31).toInt()
@@ -193,7 +194,8 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
             StringUtils.writeTwoDigits(text, 0, month)
             text[2] = '.'
             StringUtils.writeTwoDigits(text, 3, day)
-            return String(text, 0, 5)
+
+            return text
         }
     }
 

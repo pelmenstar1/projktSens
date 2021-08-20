@@ -6,11 +6,11 @@ import android.graphics.RectF;
 
 import com.pelmenstar.projktSens.chartLite.DataRef;
 import com.pelmenstar.projktSens.chartLite.SimpleChartAnimator;
-import com.pelmenstar.projktSens.chartLite.SpecialColors;
 import com.pelmenstar.projktSens.chartLite.ViewPortHandler;
 import com.pelmenstar.projktSens.chartLite.data.ChartData;
 import com.pelmenstar.projktSens.chartLite.data.DataSet;
 import com.pelmenstar.projktSens.chartLite.data.Entry;
+import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
 import com.pelmenstar.projktSens.shared.EmptyArray;
 
 import org.jetbrains.annotations.NotNull;
@@ -123,7 +123,8 @@ public final class LineChartRenderer {
                     valOffset *= 0.5f;
                 }
 
-                String[] labels = dataSet.labels;
+                String[] labels = dataSet.cachedStringLabels;
+                ValueFormatter valueFormatter = dataSet.getValueFormatter();
 
                 long[] entries = dataSet.getEntries();
                 int eIndex = 0;
@@ -162,9 +163,16 @@ public final class LineChartRenderer {
                     }
 
                     if (drawValues && eIndex > 0 && eIndex < maxIdx) {
-                        String label = labels[eIndex];
+                        float textY = y - valOffset;
+                        if(labels != null) {
+                            String label = labels[eIndex];
 
-                        c.drawText(label, 0, label.length(), x, y - valOffset, labelPaint);
+                            c.drawText(label, 0, label.length(), x, textY, labelPaint);
+                        } else {
+                            char[] buffer = valueFormatter.formatToCharArray(y);
+
+                            c.drawText(buffer, 0, buffer.length, x, textY, labelPaint);
+                        }
                     }
 
                     eIndex++;

@@ -67,18 +67,11 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
 
             float v = min;
 
-            if (axis.labels.length != labelCount) {
-                axis.labels = new String[labelCount];
-            }
-
-            String[] labels = axis.labels;
             long hash = 0;
 
             for (int i = 0; i < labelCount; i++) {
                 entries[i] = v;
                 hash = hash * 31 + Float.floatToIntBits(v);
-
-                labels[i] = valueFormatter.format(v);
 
                 v += interval;
             }
@@ -134,26 +127,30 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
                 axis.entries = entries;
             }
 
-            String[] labels = axis.labels;
-            if (labels.length != n) {
-                labels = new String[n];
-                axis.labels = labels;
-            }
-
             float v = first;
-            int i = 0;
             long hash = 0;
 
-            while (i < n) {
+            for(int i = 0; i < n; i++) {
                 entries[i] = v;
                 hash = hash * 31 + Float.floatToIntBits(v);
-                labels[i] = valueFormatter.format(v);
 
                 v += interval;
-                i++;
             }
 
             axis.entriesHash = hash;
+        }
+
+        if(!valueFormatter.supportsFormattingToCharArray()) {
+            String[] labels = axis.labels;
+            int n = entries.length;
+
+            if (labels == null || labels.length != n) {
+                axis.labels = labels = new String[n];
+            }
+
+            for(int i = 0; i < n; i++) {
+                labels[i] = valueFormatter.formatToString(entries[i]);
+            }
         }
     }
 

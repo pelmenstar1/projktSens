@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 
 import com.pelmenstar.projktSens.chartLite.ViewPortHandler;
 import com.pelmenstar.projktSens.chartLite.components.YAxis;
+import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
 import com.pelmenstar.projktSens.shared.EmptyArray;
 
 import org.jetbrains.annotations.NotNull;
@@ -79,6 +80,7 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
         float[] entries = axis.entries;
         String[] labels = axis.labels;
         int pos = axis.getPosition();
+        ValueFormatter valueFormatter = axis.getValueFormatter();
 
         float xOffset = axis.getXOffset();
 
@@ -119,14 +121,26 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
             float y = computedPoints[pOffset];
 
             if (drawLabels) {
-                String label = labels[eOffset];
-
                 if (pos == YAxis.POSITION_LEFT || pos == YAxis.POSITION_BOTH) {
-                    c.drawText(label, 0, label.length(), 1f, y, labelPaint);
+                    if(labels != null) {
+                        String label = labels[eOffset];
+                        c.drawText(label, 0, label.length(), 1f, y, labelPaint);
+                    } else {
+                        char[] text = valueFormatter.formatToCharArray(entries[eOffset]);
+                        c.drawText(text, 0, text.length, 1f, y, labelPaint);
+                    }
                 }
 
                 if (pos == YAxis.POSITION_RIGHT || pos == YAxis.POSITION_BOTH) {
-                    c.drawText(label, 0, label.length(), contentRight + xOffset, y, labelPaint);
+                    float x = contentRight + xOffset;
+
+                    if(labels != null) {
+                        String label = labels[eOffset];
+                        c.drawText(label, 0, label.length(), x, y, labelPaint);
+                    } else {
+                        char[] text = valueFormatter.formatToCharArray(entries[eOffset]);
+                        c.drawText(text, 0, text.length, x, y, labelPaint);
+                    }
                 }
             }
 

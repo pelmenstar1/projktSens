@@ -78,10 +78,15 @@ public final class YAxis extends AxisBase {
         p.setTypeface(typeface);
         String str = "";
 
-        for (String label : labels) {
-            if (label.length() > str.length()) {
-                str = label;
+        if(labels != null) {
+            for (String label : labels) {
+                if (label.length() > str.length()) {
+                    str = label;
+                }
             }
+        } else {
+            char[] text = valueFormatter.formatToCharArray(0f);
+            str = new String(text);
         }
 
         float width = p.measureText(str, 0, str.length()) + getXOffset() * 2f;

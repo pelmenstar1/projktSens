@@ -7,16 +7,17 @@ import org.jetbrains.annotations.NotNull;
  * <br/> <br/>
  * This class is singleton. Can be accessed through {@link IntValueFormatter#INSTANCE}
  */
-public final class IntValueFormatter implements ValueFormatter {
+public final class IntValueFormatter extends ValueFormatter {
     @NotNull
     public static final IntValueFormatter INSTANCE = new IntValueFormatter();
 
     private IntValueFormatter() {
+        super(false);
     }
 
     @Override
     @NotNull
-    public String format(float value) {
+    public String formatToString(float value) {
         return Integer.toString((int) value);
     }
 }

@@ -2,10 +2,10 @@ package com.pelmenstar.projktSens.chartLite.renderer;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
 
 import com.pelmenstar.projktSens.chartLite.ViewPortHandler;
 import com.pelmenstar.projktSens.chartLite.components.XAxis;
+import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
 import com.pelmenstar.projktSens.shared.EmptyArray;
 
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 public final class XAxisRenderer extends AxisRenderer<XAxis> {
     private final float[] computeAxisValues = new float[4];
     private final Paint.FontMetrics labelFontMetrics = new Paint.FontMetrics();
-    private final Rect labelBounds = new Rect();
     private float[] computedPoints = EmptyArray.FLOAT;
     private long computedPointsAxisEntriesHash = 0;
     private long computedPointsVphHash = 0;
@@ -84,6 +83,7 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
         float[] entries = axis.entries;
         String[] labels = axis.labels;
         float yOffset = axis.getYOffset();
+        ValueFormatter valueFormatter = axis.getValueFormatter();
 
         int pos = axis.getPosition();
 
@@ -124,8 +124,6 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
             float x = computedPoints[pOffset];
 
             if (drawLabels) {
-                String label = labels[eOffset];
-
                 labelPaint.getFontMetrics(labelFontMetrics);
 
                 float textYOffset = -labelFontMetrics.ascent;
@@ -133,13 +131,25 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
                 if (pos == XAxis.POSITION_TOP || pos == XAxis.POSITION_BOTH_SIDED) {
                     float textY = textYOffset + contentTop - yOffset;
 
-                    c.drawText(label, 0, label.length(), x, textY, labelPaint);
+                    if(labels != null) {
+                        String label = labels[eOffset];
+                        c.drawText(label, 0, label.length(), x, textY, labelPaint);
+                    } else {
+                        char[] text = valueFormatter.formatToCharArray(entries[eOffset]);
+                        c.drawText(text, 0, text.length, x, textY, labelPaint);
+                    }
                 }
 
                 if (pos == XAxis.POSITION_BOTTOM || pos == XAxis.POSITION_BOTH_SIDED) {
                     float textY = textYOffset + contentBottom + yOffset;
 
-                    c.drawText(label, 0, label.length(), x, textY, labelPaint);
+                    if(labels != null) {
+                        String label = labels[eOffset];
+                        c.drawText(label, 0, label.length(), x, textY, labelPaint);
+                    } else {
+                        char[] text = valueFormatter.formatToCharArray(entries[eOffset]);
+                        c.drawText(text, 0, text.length, x, textY, labelPaint);
+                    }
                 }
             }
 

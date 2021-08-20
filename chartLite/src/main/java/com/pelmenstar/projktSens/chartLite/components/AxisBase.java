@@ -26,11 +26,12 @@ public abstract class AxisBase {
     protected static final int FLAG_CUSTOM_AXIS_MIN = 1 << 5;
     protected static final int FLAG_CUSTOM_AXIS_MAX = 1 << 6;
     protected static final int FLAG_ENABLED = 1 << 7;
-    @NotNull
-    public float[] entries = EmptyArray.FLOAT;
+
+    public float @NotNull [] entries = EmptyArray.FLOAT;
     public long entriesHash = 0;
-    @NotNull
-    public String[] labels = EmptyArray.STRING;
+
+    public @NotNull String @Nullable [] labels = EmptyArray.STRING;
+
     @NotNull
     protected ValueFormatter valueFormatter = FloatValueFormatter.INSTANCE;
     protected float granularity = 1f;
@@ -258,12 +259,16 @@ public abstract class AxisBase {
     public void setValueFormatter(@NotNull ValueFormatter f) {
         valueFormatter = f;
 
-        if (labels.length != entries.length) {
-            labels = new String[entries.length];
-        }
+        if(f.supportsFormattingToCharArray()) {
+            labels = null;
+        } else {
+            if (labels == null || labels.length != entries.length) {
+                labels = new String[entries.length];
+            }
 
-        for (int i = 0; i < entries.length; i++) {
-            labels[i] = f.format(entries[i]);
+            for (int i = 0; i < entries.length; i++) {
+                labels[i] = f.formatToString(entries[i]);
+            }
         }
     }
 
