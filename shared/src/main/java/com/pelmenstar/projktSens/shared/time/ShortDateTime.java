@@ -141,6 +141,22 @@ public final class ShortDateTime {
         return ofInternal(ShortDate.ofEpochDay(epochDay), secsOfDay);
     }
 
+    public static long hourAbsDifference(@ShortDateTimeLong long a, @ShortDateTimeLong long b) {
+        long aEpoch = toEpochSecond(a);
+        long bEpoch = toEpochSecond(b);
+        long diff = Math.abs(aEpoch - bEpoch);
+
+        return diff / 3600;
+    }
+
+    @ShortDateTimeLong
+    public static long absDifference(@ShortDateTimeLong long a, @ShortDateTimeLong long b) {
+        long aEpoch = toEpochSecond(a);
+        long bEpoch = toEpochSecond(b);
+
+        return ofEpochSecond(Math.abs(aEpoch - bEpoch));
+    }
+
     /**
      * Adds specified seconds to particular datetime-long and returns the last one.
      *
