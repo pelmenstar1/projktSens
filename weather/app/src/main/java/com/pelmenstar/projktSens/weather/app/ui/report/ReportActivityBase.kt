@@ -7,11 +7,14 @@ import android.os.Message
 import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.widget.LinearLayout
 import androidx.core.content.res.ResourcesCompat
+import com.pelmenstar.projktSens.shared.android.NetworkUtils
 import com.pelmenstar.projktSens.shared.android.SerializableParcelWrapper
 import com.pelmenstar.projktSens.shared.android.ext.Message
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
+import com.pelmenstar.projktSens.weather.app.NetworkDataSource
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
@@ -36,6 +39,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
     private var loadingView: View? = null
     private var noDataView: View? = null
     private var errorView: View? = null
+    private var noNetworkView: View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,16 +75,21 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
             return
         }
 
-        setStatus(STATUS_LOADING)
+        val component = DaggerAppComponent
+            .builder()
+            .appModule(AppModule(this))
+            .build()
+
+        val dataSource = component.dataSource()
+        val isConnected = NetworkUtils.isConnectedToAnyNetwork(this)
+        if(!isConnected) {
+            setStatus(STATUS_NO_NETWORK)
+            return
+        } else {
+            setStatus(STATUS_LOADING)
+        }
 
         loadReportJob = scope.launch {
-            val component = DaggerAppComponent
-                .builder()
-                .appModule(AppModule(this@ReportActivityBase))
-                .build()
-
-            val dataSource = component.dataSource()
-
             var newStatus: Int
             try {
                 val r = loadReport(dataSource)
@@ -115,6 +124,13 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         }
 
         when (status) {
+            STATUS_NO_NETWORK -> {
+                if(noNetworkView == null) {
+                    noNetworkView = createNoNetworkView()
+                }
+
+                setContentView(noNetworkView)
+            }
             STATUS_LOADING -> {
                 if (loadingView == null) {
                     loadingView = createLoadingView()
@@ -149,6 +165,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                 noDataView = null
                 errorView = null
                 loadingView = null
+                noNetworkView = null
 
                 setContentView(createChartView(r))
             }
@@ -172,12 +189,12 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         val res = resources
 
         val retryButtonSize =
-            res.getDimensionPixelSize(R.dimen.reportActivity_errorView_retryButtonSize)
+            res.getDimensionPixelSize(R.dimen.reportActivity_retryButtonSize)
         val retryButtonTopMargin =
-            res.getDimensionPixelSize(R.dimen.reportActivity_errorView_retryButtonTopMargin)
+            res.getDimensionPixelSize(R.dimen.reportActivity_retryButtonTopMargin)
 
         return LinearLayout(this) {
-            orientation = android.widget.LinearLayout.VERTICAL
+            orientation = LinearLayout.VERTICAL
 
             TextView {
                 linearLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
@@ -215,6 +232,36 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                 colorTransition =
                     LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
                 transitionView = this
+            }
+        }
+    }
+
+    private fun createNoNetworkView(): View {
+        val res = resources
+
+        return LinearLayout(this) {
+            orientation = LinearLayout.VERTICAL
+
+            View {
+                val size = res.getDimensionPixelSize(R.dimen.reportActivity_noNetwork_iconSize)
+                linearLayoutParams(size, size) {
+                    topMargin = res.getDimensionPixelOffset(R.dimen.reportActivity_noNetwork_iconTopMargin)
+                    gravity = Gravity.CENTER_HORIZONTAL
+                }
+
+                background = ResourcesCompat.getDrawable(res, R.drawable.ic_wifi_off, theme)
+            }
+            Button {
+                val size = res.getDimensionPixelSize(R.dimen.reportActivity_retryButtonSize)
+                linearLayoutParams(size, size) {
+                    gravity = Gravity.CENTER_HORIZONTAL
+                    topMargin = res.getDimensionPixelSize(R.dimen.reportActivity_retryButtonTopMargin)
+                }
+
+                background = ResourcesCompat.getDrawable(res, R.drawable.ic_retry, theme)
+                setOnClickListener {
+                    startLoadingReport()
+                }
             }
         }
     }
@@ -271,6 +318,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         private val scope = CoroutineScope(Dispatchers.Default + CoroutineName("ReportScope"))
         private const val MSG_SET_STATUS = 0
 
+        private const val STATUS_NO_NETWORK = 4
         private const val STATUS_LOADING = 3
         private const val STATUS_NO_DATA = 0
         private const val STATUS_ERROR = 1
