@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.drawable.RotateDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -256,6 +257,8 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
                 }
             }
 
+            val nextDrawable = ResourcesCompat.getDrawable(res, R.drawable.ic_next, theme)!!
+
             prevScreenButton = Button {
                 frameLayoutParams(actionButtonSize, actionButtonSize) {
                     gravity = Gravity.START or Gravity.BOTTOM
@@ -264,7 +267,11 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
                     bottomMargin = actionButtonMargin
                 }
 
-                background = ResourcesCompat.getDrawable(res, R.drawable.ic_previous, theme)
+                background = RotateDrawable().apply {
+                    drawable = nextDrawable.constantState?.newDrawable()
+                    rotation = 180f
+                }
+
                 setOnClickListener {
                     presenter.previousScreen()
                 }
@@ -278,7 +285,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
                     bottomMargin = actionButtonMargin
                 }
 
-                background = ResourcesCompat.getDrawable(res, R.drawable.ic_next, theme)
+                background = nextDrawable
                 setOnClickListener { nextScreenOrFinish() }
             }
         }
@@ -294,7 +301,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
     }
 
     override fun setCurrentScreenFlags(first: Boolean, last: Boolean) {
-        prevScreenButton.isEnabled = !first
+        prevScreenButton.visibility = if(first) View.INVISIBLE else View.VISIBLE
 
         isFirstScreen = first
         isLastScreen = last
