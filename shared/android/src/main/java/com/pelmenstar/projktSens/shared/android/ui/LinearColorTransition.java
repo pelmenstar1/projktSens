@@ -129,7 +129,9 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
 
         CacheEntry cacheEntry = transitionCacheByHash.get(hash, null);
         if (cacheEntry != null) {
-            return new LinearColorTransition(cacheEntry.colors, cacheEntry.framesPerColor);
+            if(cacheEntry.framesPerColor == frames) {
+                return new LinearColorTransition(cacheEntry.colors, frames);
+            }
         }
 
         int[] tColors = new int[frames];
@@ -214,7 +216,9 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
         int hash = Arrays.hashCode(colors);
         CacheEntry cacheEntry = transitionCacheByHash.get(hash, null);
         if (cacheEntry != null) {
-            return new LinearColorTransition(cacheEntry.colors, cacheEntry.framesPerColor);
+            if(cacheEntry.framesPerColor == framesPerColor) {
+                return new LinearColorTransition(cacheEntry.colors, framesPerColor);
+            }
         }
 
         int idx = 0;
@@ -294,7 +298,9 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
             boolean putToCache) {
         CacheEntry cacheEntry = transitionCacheByResId.get(colorsRes, null);
         if (cacheEntry != null) {
-            return new LinearColorTransition(cacheEntry.colors, cacheEntry.framesPerColor);
+            if(frames == cacheEntry.framesPerColor) {
+                return new LinearColorTransition(cacheEntry.colors, frames);
+            }
         }
 
         int[] colors = context.getResources().getIntArray(colorsRes);
@@ -303,7 +309,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
         if (putToCache) {
             transitionCacheByResId.put(
                     colorsRes,
-                    new CacheEntry(transition.transColors, transition.framesPerColor)
+                    new CacheEntry(transition.transColors, frames)
             );
         }
 
