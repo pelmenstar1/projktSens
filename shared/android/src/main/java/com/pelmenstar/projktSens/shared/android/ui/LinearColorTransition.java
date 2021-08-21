@@ -2,7 +2,10 @@ package com.pelmenstar.projktSens.shared.android.ui;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.util.SparseArray;
+import android.view.Display;
+import android.view.WindowManager;
 
 import androidx.annotation.ArrayRes;
 import androidx.annotation.ColorInt;
@@ -249,6 +252,38 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
             int frames
     ) {
         return fromArrayRes(context, colorsRes, frames, true);
+    }
+
+    @NotNull
+    public static LinearColorTransition fromArrayResWithDisplayRefreshRate(
+            @NotNull Context context,
+            @ArrayRes int colorRes
+    ) {
+        return fromArrayResWithDisplayRefreshRate(context, colorRes, true);
+    }
+
+    @NotNull
+    public static LinearColorTransition fromArrayResWithDisplayRefreshRate(
+            @NotNull Context context,
+            @ArrayRes int colorsRes,
+            boolean putToCache
+    ) {
+        Display display;
+        if(Build.VERSION.SDK_INT >= 30) {
+            display = context.getDisplay();
+        } else {
+            WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+            display = windowManager.getDefaultDisplay();
+        }
+
+        int frameRate;
+        if(display != null) {
+            frameRate = (int)display.getRefreshRate();
+        } else {
+            frameRate = DEFAULT_TRANSITION_FRAMES;
+        }
+
+        return fromArrayRes(context, colorsRes, frameRate, putToCache);
     }
 
     @NotNull

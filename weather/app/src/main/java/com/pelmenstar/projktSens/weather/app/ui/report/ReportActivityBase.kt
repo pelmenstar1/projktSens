@@ -229,8 +229,10 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                     gravity = Gravity.CENTER
                 }
 
-                colorTransition =
-                    LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
+                colorTransition = LinearColorTransition.fromArrayResWithDisplayRefreshRate(
+                    context,
+                    R.array.defaultTransitionColors
+                )
                 transitionView = this
             }
         }

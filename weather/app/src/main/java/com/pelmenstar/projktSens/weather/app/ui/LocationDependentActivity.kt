@@ -91,8 +91,10 @@ abstract class LocationDependentActivity : HomeButtonSupportActivity() {
                     gravity = Gravity.CENTER
                 }
 
-                colorTransition =
-                    LinearColorTransition.fromArrayRes(context, R.array.defaultTransitionColors)
+                colorTransition = LinearColorTransition.fromArrayResWithDisplayRefreshRate(
+                    context,
+                    R.array.defaultTransitionColors
+                )
             }
         }
     }
