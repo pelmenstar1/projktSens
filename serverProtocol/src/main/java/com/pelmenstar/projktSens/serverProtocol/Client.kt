@@ -53,8 +53,6 @@ class Client(config: ProtoConfig) {
             Response.Empty -> null
             is Response.Error -> throw ServerException(response.error)
             is Response.Ok<*> -> response.value as T
-
-            else -> throw ServerException(Errors.INVALID_RESPONSE)
         }
     }
 

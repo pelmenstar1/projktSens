@@ -10,12 +10,12 @@ import java.sql.SQLException;
  */
 public final class Errors {
     /**
-     * Signals that no error was happened
+     * Signals that no error happened
      */
     public static final int NONE = 0;
 
     /**
-     * Signals that unknown error was happened
+     * Signals that unknown error happened
      */
     public static final int UNKNOWN = 1;
 
@@ -30,19 +30,14 @@ public final class Errors {
     public static final int INVALID_COMMAND = 3;
 
     /**
-     * Signals that some kind of database error was happened
+     * Signals that some kind of database error happened
      */
     public static final int INTERNAL_DB_ERROR = 4;
 
     /**
-     * Signals that some kind of IO error was happened
+     * Signals that some kind of IO error happened
      */
     public static final int IO = 5;
-
-    /**
-     * Made for clients to mark that server's response was not valid
-     */
-    public static final int INVALID_RESPONSE = 6;
 
     private static final String[] ERROR_NAMES = new String[]{
             "NONE",
@@ -51,7 +46,6 @@ public final class Errors {
             "INVALID_COMMAND",
             "INTERNAL_DB_ERROR",
             "IO",
-            "INVALID_RESPONSE"
     };
 
     private Errors() {
@@ -65,8 +59,6 @@ public final class Errors {
     public static int exceptionToError(@NotNull Exception e) {
         if (e instanceof IOException) {
             return IO;
-        } else if (e instanceof SQLException) {
-            return INTERNAL_DB_ERROR;
         } else {
             return UNKNOWN;
         }

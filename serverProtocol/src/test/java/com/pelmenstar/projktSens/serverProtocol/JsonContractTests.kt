@@ -50,7 +50,6 @@ class JsonContractTests {
         testCase(Errors.UNKNOWN)
         testCase(Errors.INVALID_COMMAND)
         testCase(Errors.INVALID_ARGUMENTS)
-        testCase(Errors.INVALID_RESPONSE)
         testCase(Errors.IO)
         testCase(Errors.INTERNAL_DB_ERROR)
     }
