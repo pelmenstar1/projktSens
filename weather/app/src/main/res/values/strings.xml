@@ -47,6 +47,7 @@
     <string name="port">Server port</string>
     <string name="settings_weatherRcvInterval_name">Receive interval (ms)</string>
     <string name="settings_weatherRcvInterval_lessOrEqZero">Less or equal 0</string>
+    <string name="settings_lockHomeScreen">Lock home screen</string>
 
     <string name="lazyLoadingCalendar_failedToLoad">Failed to load calendar</string>
     <string name="failedToGetLocation">Failed to get your location</string>

@@ -10,6 +10,7 @@ import android.widget.AdapterView.OnItemSelectedListener
 import androidx.annotation.ArrayRes
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.pelmenstar.projktSens.serverProtocol.ContractType
 import com.pelmenstar.projktSens.shared.EmptyArray
 import com.pelmenstar.projktSens.shared.InetAddressUtils
@@ -31,7 +32,8 @@ val APP_SETTING_CLASSES: Array<out Class<out Setting<*>>> = arrayOf(
     ServerHostSetting::class.java,
     ServerContractSetting::class.java,
     ServerPortSetting::class.java,
-    WeatherReceiveIntervalSetting::class.java
+    WeatherReceiveIntervalSetting::class.java,
+    KeepHomeScreenOnSetting::class.java
 )
 
 @JvmField
@@ -530,6 +532,57 @@ class WeatherReceiveIntervalSetting : Setting<WeatherReceiveIntervalSetting.Stat
 
     companion object {
         private const val BUNDLE_STATE_INTERVAL = "WeatherReceiveIntervalSetting.State.interval"
+    }
+}
+
+class KeepHomeScreenOnSetting: Setting<KeepHomeScreenOnSetting.State>() {
+    class State(@JvmField var isEnabled: Boolean) {
+        override fun equals(other: Any?): Boolean {
+            return equalsPattern(other) { o -> isEnabled == o.isEnabled }
+        }
+
+        override fun hashCode(): Int {
+            return if(isEnabled) 1 else 0
+        }
+    }
+
+    override val nameId: Int
+        get() = R.string.settings_lockHomeScreen
+
+    override fun createView(context: Context): View {
+        return SwitchMaterial(context).apply {
+            isChecked = state.isEnabled
+
+            setOnCheckedChangeListener { _, isChecked ->
+                state.isEnabled = isChecked
+            }
+        }
+    }
+
+    override fun loadStateFromPrefs(prefs: Preferences) {
+        state = State(prefs.getBoolean(AppPreferences.KEEP_HOME_SCREEN_ON))
+    }
+
+    override fun loadStateFromBundle(bundle: Bundle): Boolean {
+        val isEnabled = bundle.get(BUNDLE_STATE_KEEP_HOME_SCREEN_ON) as Boolean?
+        return if(isEnabled != null) {
+            state = State(isEnabled)
+            true
+        } else {
+            false
+        }
+    }
+
+    override fun saveStateToPrefs(prefs: Preferences) {
+        prefs.setBoolean(AppPreferences.KEEP_HOME_SCREEN_ON, state.isEnabled)
+    }
+
+    override fun saveStateToBundle(outState: Bundle) {
+        outState.putBoolean(BUNDLE_STATE_KEEP_HOME_SCREEN_ON, state.isEnabled)
+    }
+
+    companion object {
+        private const val BUNDLE_STATE_KEEP_HOME_SCREEN_ON = "KeepHomeScreenOnSetting.state.isKeepHomeScreenOn"
     }
 }
 

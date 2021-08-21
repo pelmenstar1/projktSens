@@ -82,6 +82,10 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
         prettyDateFormatter = component.prettyDateFormatter()
         unitFormatter = component.unitFormatter()
+        val prefs = component.preferences()
+        if(prefs.isKeepHomeScreenOn) {
+            window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
 
         presenter = component.homePresenter().also {
             it.attach(this)

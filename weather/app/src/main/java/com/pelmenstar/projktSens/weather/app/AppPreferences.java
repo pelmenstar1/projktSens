@@ -10,32 +10,29 @@ public interface AppPreferences extends Preferences {
     int WEATHER_RECEIVE_INTERVAL = 5;
     int IS_GPS_PERMISSION_DENIED = 6;
     int IS_FIRST_START = 7;
+    int KEEP_HOME_SCREEN_ON = 8;
 
     int getUnits();
-
     void setUnits(int units);
 
     int getServerHostInt();
-
     void setServerHostInt(int value);
 
     int getContractType();
-
     void setContractType(int type);
 
     int getServerPort();
-
     void setServerPort(int port);
 
     int getWeatherReceiveInterval();
-
     void setWeatherReceiveInterval(int interval);
 
     boolean isGpsPermissionDenied();
-
     void setGpsPermissionDenied(boolean value);
 
     boolean isFirstStart();
-
     void setFirstStart(boolean value);
+
+    boolean isKeepHomeScreenOn();
+    void setKeepHomeScreenOn(boolean value);
 }

@@ -131,4 +131,5 @@
         <item>мм</item>
         <item>Па</item>
     </string-array>
+    <string name="settings_lockHomeScreen">Блокувати головний екран</string>
 </resources>
