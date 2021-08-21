@@ -176,11 +176,11 @@ class SettingsActivity : HomeButtonSupportActivity() {
                         val changed = recomputedHash != initialStateHash
 
                         if (changed) {
-                            prefs.beginModifying()
-                            settings.forEach {
-                                it.saveStateToPrefs(prefs)
+                            prefs.modify {
+                                settings.forEach { setting ->
+                                    setting.saveStateToPrefs(this)
+                                }
                             }
-                            prefs.endModifying()
                         }
 
                         setResult(changed)

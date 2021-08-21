@@ -13,3 +13,12 @@ interface Preferences {
     fun setBoolean(id: Int, value: Boolean)
     fun endModifying()
 }
+
+inline fun<T : Preferences> T.modify(block: T.() -> Unit) {
+    beginModifying()
+    try {
+        block()
+    } finally {
+        endModifying()
+    }
+}

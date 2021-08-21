@@ -2,6 +2,7 @@ package com.pelmenstar.projktSens.weather.app.ui.firstStart
 
 import android.os.Bundle
 import android.view.View
+import com.pelmenstar.projktSens.shared.android.modify
 import com.pelmenstar.projktSens.shared.android.mvp.BasePresenter
 import com.pelmenstar.projktSens.weather.app.AppPreferences
 
@@ -109,12 +110,12 @@ class FirstStartPresenter(
     }
 
     override fun onFinish() {
-        prefs.beginModifying()
-        for (screen in screens) {
-            screen.saveStateToPrefs(prefs)
+        prefs.modify {
+            screens.forEach { screen ->
+                screen.saveStateToPrefs(this)
+            }
+            prefs.isFirstStart = false
         }
-        prefs.isFirstStart = false
-        prefs.endModifying()
     }
 
     companion object {
