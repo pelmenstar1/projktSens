@@ -4,6 +4,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Writer;
 
+/**
+ * Allows {@link StringBuilder} to be {@link Writer}.
+ * Delegates all operations to {@link StringBuilder}
+ */
 public final class StringBuilderWriter extends Writer {
     private final StringBuilder sb;
 

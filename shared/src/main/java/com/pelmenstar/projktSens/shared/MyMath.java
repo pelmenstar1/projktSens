@@ -59,6 +59,9 @@ public final class MyMath {
         return value;
     }
 
+    /**
+     * Returns count of decimal digits in value
+     */
     public static int decimalDigitCount(int value) {
         if (value < 10) {
             return 1;

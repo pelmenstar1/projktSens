@@ -141,6 +141,11 @@ public final class ShortDateTime {
         return ofInternal(ShortDate.ofEpochDay(epochDay), secsOfDay);
     }
 
+    /**
+     * Returns absolute difference in hours between two datetimes
+     * @param a first datetime
+     * @param b second datetime
+     */
     public static long hourAbsDifference(@ShortDateTimeLong long a, @ShortDateTimeLong long b) {
         long aEpoch = toEpochSecond(a);
         long bEpoch = toEpochSecond(b);
@@ -149,6 +154,11 @@ public final class ShortDateTime {
         return diff / 3600;
     }
 
+    /**
+     * Returns absolute difference between two datetimes
+     * @param a first datetime
+     * @param b second datetime
+     */
     @ShortDateTimeLong
     public static long absDifference(@ShortDateTimeLong long a, @ShortDateTimeLong long b) {
         long aEpoch = toEpochSecond(a);
@@ -184,11 +194,19 @@ public final class ShortDateTime {
         return (long) ShortDate.toEpochDay(getDate(dateTime)) * TimeConstants.SECONDS_IN_DAY + time;
     }
 
+    /**
+     * Converts start of given date to epoch second.
+     * May be more efficient than {@code toEpochSecond(startOfDay(date))}
+     */
     @EpochSecondsLong
     public static long startOfDayToEpochSecond(@ShortDateInt int date) {
         return (long) ShortDate.toEpochDay(date) * TimeConstants.SECONDS_IN_DAY;
     }
 
+    /**
+     * Converts end of given date to epoch second.
+     * May be more efficient than {@code toEpochSecond(endOfDay(date))}
+     */
     @EpochSecondsLong
     public static long endOfDayToEpochSecond(@ShortDateInt int date) {
         final int endOfDay = TimeConstants.SECONDS_IN_DAY - 1;

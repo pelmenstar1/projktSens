@@ -9,10 +9,20 @@ import org.jetbrains.annotations.NotNull;
  * Abstract class that responsible for formatting dates in pretty view.
  */
 public abstract class PrettyDateFormatter {
+    /**
+     * Returns approximate count of chars needed to format datetime
+     * May return exact or less count of chart
+     * (Can return less in case of the date is today or yesterday)
+     */
     public final int approximatePrettyDateTimeLength(@ShortDateTimeLong long dateTime) {
         return approximatePrettyDateLength(ShortDateTime.getDate(dateTime)) + 6;
     }
 
+    /**
+     * Returns approximate count of chars needed to format date
+     * May return exact or less count of chart
+     * (Can return less in case of the date is today or yesterday)
+     */
     public final int approximatePrettyDateLength(@ShortDateInt int date) {
         int month = ShortDate.getMonth(date);
         int day = ShortDate.getDayOfMonth(date);

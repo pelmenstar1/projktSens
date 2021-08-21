@@ -31,7 +31,7 @@ public final class ShortDateRange extends AppendableToStringBuilder {
     public final int start;
 
     /**
-     * End date, inclusive. Always equals or greater than {@link ShortDateRange#start}
+     * End date, inclusive. Always greater than {@link ShortDateRange#start}
      */
     @ShortDateInt
     public final int endInclusive;
@@ -61,7 +61,6 @@ public final class ShortDateRange extends AppendableToStringBuilder {
         if (start > endInclusive) {
             throw new ValidationException("start > endInclusive");
         }
-
 
         this.start = start;
         this.endInclusive = endInclusive;

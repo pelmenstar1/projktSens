@@ -14,10 +14,21 @@ import org.jetbrains.annotations.NotNull;
  * {@link ObjectSerializer#getSerializedObjectSize(T)}
  */
 public interface ObjectSerializer<T> {
+    /**
+     * Returns determined count of bytes needed to store given value.
+     * Should return the same size for the same object.
+     */
     int getSerializedObjectSize(@NotNull T value);
 
+    /**
+     * Writes given value to writer.
+     */
     void writeObject(@NotNull T value, @NotNull ValueWriter writer);
 
+    /**
+     * Reads {@link T} object from given reader.
+     * Should create new object each time it's called.
+     */
     @Contract("_ -> new")
     @NotNull
     T readObject(@NotNull ValueReader reader) throws ValidationException;

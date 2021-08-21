@@ -61,7 +61,7 @@ public final class ValueReader {
     /**
      * Reads byte from the buffer and moves cursor for 1 byte
      *
-     * @throws IndexOutOfBoundsException if there are lack of data
+     * @throws IndexOutOfBoundsException if there is lack of data
      */
     public byte readInt8() {
         return data[position++];
@@ -70,7 +70,7 @@ public final class ValueReader {
     /**
      * Reads short from the internal buffer and moves cursor for 2 bytes
      *
-     * @throws IndexOutOfBoundsException if there are lack of data
+     * @throws IndexOutOfBoundsException if there is lack of data
      */
     public short readInt16() {
         short s = Bytes.readShort(data, position);
@@ -82,7 +82,7 @@ public final class ValueReader {
     /**
      * Reads int from the buffer and moves cursor for 4 bytes
      *
-     * @throws IndexOutOfBoundsException if there are lack of data
+     * @throws IndexOutOfBoundsException if there is lack of data
      */
     public int readInt32() {
         int i = Bytes.readInt(data, position);
@@ -94,7 +94,7 @@ public final class ValueReader {
     /**
      * Reads float from the buffer and moves cursor for 4 bytes
      *
-     * @throws IndexOutOfBoundsException if there are lack of data
+     * @throws IndexOutOfBoundsException if there is lack of data
      */
     public float readFloat() {
         return Float.intBitsToFloat(readInt32());
@@ -103,7 +103,7 @@ public final class ValueReader {
     /**
      * Reads long from the buffer and moves cursor for 8 bytes
      *
-     * @throws IndexOutOfBoundsException if there are lack of data
+     * @throws IndexOutOfBoundsException if there is lack of data
      */
     public long readInt64() {
         long l = Bytes.readLong(data, position);
@@ -112,6 +112,11 @@ public final class ValueReader {
         return l;
     }
 
+    /**
+     * Reads only 24 bits from the buffer.
+     *
+     * @throws IndexOutOfBoundsException if there is lack of data
+     */
     public int readInt24() {
         int i = Bytes.readInt24(data, position);
         position += 3;
@@ -120,6 +125,11 @@ public final class ValueReader {
         return i;
     }
 
+    /**
+     * Reads only 40 bits from the buffer.
+     *
+     * @throws IndexOutOfBoundsException if there is lack of data
+     */
     public long readInt40() {
         long l = Bytes.readInt40(data, position);
         position += 5;

@@ -48,6 +48,9 @@ public final class ShortTime {
         return time >= 0 && time < TimeConstants.SECONDS_IN_DAY;
     }
 
+    /**
+     * Returns given time if time isn't {@link ShortTime#NONE}, otherwise, returns defaultValue
+     */
     @TimeInt
     public static int defaultIfNone(@TimeInt int time, @TimeInt int defaultValue) {
         return time == NONE ? defaultValue : time;
@@ -62,7 +65,7 @@ public final class ShortTime {
     }
 
     /**
-     * Gets string representation of time-int in format 'HH:MM:SS'
+     * Returns string representation of time-int in format 'HH:MM:SS'
      *
      * @throws IllegalArgumentException if time isn't invalid
      */

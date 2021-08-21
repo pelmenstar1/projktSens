@@ -165,7 +165,7 @@ public final class ShortDate {
     }
 
     /**
-     * Returns today date-int in current time-zone
+     * Returns today date-int in current timezone
      */
     @ShortDateInt
     public static int now() {
@@ -173,7 +173,7 @@ public final class ShortDate {
     }
 
     /**
-     * Returns today epoch day in current time-zone
+     * Returns today epoch day in current timezone
      */
     public static int nowEpochDay() {
         return (int) (TimeUtils.currentLocalTimeMillis() / TimeConstants.MILLIS_IN_DAY);

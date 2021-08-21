@@ -24,7 +24,8 @@ public final class Serializable {
     }
 
     /**
-     * Gets a serializer for specified {@link Class}. Requirements for class is described in {@link ObjectSerializer}
+     * Gets a serializer for specified {@link Class}.
+     * Requirements for class is described in {@link ObjectSerializer}
      *
      * @throws SerializerContractException if given class doesn't meet requirements described in {@link ObjectSerializer}
      * @throws NullPointerException        if specified class is null

@@ -1,7 +1,7 @@
 package com.pelmenstar.projktSens.shared.time;
 
 /**
- * Contains various constants related with time
+ * Contains various constants related to time
  */
 public final class TimeConstants {
     /**

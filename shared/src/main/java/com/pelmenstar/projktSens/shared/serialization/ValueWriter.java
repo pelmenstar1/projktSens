@@ -67,7 +67,7 @@ public final class ValueWriter {
     }
 
     /**
-     * Writes specified value and moves cursor for 2 byte
+     * Writes specified value and moves cursor for 2 bytes
      *
      * @throws IndexOutOfBoundsException if cursor is in {@code size() - 1} position or further
      */
@@ -77,7 +77,7 @@ public final class ValueWriter {
     }
 
     /**
-     * Writes specified value and moves cursor for 4 byte
+     * Writes specified value and moves cursor for 4 bytes
      *
      * @throws IndexOutOfBoundsException if cursor is in {@code size() - 3} position or further
      */
@@ -87,7 +87,7 @@ public final class ValueWriter {
     }
 
     /**
-     * Writes specified value and moves cursor for 4 byte
+     * Writes specified value and moves cursor for 4 bytes
      *
      * @throws IndexOutOfBoundsException if cursor is in {@code size() - 3} position or further
      */
@@ -96,7 +96,7 @@ public final class ValueWriter {
     }
 
     /**
-     * Writes specified value and moves cursor for 8 byte
+     * Writes specified value and moves cursor for 8 bytes
      *
      * @throws IndexOutOfBoundsException if cursor is in {@code size() - 7} position or further
      */
@@ -105,11 +105,17 @@ public final class ValueWriter {
         position += 8;
     }
 
+    /**
+     * Writes only 24 bits of specified value and moves cursor for 3 bytes
+     */
     public void emitInt24(int value) {
         Bytes.writeInt24(value, data, position);
         position += 3;
     }
 
+    /**
+     * Writes only 40 bits of specified value and moves cursor for 5 bytes
+     */
     public void emitInt40(long value) {
         Bytes.writeInt40(value, data, position);
         position += 5;

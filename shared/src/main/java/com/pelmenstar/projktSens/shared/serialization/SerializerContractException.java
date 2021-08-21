@@ -57,21 +57,12 @@ public final class SerializerContractException extends RuntimeException {
     }
 
     private static void appendModifiers(int mods, @NotNull StringBuilder sb) {
-        checkAccessFlags:
-        {
-            if ((mods & Modifier.PUBLIC) != 0) {
-                sb.append("public ");
-                break checkAccessFlags;
-            }
-
-            if ((mods & Modifier.PRIVATE) != 0) {
-                sb.append("private ");
-                break checkAccessFlags;
-            }
-
-            if ((mods & Modifier.PROTECTED) != 0) {
-                sb.append("protected ");
-            }
+        if ((mods & Modifier.PUBLIC) != 0) {
+            sb.append("public ");
+        } else if ((mods & Modifier.PRIVATE) != 0) {
+            sb.append("private ");
+        } else if ((mods & Modifier.PROTECTED) != 0) {
+            sb.append("protected ");
         }
 
         if ((mods & Modifier.STATIC) != 0) {

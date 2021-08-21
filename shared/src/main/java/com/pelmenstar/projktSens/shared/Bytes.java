@@ -9,6 +9,13 @@ public final class Bytes {
     private Bytes() {
     }
 
+    /**
+     * Replace byte at given index to another value.
+     * @param bits old bits represented in int32
+     * @param byteIndex index in range of [0; 3]
+     * @param value new byte ar byteIndex
+     * @return new version of number with replaced byte
+     */
     public static int withByte(int bits, int byteIndex, int value) {
         int shift = byteIndex << 3;
         return (bits & ~(0xff << shift)) | (value << shift);
@@ -38,12 +45,18 @@ public final class Bytes {
         buffer[offset + 3] = (byte) (value >> 24);
     }
 
+    /**
+     * Write 24 bits of value to buffer at specified offset
+     */
     public static void writeInt24(int value, byte @NotNull [] buffer, int offset) {
         buffer[offset] = (byte) value;
         buffer[offset + 1] = (byte) (value >> 8);
         buffer[offset + 2] = (byte) (value >> 16);
     }
 
+    /**
+     * Write 40 bits of value to buffer at specified offset
+     */
     public static void writeInt40(long value, byte @NotNull [] buffer, int offset) {
         buffer[offset] = (byte) value;
         buffer[offset + 1] = (byte) (value >> 8);
@@ -81,6 +94,9 @@ public final class Bytes {
                 ((buffer[offset + 7] & 0xffL) << 56);
     }
 
+    /**
+     * Reads 40 bits from buffer at specified offset
+     */
     public static long readInt40(byte @NotNull [] buffer, int offset) {
         return ((buffer[offset] & 0xffL)) |
                 ((buffer[offset + 1] & 0xffL) << 8) |
@@ -99,6 +115,9 @@ public final class Bytes {
                 ((buffer[offset + 3] & 0xFF) << 24);
     }
 
+    /**
+     * Reads 24 bits from buffer at specified offset
+     */
     public static int readInt24(byte @NotNull [] buffer, int offset) {
         return (buffer[offset] & 0xFF) |
                 ((buffer[offset + 1] & 0xFF) << 8) |
