@@ -29,12 +29,4 @@ public final class IntPair {
     public static int getSecond(long pair) {
         return (int) (pair >> 32);
     }
-
-    public static long withFirst(long pair, int value) {
-        return (pair & 0xffffffff00000000L) | ((long) value & 0xffffffffL);
-    }
-
-    public static long withSecond(long pair, int value) {
-        return (pair & 0x00000000ffffffffL) | ((long) value << 32);
-    }
 }

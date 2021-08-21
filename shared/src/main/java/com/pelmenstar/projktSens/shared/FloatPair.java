@@ -29,12 +29,4 @@ public final class FloatPair {
     public static float getSecond(long pair) {
         return Float.intBitsToFloat((IntPair.getSecond(pair)));
     }
-
-    public static long withFirst(long pair, float value) {
-        return IntPair.withFirst(pair, Float.floatToIntBits(value));
-    }
-
-    public static long withSecond(long pair, float value) {
-        return IntPair.withSecond(pair, Float.floatToIntBits(value));
-    }
 }
