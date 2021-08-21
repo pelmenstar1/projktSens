@@ -204,7 +204,7 @@ class ServerHostSetting : Setting<ServerHostSetting.State>() {
 
         internal fun setHost(text: Editable) {
             val textLength = text.length
-            val buffer = if (_hostBuffer.size != textLength) {
+            val buffer = if (_hostBuffer.size == textLength) {
                 _hostBuffer
             } else {
                 CharArray(textLength)
