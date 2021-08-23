@@ -22,3 +22,11 @@ fun IntArray.add(value: Int): IntArray {
 
     return newArray
 }
+
+fun LongArray.add(value: Long): LongArray {
+    val newArray = LongArray(size + 1)
+    System.arraycopy(this, 0, newArray, 0, size)
+    newArray[size] = value
+
+    return newArray
+}

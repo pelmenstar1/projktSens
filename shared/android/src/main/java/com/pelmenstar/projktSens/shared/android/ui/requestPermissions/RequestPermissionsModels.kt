@@ -2,17 +2,20 @@
 
 package com.pelmenstar.projktSens.shared.android.ui.requestPermissions
 
+import android.app.Activity
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import com.pelmenstar.projktSens.shared.add
+import com.pelmenstar.projktSens.shared.*
 import com.pelmenstar.projktSens.shared.android.ext.readNonNullString
-import com.pelmenstar.projktSens.shared.appendArray
-import com.pelmenstar.projktSens.shared.equalsPattern
 
-class ModePermissionArray : Parcelable {
+class ModePermissionArray : Parcelable, Collection<String>, AppendableToStringBuilder {
     val mode: Int
-    val androidPermissions: Array<out String>
+    private val androidPermissions: Array<out String>
+
+    override val size: Int
+        get() = androidPermissions.size
 
     internal constructor(mode: Int, permissions: Array<out String>) {
         this.mode = mode
@@ -26,6 +29,22 @@ class ModePermissionArray : Parcelable {
         androidPermissions = Array(length) { parcel.readNonNullString() }
     }
 
+    @RequiresApi(23)
+    fun request(activity: Activity, requestCode: Int) {
+        activity.requestPermissions(androidPermissions, requestCode)
+    }
+
+    override fun contains(element: String): Boolean {
+        return androidPermissions.contains(element)
+    }
+
+    override fun containsAll(elements: Collection<String>): Boolean {
+        return elements.all { contains(it) }
+    }
+
+    override fun isEmpty(): Boolean = androidPermissions.isEmpty()
+    override fun iterator(): Iterator<String> = ArrayIterator(androidPermissions)
+
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeInt(mode)
 
@@ -37,7 +56,7 @@ class ModePermissionArray : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         return equalsPattern(other) { o ->
-            mode == o.mode && androidPermissions.contentEquals(o.androidPermissions)
+            mode == o.mode && androidPermissions contentEquals o.androidPermissions
         }
     }
 
@@ -47,8 +66,8 @@ class ModePermissionArray : Parcelable {
         return result
     }
 
-    override fun toString(): String {
-        return buildString {
+    override fun append(sb: StringBuilder) {
+        sb.run {
             append("{mode=")
             append(
                 when (mode) {
@@ -82,18 +101,12 @@ class ModePermissionArray : Parcelable {
         fun everyOf(vararg androidPermissions: String): ModePermissionArray {
             return ModePermissionArray(MODE_EVERY, androidPermissions)
         }
-
-        fun anyOfArray(androidPermissions: Array<out String>): ModePermissionArray {
-            return ModePermissionArray(MODE_ANY, androidPermissions)
-        }
-
-        fun everyOfArray(androidPermissions: Array<out String>): ModePermissionArray {
-            return ModePermissionArray(MODE_EVERY, androidPermissions)
-        }
     }
 }
 
-class RequestPermissionInfo : Parcelable {
+class RequestPermissionInfo : Parcelable, AppendableToStringBuilder {
+    val id: Int
+
     @StringRes
     val userDescriptionId: Int
 
@@ -102,22 +115,31 @@ class RequestPermissionInfo : Parcelable {
     val modePermissions: ModePermissionArray
 
     constructor(
+        id: Int,
         @StringRes userDescriptionId: Int,
         @StringRes whyTextId: Int,
         permissions: ModePermissionArray
     ) {
+        this.id = id
         this.userDescriptionId = userDescriptionId
         this.whyTextId = whyTextId
         this.modePermissions = permissions
     }
 
     private constructor(parcel: Parcel) {
+        id = parcel.readInt()
         userDescriptionId = parcel.readInt()
         whyTextId = parcel.readInt()
         modePermissions = ModePermissionArray.CREATOR.createFromParcel(parcel)
     }
 
+    @RequiresApi(23)
+    fun request(activity: Activity, requestCode: Int) {
+        modePermissions.request(activity, requestCode)
+    }
+
     override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeInt(id)
         dest.writeInt(userDescriptionId)
         dest.writeInt(whyTextId)
         modePermissions.writeToParcel(dest, 0)
@@ -127,7 +149,10 @@ class RequestPermissionInfo : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         return equalsPattern(other) { o ->
-            userDescriptionId == o.userDescriptionId && whyTextId == o.whyTextId && modePermissions == o.modePermissions
+            id == o.id &&
+            userDescriptionId == o.userDescriptionId &&
+            whyTextId == o.whyTextId &&
+            modePermissions == o.modePermissions
         }
     }
 
@@ -135,12 +160,23 @@ class RequestPermissionInfo : Parcelable {
         var result = userDescriptionId
         result = 31 * result + modePermissions.hashCode()
         result = 31 * result + whyTextId
+        result = 31 * result + id
 
         return result
     }
 
-    override fun toString(): String {
-        return "{userDescriptionId=$userDescriptionId, whyTextId=$whyTextId, modePermissions=$modePermissions}"
+    override fun append(sb: StringBuilder) {
+        sb.run {
+            append("{id=")
+            append(id)
+            append(", userDescriptionId=")
+            append(userDescriptionId)
+            append(", whyTextId=")
+            append(whyTextId)
+            append(", modePermissions=")
+            modePermissions.append(this)
+            append('}')
+        }
     }
 
     companion object {
@@ -152,9 +188,10 @@ class RequestPermissionInfo : Parcelable {
     }
 }
 
-class RequestPermissionsContext : Parcelable {
+class RequestPermissionsContext : Parcelable, Collection<RequestPermissionInfo>,
+    AppendableToStringBuilder {
     private val permissions: Array<out RequestPermissionInfo>
-    val count: Int
+    override val size: Int
         get() = permissions.size
 
     constructor(permissions: Array<out RequestPermissionInfo>) {
@@ -170,20 +207,27 @@ class RequestPermissionsContext : Parcelable {
         return permissions[index]
     }
 
+    override fun contains(element: RequestPermissionInfo): Boolean {
+        return permissions.contains(element)
+    }
+
+    override fun containsAll(elements: Collection<RequestPermissionInfo>): Boolean {
+        return elements.all { contains(it) }
+    }
+
+    override fun isEmpty(): Boolean = permissions.isEmpty()
+    override fun iterator(): Iterator<RequestPermissionInfo> = ArrayIterator(permissions)
+
     override fun equals(other: Any?): Boolean {
         return equalsPattern(other) { o ->
             permissions contentEquals o.permissions
         }
     }
 
-    override fun hashCode(): Int {
-        return permissions.contentHashCode()
-    }
+    override fun hashCode(): Int = permissions.contentHashCode()
 
-    override fun toString(): String {
-        return buildString {
-            appendArray(permissions)
-        }
+    override fun append(sb: StringBuilder) {
+        sb.appendArray(permissions)
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
@@ -208,11 +252,11 @@ class RequestPermissionsContext : Parcelable {
 class RequestPermissionsContextBuilder {
     object PermissionArrayModeSelect {
         fun anyOf(vararg permissions: String): ModePermissionArray {
-            return ModePermissionArray.anyOfArray(permissions)
+            return ModePermissionArray(ModePermissionArray.MODE_ANY, permissions)
         }
 
         fun everyOf(vararg permissions: String): ModePermissionArray {
-            return ModePermissionArray.everyOfArray(permissions)
+            return ModePermissionArray(ModePermissionArray.MODE_EVERY, permissions)
         }
     }
 
@@ -220,12 +264,13 @@ class RequestPermissionsContextBuilder {
     var _permissions = emptyArray<RequestPermissionInfo>()
 
     inline fun permission(
+        id: Int,
         @StringRes userDescriptionId: Int,
         @StringRes whyTextId: Int,
         block: PermissionArrayModeSelect.() -> ModePermissionArray
     ) {
         val modeArray = block(PermissionArrayModeSelect)
-        val perm = RequestPermissionInfo(userDescriptionId, whyTextId, modeArray)
+        val perm = RequestPermissionInfo(id, userDescriptionId, whyTextId, modeArray)
 
         _permissions = _permissions.add(perm)
     }

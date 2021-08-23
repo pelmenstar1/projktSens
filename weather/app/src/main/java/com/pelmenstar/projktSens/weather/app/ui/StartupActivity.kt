@@ -3,8 +3,10 @@ package com.pelmenstar.projktSens.weather.app.ui
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
+import com.pelmenstar.projktSens.shared.android.ui.requestPermissions.PackedPermissionState
 import com.pelmenstar.projktSens.shared.android.ui.requestPermissions.RequestPermissionsActivity
 import com.pelmenstar.projktSens.shared.android.ui.requestPermissions.RequestPermissionsContext
 import com.pelmenstar.projktSens.weather.app.AppPreferences
@@ -26,6 +28,7 @@ class StartupActivity : Activity() {
         val permContext = RequestPermissionsContext {
             if (!prefs.isGpsPermissionDenied) {
                 permission(
+                    id = PERMISSION_ID_LOCATION,
                     userDescriptionId = R.string.permissionGps_userDescription,
                     whyTextId = R.string.permissionGps_whyText
                 ) {
@@ -67,10 +70,18 @@ class StartupActivity : Activity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (data != null && !prefs.isGpsPermissionDenied) {
-                val deniedPermissions =
-                    data.getIntArrayExtra(RequestPermissionsActivity.RETURN_DATA_DENIED_PERMISSION_INDICES)
-                if (deniedPermissions != null && deniedPermissions.contains(0)) {
-                    prefs.isGpsPermissionDenied = true
+                val packedPermissionStates =
+                    data.getLongArrayExtra(RequestPermissionsActivity.RETURN_DATA_PERMISSION_STATES)
+
+                if(packedPermissionStates != null) {
+                    for(packedState in packedPermissionStates) {
+                        if(PackedPermissionState.getId(packedState) == PERMISSION_ID_LOCATION) {
+                            val state = PackedPermissionState.getState(packedState)
+                            if(state == PackageManager.PERMISSION_DENIED) {
+                                prefs.isGpsPermissionDenied = true
+                            }
+                        }
+                    }
                 }
             }
 
@@ -85,6 +96,8 @@ class StartupActivity : Activity() {
     }
 
     companion object {
+        private const val PERMISSION_ID_LOCATION = 0
+
         private const val REQUEST_CODE_PERMISSIONS = 0
         private const val REQUEST_CODE_FIRST_START = 1
     }

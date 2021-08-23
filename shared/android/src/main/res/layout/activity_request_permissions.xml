@@ -38,6 +38,18 @@
         android:paddingEnd="@dimen/requestPermissions_whyText_sidePadding"/>
 
     <Button
+        android:id="@+id/requestPermissions_requestButton"
+        android:layout_width="@dimen/requestPermissions_requestButtonSize"
+        android:layout_height="@dimen/requestPermissions_requestButtonSize"
+        android:layout_marginBottom="@dimen/requestPermissions_requestButtonMarginBottom"
+        android:background="@drawable/ic_circle_with_inner"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!--
+
+    <Button
         android:id="@+id/requestPermissions_request"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -54,4 +66,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="@dimen/requestPermissions_actionButtonMargin"
         android:text="@string/dontRequestPermission"/>
+    -->
 </androidx.constraintlayout.widget.ConstraintLayout>

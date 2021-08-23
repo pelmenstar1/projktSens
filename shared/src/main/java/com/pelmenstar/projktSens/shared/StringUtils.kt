@@ -16,3 +16,7 @@ inline fun String.getChars(srcBegin: Int, srcEnd: Int, buffer: CharArray, dstBeg
 inline fun StringBuilder.appendArray(array: Array<out Any>?) {
     StringUtils.appendArray(array, this)
 }
+
+inline fun StringBuilder.appendArray(array: Array<out AppendableToStringBuilder>?) {
+    StringUtils.appendArray(array, this)
+}
