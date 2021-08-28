@@ -9,6 +9,7 @@
     <dimen name="requestPermissions_whyText_sidePadding">10dp</dimen>
     <dimen name="requestPermissions_whyText_topMargin">10dp</dimen>
 
-
-    <dimen name="settings_boundsMargin">5dp</dimen>
+    <dimen name="settings_groupMargin">7dp</dimen>
+    <dimen name="settings_groupPadding">7dp</dimen>
+    <dimen name="settings_groupBackgroundRadius">6dp</dimen>
 </resources>

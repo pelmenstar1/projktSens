@@ -2,9 +2,94 @@ package com.pelmenstar.projktSens.shared.android.ui.settings
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.view.View
 import androidx.annotation.StringRes
+import com.pelmenstar.projktSens.shared.ReflectionUtils
 import com.pelmenstar.projktSens.shared.android.Preferences
+import com.pelmenstar.projktSens.shared.android.ext.readNonNullString
+import com.pelmenstar.projktSens.shared.android.ui.*
+
+private typealias SettingClass = Class<out Setting<*>>
+
+class SettingGroup: Parcelable {
+    private var _items: Array<out Setting<*>>? = null
+    private var _itemClasses: Array<out SettingClass>? = null
+
+    val items: Array<out Setting<*>>
+        get() {
+            var items = _items
+            if(items != null) {
+                return items
+            }
+
+            val classes = _itemClasses ?: throw RuntimeException("_classes == null")
+
+            items = Array(classes.size) { i ->
+                ReflectionUtils.createFromEmptyConstructor(classes[i])
+            }
+            _items = items
+
+            return items
+        }
+
+    val itemClasses: Array<out SettingClass>
+        get() {
+            var itemClasses = _itemClasses
+            if(itemClasses != null) {
+                return itemClasses
+            }
+
+            val items = _items ?: throw RuntimeException("_items == null")
+            itemClasses = Array(items.size) { i -> items[i].javaClass }
+            _itemClasses = itemClasses
+
+            return itemClasses
+        }
+
+    constructor(items: Array<out Setting<*>>) {
+        _items = items
+    }
+
+    constructor(vararg itemClassNames: SettingClass) {
+        _itemClasses = itemClassNames
+    }
+
+    constructor(parcel: Parcel) {
+        val itemsCount = parcel.readInt()
+        _itemClasses = Array(itemsCount) {
+            Class.forName(parcel.readNonNullString()) as SettingClass
+        }
+    }
+
+    override fun describeContents(): Int = 0
+
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        val items = _items
+        if(items != null) {
+            dest.writeInt(items.size)
+            for (setting in items) {
+                dest.writeString(setting.javaClass.name)
+            }
+        } else {
+            val classes = _itemClasses!!
+
+            dest.writeInt(classes.size)
+            for(c in classes) {
+                dest.writeString(c.name)
+            }
+        }
+    }
+
+    companion object {
+        @JvmField
+        val CREATOR = object: Parcelable.Creator<SettingGroup> {
+            override fun createFromParcel(source: Parcel) = SettingGroup(source)
+            override fun newArray(size: Int) = arrayOfNulls<SettingGroup>(size)
+        }
+    }
+}
 
 /**
  * Describes the required information to create setting, save and load state of it.

@@ -19,6 +19,7 @@ import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
 import com.pelmenstar.projktSens.shared.android.ui.EditText
 import com.pelmenstar.projktSens.shared.android.ui.settings.Setting
+import com.pelmenstar.projktSens.shared.android.ui.settings.SettingGroup
 import com.pelmenstar.projktSens.shared.equalsPattern
 import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.R
@@ -26,20 +27,21 @@ import com.pelmenstar.projktSens.weather.models.ValueUnit
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
 
 @JvmField
-val APP_SETTING_CLASSES: Array<out Class<out Setting<*>>> = arrayOf(
-    TemperatureSetting::class.java,
-    PressureSetting::class.java,
-    ServerHostSetting::class.java,
-    ServerContractSetting::class.java,
-    ServerPortSetting::class.java,
-    WeatherReceiveIntervalSetting::class.java,
-    KeepHomeScreenOnSetting::class.java
+val APP_SETTING_GROUPS: Array<out SettingGroup> = arrayOf(
+    SettingGroup(
+        TemperatureSetting::class.java,
+        PressureSetting::class.java,
+    ),
+    SettingGroup(
+        ServerHostSetting::class.java,
+        ServerContractSetting::class.java,
+        ServerPortSetting::class.java,
+        WeatherReceiveIntervalSetting::class.java
+    ),
+    SettingGroup(
+        KeepHomeScreenOnSetting::class.java
+    )
 )
-
-@JvmField
-val APP_SETTING_CLASS_NAMES: Array<out String> = Array(APP_SETTING_CLASSES.size) { i ->
-    APP_SETTING_CLASSES[i].name
-}
 
 abstract class ValueUnitSetting : Setting<ValueUnitSetting.State>() {
     data class State(@JvmField var unit: Int)

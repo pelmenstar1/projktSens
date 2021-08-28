@@ -19,7 +19,7 @@ import com.pelmenstar.projktSens.weather.app.di.AppComponent
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
-import com.pelmenstar.projktSens.weather.app.ui.APP_SETTING_CLASS_NAMES
+import com.pelmenstar.projktSens.weather.app.ui.APP_SETTING_GROUPS
 import com.pelmenstar.projktSens.weather.app.ui.ComplexWeatherView
 import com.pelmenstar.projktSens.weather.app.ui.LazyLoadingCalendarView
 import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.ComplexWeatherView
@@ -259,7 +259,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
             ) {
                 val intent = SettingsActivity.intent(
                     context,
-                    APP_SETTING_CLASS_NAMES,
+                    APP_SETTING_GROUPS,
                     prefsClass
                 )
                 startSettingActivity.launch(intent)

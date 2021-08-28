@@ -15,19 +15,17 @@ import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
 import com.pelmenstar.projktSens.shared.android.ui.EditText
 import com.pelmenstar.projktSens.shared.android.ui.settings.Setting
+import com.pelmenstar.projktSens.shared.android.ui.settings.SettingGroup
 import com.pelmenstar.projktSens.shared.equalsPattern
 
 @JvmField
-val APP_SETTING_CLASSES: Array<out Class<out Setting<*>>> = arrayOf(
-    ServerPortSetting::class.java,
-    ServerContractSetting::class.java,
-    WeatherSendIntervalSetting::class.java
+val APP_SETTING_GROUPS: Array<out SettingGroup> = arrayOf(
+    SettingGroup(
+        ServerPortSetting::class.java,
+        ServerContractSetting::class.java,
+        WeatherSendIntervalSetting::class.java
+    )
 )
-
-@JvmField
-val APP_SETTING_CLASS_NAMES: Array<out String> = Array(APP_SETTING_CLASSES.size) { i ->
-    APP_SETTING_CLASSES[i].name
-}
 
 class ServerPortSetting : Setting<ServerPortSetting.State>() {
     class State(port: Int) : IncompleteState() {

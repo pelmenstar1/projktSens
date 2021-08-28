@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity() {
             ) {
                 val intent = SettingsActivity.intent(
                     context,
-                    APP_SETTING_CLASS_NAMES,
+                    APP_SETTING_GROUPS,
                     AppPreferences::class.java
                 )
                 context.startActivity(intent)

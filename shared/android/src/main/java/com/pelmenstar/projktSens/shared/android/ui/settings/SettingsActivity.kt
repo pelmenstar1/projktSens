@@ -6,21 +6,20 @@ package com.pelmenstar.projktSens.shared.android.ui.settings
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.widget.LinearLayout
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
-import android.widget.GridLayout
+import androidx.core.view.setMargins
 import com.pelmenstar.projktSens.shared.ReflectionUtils
 import com.pelmenstar.projktSens.shared.android.*
 import com.pelmenstar.projktSens.shared.android.ext.Intent
-import com.pelmenstar.projktSens.shared.android.ext.getStringArrayNotNull
 import com.pelmenstar.projktSens.shared.android.ext.getStringNotNull
 import com.pelmenstar.projktSens.shared.android.ui.*
-import com.pelmenstar.projktSens.shared.getChars
 
 class SettingsActivity : HomeButtonSupportActivity() {
-    private lateinit var settings: Array<out Setting<*>>
+    private lateinit var settingGroups: Array<out SettingGroup>
     private lateinit var prefs: Preferences
 
     private lateinit var saveButton: Button
@@ -46,10 +45,8 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     private fun initFromIntentExtra() {
         val intent = requireIntent()
-        val settingClassNames = intent.getStringArrayNotNull(EXTRA_SETTINGS)
-        settings = Array(settingClassNames.size) { i ->
-            ReflectionUtils.createFromEmptyConstructor(settingClassNames[i])
-        }
+        val groupsRaw = intent.getParcelableArrayExtra(EXTRA_GROUPS)!!
+        settingGroups = Array(groupsRaw.size) { i -> groupsRaw[i] as SettingGroup }
 
         val prefsName = intent.getStringNotNull(EXTRA_PREFERENCES)
         prefs = ReflectionUtils.createFromEmptyConstructorOrInstance<Preferences>(prefsName).also {
@@ -58,14 +55,17 @@ class SettingsActivity : HomeButtonSupportActivity() {
     }
 
     private fun loadStates(savedInstanceState: Bundle?) {
-        settings.forEach {
-            if (savedInstanceState != null) {
-                val success = it.loadStateFromBundle(savedInstanceState)
-                if (success) {
-                    return@forEach
+        settingGroups.forEach {
+            for(setting in it.items) {
+                if (savedInstanceState != null) {
+                    val success = setting.loadStateFromBundle(savedInstanceState)
+                    if (success) {
+                        continue
+                    }
                 }
+
+                setting.loadStateFromPrefs(prefs)
             }
-            it.loadStateFromPrefs(prefs)
         }
     }
 
@@ -79,10 +79,13 @@ class SettingsActivity : HomeButtonSupportActivity() {
     }
 
     private fun computeCurrentStateHash(): Long {
-        val settings = settings
+        val groups = settingGroups
         var result: Long = 1
-        for (setting in settings) {
-            result = result * 31 + setting.state.hashCode()
+
+        for(group in groups) {
+            for(setting in group.items) {
+                result = result * 31 + setting.state.hashCode()
+            }
         }
 
         return result
@@ -93,71 +96,47 @@ class SettingsActivity : HomeButtonSupportActivity() {
             saveButton.isEnabled = isValid
         }
 
-        settings.forEach {
-            // after state is loaded
-            val state = it.state
+        // after state is loaded
+        settingGroups.forEach { group ->
+            group.items.forEach { setting ->
+                val state = setting.state
 
-            if (state is Setting.IncompleteState) {
-                state.onValidChanged = onValidChangedListener
-                // isValid can already be false, so update saveButton
-                if (!state.isValid) {
-                    saveButton.isEnabled = false
+                if (state is Setting.IncompleteState) {
+                    state.onValidChanged = onValidChangedListener
+
+                    // isValid can already be false, so update saveButton
+                    if (!state.isValid) {
+                        saveButton.isEnabled = false
+                    }
                 }
             }
+
+
         }
     }
 
     private fun createContent(): View {
         val prefs = prefs
-        val settings = settings
+        val groups = settingGroups
 
         val res = resources
-        val context = this
-        val boundsMargin = res.getDimensionPixelSize(R.dimen.settings_boundsMargin)
-
-        val body1 = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
+        val boundsMargin = res.getDimensionPixelSize(R.dimen.settings_groupMargin)
 
         return FrameLayout(this) {
-            GridLayout {
+            LinearLayout {
                 frameLayoutParams(MATCH_PARENT, MATCH_PARENT)
 
-                columnCount = 2
-                rowCount = settings.size
+                orientation = LinearLayout.VERTICAL
 
-                val settingNameSpec = GridLayout.spec(0, GridLayout.START)
-                val viewSpec = GridLayout.spec(1, GridLayout.END)
+                val groupLayoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+                    setMargins(boundsMargin)
+                }
 
-                for (i in settings.indices) {
-                    val setting = settings[i]
+                val options = GroupInflateOptions(context)
 
-                    val rowSpec = GridLayout.spec(i)
-                    TextView {
-                        gridLayoutParams(
-                            rowSpec,
-                            columnSpec = settingNameSpec
-                        ) {
-                            leftMargin = boundsMargin
-                        }
-
-                        applyTextAppearance(body1)
-
-                        val name = res.getString(setting.nameId)
-                        val nameLength = name.length
-
-                        val buffer = CharArray(nameLength + 1)
-                        name.getChars(0, nameLength, buffer, 0)
-                        buffer[nameLength] = ':'
-
-                        setText(buffer, 0, buffer.size)
-                    }
-
-                    addView(setting.createView(context).apply {
-                        gridLayoutParams(
-                            rowSpec,
-                            columnSpec = viewSpec
-                        ) {
-                            rightMargin = boundsMargin
-                        }
+                for(group in groups) {
+                    addView(createGroupLayout(context, group, options).apply {
+                        layoutParams = groupLayoutParams
                     })
                 }
             }
@@ -177,8 +156,10 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
                         if (changed) {
                             prefs.modify {
-                                settings.forEach { setting ->
-                                    setting.saveStateToPrefs(this)
+                                groups.forEach { group ->
+                                    group.items.forEach { setting ->
+                                        setting.saveStateToPrefs(this)
+                                    }
                                 }
                             }
                         }
@@ -200,7 +181,9 @@ class SettingsActivity : HomeButtonSupportActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        settings.forEach { it.saveStateToBundle(outState) }
+        settingGroups.forEach {
+            it.items.forEach { setting -> setting.saveStateToBundle(outState)  }
+        }
 
         // Why to save hashes, if we can re-compute it?
         // Saving here is VERY important.
@@ -225,7 +208,7 @@ class SettingsActivity : HomeButtonSupportActivity() {
 
     companion object {
         private const val STATE_INITIAL_STATE_HASH = "SettingsActivity.state.initialStateHash"
-        private const val EXTRA_SETTINGS = "SettingsActivity.intent.settings"
+        private const val EXTRA_GROUPS = "SettingsActivity.intent.groups"
         private const val EXTRA_PREFERENCES = "SettingsActivity.intent.preferences"
 
         const val RETURN_DATA_STATE_CHANGED = "SettingsActivity.returnData.stateChanged"
@@ -233,24 +216,11 @@ class SettingsActivity : HomeButtonSupportActivity() {
         @JvmStatic
         fun intent(
             context: Context,
-            settingClasses: Array<out Class<out Setting<*>>>,
-            prefsClass: Class<out Preferences>
-        ): Intent {
-            val names = Array(settingClasses.size) { i ->
-                settingClasses[i].name
-            }
-
-            return intent(context, names, prefsClass)
-        }
-
-        @JvmStatic
-        fun intent(
-            context: Context,
-            settingClassNames: Array<out String>,
+            groups: Array<out SettingGroup>,
             prefsClass: Class<out Preferences>
         ): Intent {
             return Intent(context, SettingsActivity::class.java) {
-                putExtra(EXTRA_SETTINGS, settingClassNames)
+                putExtra(EXTRA_GROUPS, groups)
                 putExtra(EXTRA_PREFERENCES, prefsClass.name)
             }
         }
