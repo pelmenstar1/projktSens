@@ -1,5 +1,7 @@
 package com.pelmenstar.projktSens.shared.android.ui.requestPermissions
 
+import android.animation.Animator
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,11 +14,13 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.addListener
 import com.pelmenstar.projktSens.shared.EmptyArray
 import com.pelmenstar.projktSens.shared.add
 import com.pelmenstar.projktSens.shared.android.R
 import com.pelmenstar.projktSens.shared.android.ext.Intent
 import com.pelmenstar.projktSens.shared.android.ext.getParcelableExtraNotNull
+import com.pelmenstar.projktSens.shared.android.ui.actionBar
 import com.pelmenstar.projktSens.shared.android.ui.requireIntent
 
 class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_permissions) {
@@ -35,6 +39,10 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
         }
 
         super.onCreate(savedInstanceState)
+
+        actionBar {
+            hide()
+        }
 
         initViews()
 
@@ -65,14 +73,31 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
     }
 
     private fun showWhyTextForCurrentPermission() {
-        whyTextView.apply {
-            text = resources.getText(currentPermission.whyTextId)
-            visibility = View.VISIBLE
+        val whyTextView = whyTextView
+        whyTextView.text = resources.getText(currentPermission.whyTextId)
+
+        ObjectAnimator().apply {
+            target = whyTextView
+            setProperty(View.TRANSLATION_X)
+            setFloatValues(-whyTextView.x, 0f)
+
+            start()
         }
+
+        whyTextView.visibility = View.VISIBLE
     }
 
     private fun hideWhyText() {
-        whyTextView.visibility = View.GONE
+        ObjectAnimator().apply {
+            target = whyTextView
+            setProperty(View.TRANSLATION_X)
+            setFloatValues(0f, -whyTextView.x)
+            addListener(onEnd = {
+                whyTextView.visibility = View.GONE
+            })
+
+            start()
+        }
     }
 
     private fun nextPermission() {
@@ -135,7 +160,9 @@ class RequestPermissionsActivity : AppCompatActivity(R.layout.activity_request_p
             PackageManager.PERMISSION_DENIED
         }
 
-        packedPermissionStates = packedPermissionStates.add(PackedPermissionState.create(permInfo.id, state))
+        packedPermissionStates = packedPermissionStates.add(
+            PackedPermissionState.create(permInfo.id, state)
+        )
 
         nextPermission()
     }
