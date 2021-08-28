@@ -10,11 +10,10 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.core.content.res.ResourcesCompat
 import com.pelmenstar.projktSens.shared.android.NetworkUtils
-import com.pelmenstar.projktSens.shared.android.SerializableParcelWrapper
 import com.pelmenstar.projktSens.shared.android.ext.Message
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
-import com.pelmenstar.projktSens.weather.app.NetworkDataSource
+import com.pelmenstar.projktSens.shared.serialization.Serializable
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
@@ -49,17 +48,14 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                 status = savedInstanceState.getByte(STATE_STATUS).toInt()
 
                 if (status == STATUS_OK) {
-                    val wrapper =
-                        savedInstanceState.getParcelable<SerializableParcelWrapper<TReport>>(
-                            STATE_REPORT
-                        )
-                    if (wrapper == null) {
+                    val rawReport = savedInstanceState.getByteArray(STATE_REPORT)
+                    if (rawReport == null) {
                         Log.e(TAG, "Invalid saved state. STATE_REPORT property is null")
 
                         return@try_load_from_saved_state
                     }
 
-                    report = wrapper.value
+                    report = Serializable.ofByteArray(rawReport, serializer)
                 }
 
                 setStatus(status)
@@ -276,10 +272,9 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         synchronized(lock) {
             val report = report
             if (report != null) {
-                outState.putParcelable(
-                    STATE_REPORT,
-                    SerializableParcelWrapper(report, serializer)
-                )
+                val buffer = Serializable.toByteArray(report, serializer)
+
+                outState.putByteArray(STATE_REPORT, buffer)
             }
         }
     }
