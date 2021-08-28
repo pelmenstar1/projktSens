@@ -96,7 +96,9 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                     STATUS_OK
                 }
 
-                report = r
+                synchronized(lock) {
+                    report = r
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "when loading data", e)
 
@@ -150,10 +152,13 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                 setContentView(errorView)
             }
             STATUS_OK -> {
-                val r = report
-                if (r == null) {
-                    Log.e(TAG, "setStatus(STATUS_OK), but report is null")
-                    return
+                val r = synchronized(lock) {
+                    val value = report
+                    if (value == null) {
+                        Log.e(TAG, "setStatus(STATUS_OK), but report is null")
+                        return
+                    }
+                    value
                 }
 
                 transitionView = null
@@ -282,9 +287,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
     override fun onDestroy() {
         super.onDestroy()
 
-        synchronized(lock) {
-            transitionView?.stopTransition()
-        }
+        transitionView?.stopTransition()
         loadReportJob?.cancel()
 
         mainThread.removeCallbacksAndMessages(null)
