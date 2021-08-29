@@ -37,8 +37,8 @@ public final class UnitValueWithDate extends AppendableToStringBuilder {
 
     @Override
     public int hashCode() {
-        int result = (int) (dateTime ^ (dateTime >>> 32));
-        result = 31 * result + (int) (value ^ (value >>> 32));
+        int result = Long.hashCode(dateTime);
+        result = 31 * result + Long.hashCode(value);
         return result;
     }
 

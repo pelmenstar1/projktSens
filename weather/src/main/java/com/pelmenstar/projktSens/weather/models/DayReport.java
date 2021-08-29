@@ -17,15 +17,6 @@ import java.util.Arrays;
 
 /**
  * A data class to save information about day statistics.
- * Instances of {@link DayReport} can be serialized in format described below: <br/>
- * - ReportStats | {@link ReportStats#SERIALIZED_OBJECT_SIZE} <br/>
- * - entries.length | 2 bytes <br/>
- * [ <br/>
- * - time | 4 bytes <br/>
- * - temperature | 4 bytes <br/>
- * - humidity | 4 byte <br/>
- * - pressure | 4 bytes <br/>
- * ] <br/>
  */
 public final class DayReport extends AppendableToStringBuilder {
     /**
@@ -99,9 +90,23 @@ public final class DayReport extends AppendableToStringBuilder {
     }
 
     public DayReport(@NotNull Entry @NotNull [] entries, @NotNull ReportStats stats) {
+        int tempUnit = ValueUnitsPacked.getTemperatureUnit(stats.units);
+        int pressUnit = ValueUnitsPacked.getPressureUnit(stats.units);
+
+        for(Entry entry: entries) {
+            if(!ShortTime.isValid(entry.time)) {
+                throw ValidationException.invalidValue("entry time", entry.time);
+            }
+
+            UnitValue.ensureValid(entry.temperature, tempUnit, "entry temperature");
+            UnitValue.ensureValid(entry.humidity, ValueUnit.HUMIDITY, "entry humidity");
+            UnitValue.ensureValid(entry.pressure, pressUnit, "entry pressure");
+        }
+
         this.entries = entries;
         this.stats = stats;
     }
+
 
     @Override
     public boolean equals(Object other) {
@@ -297,10 +302,7 @@ public final class DayReport extends AppendableToStringBuilder {
         @Override
         @NotNull
         public DayReport readObject(@NotNull ValueReader reader) throws ValidationException {
-            ReportStats header = ReportStats.SERIALIZER.readObject(reader);
-
-            int tempUnit = ValueUnitsPacked.getTemperatureUnit(header.units);
-            int pressUnit = ValueUnitsPacked.getPressureUnit(header.units);
+            ReportStats stats = ReportStats.SERIALIZER.readObject(reader);
 
             int entriesLength = reader.readInt16();
             Entry[] entries = new Entry[entriesLength];
@@ -311,26 +313,10 @@ public final class DayReport extends AppendableToStringBuilder {
                 float hum = reader.readFloat();
                 float press = reader.readFloat();
 
-                if (!ShortTime.isValid(time)) {
-                    throw ValidationException.invalidValue("time", time);
-                }
-
-                if (!UnitValue.isValid(temp, tempUnit)) {
-                    throw ValidationException.invalidValue("temperature", temp);
-                }
-
-                if (!UnitValue.isValid(hum, ValueUnit.HUMIDITY)) {
-                    throw ValidationException.invalidValue("humidity", hum);
-                }
-
-                if (!UnitValue.isValid(press, pressUnit)) {
-                    throw ValidationException.invalidValue("pressure", press);
-                }
-
                 entries[i] = new Entry(time, temp, hum, press);
             }
 
-            return new DayReport(entries, header);
+            return new DayReport(entries, stats);
         }
     }
 }

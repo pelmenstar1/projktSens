@@ -3,12 +3,9 @@ package com.pelmenstar.projktSens.weather.models;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Contains all valid value units represented in int and helper method to use it
+ * Contains all valid value units represented in int and helper methods to use it
  */
 public final class ValueUnit {
-    /**
-     * This unit is valid, but marks that some variable contains no value
-     */
     public static final int NONE = -1;
     public static final int CELSIUS = 0;
     public static final int KELVIN = 1;

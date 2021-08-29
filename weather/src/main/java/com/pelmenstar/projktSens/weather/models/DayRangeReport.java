@@ -126,6 +126,24 @@ public final class DayRangeReport extends AppendableToStringBuilder {
     }
 
     public DayRangeReport(@NotNull Entry @NotNull [] entries, @NotNull ReportStats stats) {
+        int tempUnit = ValueUnitsPacked.getTemperatureUnit(stats.units);
+        int pressUnit = ValueUnitsPacked.getPressureUnit(stats.units);
+
+        for(Entry entry: entries) {
+            if(!ShortDate.isValid(entry.date)) {
+                throw ValidationException.invalidValue("entry date", entry.date);
+            }
+
+            UnitValue.ensureValid(entry.minTemperature, tempUnit, "entry min temperature");
+            UnitValue.ensureValid(entry.maxTemperature, tempUnit, "entry max temperature");
+
+            UnitValue.ensureValid(entry.minHumidity, ValueUnit.HUMIDITY, "entry min humidity");
+            UnitValue.ensureValid(entry.maxHumidity, ValueUnit.HUMIDITY, "entry max humidity");
+
+            UnitValue.ensureValid(entry.minPressure, pressUnit, "entry min pressure");
+            UnitValue.ensureValid(entry.maxPressure, pressUnit, "entry max pressure");
+        }
+
         this.entries = entries;
         this.stats = stats;
     }
@@ -398,8 +416,7 @@ public final class DayRangeReport extends AppendableToStringBuilder {
         @NotNull
         public DayRangeReport readObject(@NotNull ValueReader reader) throws ValidationException {
             ReportStats stats = ReportStats.SERIALIZER.readObject(reader);
-            int tempUnit = ValueUnitsPacked.getTemperatureUnit(stats.units);
-            int pressUnit = ValueUnitsPacked.getPressureUnit(stats.units);
+
 
             int entriesLength = reader.readInt16();
             Entry[] data = new Entry[entriesLength];
@@ -415,34 +432,6 @@ public final class DayRangeReport extends AppendableToStringBuilder {
 
                 float minPress = reader.readFloat();
                 float maxPress = reader.readFloat();
-
-                if (!ShortDate.isValid(date)) {
-                    throw ValidationException.invalidValue("date", date);
-                }
-
-                if (!UnitValue.isValid(minTemp, tempUnit)) {
-                    throw ValidationException.invalidValue("minTemp", minTemp);
-                }
-
-                if (!UnitValue.isValid(maxTemp, tempUnit)) {
-                    throw ValidationException.invalidValue("maxTemp", maxTemp);
-                }
-
-                if (!UnitValue.isValid(minHum, ValueUnit.HUMIDITY)) {
-                    throw ValidationException.invalidValue("minHum", minHum);
-                }
-
-                if (!UnitValue.isValid(maxHum, ValueUnit.HUMIDITY)) {
-                    throw ValidationException.invalidValue("maxHum", maxHum);
-                }
-
-                if (!UnitValue.isValid(minPress, pressUnit)) {
-                    throw ValidationException.invalidValue("minPress", minPress);
-                }
-
-                if (!UnitValue.isValid(maxPress, pressUnit)) {
-                    throw ValidationException.invalidValue("maxPress", maxPress);
-                }
 
                 data[i] = new Entry(
                         date,

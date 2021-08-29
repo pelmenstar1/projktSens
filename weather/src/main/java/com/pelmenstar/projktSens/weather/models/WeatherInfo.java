@@ -55,17 +55,9 @@ public final class WeatherInfo extends AppendableToStringBuilder {
             throw ValidationException.invalidValue("dateTime", dateTime);
         }
 
-        if (!UnitValue.isValid(temperature, ValueUnitsPacked.getTemperatureUnit(units))) {
-            throw ValidationException.invalidValue("temperature", temperature);
-        }
-
-        if (!UnitValue.isValid(humidity, ValueUnit.HUMIDITY)) {
-            throw ValidationException.invalidValue("humidity", humidity);
-        }
-
-        if (!UnitValue.isValid(pressure, ValueUnitsPacked.getPressureUnit(units))) {
-            throw ValidationException.invalidValue("pressure", pressure);
-        }
+        UnitValue.ensureValid(temperature, ValueUnitsPacked.getTemperatureUnit(units), "temperature");
+        UnitValue.ensureValid(humidity, ValueUnit.HUMIDITY, "humidity");
+        UnitValue.ensureValid(pressure, ValueUnitsPacked.getPressureUnit(units), "pressure");
 
         this.units = units;
         this.dateTime = dateTime;
@@ -90,7 +82,7 @@ public final class WeatherInfo extends AppendableToStringBuilder {
 
     @Override
     public int hashCode() {
-        int result = (int) (dateTime ^ (dateTime >>> 32));
+        int result = Long.hashCode(dateTime);
         result = 31 * result + Float.floatToIntBits(temperature);
         result = 31 * result + Float.floatToIntBits(humidity);
         result = 31 * result + Float.floatToIntBits(pressure);

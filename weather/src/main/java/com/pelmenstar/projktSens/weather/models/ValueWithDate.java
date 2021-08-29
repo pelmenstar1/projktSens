@@ -37,18 +37,13 @@ public final class ValueWithDate extends AppendableToStringBuilder {
         Serializable.registerSerializer(ValueWithDate.class, SERIALIZER);
     }
 
-    ValueWithDate(long dateTime, float value, @SuppressWarnings("unused") boolean ignore) {
-        this.dateTime = dateTime;
-        this.value = value;
-    }
-
     public ValueWithDate(long dateTime, float value) {
         if (!ShortDateTime.isValid(dateTime)) {
-            throw new IllegalArgumentException("dateTime");
+            throw ValidationException.invalidValue("dateTime", dateTime);
         }
 
         this.dateTime = dateTime;
-        this.value = MyMath.round(value);
+        this.value = value;
     }
 
     @Override
@@ -63,7 +58,7 @@ public final class ValueWithDate extends AppendableToStringBuilder {
 
     @Override
     public int hashCode() {
-        int result = (int) (dateTime ^ (dateTime >>> 32));
+        int result = Long.hashCode(dateTime);
         result = 31 * result + Float.floatToIntBits(value);
 
         return result;
@@ -112,7 +107,7 @@ public final class ValueWithDate extends AppendableToStringBuilder {
                 throw ValidationException.invalidValue("dateTime", dateTime);
             }
 
-            return new ValueWithDate(dateTime, value, false);
+            return new ValueWithDate(dateTime, value);
         }
     }
 }

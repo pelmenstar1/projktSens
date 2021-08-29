@@ -101,35 +101,12 @@ public final class Serializable {
     /**
      * Deserializes raw data to object of type {@link <T>}
      *
-     * @param data some valid raw data
-     * @param c    {@linkplain Class<T>}
-     */
-    @NotNull
-    public static <T> T ofByteArray(byte @NotNull [] data, @NotNull Class<T> c) {
-        return ofByteArray(data, getSerializer(c));
-    }
-
-    /**
-     * Deserializes raw data to object of type {@link <T>}
-     *
      * @param data       some valid raw data
      * @param serializer serializer that will be used to parse data
      */
     @NotNull
     public static <T> T ofByteArray(byte @NotNull [] data, @NotNull ObjectSerializer<T> serializer) {
-        ValueReader reader = new ValueReader(data);
-
-        return serializer.readObject(reader);
-    }
-
-    /**
-     * Converts specified object to raw byte data
-     *
-     * @param obj some object
-     * @param c   class of specified object
-     */
-    public static <T> byte @NotNull [] toByteArray(@NotNull T obj, @NotNull Class<T> c) {
-        return toByteArray(obj, getSerializer(c));
+        return serializer.readObject(new ValueReader(data));
     }
 
     /**
@@ -140,9 +117,8 @@ public final class Serializable {
      */
     public static <T> byte @NotNull [] toByteArray(@NotNull T obj, @NotNull ObjectSerializer<T> serializer) {
         byte[] buffer = new byte[serializer.getSerializedObjectSize(obj)];
-        ValueWriter writer = new ValueWriter(buffer);
 
-        serializer.writeObject(obj, writer);
+        serializer.writeObject(obj, new ValueWriter(buffer));
 
         return buffer;
     }

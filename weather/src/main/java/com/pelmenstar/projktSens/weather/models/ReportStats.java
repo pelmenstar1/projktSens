@@ -40,10 +40,27 @@ public final class ReportStats extends AppendableToStringBuilder {
                        @NotNull ParameterStats tempStats,
                        @NotNull ParameterStats humStats,
                        @NotNull ParameterStats pressStats) {
+        int tempUnit = ValueUnitsPacked.getTemperatureUnit(units);
+        int pressUnit = ValueUnitsPacked.getPressureUnit(units);
+
+        ensureParamStatsValid(tempStats, tempUnit, "temperature");
+        ensureParamStatsValid(humStats, ValueUnit.HUMIDITY, "humidity");
+        ensureParamStatsValid(pressStats, pressUnit, "pressure");
+
         this.units = units;
         this.temperature = tempStats;
         this.humidity = humStats;
         this.pressure = pressStats;
+    }
+
+    private static void ensureParamStatsValid(
+            @NotNull ParameterStats paramStats,
+            int unit,
+            @NotNull String unitName
+    ) {
+        UnitValue.ensureValid(paramStats.min.value, unit, "min " + unitName);
+        UnitValue.ensureValid(paramStats.max.value, unit, "max " + unitName);
+        UnitValue.ensureValid(paramStats.avg, unit, "avg " + unitName);
     }
 
     @Override
@@ -104,51 +121,9 @@ public final class ReportStats extends AppendableToStringBuilder {
                 throw ValidationException.invalidValue("units", units);
             }
 
-            int tempUnit = ValueUnitsPacked.getTemperatureUnit(units);
-            int pressUnit = ValueUnitsPacked.getPressureUnit(units);
-
             ParameterStats temp = ParameterStats.SERIALIZER.readObject(reader);
             ParameterStats hum = ParameterStats.SERIALIZER.readObject(reader);
             ParameterStats press = ParameterStats.SERIALIZER.readObject(reader);
-
-            // validate temperature
-            if (!UnitValue.isValid(temp.min.value, tempUnit)) {
-                throw ValidationException.invalidValue("min temperature", temp.min.value);
-            }
-
-            if (!UnitValue.isValid(temp.max.value, tempUnit)) {
-                throw ValidationException.invalidValue("max temperature", temp.max.value);
-            }
-
-            if (!UnitValue.isValid(temp.avg, tempUnit)) {
-                throw ValidationException.invalidValue("avg temperature", temp.avg);
-            }
-
-            // validate humidity
-            if (!UnitValue.isValid(hum.min.value, ValueUnit.HUMIDITY)) {
-                throw ValidationException.invalidValue("min humidity", hum.min.value);
-            }
-
-            if (!UnitValue.isValid(hum.max.value, ValueUnit.HUMIDITY)) {
-                throw ValidationException.invalidValue("max humidity", hum.max.value);
-            }
-
-            if (!UnitValue.isValid(hum.avg, ValueUnit.HUMIDITY)) {
-                throw ValidationException.invalidValue("avg humidity", hum.avg);
-            }
-
-            // validate pressure
-            if (!UnitValue.isValid(press.min.value, pressUnit)) {
-                throw ValidationException.invalidValue("min pressure", press.min.value);
-            }
-
-            if (!UnitValue.isValid(press.max.value, pressUnit)) {
-                throw ValidationException.invalidValue("max pressure", press.max.value);
-            }
-
-            if (!UnitValue.isValid(press.avg, pressUnit)) {
-                throw ValidationException.invalidValue("avg pressure", press.avg);
-            }
 
             return new ReportStats(units, temp, hum, press);
         }

@@ -18,52 +18,6 @@ public final class ValidationException extends RuntimeException {
     }
 
     /**
-     * Creates {@link ValidationException} which signals that some input has invalid size.
-     *
-     * @param actual   actual size of input
-     * @param expected expected size of input
-     * @return {@link ValidationException} with appropriate message
-     */
-    @NotNull
-    public static ValidationException invalidSize(int actual, int expected) {
-        return new ValidationException("Invalid size. Actual: " + actual + ", but expected: " + expected);
-    }
-
-    /**
-     * Creates {@link ValidationException} which signals that some input has invalid size.
-     * Despite the {@link ValidationException#invalidSize(int, int)}, expected size of input is not indicated
-     *
-     * @param actual            actual size of input
-     * @param additionalMessage some message
-     * @return {@link ValidationException} with appropriate message
-     */
-    @NotNull
-    public static ValidationException invalidSize(int actual, @NotNull String additionalMessage) {
-        return new ValidationException("Invalid size. Actual: " + actual + ", but expected: " + additionalMessage);
-    }
-
-    /**
-     * Creates {@link ValidationException} which signals that some input is invalid
-     *
-     * @return {@link ValidationException} with appropriate message
-     */
-    @NotNull
-    public static ValidationException invalidContent() {
-        return new ValidationException("Invalid content");
-    }
-
-    /**
-     * Creates {@link ValidationException} which signals that some input is invalid
-     * Despite the {@link ValidationException#invalidContent()} method, additional message can be indicated
-     *
-     * @return {@link ValidationException} with appropriate message
-     */
-    @NotNull
-    public static ValidationException invalidContent(@NotNull String additionalMessage) {
-        return new ValidationException("Invalid content. " + additionalMessage);
-    }
-
-    /**
      * Creates {@link ValidationException} which signals that some value of input is invalid, value type is {@code int}.
      *
      * @param valueName name of value
@@ -72,7 +26,7 @@ public final class ValidationException extends RuntimeException {
      */
     @NotNull
     public static ValidationException invalidValue(@NotNull String valueName, int value) {
-        return new ValidationException("Invalid '" + valueName + "': " + value);
+        return invalidValue(valueName, Integer.toString(value));
     }
 
     /**
@@ -84,7 +38,7 @@ public final class ValidationException extends RuntimeException {
      */
     @NotNull
     public static ValidationException invalidValue(@NotNull String valueName, float value) {
-        return new ValidationException("Invalid '" + valueName + "': " + value);
+        return invalidValue(valueName, Float.toString(value));
     }
 
     /**
@@ -96,6 +50,11 @@ public final class ValidationException extends RuntimeException {
      */
     @NotNull
     public static ValidationException invalidValue(@NotNull String valueName, long value) {
+        return invalidValue(valueName, Long.toString(value));
+    }
+
+    @NotNull
+    public static ValidationException invalidValue(@NotNull String valueName, @NotNull String value) {
         return new ValidationException("Invalid '" + valueName + "': " + value);
     }
 

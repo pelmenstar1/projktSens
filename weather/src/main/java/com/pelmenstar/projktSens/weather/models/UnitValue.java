@@ -1,5 +1,9 @@
 package com.pelmenstar.projktSens.weather.models;
 
+import com.pelmenstar.projktSens.shared.FloatPair;
+import com.pelmenstar.projktSens.shared.IntPair;
+import com.pelmenstar.projktSens.shared.serialization.ValidationException;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -7,6 +11,17 @@ import org.jetbrains.annotations.NotNull;
  * This class responsible for creating this union and helping to use it.
  */
 public final class UnitValue {
+    private static final long[] UNIT_RANGES = new long[] {
+            IntPair.of(-100, 100), // celsius
+            IntPair.of(-148, 212), // fahrenheit
+            IntPair.of(173, 373), // kelvin
+
+            IntPair.of(0, 100), // humidity
+
+            IntPair.of(0, 1000), // mm of mercury
+            IntPair.of(0, 133322) // pascal
+    };
+
     /**
      * Creates union of value and related unit.
      * Bit format: <br/>
@@ -57,26 +72,26 @@ public final class UnitValue {
      * Gets value of unit-value
      *
      * @param value       current value
-     * @param currentUnit unit of value
-     * @param unit        new unit
-     * @throws IllegalArgumentException if currentUnit or unit are invalid
+     * @param currentUnit newUnit of value
+     * @param newUnit        new newUnit
+     * @throws IllegalArgumentException if currentUnit or newUnit are invalid
      */
-    public static float getValue(float value, int currentUnit, int unit) {
+    public static float getValue(float value, int currentUnit, int newUnit) {
         if (ValueUnit.isTemperatureUnit(currentUnit)) {
-            if (!ValueUnit.isTemperatureUnit(unit)) {
-                throw new IllegalArgumentException("unit");
+            if (!ValueUnit.isTemperatureUnit(newUnit)) {
+                throw new IllegalArgumentException("newUnit");
             }
 
-            return fromCelsius(toCelsius(value, currentUnit), unit);
+            return fromCelsius(toCelsius(value, currentUnit), newUnit);
         } else if (ValueUnit.isPressureUnit(currentUnit)) {
-            if (!ValueUnit.isPressureUnit(unit)) {
-                throw new IllegalArgumentException("unit");
+            if (!ValueUnit.isPressureUnit(newUnit)) {
+                throw new IllegalArgumentException("newUnit");
             }
 
-            return fromMmOfMercury(toMmOfMercury(value, currentUnit), unit);
+            return fromMmOfMercury(toMmOfMercury(value, currentUnit), newUnit);
         } else {
-            if (!(unit == ValueUnit.HUMIDITY && currentUnit == ValueUnit.HUMIDITY)) {
-                throw new IllegalArgumentException("unit");
+            if (!(newUnit == ValueUnit.HUMIDITY && currentUnit == ValueUnit.HUMIDITY)) {
+                throw new IllegalArgumentException("newUnit");
             }
 
             return value;
@@ -121,24 +136,20 @@ public final class UnitValue {
      * @param unit  unit of value
      */
     public static boolean isValid(float value, int unit) {
-        switch (unit) {
-            case ValueUnit.CELSIUS:
-                return value >= -100 && value <= 100;
-            case ValueUnit.FAHRENHEIT:
-                return value >= -148 && value <= 212;
-            case ValueUnit.KELVIN:
-                return value >= 173 && value <= 373;
+        if(!ValueUnit.isValidUnit(unit)) {
+            return false;
+        }
 
-            case ValueUnit.HUMIDITY:
-                return value >= 0 && value <= 100;
+        long range = UNIT_RANGES[unit];
+        float min = IntPair.getFirst(range);
+        float max = IntPair.getSecond(range);
 
-            case ValueUnit.MM_OF_MERCURY:
-                return value >= 0 && value <= 1000;
-            case ValueUnit.PASCAL:
-                return value >= 0 && value <= 133322;
+        return value >= min && value <= max;
+    }
 
-            default:
-                return false;
+    public static void ensureValid(float value, int unit, @NotNull String valueName) {
+        if(!isValid(value, unit)) {
+            throw ValidationException.invalidValue(valueName, value);
         }
     }
 
@@ -162,7 +173,7 @@ public final class UnitValue {
             case ValueUnit.KELVIN:
                 return c + 273f;
             case ValueUnit.FAHRENHEIT:
-                return (c / 1.8f) + 32;
+                return (c * (1 / 1.8f)) + 32;
             default:
                 throw new IllegalArgumentException("unit");
         }
@@ -173,7 +184,7 @@ public final class UnitValue {
             case ValueUnit.MM_OF_MERCURY:
                 return value;
             case ValueUnit.PASCAL:
-                return value / 133;
+                return value * (1f / 133f);
             default:
                 throw new IllegalArgumentException("unit");
         }
