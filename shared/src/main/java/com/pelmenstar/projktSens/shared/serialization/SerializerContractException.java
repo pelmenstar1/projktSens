@@ -66,7 +66,7 @@ public final class SerializerContractException extends RuntimeException {
         }
 
         if ((mods & Modifier.STATIC) != 0) {
-            sb.append("final ");
+            sb.append("static ");
         }
 
         if ((mods & Modifier.FINAL) != 0) {
