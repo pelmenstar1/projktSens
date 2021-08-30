@@ -44,8 +44,8 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
 
     private String tempUnitStr = "";
     private String tempStr = "";
-    private char[] humStr = EmptyArray.CHAR;
-    private char[] pressStr = EmptyArray.CHAR;
+    private String humStr = "";
+    private String pressStr = "";
 
     private float tempStrY;
     private float humStrY;
@@ -118,8 +118,11 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
 
         tempUnitStr = unitFormatter.getUnitString(prefTempUnit);
         tempStr = Float.toString(UnitValue.getValue(value.temperature, valueTempUnit, prefTempUnit));
-        humStr = unitFormatter.formatValueToCharBuffer(value.humidity, ValueUnit.HUMIDITY);
-        pressStr = unitFormatter.formatValueToCharBuffer(UnitValue.getValue(value.pressure, valuePressUnit, prefPressUnit), prefPressUnit);
+        humStr = unitFormatter.formatValue(value.humidity, ValueUnit.HUMIDITY);
+        pressStr = unitFormatter.formatValue(
+                UnitValue.getValue(value.pressure, valuePressUnit, prefPressUnit),
+                prefPressUnit
+        );
 
         invalidatePositions();
     }
@@ -132,7 +135,7 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
         tempUnitPaint.getTextBounds(tempUnitStr, 0, tempUnitStr.length(), textSizeBuffer);
         float tempUnitStrHeight = textSizeBuffer.height();
 
-        humPressPaint.getTextBounds(humStr, 0, humStr.length, textSizeBuffer);
+        humPressPaint.getTextBounds(humStr, 0, humStr.length(), textSizeBuffer);
         float humStrHeight = textSizeBuffer.height();
 
         tempStrY = tempStrHeight;
@@ -149,8 +152,8 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
 
         c.drawText(tempStr, x, y + tempStrY, tempPaint);
         c.drawText(tempUnitStr, x + PackedPointF.getX(tempUnitStrPos), y + PackedPointF.getY(tempUnitStrPos), tempUnitPaint);
-        c.drawText(humStr, 0, humStr.length, x, y + humStrY, humPressPaint);
-        c.drawText(pressStr, 0, pressStr.length, x, y + pressStrY, humPressPaint);
+        c.drawText(humStr, x, y + humStrY, humPressPaint);
+        c.drawText(pressStr, x, y + pressStrY, humPressPaint);
     }
 
     @Override

@@ -46,29 +46,6 @@ class StringUtilsTests  {
         }
     }
 
-    @Test
-    fun writeFloatRounded1() {
-        val random = Random(0)
-
-        repeat(100) {
-            var number = random.nextFloat() * 10_000
-            if(random.nextBoolean()) {
-                number = -number
-            }
-
-            val buffer = CharArray(2 + StringUtils.getBufferSizeForRoundedFloat(number))
-            buffer[0] = 'a'
-            buffer[1] = 'b'
-
-            StringUtils.writeFloatRound1(number, buffer, 2)
-
-            val expected = "ab${number.round()}"
-            val actual = String(buffer)
-
-            assertEquals(expected, actual)
-        }
-    }
-
     private fun fourDigitsVerified(value: Int): String {
         return buildString(4) {
             when {

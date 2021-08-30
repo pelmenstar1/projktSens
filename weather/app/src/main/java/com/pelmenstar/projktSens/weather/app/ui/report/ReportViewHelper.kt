@@ -92,12 +92,12 @@ private fun ViewGroup.ValueParamView(
     PrefixTextView {
         layoutParams = c.layoutParams
 
-        val valueBuffer = c.unitFormatter.formatValueToCharBuffer(
+        val valueStr = c.unitFormatter.formatValue(
             UnitValue.getValue(value, c.statsUnit, c.prefUnit),
             c.prefUnit
         )
 
-        setPrefixAndValue(prefix, valueBuffer)
+        setPrefixAndValue(prefix, valueStr)
 
         applyTextAppearance(c.textAppearance)
     }

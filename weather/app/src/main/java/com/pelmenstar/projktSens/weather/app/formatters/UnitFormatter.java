@@ -1,6 +1,5 @@
 package com.pelmenstar.projktSens.weather.app.formatters;
 
-import com.pelmenstar.projktSens.shared.MyMath;
 import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter;
 import com.pelmenstar.projktSens.weather.models.UnitValue;
@@ -27,75 +26,57 @@ public final class UnitFormatter {
 
     @NotNull
     public String formatValue(float value, int unit) {
-        return new String(formatValueToCharBuffer(value, unit));
-    }
-
-    public char @NotNull [] formatValueToCharBuffer(float value, int unit) {
         String unitString = getUnitString(unit);
-        int valueLength = StringUtils.getBufferSizeForRoundedFloat(value);
-        int bufferLength = unitString.length() + valueLength;
 
-        char[] buffer = new char[bufferLength];
+        int sbLength = StringUtils.getRound1Length(value) + unitString.length();
+        StringBuilder sb = new StringBuilder(sbLength);
 
-        StringUtils.writeFloatRound1(value, buffer, 0);
-        unitString.getChars(0, unitString.length(), buffer, valueLength);
+        StringUtils.appendRound1(value, sb);
+        sb.append(unitString);
 
-        return buffer;
+        return sb.toString();
     }
 
     @NotNull
     public String formatValueAndDelta(float value, float delta, int unit) {
-        return new String(formatValueAndDeltaToCharBuffer(value, delta, unit));
-    }
-
-    public char @NotNull [] formatValueAndDeltaToCharBuffer(float value, float delta, int unit) {
         String unitStr = getUnitString(unit);
-        int valueLength = StringUtils.getBufferSizeForRoundedFloat(value);
-        int deltaLength = StringUtils.getBufferSizeForSignedRoundedFloat(delta);
 
-        int bufferLength = valueLength + deltaLength + unitStr.length() * 2 + 3;
-        char[] buffer = new char[bufferLength];
+        int sbLength = StringUtils.getRound1Length(value) +
+                StringUtils.getSignedRound1Length(delta) +
+                unitStr.length() * 2 +
+                3;
+        StringBuilder sb = new StringBuilder(sbLength);
 
-        StringUtils.writeFloatRound1(value, buffer, 0);
-        unitStr.getChars(0, unitStr.length(), buffer, valueLength);
-        int valueAndUnitPos = valueLength + unitStr.length();
-        buffer[valueAndUnitPos] = ' ';
-        buffer[valueAndUnitPos + 1] = '(';
-        StringUtils.writeSignedFloatRound1(delta, buffer, valueAndUnitPos + 2);
-        int deltaEndPos = valueAndUnitPos + deltaLength + 2;
-        unitStr.getChars(0, unitStr.length(), buffer, deltaEndPos);
-        buffer[deltaEndPos + unitStr.length()] = ')';
+        StringUtils.appendRound1(value, sb);
+        sb.append(unitStr);
+        sb.append(' ');
+        sb.append('(');
+        StringUtils.appendSignedRound1(delta, sb);
+        sb.append(unitStr);
+        sb.append(')');
 
-        return buffer;
+        return sb.toString();
     }
 
     @NotNull
     public String formatValueWithDate(@NotNull ValueWithDate vd, int currentUnit, int prefUnit) {
-        return formatValueWithDateToBuilder(vd, currentUnit, prefUnit).toString();
-    }
-
-    @NotNull
-    private StringBuilder formatValueWithDateToBuilder(
-            @NotNull ValueWithDate vd,
-            int currentUnit, int prefUnit
-    ) {
         long dateTime = vd.dateTime;
         float value = UnitValue.getValue(vd.value, currentUnit, prefUnit);
         String unitString = getUnitString(prefUnit);
 
-        int sbLength = MyMath.decimalDigitCount((int) value) +
+        int sbLength = StringUtils.getRound1Length(value) +
                 unitString.length() + dateFormatter.approximatePrettyDateTimeLength(dateTime) + 5;
 
         StringBuilder sb = new StringBuilder(sbLength);
 
-        sb.append(MyMath.round(value));
+        StringUtils.appendRound1(value, sb);
         sb.append(unitString);
         sb.append(' ');
         sb.append('(');
         dateFormatter.appendPrettyDateTime(dateTime, sb);
         sb.append(')');
 
-        return sb;
+        return sb.toString();
     }
 
     @NotNull

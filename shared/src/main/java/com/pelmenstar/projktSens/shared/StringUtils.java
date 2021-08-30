@@ -3,16 +3,13 @@ package com.pelmenstar.projktSens.shared;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 /**
  * Represents a helper class that efficiently build strings
  */
 public final class StringUtils {
-    private static final byte[] digits = {
-            '0' , '1' , '2' , '3' , '4' , '5' ,
-            '6' , '7' , '8' , '9'
-    };
-
-    private static final byte [] DigitTens = {
+    private static final byte[] DIGITS_TENS = {
             '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
             '1', '1', '1', '1', '1', '1', '1', '1', '1', '1',
             '2', '2', '2', '2', '2', '2', '2', '2', '2', '2',
@@ -23,9 +20,9 @@ public final class StringUtils {
             '7', '7', '7', '7', '7', '7', '7', '7', '7', '7',
             '8', '8', '8', '8', '8', '8', '8', '8', '8', '8',
             '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
-    } ;
+    };
 
-    private static final byte [] DigitOnes = {
+    private static final byte[] DIGIT_ONES = {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -36,11 +33,49 @@ public final class StringUtils {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-    } ;
+    };
 
     private static final char[] hexBuffer = new char[8];
 
     private StringUtils() {
+    }
+
+    @NotNull
+    public static String toStringHexColors(int @NotNull [] colors) {
+        StringBuilder sb = new StringBuilder(hexColorsLength(colors.length));
+        appendHexColors(colors, sb);
+
+        return sb.toString();
+    }
+
+    public static void appendHexColors(int @NotNull [] colors, @NotNull StringBuilder sb) {
+        sb.ensureCapacity(sb.length() + hexColorsLength(colors.length));
+
+        sb.append('[');
+        if (colors.length > 0) {
+            int maxIdx = colors.length - 1;
+
+            synchronized (hexBuffer) {
+                for (int i = 0; i < maxIdx; i++) {
+                    appendHexThroughBufferLocked(colors[i], sb);
+                    sb.append(',');
+                }
+
+                appendHexThroughBufferLocked(colors[maxIdx], sb);
+            }
+        }
+        sb.append(']');
+    }
+
+    private static void appendHexThroughBufferLocked(int value, @NotNull StringBuilder sb) {
+        sb.append('#');
+        writeHex(value, hexBuffer, 0);
+        sb.append(hexBuffer);
+    }
+
+    private static int hexColorsLength(int arrayLength) {
+        int t = arrayLength << 3 + arrayLength; // arrayLength * 9
+        return t + (arrayLength - 1) + 2; // including commas and [, ]
     }
 
     public static void appendHexColor(int value, @NotNull StringBuilder sb) {
@@ -75,9 +110,10 @@ public final class StringUtils {
         int n = 0;
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
+            int d = c - '0';
 
-            if (c >= '0' && c <= '9') {
-                n = n * 10 + (c - '0');
+            if (d >= 0 && d <= 9) {
+                n = ((n << 3) + (n << 1)) + d;
             } else {
                 return -1;
             }
@@ -131,120 +167,64 @@ public final class StringUtils {
 
                 for (int i = 0; i < endIdx; i++) {
                     AppendableToStringBuilder element = array[i];
-                    if (element == null) {
-                        appendNull(sb);
-                    } else {
-                        element.append(sb);
-                    }
 
+                    append(element, sb);
                     sb.append(',');
                 }
 
-                AppendableToStringBuilder last = array[endIdx];
-                if (last == null) {
-                    appendNull(sb);
-                } else {
-                    last.append(sb);
-                }
+                append(array[endIdx], sb);
             }
             sb.append(']');
         }
     }
 
     private static void appendNull(@NotNull StringBuilder sb) {
-        sb.ensureCapacity(sb.length() + 4);
-        sb.append('n');
-        sb.append('u');
-        sb.append('l');
-        sb.append('l');
+        sb.append((String)null);
     }
 
-    public static int getBufferSizeForRoundedFloat(float number) {
-        int intPart = (int)number;
-        int sign = 0;
-        if(intPart < 0) {
-            sign = 1;
-            intPart = -intPart;
+    private static void append(@Nullable AppendableToStringBuilder value, @NotNull StringBuilder sb) {
+        if(value == null) {
+            appendNull(sb);
+        } else {
+            value.append(sb);
+        }
+    }
+
+    public static int getRound1Length(float number) {
+        int i = (int)number;
+        int length = MyMath.decimalDigitCount(i) + 2;
+        if(i < 0) {
+            length++;
         }
 
-        return MyMath.decimalDigitCount(intPart) + sign + 2;
+        return length;
     }
 
-    public static int getBufferSizeForSignedRoundedFloat(float number) {
-       return MyMath.decimalDigitCount((int)number) + 3;
+    public static int getSignedRound1Length(float number) {
+        return MyMath.decimalDigitCount((int)number) + 3;
     }
 
-    public static void writeSignedFloatRound1(float number, char @NotNull [] buffer, int offset) {
-        buffer[offset] = number >= 0 ? '+' : '-';
-        writeAbsoluteFloatRound1(Math.abs(number), buffer, offset + 1);
-    }
-
-    public static void writeFloatRound1(float number, char @NotNull [] buffer, int offset) {
-        if(number < 0) {
-            buffer[offset++] = '-';
+    public static void appendRound1(float number, @NotNull StringBuilder sb) {
+        int i = (int) number;
+        if(i < 0) {
+            i = -i;
+            number = -number;
+            sb.append('-');
         }
 
-        writeAbsoluteFloatRound1(Math.abs(number), buffer, offset);
+        int fr = (int) ((number - i) * 10f);
+
+        sb.append(i);
+        sb.append('.');
+        sb.append((char) ('0' + fr));
     }
 
-    private static void writeAbsoluteFloatRound1(float number, char @NotNull [] buffer, int offset) {
-        int intPart = (int)number;
-        int frDigit = (int)((number - intPart) * 10f);
-
-        int digitCount = MyMath.decimalDigitCount(intPart);
-        int intPartLastIndex = offset + digitCount;
-        getCharsForPositive(intPart, buffer, intPartLastIndex);
-        buffer[intPartLastIndex] = '.';
-        buffer[intPartLastIndex + 1] = (char)('0' + frDigit);
-    }
-
-    // Stolen from Android 30 source
-    private static void getCharsForPositive(int i, char @NotNull [] buffer, int bIndex) {
-        int q, r;
-        int charPos = bIndex;
-
-        // Generate two digits per iteration
-        while (i >= 65536) {
-            q = i / 100;
-            // really: r = i - (q * 100);
-            r = i - ((q << 6) + (q << 5) + (q << 2));
-            i = q;
-            buffer [--charPos] = (char)DigitOnes[r];
-            buffer [--charPos] = (char)DigitTens[r];
-        }
-
-        // Fall thru to fast mode for smaller numbers
-        // assert(i <= 65536, i);
-        do {
-            q = (i * 52429) >>> (16 + 3);
-            r = i - ((q << 3) + (q << 1));  // r = i-(q*10) ...
-            buffer[--charPos] = (char)digits[r];
-            i = q;
-        } while (i != 0);
-    }
-
-    /**
-     * Appends number to {@link StringBuilder}, but represented with its sign.
-     * {@link StringBuilder#append(int)} on non-negative numbers appends number without its '+' sign.
-     */
-    public static void appendSigned(int number, @NotNull StringBuilder sb) {
-        if (number > 0) {
+    public static void appendSignedRound1(float number, @NotNull StringBuilder sb) {
+        if (number > 0f) {
             sb.append('+');
         }
 
-        sb.append(number);
-    }
-
-    /**
-     * Appends number to {@link StringBuilder}, but represented with its sign.
-     * {@link StringBuilder#append(float)} on non-negative numbers appends number without its '+' sign.
-     */
-    public static void appendSigned(float number, @NotNull StringBuilder sb) {
-        if (number > 0) {
-            sb.append('+');
-        }
-
-        sb.append(number);
+        appendRound1(number, sb);
     }
 
     @NotNull
@@ -257,35 +237,26 @@ public final class StringUtils {
     }
 
     public static void appendTwoDigits(int number, @NotNull StringBuilder sb) {
-        if (number < 0 || number >= 100) {
-            throw new IllegalArgumentException("number=" + number + ". Number must to be in range [0; 99]");
-        }
-
-        if (number < 10) {
-            sb.append('0');
-            sb.append((char) ('0' + number));
-        } else {
-            int d2 = number / 10;
-
-            sb.append((char) ('0' + d2));
-            sb.append((char) ('0' + (number - (d2 * 10))));
-        }
+        sb.ensureCapacity(sb.length() + 2);
+        appendTwoDigitsInternal(number, sb);
     }
 
     public static void writeTwoDigits(char @NotNull [] buffer, int offset, int number) {
-        if (number < 0 || number > 99) {
-            throw new IllegalArgumentException("number=" + number + ". Number must to be in range [0; 99]");
-        }
+        buffer[offset] = (char) DIGITS_TENS[number];
+        buffer[offset + 1] = (char) DIGIT_ONES[number];
+    }
 
-        if (number < 10) {
-            buffer[offset] = '0';
-            buffer[offset + 1] = (char) ('0' + number);
-        } else {
-            int d2 = number / 10;
+    private static void appendTwoDigitsInternal(int number, @NotNull StringBuilder sb) {
+        sb.append((char) DIGITS_TENS[number]);
+        sb.append((char) DIGIT_ONES[number]);
+    }
 
-            buffer[offset] = (char) ('0' + d2);
-            buffer[offset + 1] = (char) ('0' + (number - (d2 * 10)));
-        }
+    private static void writeThreeDigits(char @NotNull [] buffer, int offset, int number) {
+        int d = number / 10;
+        int r = number - ((d << 3) + (d << 1));
+
+        writeTwoDigits(buffer, offset, d);
+        buffer[offset + 2] = (char) ('0' + r);
     }
 
     @NotNull
@@ -302,91 +273,21 @@ public final class StringUtils {
             throw new IllegalArgumentException("number=" + number + ". Number must be in range [0; 9999]");
         }
 
-        if (number < 10) {
-            sb.append('0');
-            sb.append('0');
-            sb.append('0');
-            sb.append((char) ('0' + number));
-        } else if (number < 100) {
-            int d2 = number / 10;
+        sb.ensureCapacity(sb.length() + 4);
 
-            sb.append('0');
-            sb.append('0');
-            sb.append((char) ('0' + d2));
-            sb.append((char) ('0' + (number - (d2 * 10))));
-        } else if (number < 1000) {
-            int d3 = number / 100;
+        int d = number / 100;
+        int r = number - ((d << 6) + (d << 5) + (d << 2));
 
-            number -= (d3 * 100);
-
-            int d2 = number / 10;
-
-            sb.append('0');
-            sb.append((char) ('0' + d3));
-            sb.append((char) ('0' + d2));
-            sb.append((char) ('0' + (number - (d2 * 10))));
-        } else {
-            int d4 = number / 1000;
-
-            number -= (d4 * 1000);
-
-            int d3 = number / 100;
-
-            number -= (d3 * 100);
-
-            int d2 = number / 10;
-
-            sb.append((char) ('0' + d4));
-            sb.append((char) ('0' + d3));
-            sb.append((char) ('0' + d2));
-            sb.append((char) ('0' + (number - (d2 * 10))));
-        }
+        appendTwoDigitsInternal(d, sb);
+        appendTwoDigitsInternal(r, sb);
     }
 
     public static void writeFourDigits(char @NotNull [] buffer, int offset, int number) {
-        if (number < 0 || number > 9999) {
-            throw new IllegalArgumentException("number=" + number + ". Number must be in range [0; 9999]");
-        }
+        int d = number / 100;
+        int r = number - ((d << 6) + (d << 5) + (d << 2));
 
-        if (number < 10) {
-            buffer[offset] = '0';
-            buffer[offset + 1] = '0';
-            buffer[offset + 2] = '0';
-            buffer[offset + 3] = (char) ('0' + number);
-        } else if (number < 100) {
-            int d2 = number / 10;
-
-            buffer[offset] = '0';
-            buffer[offset + 1] = '0';
-            buffer[offset + 2] = (char) ('0' + d2);
-            buffer[offset + 3] = (char) ('0' + (number - (d2 * 10)));
-        } else if (number < 1000) {
-            int d3 = number / 100;
-
-            number -= (d3 * 100);
-
-            int d2 = number / 10;
-
-            buffer[offset] = '0';
-            buffer[offset + 1] = (char) ('0' + d3);
-            buffer[offset + 2] = (char) ('0' + d2);
-            buffer[offset + 3] = (char) ('0' + (number - (d2 * 10)));
-        } else {
-            int d4 = number / 1000;
-
-            number -= (d4 * 1000);
-
-            int d3 = number / 100;
-
-            number -= (d3 * 100);
-
-            int d2 = number / 10;
-
-            buffer[offset] = (char) ('0' + d4);
-            buffer[offset + 1] = (char) ('0' + d3);
-            buffer[offset + 2] = (char) ('0' + d2);
-            buffer[offset + 3] = (char) ('0' + (number - (d2 * 10)));
-        }
+        writeTwoDigits(buffer, offset, d);
+        writeTwoDigits(buffer, offset + 2, r);
     }
 
     public static void writeByte(char @NotNull [] buffer, int offset, int value) {
@@ -397,20 +298,9 @@ public final class StringUtils {
         if (value < 10) {
             buffer[offset] = (char) ('0' + value);
         } else if (value < 100) {
-            int d2 = value / 10;
-
-            buffer[offset] = (char) ('0' + d2);
-            buffer[offset + 1] = (char) ('0' + (value - (d2 * 10)));
+            writeTwoDigits(buffer, offset, value);
         } else {
-            int d3 = value / 100;
-
-            value -= (d3 * 100);
-
-            int d2 = value / 10;
-
-            buffer[offset] = (char) ('0' + d3);
-            buffer[offset + 1] = (char) ('0' + d2);
-            buffer[offset + 2] = (char) ('0' + (value - (d2 * 10)));
+            writeThreeDigits(buffer, offset, value);
         }
     }
 

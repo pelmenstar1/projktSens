@@ -25,8 +25,6 @@ public final class PrefixTextView extends MaterialTextView {
     @NotNull
     private String value = "";
 
-    private char @NotNull [] valueBuffer = EmptyArray.CHAR;
-
     public PrefixTextView(@NotNull Context context) {
         this(context, null, android.R.attr.textViewStyle, 0);
     }
@@ -80,12 +78,6 @@ public final class PrefixTextView extends MaterialTextView {
         invalidateText();
     }
 
-    public void setValue(char @NotNull [] valueBuffer) {
-        this.valueBuffer = valueBuffer;
-
-        invalidateText();
-    }
-
     public void setPrefixAndValue(@NotNull String prefix, @NotNull String value) {
         this.prefix = prefix;
         this.value = value;
@@ -93,25 +85,11 @@ public final class PrefixTextView extends MaterialTextView {
         invalidateText();
     }
 
-    public void setPrefixAndValue(@NotNull String prefix, char @NotNull [] valueBuffer) {
-        this.prefix = prefix;
-        this.valueBuffer = valueBuffer;
-
-        invalidateText();
-    }
-
     private char[] textCache = EmptyArray.CHAR;
 
     private void invalidateText() {
-        char[] valueBuffer = this.valueBuffer;
-
         int prefixLength = prefix.length();
-        int valueLength;
-        if (valueBuffer.length > 0) {
-            valueLength = valueBuffer.length;
-        } else {
-            valueLength = value.length();
-        }
+        int valueLength = value.length();
 
         int valueBegin = prefixLength + 2;
         int textLength = valueBegin + valueLength;
@@ -126,12 +104,7 @@ public final class PrefixTextView extends MaterialTextView {
         prefix.getChars(0, prefixLength, buffer, 0);
         buffer[prefixLength] = ':';
         buffer[prefixLength + 1] = ' ';
-
-        if (valueBuffer.length > 0) {
-            System.arraycopy(valueBuffer, 0, buffer, valueBegin, valueBuffer.length);
-        } else {
-            value.getChars(0, valueLength, buffer, valueBegin);
-        }
+        value.getChars(0, valueLength, buffer, valueBegin);
 
         setText(buffer, 0, textLength);
     }

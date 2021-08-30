@@ -123,9 +123,10 @@ public class InetAddressUtils {
         int maxIdx = str.length() - 1;
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
+            int d = c - '0';
 
-            if (c >= '0' && c <= '9') {
-                currentByte = currentByte * 10 + (c - '0');
+            if (d >= 0 && d <= 9) {
+                currentByte = (currentByte << 3) + (currentByte << 1) + d;
 
                 if (currentByte > 255) {
                     return IP_ERROR;
@@ -166,14 +167,15 @@ public class InetAddressUtils {
         int maxIdx = buffer.length - 1;
         for (int i = 0; i < buffer.length; i++) {
             char c = buffer[i];
+            int d = c - '0';
 
-            if (c >= '0' && c <= '9') {
-                currentByte = currentByte * 10 + (c - '0');
+            if (d >= 0 && d <= 9) {
+                currentByte = (currentByte << 3) + (currentByte << 1) + d;
 
                 if (currentByte > 255) {
                     return IP_ERROR;
                 }
-            } else if (c == '.') {
+            }else if (c == '.') {
                 if (byteIndex == 4 || i == maxIdx || i == strByteStartIndex) {
                     return IP_ERROR;
                 }
