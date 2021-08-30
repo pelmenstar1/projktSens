@@ -20,8 +20,9 @@ import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.models.WeatherDataSource
 import kotlinx.coroutines.*
 
-abstract class ReportActivityBase<TReport : Any> protected constructor(private val serializer: ObjectSerializer<TReport>) :
-    HomeButtonSupportActivity() {
+abstract class ReportActivityBase<TReport : Any> protected constructor(
+    private val serializer: ObjectSerializer<TReport>
+) : HomeButtonSupportActivity() {
     @Volatile
     private var report: TReport? = null
 
@@ -30,8 +31,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
     private var status = STATUS_NO_DATA
     private val lock = Any()
 
-    @Suppress("LeakingThis") // this reference will be cleared in onDestroy()
-    private val mainThread = MainThreadHandler(this)
+    private val mainThread = MainThreadHandler()
 
     private var transitionView: TransitionView? = null
 
@@ -78,7 +78,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
 
         val dataSource = component.dataSource()
         val isConnected = NetworkUtils.isConnectedToAnyNetwork(this)
-        if(!isConnected) {
+        if (!isConnected) {
             setStatus(STATUS_NO_NETWORK)
             return
         } else {
@@ -105,13 +105,18 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                 newStatus = STATUS_ERROR
             }
 
-            mainThread.sendMessage(Message {
-                what = MSG_SET_STATUS
-                arg1 = newStatus
-            })
+            postSetStatus(newStatus)
         }.also { job ->
             job.invokeOnCompletion { loadReportJob = null }
         }
+    }
+
+    private fun postSetStatus(status: Int) {
+        mainThread.sendMessage(Message {
+            what = MSG_SET_STATUS
+            obj = this@ReportActivityBase
+            arg1 = status
+        })
     }
 
     private fun setStatus(status: Int) {
@@ -123,7 +128,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
 
         when (status) {
             STATUS_NO_NETWORK -> {
-                if(noNetworkView == null) {
+                if (noNetworkView == null) {
                     noNetworkView = createNoNetworkView()
                 }
 
@@ -230,7 +235,7 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                     gravity = Gravity.CENTER
                 }
 
-                colorTransition = LinearColorTransition.fromArrayResWithDisplayRefreshRate(
+                colorTransition = LinearColorTransition.fromArrayRes(
                     context,
                     R.array.defaultTransitionColors
                 )
@@ -248,7 +253,8 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
             View {
                 val size = res.getDimensionPixelSize(R.dimen.reportActivity_noNetwork_iconSize)
                 linearLayoutParams(size, size) {
-                    topMargin = res.getDimensionPixelOffset(R.dimen.reportActivity_noNetwork_iconTopMargin)
+                    topMargin =
+                        res.getDimensionPixelOffset(R.dimen.reportActivity_noNetwork_iconTopMargin)
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
 
@@ -258,7 +264,8 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
                 val size = res.getDimensionPixelSize(R.dimen.reportActivity_retryButtonSize)
                 linearLayoutParams(size, size) {
                     gravity = Gravity.CENTER_HORIZONTAL
-                    topMargin = res.getDimensionPixelSize(R.dimen.reportActivity_retryButtonTopMargin)
+                    topMargin =
+                        res.getDimensionPixelSize(R.dimen.reportActivity_retryButtonTopMargin)
                 }
 
                 background = ResourcesCompat.getDrawable(res, R.drawable.ic_retry, theme)
@@ -291,23 +298,17 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(private v
         loadReportJob?.cancel()
 
         mainThread.removeCallbacksAndMessages(null)
-        mainThread.activity = null
     }
 
     protected abstract fun createChartView(report: TReport): View
     protected abstract suspend fun loadReport(dataSource: WeatherDataSource): TReport?
 
-    private class MainThreadHandler(@JvmField var activity: ReportActivityBase<*>?) :
-        Handler(Looper.getMainLooper()) {
+    private class MainThreadHandler : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
-            val activity = activity
-            if (activity == null) {
-                Log.e(TAG, "activity in MainThreadHandler is null")
-                return
-            }
-
             when (msg.what) {
                 MSG_SET_STATUS -> {
+                    val activity = msg.obj as ReportActivityBase<*>
+
                     activity.setStatus(msg.arg1)
                 }
             }

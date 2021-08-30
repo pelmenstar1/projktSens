@@ -259,38 +259,6 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
     }
 
     @NotNull
-    public static LinearColorTransition fromArrayResWithDisplayRefreshRate(
-            @NotNull Context context,
-            @ArrayRes int colorRes
-    ) {
-        return fromArrayResWithDisplayRefreshRate(context, colorRes, true);
-    }
-
-    @NotNull
-    public static LinearColorTransition fromArrayResWithDisplayRefreshRate(
-            @NotNull Context context,
-            @ArrayRes int colorsRes,
-            boolean putToCache
-    ) {
-        Display display;
-        if(Build.VERSION.SDK_INT >= 30) {
-            display = context.getDisplay();
-        } else {
-            WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
-            display = windowManager.getDefaultDisplay();
-        }
-
-        int frameRate;
-        if(display != null) {
-            frameRate = (int)display.getRefreshRate();
-        } else {
-            frameRate = DEFAULT_TRANSITION_FRAMES;
-        }
-
-        return fromArrayRes(context, colorsRes, frameRate, putToCache);
-    }
-
-    @NotNull
     public static LinearColorTransition fromArrayRes(
             @NotNull Context context,
             @ArrayRes int colorsRes,

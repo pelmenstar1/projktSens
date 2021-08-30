@@ -8,9 +8,13 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.setPadding
 import com.pelmenstar.projktSens.chartLite.LineChart
 import com.pelmenstar.projktSens.chartLite.data.ChartData
+import com.pelmenstar.projktSens.shared.android.RoundRectDrawable
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppModule
@@ -28,23 +32,31 @@ private class ParameterStatsPrefixStrings(
 
 private class ChartViewCreationContext(
     @JvmField val textLeftMargin: Int,
-    chartSideMargin: Int, blockTopMargin: Int, chartHeight: Int,
+    blockSideMargin: Int, blockTopBottomMargin: Int, headerBlockTopMargin: Int, chartHeight: Int,
     @JvmField val headerAppearance: TextAppearance, @JvmField val paramAppearance: TextAppearance,
     @JvmField val unitFormatter: UnitFormatter,
     @JvmField val strings: ParameterStatsPrefixStrings,
-    @JvmField val chartOptions: (LineChart) -> Unit
+    @JvmField val chartOptions: (LineChart) -> Unit,
+    @JvmField @ColorInt val blockBackgroundColor: Int,
+    @JvmField val blockPadding: Int,
+    @JvmField val blockRadius: Float,
 ) {
     @JvmField
-    val headerLayoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
-        gravity = Gravity.CENTER_HORIZONTAL
-        topMargin = blockTopMargin
+    val blockLayoutParams = LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
+        leftMargin = blockSideMargin
+        rightMargin = blockSideMargin
+        topMargin = blockTopBottomMargin
+        bottomMargin = blockTopBottomMargin
     }
 
     @JvmField
-    val chartLayoutParams = LinearLayout.LayoutParams(MATCH_PARENT, chartHeight).apply {
-        leftMargin = chartSideMargin
-        rightMargin = chartSideMargin
+    val headerLayoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+        gravity = Gravity.CENTER_HORIZONTAL
+        topMargin = headerBlockTopMargin
     }
+
+    @JvmField
+    val chartLayoutParams = LinearLayout.LayoutParams(MATCH_PARENT, chartHeight)
 }
 
 private class ValueParamCreationContext(
@@ -100,30 +112,42 @@ private fun ViewGroup.ParamStatsBlock(
 ) {
     val strings = creationContext.strings
 
-    TextView {
-        layoutParams = creationContext.headerLayoutParams
+    LinearLayout {
+        layoutParams = creationContext.blockLayoutParams
+        orientation = LinearLayout.VERTICAL
 
-        text = context.resources.getText(headerRes)
-        applyTextAppearance(creationContext.headerAppearance)
-    }
+        setPadding(creationContext.blockPadding)
+        background = RoundRectDrawable(
+            creationContext.blockBackgroundColor,
+            creationContext.blockRadius,
+            true
+        )
 
-    val vpContext = ValueParamCreationContext(
-        statsUnit, prefUnit,
-        creationContext.unitFormatter,
-        creationContext.textLeftMargin,
-        creationContext.paramAppearance
-    )
+        TextView {
+            layoutParams = creationContext.headerLayoutParams
 
-    ValueParamView(strings.min, paramStats.min, vpContext)
-    ValueParamView(strings.max, paramStats.max, vpContext)
-    ValueParamView(strings.avg, paramStats.avg, vpContext)
-    ValueParamView(strings.median, paramStats.median, vpContext)
+            text = context.resources.getText(headerRes)
+            applyTextAppearance(creationContext.headerAppearance)
+        }
 
-    MaterialChart {
-        layoutParams = creationContext.chartLayoutParams
+        val vpContext = ValueParamCreationContext(
+            statsUnit, prefUnit,
+            creationContext.unitFormatter,
+            creationContext.textLeftMargin,
+            creationContext.paramAppearance
+        )
 
-        creationContext.chartOptions(this)
-        this.data = data
+        ValueParamView(strings.min, paramStats.min, vpContext)
+        ValueParamView(strings.max, paramStats.max, vpContext)
+        ValueParamView(strings.avg, paramStats.avg, vpContext)
+        ValueParamView(strings.median, paramStats.median, vpContext)
+
+        MaterialChart {
+            layoutParams = creationContext.chartLayoutParams
+
+            creationContext.chartOptions(this)
+            this.data = data
+        }
     }
 }
 
@@ -152,11 +176,17 @@ fun createChartView(
     val prefPressUnit = ValueUnitsPacked.getPressureUnit(prefUnits)
 
     val res = context.resources
+    val theme = context.theme
 
-    val textLeftMargin = res.getDimensionPixelOffset(R.dimen.reportActivity_chartViewTextLeftMargin)
-    val chartSideMargin = res.getDimensionPixelOffset(R.dimen.reportActivity_chartViewSideMargin)
-    val blockTopMargin = res.getDimensionPixelOffset(R.dimen.reportActivity_chartViewBlockTopMargin)
+    val textLeftMargin = res.getDimensionPixelOffset(R.dimen.reportActivity_chartView_textLeftMargin)
+    val blockHeaderTopMargin = res.getDimensionPixelOffset(R.dimen.reportActivity_chartView_blockHeaderTopMargin)
+    val blockSideMargin = res.getDimensionPixelOffset(R.dimen.reportActivity_chartView_blockSideMargin)
+    val blockTopBottomMargin = res.getDimensionPixelOffset(R.dimen.reportActivity_chartView_blockTopBottomMargin)
     val chartHeight = res.getDimensionPixelSize(R.dimen.reportActivity_chartHeight)
+    val blockRadius = res.getDimension(R.dimen.reportActivity_chartView_blockRadius)
+    val blockPadding = res.getDimensionPixelOffset(R.dimen.reportActivity_chartView_blockPadding)
+
+    val blockBackgroundColor = ResourcesCompat.getColor(res, R.color.report_blockColor, theme)
 
     val headerAppearance =
         TextAppearance(context, R.style.TextAppearance_MaterialComponents_Headline4)
@@ -170,12 +200,14 @@ fun createChartView(
     )
 
     val creationContext = ChartViewCreationContext(
-        textLeftMargin, chartSideMargin, blockTopMargin,
-        chartHeight,
+        textLeftMargin, blockSideMargin, blockTopBottomMargin, blockHeaderTopMargin, chartHeight,
         headerAppearance, paramAppearance,
         unitFormatter,
         strings,
-        chartOptions
+        chartOptions,
+        blockBackgroundColor,
+        blockPadding,
+        blockRadius
     )
 
     return ScrollView(context) {

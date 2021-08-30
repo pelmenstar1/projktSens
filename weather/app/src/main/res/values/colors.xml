@@ -6,6 +6,8 @@
 
     <color name="moonVisibleColor">#fea</color>
 
+    <color name="report_blockColor">#1D1C1C</color>
+
     <color name="chartMaxColor">#E83737</color>
     <color name="chartMinColor">#0CB0D8</color>
 

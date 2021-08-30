@@ -68,7 +68,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
                 gravity = Gravity.CENTER
             }
 
-            colorTransition = LinearColorTransition.fromArrayResWithDisplayRefreshRate(
+            colorTransition = LinearColorTransition.fromArrayRes(
                 context,
                 R.array.defaultTransitionColors
             )

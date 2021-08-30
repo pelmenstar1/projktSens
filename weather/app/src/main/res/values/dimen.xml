@@ -11,9 +11,12 @@
     <dimen name="reportActivity_retryButtonSize">35dp</dimen>
     <dimen name="reportActivity_retryButtonTopMargin">10dp</dimen>
     <dimen name="reportActivity_transitionViewSize">80dp</dimen>
-    <dimen name="reportActivity_chartViewTextLeftMargin">5dp</dimen>
-    <dimen name="reportActivity_chartViewSideMargin">7dp</dimen>
-    <dimen name="reportActivity_chartViewBlockTopMargin">10dp</dimen>
+    <dimen name="reportActivity_chartView_textLeftMargin">5dp</dimen>
+    <dimen name="reportActivity_chartView_blockSideMargin">7dp</dimen>
+    <dimen name="reportActivity_chartView_blockHeaderTopMargin">10dp</dimen>
+    <dimen name="reportActivity_chartView_blockPadding">10dp</dimen>
+    <dimen name="reportActivity_chartView_blockTopBottomMargin">10dp</dimen>
+    <dimen name="reportActivity_chartView_blockRadius">7dp</dimen>
     <dimen name="reportActivity_noNetwork_iconSize">100dp</dimen>
     <dimen name="reportActivity_noNetwork_iconTopMargin">15dp</dimen>
 
