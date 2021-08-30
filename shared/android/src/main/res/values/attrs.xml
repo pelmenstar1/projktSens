@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="settings_blockBackgroundColor" format="color"/>
+
     <declare-styleable name="PrefixTextView">
         <attr name="prefix" format="string" />
         <attr name="value" format="string" />

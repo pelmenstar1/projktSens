@@ -24,6 +24,8 @@
     <color name="sunriseSunsetArc_overArcColor">#DCDCDC</color>
     <color name="sunriseSunsetArc_textColor">#ffffff</color>
 
+    <color name="settings_groupBackgroundColor">#1D1C1C</color>
+
     <array name="defaultTransitionColors">
         <item>#852F14</item>
         <item>#BC441E</item>

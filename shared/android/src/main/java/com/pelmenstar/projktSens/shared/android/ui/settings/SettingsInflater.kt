@@ -1,15 +1,10 @@
 package com.pelmenstar.projktSens.shared.android.ui.settings
 
 import android.content.Context
-import android.graphics.Paint
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RoundRectShape
-import android.graphics.drawable.shapes.Shape
+import android.util.TypedValue
 import android.view.ViewGroup
 import android.widget.GridLayout
 import android.widget.LinearLayout
-import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.setPadding
 import com.pelmenstar.projktSens.shared.android.R
@@ -27,7 +22,14 @@ internal class GroupInflateOptions(context: Context) {
         val res = context.resources
         val theme = context.theme
 
-        backgroundColor = ResourcesCompat.getColor(res, R.color.settings_groupBackground, theme)
+        val groupBgValue = TypedValue()
+        val resolved = theme.resolveAttribute(R.attr.settings_blockBackgroundColor, groupBgValue, true)
+
+        backgroundColor = if(resolved) {
+            groupBgValue.data
+        } else {
+            ResourcesCompat.getColor(res, R.color.settings_defaultGroupBackground, theme)
+        }
         backgroundRadius = res.getDimension(R.dimen.settings_groupBackgroundRadius)
 
         padding = res.getDimensionPixelOffset(R.dimen.settings_groupPadding)

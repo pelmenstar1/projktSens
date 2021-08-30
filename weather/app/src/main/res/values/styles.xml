@@ -9,6 +9,7 @@
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:statusBarColor">?android:attr/colorBackground</item>
+        <item name="settings_blockBackgroundColor">@color/settings_groupBackgroundColor</item>
     </style>
 
     <style name="AppTheme.Dialog" parent="Theme.MaterialComponents.Dialog">
