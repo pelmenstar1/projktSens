@@ -2,10 +2,7 @@ package com.pelmenstar.projktSens.shared.android.ui;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Build;
 import android.util.SparseArray;
-import android.view.Display;
-import android.view.WindowManager;
 
 import androidx.annotation.ArrayRes;
 import androidx.annotation.ColorInt;
@@ -21,7 +18,7 @@ import java.util.Arrays;
  * Represents a linear color transition
  */
 public final class LinearColorTransition extends AppendableToStringBuilder implements Cloneable {
-    private static final class CacheEntry {
+    private static final class CacheEntry extends AppendableToStringBuilder {
         public final int @NotNull [] colors;
         public final int framesPerColor;
 
@@ -49,12 +46,12 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
         }
 
         @Override
-        @NotNull
-        public String toString() {
-            return "CacheEntry{" +
-                    "colors=" + Arrays.toString(colors) +
-                    ", framesPerColor=" + framesPerColor +
-                    '}';
+        public void append(@NotNull StringBuilder sb) {
+            sb.append("{colors=");
+            StringUtils.appendHexColors(colors, sb);
+            sb.append(", framesPerColor=");
+            sb.append(framesPerColor);
+            sb.append('}');
         }
     }
 
@@ -328,13 +325,8 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
 
     @Override
     public void append(@NotNull StringBuilder sb) {
-        sb.append("{ resultColors=[");
-        int maxIdx = transColors.length - 1;
-        for (int i = 0; i < maxIdx; i++) {
-            StringUtils.appendHexColor(transColors[i], sb);
-            sb.append(',');
-        }
-        StringUtils.appendHexColor(transColors[maxIdx], sb);
-        sb.append("] }");
+        sb.append("{resultColors=");
+        StringUtils.appendHexColors(transColors, sb);
+        sb.append('}');
     }
 }
