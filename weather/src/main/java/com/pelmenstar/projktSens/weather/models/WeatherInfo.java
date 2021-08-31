@@ -111,9 +111,9 @@ public final class WeatherInfo extends AppendableToStringBuilder {
         return new WeatherInfo(
                 ValueUnitsPacked.create(ValueUnit.CELSIUS, ValueUnit.MM_OF_MERCURY),
                 dateTime,
-                RandomUtils.nextInt(random, -10, 30),
-                RandomUtils.nextInt(random, 50, 90),
-                RandomUtils.nextInt(random, 702, 798)
+                RandomUtils.nextFloat(random, -10f, 30f),
+                RandomUtils.nextFloat(random, 50f, 90f),
+                RandomUtils.nextFloat(random, 702f, 798f)
         );
     }
 

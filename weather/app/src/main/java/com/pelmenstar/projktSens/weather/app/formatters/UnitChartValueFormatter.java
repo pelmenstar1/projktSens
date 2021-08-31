@@ -19,6 +19,6 @@ public final class UnitChartValueFormatter extends ValueFormatter {
     @NotNull
     @Override
     public String formatToString(float value) {
-        return unitFormatter.formatValue((int) value, unit);
+        return unitFormatter.formatValue(value, unit);
     }
 }

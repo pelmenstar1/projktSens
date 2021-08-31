@@ -204,6 +204,14 @@ public final class StringUtils {
         return MyMath.decimalDigitCount((int)number) + 3;
     }
 
+    @NotNull
+    public static String toStringRound1(float number) {
+        StringBuilder sb = new StringBuilder(getRound1Length(number));
+        appendRound1(number, sb);
+
+        return sb.toString();
+    }
+
     public static void appendRound1(float number, @NotNull StringBuilder sb) {
         int i = (int) number;
         if(i < 0) {

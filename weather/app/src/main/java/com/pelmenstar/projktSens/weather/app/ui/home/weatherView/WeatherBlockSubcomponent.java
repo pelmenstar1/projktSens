@@ -9,8 +9,8 @@ import android.graphics.Typeface;
 
 import androidx.core.content.res.ResourcesCompat;
 
-import com.pelmenstar.projktSens.shared.EmptyArray;
 import com.pelmenstar.projktSens.shared.PackedPointF;
+import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.weather.app.AppPreferences;
 import com.pelmenstar.projktSens.weather.app.R;
 import com.pelmenstar.projktSens.weather.app.di.AppComponent;
@@ -116,8 +116,10 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
         int valueTempUnit = ValueUnitsPacked.getTemperatureUnit(valueUnits);
         int valuePressUnit = ValueUnitsPacked.getPressureUnit(valueUnits);
 
+        float convertedTemp = UnitValue.getValue(value.temperature, valueTempUnit, prefTempUnit);
+
         tempUnitStr = unitFormatter.getUnitString(prefTempUnit);
-        tempStr = Float.toString(UnitValue.getValue(value.temperature, valueTempUnit, prefTempUnit));
+        tempStr = StringUtils.toStringRound1(convertedTemp);
         humStr = unitFormatter.formatValue(value.humidity, ValueUnit.HUMIDITY);
         pressStr = unitFormatter.formatValue(
                 UnitValue.getValue(value.pressure, valuePressUnit, prefPressUnit),
