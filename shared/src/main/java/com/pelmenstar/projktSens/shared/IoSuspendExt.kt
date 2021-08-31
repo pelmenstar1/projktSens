@@ -1,6 +1,5 @@
 package com.pelmenstar.projktSens.shared
 
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -15,7 +14,7 @@ import kotlin.math.min
  * Suspend version of [Socket.connect]
  */
 suspend fun Socket.connectSuspend(address: SocketAddress) {
-    suspendCancellableCoroutine<Unit> { cont ->
+    suspendCoroutine<Unit> { cont ->
         connect(address)
         cont.resumeWith(UnitResult.SUCCESS)
     }
@@ -32,7 +31,7 @@ suspend fun Socket.connectSuspend(address: SocketAddress, timeout: Int) {
  * Suspend version of [Socket.bind]
  */
 suspend fun ServerSocket.bindSuspend(address: SocketAddress, backlog: Int) {
-    suspendCancellableCoroutine<Unit> { cont ->
+    suspendCoroutine<Unit> { cont ->
         bind(address, backlog)
         cont.resumeWith(UnitResult.SUCCESS)
     }
@@ -42,7 +41,7 @@ suspend fun ServerSocket.bindSuspend(address: SocketAddress, backlog: Int) {
  * Suspend version of [ServerSocket.accept]
  */
 suspend fun ServerSocket.acceptSuspend(): Socket {
-    return suspendCancellableCoroutine { cont ->
+    return suspendCoroutine { cont ->
         val socket = accept()
 
         cont.resumeWith(Result.success(socket))
@@ -106,13 +105,11 @@ suspend fun InputStream.readSuspendAndThrowIfNotEnough(
     return suspendCoroutine { cont ->
         val bytesRead = read(buffer, offset, length)
 
-        val result = if (bytesRead != length) {
-            Result.failure(IOException("Cannot read data"))
-        } else {
-            UnitResult.SUCCESS
+        if(bytesRead != length) {
+            throw IOException("Cannot read data")
         }
 
-        cont.resumeWith(result)
+        cont.resumeWith(UnitResult.SUCCESS)
     }
 }
 
