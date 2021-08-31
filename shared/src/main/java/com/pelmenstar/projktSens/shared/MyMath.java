@@ -85,4 +85,8 @@ public final class MyMath {
             return 10;
         }
     }
+
+    public static int hashCodeLong(long value) {
+        return (int)(value ^ (value >>> 32));
+    }
 }

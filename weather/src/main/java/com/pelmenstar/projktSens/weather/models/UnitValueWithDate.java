@@ -1,6 +1,7 @@
 package com.pelmenstar.projktSens.weather.models;
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
+import com.pelmenstar.projktSens.shared.MyMath;
 import com.pelmenstar.projktSens.shared.serialization.ValidationException;
 import com.pelmenstar.projktSens.shared.time.ShortDateTime;
 import com.pelmenstar.projktSens.shared.time.ShortDateTimeLong;
@@ -37,8 +38,8 @@ public final class UnitValueWithDate extends AppendableToStringBuilder {
 
     @Override
     public int hashCode() {
-        int result = Long.hashCode(dateTime);
-        result = 31 * result + Long.hashCode(value);
+        int result = MyMath.hashCodeLong(dateTime);
+        result = 31 * result + MyMath.hashCodeLong(value);
         return result;
     }
 

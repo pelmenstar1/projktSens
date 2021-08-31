@@ -58,7 +58,7 @@ public final class ValueWithDate extends AppendableToStringBuilder {
 
     @Override
     public int hashCode() {
-        int result = Long.hashCode(dateTime);
+        int result = MyMath.hashCodeLong(dateTime);
         result = 31 * result + Float.floatToIntBits(value);
 
         return result;

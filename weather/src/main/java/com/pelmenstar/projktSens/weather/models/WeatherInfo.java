@@ -1,6 +1,7 @@
 package com.pelmenstar.projktSens.weather.models;
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
+import com.pelmenstar.projktSens.shared.MyMath;
 import com.pelmenstar.projktSens.shared.RandomUtils;
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer;
 import com.pelmenstar.projktSens.shared.serialization.Serializable;
@@ -82,7 +83,7 @@ public final class WeatherInfo extends AppendableToStringBuilder {
 
     @Override
     public int hashCode() {
-        int result = Long.hashCode(dateTime);
+        int result = MyMath.hashCodeLong(dateTime);
         result = 31 * result + Float.floatToIntBits(temperature);
         result = 31 * result + Float.floatToIntBits(humidity);
         result = 31 * result + Float.floatToIntBits(pressure);
