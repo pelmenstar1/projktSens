@@ -2,7 +2,9 @@ package com.pelmenstar.projktSens.weather.app.ui.moon
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.style.StyleSpan
 import android.view.Gravity
 import android.widget.LinearLayout
 import com.pelmenstar.projktSens.shared.android.ui.*
@@ -44,6 +46,8 @@ class MoonCalendarActivity : HomeButtonSupportActivity(), MoonCalendarContract.V
                         leftMargin =
                             res.getDimensionPixelOffset(R.dimen.moonCalendar_moonPhaseText_leftMargin)
                     }
+
+                    valueStyle = StyleSpan(Typeface.BOLD)
 
                     setPrefix(res.getString(R.string.moonPhase))
                     applyTextAppearance(body1)

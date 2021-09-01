@@ -2,7 +2,9 @@ package com.pelmenstar.projktSens.weather.app.ui.sunriseSunset
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.style.StyleSpan
 import android.view.View
 import android.widget.LinearLayout
 import com.pelmenstar.projktSens.shared.android.ui.*
@@ -59,9 +61,11 @@ class SunriseSunsetCalendarActivity : LocationDependentActivity(),
                 leftMargin = boundsMargin
             }
 
+            val boldStyle = StyleSpan(Typeface.BOLD)
             sunriseTimeView = TimePrefixTextView {
                 layoutParams = textViewLayoutParams
 
+                timeStyle = boldStyle
                 prefix = res.getString(R.string.sunrise)
 
                 applyTextAppearance(body1)
@@ -70,6 +74,7 @@ class SunriseSunsetCalendarActivity : LocationDependentActivity(),
             sunsetTimeView = TimePrefixTextView {
                 layoutParams = textViewLayoutParams
 
+                timeStyle = boldStyle
                 prefix = res.getString(R.string.sunset)
 
                 applyTextAppearance(body1)
@@ -78,6 +83,7 @@ class SunriseSunsetCalendarActivity : LocationDependentActivity(),
             dayLengthView = TimePrefixTextView {
                 layoutParams = textViewLayoutParams
 
+                timeStyle = boldStyle
                 prefix = res.getString(R.string.dayLength)
 
                 applyTextAppearance(body1)

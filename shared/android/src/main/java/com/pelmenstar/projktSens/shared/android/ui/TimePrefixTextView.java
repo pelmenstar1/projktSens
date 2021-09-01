@@ -2,6 +2,9 @@ package com.pelmenstar.projktSens.shared.android.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.CharacterStyle;
 import android.util.AttributeSet;
 
 import androidx.annotation.AttrRes;
@@ -26,6 +29,9 @@ public final class TimePrefixTextView extends MaterialTextView {
     @TimeInt
     private int time;
 
+    @Nullable
+    private CharacterStyle timeStyle;
+
     private char[] textCache = EmptyArray.CHAR;
 
     public TimePrefixTextView(@NotNull Context context) {
@@ -45,20 +51,33 @@ public final class TimePrefixTextView extends MaterialTextView {
 
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TimePrefixTextView, defStyleAttr, defStyleRes);
-            String prefix = a.getString(R.styleable.TimePrefixTextView_prefix);
-            if (prefix != null) {
-                setPrefix(prefix);
+
+            try {
+                String tempPrefix = a.getString(R.styleable.TimePrefixTextView_prefix);
+                if (tempPrefix != null) {
+                    prefix = tempPrefix;
+                }
+
+                time = a.getInt(R.styleable.TimePrefixTextView_time, 0);
+
+                if (!ShortTime.isValid(time)) {
+                    throw new IllegalStateException("Invalid attributes");
+                }
+
+                updateText();
+            } finally {
+                a.recycle();
             }
-
-            int time = a.getInt(R.styleable.TimePrefixTextView_time, 0);
-            if (!ShortTime.isValid(time)) {
-                throw new IllegalStateException("Invalid attributes");
-            }
-
-            setTimeInternal(time);
-
-            a.recycle();
         }
+    }
+
+    @Nullable
+    public CharacterStyle getTimeStyle() {
+        return timeStyle;
+    }
+
+    public void setTimeStyle(@Nullable CharacterStyle style) {
+        timeStyle = style;
     }
 
     /**
@@ -73,20 +92,9 @@ public final class TimePrefixTextView extends MaterialTextView {
      * Sets prefix, not null
      */
     public void setPrefix(@NotNull String prefix) {
-        String oldPrefix = this.prefix;
-        if (oldPrefix.length() != prefix.length()) {
-            textCache = new char[prefix.length() + 10];
-            char[] text = textCache;
-
-            prefix.getChars(0, prefix.length(), text, 0);
-            text[prefix.length()] = ':';
-            text[prefix.length() + 1] = ' ';
-            ShortTime.writeToCharBuffer(time, text, prefix.length() + 2);
-
-            setText(text, 0, text.length);
-        }
-
         this.prefix = prefix;
+
+        updateText();
     }
 
     /**
@@ -111,15 +119,37 @@ public final class TimePrefixTextView extends MaterialTextView {
             throw new IllegalArgumentException("time");
         }
 
-        setTimeInternal(time);
-    }
-
-    private void setTimeInternal(@TimeInt int time) {
         this.time = time;
 
-        char[] text = textCache;
-        ShortTime.writeToCharBuffer(time, text, prefix.length() + 2);
+        updateText();
+    }
 
-        setText(text, 0, text.length);
+    private void updateText() {
+        char[] buffer = textCache;
+
+        int prefixLength = prefix.length();
+        int bufferLength = prefixLength + 10;
+
+        if(bufferLength > textCache.length) {
+            textCache = buffer = new char[bufferLength];
+        }
+
+        prefix.getChars(0, prefixLength, buffer, 0);
+        buffer[prefixLength] = ':';
+        buffer[prefixLength + 1] = ' ';
+
+        int timeStart = prefixLength + 2;
+        ShortTime.writeToCharBuffer(time, buffer, timeStart);
+
+        if(timeStyle != null) {
+            String str = new String(buffer, 0, bufferLength);
+
+            SpannableString s = new SpannableString(str);
+            s.setSpan(timeStyle, timeStart, bufferLength, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+
+            setText(s, BufferType.SPANNABLE);
+        } else {
+            setText(buffer, 0, bufferLength);
+        }
     }
 }

@@ -2,6 +2,9 @@ package com.pelmenstar.projktSens.shared.android.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.CharacterStyle;
 import android.util.AttributeSet;
 
 import androidx.annotation.AttrRes;
@@ -24,6 +27,9 @@ public final class PrefixTextView extends MaterialTextView {
 
     @NotNull
     private String value = "";
+
+    @Nullable
+    private CharacterStyle valueStyle;
 
     public PrefixTextView(@NotNull Context context) {
         this(context, null, android.R.attr.textViewStyle, 0);
@@ -60,6 +66,17 @@ public final class PrefixTextView extends MaterialTextView {
         }
     }
 
+    @Nullable
+    public CharacterStyle getValueStyle() {
+        return valueStyle;
+    }
+
+    public void setValueStyle(@Nullable CharacterStyle style) {
+        valueStyle = style;
+
+        invalidateText();
+    }
+
     /**
      * Sets prefix
      */
@@ -93,11 +110,9 @@ public final class PrefixTextView extends MaterialTextView {
 
         int valueBegin = prefixLength + 2;
         int textLength = valueBegin + valueLength;
-        char[] buffer;
+        char[] buffer = textCache;
 
-        if (textCache.length == textLength) {
-            buffer = textCache;
-        } else {
+        if(textLength > textCache.length) {
             textCache = buffer = new char[textLength];
         }
 
@@ -106,6 +121,15 @@ public final class PrefixTextView extends MaterialTextView {
         buffer[prefixLength + 1] = ' ';
         value.getChars(0, valueLength, buffer, valueBegin);
 
-        setText(buffer, 0, textLength);
+        if(valueStyle != null) {
+            String str = new String(buffer, 0, textLength);
+
+            SpannableString s = new SpannableString(str);
+            s.setSpan(valueStyle, valueBegin, textLength, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+
+            setText(s, BufferType.SPANNABLE);
+        } else {
+            setText(buffer, 0, textLength);
+        }
     }
 }

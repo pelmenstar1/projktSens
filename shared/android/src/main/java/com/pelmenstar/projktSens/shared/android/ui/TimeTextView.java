@@ -42,12 +42,16 @@ public final class TimeTextView extends MaterialTextView {
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TimeTextView, defStyleAttr, defStyleRes);
 
-            int time = a.getInt(R.styleable.TimePrefixTextView_prefix, 0);
-            if (!ShortTime.isValid(time)) {
-                throw new IllegalStateException("Invalid attributes");
-            }
+            try {
+                int time = a.getInt(R.styleable.TimePrefixTextView_prefix, 0);
+                if (!ShortTime.isValid(time)) {
+                    throw new IllegalStateException("Invalid attributes");
+                }
 
-            setTimeInternal(time);
+                setTimeInternal(time);
+            } finally {
+                a.recycle();
+            }
 
             a.recycle();
         } else {
