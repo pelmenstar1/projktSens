@@ -43,7 +43,7 @@ class StartupActivity : Activity() {
         if (RequestPermissionsActivity.shouldStartActivity(this, permContext)) {
             val intent = RequestPermissionsActivity.intent(this, permContext)
 
-            startActivityForResult(intent, 0)
+            startActivityForResult(intent, REQUEST_CODE_PERMISSIONS, null)
             overridePendingTransition(0, 0)
         } else {
             onPermissionsRequested()
@@ -61,36 +61,39 @@ class StartupActivity : Activity() {
     }
 
     private fun startHomeActivityAndFinish() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivityForResult(intent, REQUEST_CODE_PERMISSIONS, null)
-        finish()
-        overridePendingTransition(0, 0)
+        val intent = Intent(this, HomeActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (data != null && !prefs.isGpsPermissionDenied) {
-                val packedPermissionStates =
-                    data.getLongArrayExtra(RequestPermissionsActivity.RETURN_DATA_PERMISSION_STATES)
+        when(requestCode) {
+            REQUEST_CODE_PERMISSIONS -> {
+                if (data != null && !prefs.isGpsPermissionDenied) {
+                    val packedPermissionStates =
+                        data.getLongArrayExtra(RequestPermissionsActivity.RETURN_DATA_PERMISSION_STATES)
 
-                if(packedPermissionStates != null) {
-                    for(packedState in packedPermissionStates) {
-                        if(PackedPermissionState.getId(packedState) == PERMISSION_ID_LOCATION) {
-                            val state = PackedPermissionState.getState(packedState)
-                            if(state == PackageManager.PERMISSION_DENIED) {
-                                prefs.isGpsPermissionDenied = true
+                    if(packedPermissionStates != null) {
+                        for(packedState in packedPermissionStates) {
+                            if(PackedPermissionState.getId(packedState) == PERMISSION_ID_LOCATION) {
+                                val state = PackedPermissionState.getState(packedState)
+                                if(state == PackageManager.PERMISSION_DENIED) {
+                                    prefs.isGpsPermissionDenied = true
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            onPermissionsRequested()
-        } else if (requestCode == REQUEST_CODE_FIRST_START) {
-            if (resultCode == RESULT_OK) {
-                startHomeActivityAndFinish()
-            } else {
-                finish()
+                onPermissionsRequested()
+            }
+            REQUEST_CODE_FIRST_START -> {
+                if (resultCode == RESULT_OK) {
+                    startHomeActivityAndFinish()
+                } else {
+                    finish()
+                }
             }
         }
     }
