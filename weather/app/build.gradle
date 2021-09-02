@@ -54,6 +54,7 @@ android {
 
 dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
 
     implementation project(':serverProtocol')
     implementation project(":shared:android")

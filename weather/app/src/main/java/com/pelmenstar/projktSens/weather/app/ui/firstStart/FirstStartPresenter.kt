@@ -9,6 +9,14 @@ import com.pelmenstar.projktSens.weather.app.AppPreferences
 class FirstStartPresenter(
     private val prefs: AppPreferences
 ) : BasePresenter<FirstStartContract.View>(), FirstStartContract.Presenter {
+    override val screenViews: Array<out View> by lazy {
+        val c = context
+
+        Array(screens.size) { i ->
+            screens[i].createView(c)
+        }
+    }
+
     private val screens: Array<out FirstStartScreen<*>> = arrayOf(
         ChooseAddressAndPortScreen(),
         ChooseServerContractScreen()
@@ -40,24 +48,7 @@ class FirstStartPresenter(
             }
         }
 
-        changeScreen(if (savedPosition == -1) 0 else savedPosition)
-    }
-
-    override fun inflateAllScreens(): Array<out View> {
-        val context = context
-        return Array(screens.size) { i ->
-            screens[i].createView(context)
-        }
-    }
-
-    override fun getScreenTitles(): Array<out String> {
-        val res = context.resources
-
-        return Array(screens.size) { i ->
-            val strId = screens[i].getTitleId()
-
-            res.getString(strId)
-        }
+        changeScreen(if (savedPosition == -1) 0 else savedPosition, withAnimation = false)
     }
 
     override fun restoreState(state: Bundle) {
@@ -72,6 +63,10 @@ class FirstStartPresenter(
         }
     }
 
+    override fun getScreenTitleAt(index: Int): String {
+        return context.resources.getString(screens[index].getTitleId())
+    }
+
     override fun previousScreen() {
         if (position > 0) {
             changeScreen(position - 1)
@@ -79,27 +74,35 @@ class FirstStartPresenter(
     }
 
     override fun nextScreen() {
-        if (position < screens.size - 1) {
+        if (position < screenViews.size - 1) {
             changeScreen(position + 1)
         }
     }
 
-    private fun changeScreen(pos: Int) {
-        var oldPosition = position
+    override fun onScreenChangedByUser(newPos: Int) {
+        val oldPosition = position
         if (oldPosition != -1) {
             val prevScreen = screens[oldPosition]
             prevScreen.saveStateToBundle(tempStateBundle)
-        } else {
-            oldPosition = pos
+        }
+
+        position = newPos
+        view.setCurrentScreenFlags(newPos == 0, newPos == screenViews.size - 1)
+    }
+
+    private fun changeScreen(pos: Int, withAnimation: Boolean = true) {
+        val oldPosition = position
+        if (oldPosition != -1) {
+            val prevScreen = screens[oldPosition]
+            prevScreen.saveStateToBundle(tempStateBundle)
         }
 
         position = pos
 
         val v = view
 
-        v.setPosition(oldPosition, pos)
-
-        v.setCurrentScreenFlags(pos == 0, pos == screens.size - 1)
+        v.setPosition(pos, screens[pos], withAnimation)
+        v.setCurrentScreenFlags(pos == 0, pos == screenViews.size - 1)
     }
 
     private fun FirstStartScreen<*>.loadStateFromBundleOrDefault(bundle: Bundle) {

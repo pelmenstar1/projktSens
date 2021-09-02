@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import com.pelmenstar.projktSens.serverProtocol.ContractType
 import com.pelmenstar.projktSens.shared.android.Preferences
@@ -22,6 +23,8 @@ class ChooseServerContractScreen : FirstStartScreen<ChooseServerContractScreen.S
         val contracts = res.getStringArray(R.array.serverContracts)
 
         return FrameLayout(context) {
+            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+
             TextView {
                 frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
                     gravity = Gravity.START

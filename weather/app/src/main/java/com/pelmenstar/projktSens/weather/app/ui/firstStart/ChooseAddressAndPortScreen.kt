@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.InputType
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.GridLayout
 import androidx.core.widget.addTextChangedListener
 import com.pelmenstar.projktSens.shared.EmptyArray
@@ -112,6 +113,8 @@ class ChooseAddressAndPortScreen : FirstStartScreen<ChooseAddressAndPortScreen.S
         val body1 = TextAppearance(context, R.style.TextAppearance_MaterialComponents_Body1)
 
         return GridLayout(context).apply {
+            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+
             columnCount = 2
             rowCount = 2
 
