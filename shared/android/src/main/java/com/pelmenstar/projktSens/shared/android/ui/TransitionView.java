@@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StyleRes;
 
 import com.pelmenstar.projktSens.shared.FloatPair;
-import com.pelmenstar.projktSens.shared.WaitForObject;
+import com.pelmenstar.projktSens.shared.InvokeOnFirstSet;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,7 +45,7 @@ public final class TransitionView extends View {
     private final AtomicInteger transitionRunning = new AtomicInteger();
     private boolean transitionStoppedByDetaching = false;
 
-    private static final WaitForObject<Handler> transThreadHandler = new WaitForObject<>();
+    private static final InvokeOnFirstSet<Handler> transThreadHandler = new InvokeOnFirstSet<>();
     private static final AtomicInteger isHandlerThreadStarted = new AtomicInteger();
 
     public TransitionView(@NotNull Context context) {
@@ -72,8 +72,7 @@ public final class TransitionView extends View {
     ) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        this.shape = Shape.COMMON[creationCounter % Shape.COMMON.length];
-        creationCounter++;
+        setNextShapeInSequence();
     }
 
     @Override
@@ -117,6 +116,7 @@ public final class TransitionView extends View {
     public boolean performClick() {
         super.performClick();
         setNextShapeInSequence();
+
         return true;
     }
 
@@ -207,7 +207,15 @@ public final class TransitionView extends View {
         }
 
         startTransitionThreadIfNot();
-        postStartTransition();
+
+        synchronized (transThreadHandler) {
+            Handler handler = transThreadHandler.get();
+            if (handler == null) {
+                transThreadHandler.setCallback(this::postStartTransition);
+            } else {
+                postStartTransition();
+            }
+        }
     }
 
     public void stopTransition() {
@@ -215,7 +223,7 @@ public final class TransitionView extends View {
     }
 
     private void postStartTransition() {
-        Handler handler = transThreadHandler.get();
+        Handler handler = transThreadHandler.getOrThrowIfNull();
 
         Message msg = Message.obtain();
         msg.what = MSG_START_TRANS_ON_CURRENT_THREAD;
@@ -365,7 +373,9 @@ public final class TransitionView extends View {
             Looper.prepare();
             Looper looper = Looper.myLooper();
 
-            transThreadHandler.set(new TransitionThreadHandler(looper));
+            synchronized (transThreadHandler) {
+                transThreadHandler.set(new TransitionThreadHandler(looper));
+            }
 
             Looper.loop();
         }
