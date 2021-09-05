@@ -2,17 +2,16 @@ package com.pelmenstar.projktSens.weather.app.ui.firstStart
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.RotateDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.setMargins
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.button.MaterialButton
+import com.pelmenstar.projktSens.shared.android.KeyboardUtils
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppModule
@@ -26,19 +25,23 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
     private lateinit var viewPager: ViewPager2
     private lateinit var viewPagerAdapter: FirstStartAdapter
 
-    private lateinit var prevScreenButton: Button
-    private lateinit var nextScreenButton: Button
+    private lateinit var prevScreenButton: MaterialButton
+    private lateinit var nextScreenButton: MaterialButton
 
     private lateinit var presenter: FirstStartContract.Presenter
 
     private var isFirstScreen = false
     private var isLastScreen = false
 
+    private var nextStr: String? = null
+    private var finishStr: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         actionBar { hide() }
 
+        initResources()
         setContentView(createContent())
 
         val component = DaggerAppComponent
@@ -74,16 +77,20 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
         presenter.detach()
     }
 
+    private fun initResources() {
+        val res = resources
+
+        nextStr = res.getString(R.string.firstStart_nextButtonText)
+        finishStr = res.getString(R.string.firstStart_finishButtonText)
+    }
+
     private fun createContent(): View {
         val context = this
         val res = resources
-        val theme = theme
 
         return FrameLayout(context) {
             val actionButtonMargin =
                 res.getDimensionPixelOffset(R.dimen.firstStartActivity_actionButtonMargin)
-            val actionButtonSize =
-                res.getDimensionPixelSize(R.dimen.firstStartActivity_actionButtonSize)
 
             LinearLayout {
                 orientation = LinearLayout.VERTICAL
@@ -98,13 +105,12 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
                     applyTextAppearance(R.style.TextAppearance_MaterialComponents_Headline5)
                 }
 
-
                 viewPager = addApply(ViewPager2(context)) {
                     linearLayoutParams(MATCH_PARENT, MATCH_PARENT) {
                         setMargins(res.getDimensionPixelOffset(R.dimen.firstStartActivity_screenPadding))
                     }
 
-                    registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+                    registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                         override fun onPageSelected(position: Int) {
                             presenter.onScreenChangedByUser(position)
                             screenTitleView.text = presenter.getScreenTitleAt(position)
@@ -116,35 +122,27 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
                 }
             }
 
-            val nextDrawable = ResourcesCompat.getDrawable(res, R.drawable.ic_next, theme)!!
-
-            prevScreenButton = Button {
-                frameLayoutParams(actionButtonSize, actionButtonSize) {
+            prevScreenButton = Button(R.attr.materialButtonOutlinedStyle) {
+                frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
                     gravity = Gravity.START or Gravity.BOTTOM
 
                     leftMargin = actionButtonMargin
                     bottomMargin = actionButtonMargin
                 }
 
-                background = RotateDrawable().apply {
-                    drawable = nextDrawable.constantState?.newDrawable()
-                    rotation = 180f
-                }
+                text = res.getString(R.string.firstStart_previousButtonText)
 
-                setOnClickListener {
-                    presenter.previousScreen()
-                }
+                setOnClickListener { presenter.previousScreen() }
             }
 
             nextScreenButton = Button {
-                frameLayoutParams(actionButtonSize, actionButtonSize) {
+                frameLayoutParams(WRAP_CONTENT, WRAP_CONTENT) {
                     gravity = Gravity.END or Gravity.BOTTOM
 
                     rightMargin = actionButtonMargin
                     bottomMargin = actionButtonMargin
                 }
 
-                background = nextDrawable
                 setOnClickListener { nextScreenOrFinish() }
             }
         }
@@ -152,11 +150,14 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
 
     override fun setPosition(position: Int, screen: FirstStartScreen<*>, withAnimation: Boolean) {
         viewPager.setCurrentItem(position, withAnimation)
-        screenTitleView.text = resources.getText(screen.getTitleId())
+        screenTitleView.text = getText(screen.getTitleId())
+
+        KeyboardUtils.hideKeyboard(this)
     }
 
     override fun setCurrentScreenFlags(first: Boolean, last: Boolean) {
-        prevScreenButton.visibility = if(first) View.INVISIBLE else View.VISIBLE
+        prevScreenButton.visibility = if (first) View.INVISIBLE else View.VISIBLE
+        nextScreenButton.text = if (last) finishStr else nextStr
 
         isFirstScreen = first
         isLastScreen = last
@@ -169,7 +170,7 @@ class FirstStartActivity : AppCompatActivity(), FirstStartContract.View {
     private fun nextScreenOrFinish() {
         val p = presenter
         if (isLastScreen) {
-           finishActivityWithOkResult()
+            finishActivityWithOkResult()
         } else {
             p.nextScreen()
         }

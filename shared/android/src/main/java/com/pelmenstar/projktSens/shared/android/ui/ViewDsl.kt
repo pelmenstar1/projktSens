@@ -3,11 +3,15 @@
 package com.pelmenstar.projktSens.shared.android.ui
 
 import android.content.Context
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.AttrRes
+import androidx.annotation.StyleRes
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatSpinner
+import com.google.android.material.R
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import kotlin.contracts.InvocationKind
@@ -131,15 +135,10 @@ inline fun ViewGroup.TimePrefixTextView(block: TimePrefixTextView.() -> Unit): T
     return addApply(TimePrefixTextView(context), block)
 }
 
-inline fun ViewGroup.Button(block: MaterialButton.() -> Unit): MaterialButton {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-
-    return addApply(MaterialButton(context), block)
-}
-
-inline fun ViewGroup.Button(defStyleAttr: Int, block: MaterialButton.() -> Unit): MaterialButton {
+inline fun ViewGroup.Button(
+    @AttrRes defStyleAttr: Int = R.attr.materialButtonStyle,
+    block: MaterialButton.() -> Unit
+): MaterialButton {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
