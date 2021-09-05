@@ -22,9 +22,9 @@ public final class Utils {
             return 0f;
         }
 
-        float d = (float) Math.ceil(Math.log10(Math.abs(number)));
-        int pw = 1 - (int) d;
-        float magnitude = (float) Math.pow(10, pw);
+        double d = Math.ceil(Math.log10(Math.abs(number)));
+        double pw = 1.0 - d;
+        float magnitude = (float) Math.pow(10.0, pw);
         int shifted = Math.round(number * magnitude);
 
         return shifted / magnitude;
