@@ -41,7 +41,7 @@ class MaterialLineChart @JvmOverloads constructor(
         circleRadius = res.getDimension(R.dimen.materialChart_circleRadius)
         lineWidth = res.getDimension(R.dimen.materialChart_lineWidth)
 
-        flags = flags or FLAG_AUTO_ANIMATED
+        isAutoAnimated = true
         xAxis.apply {
             textColor = labelColor
             position = XAxis.POSITION_BOTTOM

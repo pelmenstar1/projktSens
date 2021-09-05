@@ -1,5 +1,7 @@
 package com.pelmenstar.projktSens.chartLite.components;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Paint;
 
 import com.pelmenstar.projktSens.chartLite.Utils;
@@ -21,7 +23,13 @@ public final class YAxis extends AxisBase {
     private float minWidth = 0f;
     private float maxWidth = Float.POSITIVE_INFINITY;
 
-    public YAxis() {
+    private final Context context;
+
+    public YAxis(@NotNull Context context) {
+        super(context);
+
+        this.context = context;
+
         yOffset = 0f;
     }
 
@@ -94,11 +102,15 @@ public final class YAxis extends AxisBase {
         float minWidth = this.minWidth;
         float maxWidth = this.maxWidth;
 
-        if (minWidth > 0f)
-            minWidth = Utils.dpToPx(minWidth);
+        Resources res = context.getResources();
 
-        if (maxWidth > 0f && maxWidth != Float.POSITIVE_INFINITY)
-            maxWidth = Utils.dpToPx(maxWidth);
+        if (minWidth > 0f) {
+            minWidth = Utils.dpToPx(res, minWidth);
+        }
+
+        if (maxWidth > 0f && maxWidth != Float.POSITIVE_INFINITY) {
+            maxWidth = Utils.dpToPx(res, maxWidth);
+        }
 
         width = Math.max(minWidth, Math.min(width, maxWidth > 0f ? maxWidth : width));
 

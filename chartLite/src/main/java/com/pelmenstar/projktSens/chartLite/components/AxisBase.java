@@ -1,5 +1,7 @@
 package com.pelmenstar.projktSens.chartLite.components;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 
@@ -34,6 +36,7 @@ public abstract class AxisBase {
 
     @NotNull
     protected ValueFormatter valueFormatter = FloatValueFormatter.INSTANCE;
+
     protected float granularity = 1f;
     protected float spaceMin = 0f;
     protected float spaceMax = 0f;
@@ -41,26 +44,33 @@ public abstract class AxisBase {
     protected float max = 0f;
     protected float xOffset;
     protected float yOffset;
+
     @Nullable
     protected Typeface typeface = null;
     protected float textSize;
     @ColorInt
     protected int textColor = Color.BLACK;
+
     private int flags = FLAG_ENABLED | FLAG_DRAW_GRID_LINES | FLAG_DRAW_AXIS_LINE | FLAG_DRAW_LABELS;
+
     @ColorInt
     private int gridColor = Color.GRAY;
     private float gridLineWidth = 1f;
+
     @ColorInt
     private int axisLineColor = Color.GRAY;
     private float axisLineWidth = 1f;
+
     private int labelCount = 6;
     private int minLabels = 2;
     private int maxLabels = 25;
 
-    public AxisBase() {
-        this.textSize = Utils.dpToPx(10f);
-        this.xOffset = Utils.dpToPx(2f);
-        this.yOffset = Utils.dpToPx(2f);
+    public AxisBase(@NotNull Context context) {
+        Resources res = context.getResources();
+
+        textSize = Utils.dpToPx(res, 10f);
+        xOffset = Utils.dpToPx(res, 2f);
+        yOffset = Utils.dpToPx(res, 2f);
     }
 
     public float getXOffset() {

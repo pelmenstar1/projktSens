@@ -63,18 +63,16 @@ public class LineChart extends View {
         setWillNotDraw(false);
         // setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
-        Utils.init(context);
-
         animator = new SimpleChartAnimator(this);
         dataRef = new DataRef();
         viewPortHandler = new ViewPortHandler();
 
         renderer = new LineChartRenderer(viewPortHandler, animator, dataRef);
 
-        xAxis = new XAxis();
+        xAxis = new XAxis(context);
         xAxisRenderer = new XAxisRenderer(viewPortHandler, xAxis);
 
-        yAxis = new YAxis();
+        yAxis = new YAxis(context);
         yAxisRenderer = new YAxisRenderer(viewPortHandler, yAxis);
     }
 
@@ -159,7 +157,8 @@ public class LineChart extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int size = (int) Utils.dpToPx(50f);
+
+        int size = (int)Utils.dpToPx(getContext(), 50f);
         setMeasuredDimension(
                 Math.max(getSuggestedMinimumWidth(), resolveSize(size, widthMeasureSpec)),
                 Math.max(getSuggestedMinimumHeight(), resolveSize(size, heightMeasureSpec))
@@ -258,7 +257,7 @@ public class LineChart extends View {
             }
         }
 
-        float minOffset = Utils.dpToPx(this.minOffset);
+        float minOffset = Utils.dpToPx(getContext(), this.minOffset);
 
         viewPortHandler.setOffsets(
                 Math.max(minOffset, offsetLeft),

@@ -1,8 +1,12 @@
 package com.pelmenstar.projktSens.chartLite.components;
 
+import android.content.Context;
+
 import androidx.annotation.IntDef;
 
 import com.pelmenstar.projktSens.chartLite.Utils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -20,11 +24,16 @@ public final class XAxis extends AxisBase {
     public static final int POSITION_TOP = 0;
     public static final int POSITION_BOTTOM = 1;
     public static final int POSITION_BOTH_SIDED = 2;
+
     private boolean avoidFirstLastClipping = false;
+
     @Position
     private int position = POSITION_TOP;
-    public XAxis() {
-        yOffset = Utils.dpToPx(4f); // -3
+
+    public XAxis(@NotNull Context context) {
+        super(context);
+
+        yOffset = Utils.dpToPx(context, 4f);
     }
 
     @Position
