@@ -58,7 +58,6 @@ public class LineChart extends View {
         super(context, attrs, defStyleAttr, defStyleRes);
 
         setWillNotDraw(false);
-        // setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
         animator = new SimpleChartAnimator(this);
         dataRef = new DataRef();
@@ -180,18 +179,6 @@ public class LineChart extends View {
             flags |= FLAG_OFFSETS_CALCULATED;
         }
 
-        yAxisRenderer.computePoints();
-        xAxisRenderer.computePoints();
-        renderer.computePoints();
-
-        if (yAxis.isEnabled()) {
-            yAxisRenderer.computeAxis();
-        }
-
-        if (xAxis.isEnabled()) {
-            xAxisRenderer.computeAxis();
-        }
-
         xAxisRenderer.draw(c);
         yAxisRenderer.draw(c);
         renderer.draw(c);
@@ -204,6 +191,10 @@ public class LineChart extends View {
 
     private void prepareTransMatrix() {
         viewPortHandler.prepareTransform(xAxis.getMin(), xAxis.getMax(), yAxis.getMin(), yAxis.getMax());
+
+        renderer.computePoints();
+        xAxisRenderer.computePoints();
+        yAxisRenderer.computePoints();
     }
 
     private void notifyDataChanged() {
@@ -221,10 +212,7 @@ public class LineChart extends View {
         calculateOffsets();
     }
 
-    /**
-     * Computes internal offsets
-     */
-    public void calculateOffsets() {
+    private void calculateOffsets() {
         float offsetLeft = 0f, offsetRight = 0f, offsetTop = 0f, offsetBottom = 0f;
 
         // offsets for y-labels
