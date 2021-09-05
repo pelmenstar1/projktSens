@@ -4,6 +4,9 @@
 package com.pelmenstar.projktSens.weather.app.ui.report
 
 import android.content.Context
+import android.graphics.Typeface
+import android.text.style.CharacterStyle
+import android.text.style.StyleSpan
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -63,7 +66,8 @@ private class ValueParamCreationContext(
     @JvmField val statsUnit: Int, @JvmField val prefUnit: Int,
     @JvmField val unitFormatter: UnitFormatter,
     @JvmField val textLeftMargin: Int,
-    @JvmField val textAppearance: TextAppearance
+    @JvmField val textAppearance: TextAppearance,
+    @JvmField val valueStyle: CharacterStyle
 ) {
     @JvmField
     val layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
@@ -75,29 +79,32 @@ private fun ViewGroup.ValueParamView(
     prefix: String, vd: ValueWithDate,
     c: ValueParamCreationContext
 ) {
-    PrefixTextView {
-        layoutParams = c.layoutParams
+    val valueStr = c.unitFormatter.formatValueWithDate(vd, c.statsUnit, c.prefUnit)
 
-        val value = c.unitFormatter.formatValueWithDate(vd, c.statsUnit, c.prefUnit)
-        setPrefixAndValue(prefix, value)
-
-        applyTextAppearance(c.textAppearance)
-    }
+    ValueParamView(prefix, valueStr, c)
 }
 
 private fun ViewGroup.ValueParamView(
     prefix: String, value: Float,
     c: ValueParamCreationContext
 ) {
+    val valueStr = c.unitFormatter.formatValue(
+        UnitValue.getValue(value, c.statsUnit, c.prefUnit),
+        c.prefUnit
+    )
+
+    ValueParamView(prefix, valueStr, c)
+}
+
+private fun ViewGroup.ValueParamView(
+    prefix: String, value: String,
+    c: ValueParamCreationContext
+) {
     PrefixTextView {
         layoutParams = c.layoutParams
 
-        val valueStr = c.unitFormatter.formatValue(
-            UnitValue.getValue(value, c.statsUnit, c.prefUnit),
-            c.prefUnit
-        )
-
-        setPrefixAndValue(prefix, valueStr)
+        valueStyle = c.valueStyle
+        setPrefixAndValue(prefix, value)
 
         applyTextAppearance(c.textAppearance)
     }
@@ -134,7 +141,8 @@ private fun ViewGroup.ParamStatsBlock(
             statsUnit, prefUnit,
             creationContext.unitFormatter,
             creationContext.textLeftMargin,
-            creationContext.paramAppearance
+            creationContext.paramAppearance,
+            StyleSpan(Typeface.BOLD)
         )
 
         ValueParamView(strings.min, paramStats.min, vpContext)
