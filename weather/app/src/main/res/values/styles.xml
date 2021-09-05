@@ -12,12 +12,4 @@
         <item name="settings_blockBackgroundColor">@color/settings_groupBackgroundColor</item>
     </style>
 
-    <style name="AppTheme.Dialog" parent="Theme.MaterialComponents.Dialog">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-
-        <item name="android:statusBarColor">?android:attr/colorBackground</item>
-    </style>
-
 </resources>

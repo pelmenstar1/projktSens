@@ -28,10 +28,8 @@
     <dimen name="weatherView_tempUnitTextSize">16sp</dimen>
     <dimen name="weatherView_humPressTextSize">15sp</dimen>
     <dimen name="weatherView_moonDiameter">40dp</dimen>
-    <dimen name="weatherView_sunriseSunsetTextSize">16sp</dimen>
     <dimen name="weatherView_retrySize">30dp</dimen>
     <dimen name="weatherView_failedGetLocationTextSize">16sp</dimen>
-    <dimen name="weatherView_requestGpsSize">30dp</dimen>
 
     <dimen name="sunriseSunsetArc_dashedArcThickness">0.8dp</dimen>
     <dimen name="sunriseSunsetArc_overArcThickness">2.5dp</dimen>
@@ -58,5 +56,4 @@
     <dimen name="firstStartActivity_actionButtonMargin">5dp</dimen>
     <dimen name="firstStartActivity_screenPadding">7dp</dimen>
     <dimen name="firstStartActivity_titleTopMargin">6dp</dimen>
-    <dimen name="firstStartActivity_actionButtonSize">60dp</dimen>
 </resources>

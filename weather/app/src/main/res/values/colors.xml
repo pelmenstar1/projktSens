@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#F85522</color>
     <color name="colorPrimaryDark">#CF4317</color>
-    <color name="colorAccent">#FFC107</color>
+    <color name="colorAccent">#FF9C07</color>
 
     <color name="moonVisibleColor">#fea</color>
 
@@ -10,9 +10,6 @@
 
     <color name="chartMaxColor">#E83737</color>
     <color name="chartMinColor">#0CB0D8</color>
-
-    <color name="tempDeltaLessThanZero">#e32b2b</color>
-    <color name="tempDeltaGreaterThanZero">#2be337</color>
 
     <color name="weatherView_textColor_day">#000000</color>
     <color name="weatherView_textColor_night">#ffffff</color>

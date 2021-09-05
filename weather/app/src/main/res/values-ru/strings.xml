@@ -30,11 +30,13 @@
     <string name="noData">Ммм… Ничего</string>
     <string name="errorOccurred">Упс… Ошибка</string>
 
+    <string name="firstStart_previousButtonText">Назад</string>
+    <string name="firstStart_nextButtonText">Далее</string>
+    <string name="firstStart_finishButtonText">Закінчити</string>
     <string name="firstStart_chooseAddressAndPortTitle">Введите сервер и порт</string>
     <string name="firstStart_chooseServerContractTitle">Укажите способ передачи</string>
 
     <string name="settings">Настройки</string>
-    <string name="save_settings">Сохранить</string>
 
     <string name="serverHost">Сервер</string>
     <string name="invalidInetAddress">Неправильный адресс</string>
