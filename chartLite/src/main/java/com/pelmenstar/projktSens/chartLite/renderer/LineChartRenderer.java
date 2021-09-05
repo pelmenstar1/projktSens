@@ -29,7 +29,6 @@ public final class LineChartRenderer {
 
     @NotNull
     private final SimpleChartAnimator animator;
-    private final RectF clipRect = new RectF();
     private float[] computedPoints = EmptyArray.FLOAT;
 
     @Nullable
@@ -133,15 +132,6 @@ public final class LineChartRenderer {
                 int maxIdx = entries.length - 1;
                 int maxLineIdx = entries.length - 2;
 
-                clipRect.set(content);
-                clipRect.left -= circleRadius;
-                clipRect.top -= circleRadius;
-                clipRect.right += circleRadius;
-                clipRect.bottom += circleRadius;
-
-                int save = c.save();
-                c.clipRect(clipRect);
-
                 while (eIndex < entries.length) {
                     float x = points[pOffset];
                     float y = points[pOffset + 1];
@@ -179,8 +169,6 @@ public final class LineChartRenderer {
                     eIndex++;
                     pOffset += 2;
                 }
-
-                c.restoreToCount(save);
             }
         }
     }

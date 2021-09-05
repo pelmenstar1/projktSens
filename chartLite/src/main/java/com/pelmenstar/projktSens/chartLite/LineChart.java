@@ -22,12 +22,9 @@ import org.jetbrains.annotations.Nullable;
  * Chart that draws lines, circles, labels... Just line chart
  */
 public class LineChart extends View {
-    protected static final int FLAG_CLIP_VALUES_TO_CONTENT = 1;
-    protected static final int FLAG_CLIP_DATA_TO_CONTENT = 1 << 1;
-    protected static final int FLAG_AUTO_ANIMATED = 1 << 2;
-
-    private static final int FLAG_OFFSETS_CALCULATED = 1 << 3;
-    private static final int FLAG_FIRST_RENDER = 1 << 4;
+    private static final int FLAG_AUTO_ANIMATED = 1;
+    private static final int FLAG_OFFSETS_CALCULATED = 1 << 1;
+    private static final int FLAG_FIRST_RENDER = 1 << 2;
     private static final int AUTO_ANIMATE_COND = FLAG_AUTO_ANIMATED | FLAG_FIRST_RENDER;
 
     @NotNull
@@ -42,7 +39,7 @@ public class LineChart extends View {
     protected final YAxisRenderer yAxisRenderer;
     protected final SimpleChartAnimator animator;
 
-    protected int flags = FLAG_CLIP_DATA_TO_CONTENT | FLAG_FIRST_RENDER;
+    protected int flags = FLAG_FIRST_RENDER;
     protected float minOffset = 15f;
 
     public LineChart(@NotNull Context context) {
@@ -292,22 +289,6 @@ public class LineChart extends View {
      */
     public void animateY(long duration) {
         animator.animateY(duration);
-    }
-
-    public void setClipValuesToContent(boolean enabled) {
-        setFlag(FLAG_CLIP_VALUES_TO_CONTENT, enabled);
-    }
-
-    public void setClipDataToContent(boolean enabled) {
-        setFlag(FLAG_CLIP_DATA_TO_CONTENT, enabled);
-    }
-
-    public boolean isClipValuesToContentEnabled() {
-        return isFlagEnabled(FLAG_CLIP_VALUES_TO_CONTENT);
-    }
-
-    public boolean isClipDataToContentEnabled() {
-        return isFlagEnabled(FLAG_CLIP_DATA_TO_CONTENT);
     }
 
     public float getMinOffset() {
