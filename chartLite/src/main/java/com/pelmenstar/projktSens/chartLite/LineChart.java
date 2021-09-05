@@ -3,9 +3,7 @@ package com.pelmenstar.projktSens.chartLite;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.ViewGroup;
-import android.view.ViewParent;
+import android.view.View;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.StyleRes;
@@ -23,24 +21,18 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Chart that draws lines, circles, labels... Just line chart
  */
-public class LineChart extends ViewGroup {
-    protected static final int FLAG_PINCH_ZOOM_ENABLED = 1;
-    protected static final int FLAG_DRAG_X_ENABLED = 1 << 2;
-    protected static final int FLAG_DRAG_Y_ENABLED = 1 << 3;
-    protected static final int FLAG_SCALE_X_ENABLED = 1 << 4;
-    protected static final int FLAG_SCALE_Y_ENABLED = 1 << 5;
-    protected static final int FLAG_CLIP_VALUES_TO_CONTENT = 1 << 6;
-    protected static final int FLAG_CLIP_DATA_TO_CONTENT = 1 << 7;
-    protected static final int FLAG_TOUCH_ENABLED = 1 << 8;
-    protected static final int FLAG_DRAG_DECELERATION_ENABLED = 1 << 9;
-    protected static final int FLAG_AUTO_ANIMATED = 1 << 10;
+public class LineChart extends View {
+    protected static final int FLAG_CLIP_VALUES_TO_CONTENT = 1;
+    protected static final int FLAG_CLIP_DATA_TO_CONTENT = 1 << 1;
+    protected static final int FLAG_AUTO_ANIMATED = 1 << 2;
 
-    private static final int FLAG_OFFSETS_CALCULATED = 1 << 11;
-    private static final int FLAG_FIRST_RENDER = 1 << 12;
+    private static final int FLAG_OFFSETS_CALCULATED = 1 << 3;
+    private static final int FLAG_FIRST_RENDER = 1 << 4;
     private static final int AUTO_ANIMATE_COND = FLAG_AUTO_ANIMATED | FLAG_FIRST_RENDER;
+
     @NotNull
     protected final DataRef dataRef;
-    protected final ChartTouchListener chartTouchListener;
+
     @NotNull
     protected final LineChartRenderer renderer;
     protected final ViewPortHandler viewPortHandler;
@@ -49,11 +41,8 @@ public class LineChart extends ViewGroup {
     protected final XAxisRenderer xAxisRenderer;
     protected final YAxisRenderer yAxisRenderer;
     protected final SimpleChartAnimator animator;
-    protected int flags =
-            FLAG_TOUCH_ENABLED |
-                    FLAG_DRAG_X_ENABLED | FLAG_DRAG_Y_ENABLED |
-                    FLAG_SCALE_X_ENABLED | FLAG_SCALE_Y_ENABLED |
-                    FLAG_CLIP_DATA_TO_CONTENT | FLAG_DRAG_DECELERATION_ENABLED | FLAG_FIRST_RENDER;
+
+    protected int flags = FLAG_CLIP_DATA_TO_CONTENT | FLAG_FIRST_RENDER;
     protected float minOffset = 15f;
 
     public LineChart(@NotNull Context context) {
@@ -87,8 +76,6 @@ public class LineChart extends ViewGroup {
 
         yAxis = new YAxis();
         yAxisRenderer = new YAxisRenderer(viewPortHandler, yAxis);
-
-        chartTouchListener = new ChartTouchListener(this);
     }
 
     private boolean isFlagEnabled(int flag) {
@@ -153,59 +140,12 @@ public class LineChart extends ViewGroup {
         return dataRef.value == null || !dataRef.value.isContainsAnyEntry();
     }
 
-    @Override
-    public boolean onInterceptTouchEvent(@NotNull MotionEvent ev) {
-        int action = ev.getActionMasked();
-
-        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP) {
-            ViewParent p = getParent();
-            if (p != null) {
-                p.requestDisallowInterceptTouchEvent(false);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns whether drag deceleration is enabled
-     */
-    public boolean isDragDecelerationEnabled() {
-        return isFlagEnabled(FLAG_DRAG_DECELERATION_ENABLED);
-    }
-
-    /**
-     * Sets state of drag deceleration in chart
-     */
-    public void setDragDecelerationEnabled(boolean enabled) {
-        setFlag(FLAG_DRAG_DECELERATION_ENABLED, enabled);
-    }
-
     /**
      * Gets x-axis
      */
     @NotNull
     public XAxis getXAxis() {
         return xAxis;
-    }
-
-    /**
-     * Sets state of handling touches (if false, chart will not handle all user touches)
-     */
-    public void setTouchEnabled(boolean enabled) {
-        setFlag(FLAG_TOUCH_ENABLED, enabled);
-    }
-
-    public void disableScroll() {
-        ViewParent parent = getParent();
-        if (parent != null)
-            parent.requestDisallowInterceptTouchEvent(true);
-    }
-
-    public void enableScroll() {
-        ViewParent parent = getParent();
-        if (parent != null)
-            parent.requestDisallowInterceptTouchEvent(false);
-
     }
 
     /**
@@ -217,20 +157,13 @@ public class LineChart extends ViewGroup {
     }
 
     @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-    }
-
-    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int size = (int) Utils.dpToPx(50f);
         setMeasuredDimension(
-                Math.max(getSuggestedMinimumWidth(),
-                        resolveSize(size,
-                                widthMeasureSpec)),
-                Math.max(getSuggestedMinimumHeight(),
-                        resolveSize(size,
-                                heightMeasureSpec)));
+                Math.max(getSuggestedMinimumWidth(), resolveSize(size, widthMeasureSpec)),
+                Math.max(getSuggestedMinimumHeight(), resolveSize(size, heightMeasureSpec))
+        );
     }
 
     @Override
@@ -362,97 +295,6 @@ public class LineChart extends ViewGroup {
         animator.animateY(duration);
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        super.onTouchEvent(event);
-
-        if (dataRef.value == null || (flags & FLAG_TOUCH_ENABLED) == 0) {
-            return false;
-        }
-
-        chartTouchListener.onTouch(event);
-
-        return true;
-    }
-
-    @Override
-    public void computeScroll() {
-        chartTouchListener.computeScroll();
-    }
-
-    /**
-     * Sets scale minimum for each axis
-     *
-     * @param scaleX min scale of x-axis
-     * @param scaleY max scale of y-axis
-     */
-    public void setScaleMinimum(float scaleX, float scaleY) {
-        viewPortHandler.setMinimumScaleX(scaleX);
-        viewPortHandler.setMinimumScaleY(scaleY);
-    }
-
-    /**
-     * Determines whether dragging enabled
-     */
-    public boolean isDragEnabled() {
-        return (flags & (FLAG_DRAG_X_ENABLED | FLAG_DRAG_Y_ENABLED)) != 0;
-    }
-
-    /**
-     * Sets state of allowing dragging of chart
-     */
-    public void setDragEnabled(boolean enabled) {
-        if (enabled) {
-            flags |= (FLAG_DRAG_X_ENABLED | FLAG_DRAG_Y_ENABLED);
-        } else {
-            flags &= ~(FLAG_DRAG_X_ENABLED | FLAG_DRAG_Y_ENABLED);
-        }
-    }
-
-    public boolean isDragXEnabled() {
-        return isFlagEnabled(FLAG_DRAG_X_ENABLED);
-    }
-
-    public void setDragXEnabled(boolean enabled) {
-        setFlag(FLAG_DRAG_X_ENABLED, enabled);
-    }
-
-    public boolean isDragYEnabled() {
-        return isFlagEnabled(FLAG_DRAG_Y_ENABLED);
-    }
-
-    public void setDragYEnabled(boolean enabled) {
-        setFlag(FLAG_DRAG_Y_ENABLED, enabled);
-    }
-
-    public boolean isScaleEnabled() {
-        return (flags & (FLAG_SCALE_X_ENABLED | FLAG_SCALE_Y_ENABLED)) != 0;
-    }
-
-    public void setScaleEnabled(boolean enabled) {
-        if (enabled) {
-            flags |= (FLAG_SCALE_X_ENABLED | FLAG_SCALE_Y_ENABLED);
-        } else {
-            flags &= ~(FLAG_SCALE_X_ENABLED | FLAG_SCALE_Y_ENABLED);
-        }
-    }
-
-    public boolean isScaleXEnabled() {
-        return isFlagEnabled(FLAG_SCALE_X_ENABLED);
-    }
-
-    public void setScaleXEnabled(boolean enabled) {
-        setFlag(FLAG_SCALE_X_ENABLED, enabled);
-    }
-
-    public boolean isScaleYEnabled() {
-        return isFlagEnabled(FLAG_SCALE_Y_ENABLED);
-    }
-
-    public void setScaleYEnabled(boolean enabled) {
-        setFlag(FLAG_SCALE_Y_ENABLED, enabled);
-    }
-
     public void setClipValuesToContent(boolean enabled) {
         setFlag(FLAG_CLIP_VALUES_TO_CONTENT, enabled);
     }
@@ -487,21 +329,9 @@ public class LineChart extends ViewGroup {
         return viewPortHandler.getScaleY();
     }
 
-    public boolean isFullyZoomedOut() {
-        return viewPortHandler.isFullyZoomedOut();
-    }
-
     @NotNull
     public YAxis getYAxis() {
         return yAxis;
-    }
-
-    public void setPinchZoom(boolean enabled) {
-        setFlag(FLAG_PINCH_ZOOM_ENABLED, enabled);
-    }
-
-    public boolean isPinchZoomEnabled() {
-        return isFlagEnabled(FLAG_PINCH_ZOOM_ENABLED);
     }
 
     public float getYChartMax() {

@@ -10,31 +10,12 @@ import com.pelmenstar.projktSens.shared.EmptyArray;
 import org.jetbrains.annotations.NotNull;
 
 public final class YAxisRenderer extends AxisRenderer<YAxis> {
-    private final float[] computeAxisValues = new float[4];
     private float[] computedPoints = EmptyArray.FLOAT;
     private long computedPointsAxisEntriesHash = 0;
     private long computedPointsVphHash = 0;
 
     public YAxisRenderer(@NotNull ViewPortHandler viewPortHandler, @NotNull YAxis yAxis) {
         super(viewPortHandler, yAxis);
-    }
-
-    @Override
-    public void computeAxis() {
-        float min = axis.getMin();
-        float max = axis.getMax();
-
-        if (!viewPortHandler.isFullyZoomedOutY()) {
-            computeAxisValues[1] = viewPortHandler.contentTop();
-            computeAxisValues[3] = viewPortHandler.contentBottom();
-
-            viewPortHandler.pixelsToValues(computeAxisValues);
-
-            min = computeAxisValues[3];
-            max = computeAxisValues[1];
-        }
-
-        computeAxisValues(min, max);
     }
 
     @Override
@@ -48,7 +29,6 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
 
         computedPointsAxisEntriesHash = axisHash;
         computedPointsVphHash = vphHash;
-
 
         float[] entries = axis.entries;
         int pointsSize = entries.length * 2;

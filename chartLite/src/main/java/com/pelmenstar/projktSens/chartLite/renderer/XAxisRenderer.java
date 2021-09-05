@@ -11,7 +11,6 @@ import com.pelmenstar.projktSens.shared.EmptyArray;
 import org.jetbrains.annotations.NotNull;
 
 public final class XAxisRenderer extends AxisRenderer<XAxis> {
-    private final float[] computeAxisValues = new float[4];
     private final Paint.FontMetrics labelFontMetrics = new Paint.FontMetrics();
     private float[] computedPoints = EmptyArray.FLOAT;
     private long computedPointsAxisEntriesHash = 0;
@@ -21,24 +20,6 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
         super(viewPortHandler, xAxis);
 
         labelPaint.setTextAlign(Paint.Align.CENTER);
-    }
-
-    @Override
-    public void computeAxis() {
-        float min = axis.getMin();
-        float max = axis.getMax();
-
-        if (!viewPortHandler.isFullyZoomedOutX()) {
-            computeAxisValues[0] = viewPortHandler.contentLeft();
-            computeAxisValues[2] = viewPortHandler.contentRight();
-
-            viewPortHandler.pixelsToValues(computeAxisValues);
-
-            min = computeAxisValues[0];
-            max = computeAxisValues[2];
-        }
-
-        computeAxisValues(min, max);
     }
 
     @Override

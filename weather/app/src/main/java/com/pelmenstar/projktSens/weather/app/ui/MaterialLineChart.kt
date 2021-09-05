@@ -52,8 +52,6 @@ class MaterialLineChart @JvmOverloads constructor(
             textColor = labelColor
             position = YAxis.POSITION_LEFT
         }
-
-        setTouchEnabled(false)
     }
 
     override fun setData(data: ChartData?) {

@@ -3,8 +3,6 @@ package com.pelmenstar.projktSens.chartLite;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 
-import com.pelmenstar.projktSens.shared.MyMath;
-
 import org.jetbrains.annotations.NotNull;
 
 
@@ -18,10 +16,6 @@ public final class ViewPortHandler {
     private final float[] matrixBuffer = new float[9];
     private float chartWidth = 0f;
     private float chartHeight = 0f;
-    private float minScaleY = 1f;
-    private float maxScaleY = Float.MAX_VALUE;
-    private float minScaleX = 1f;
-    private float maxScaleX = Float.MAX_VALUE;
     private float scaleX = 1f;
     private float scaleY = 1f;
     private float transX = 0f;
@@ -49,11 +43,11 @@ public final class ViewPortHandler {
     }
 
     public void valuesToPixels(float @NotNull [] pts) {
-        cvtMatrix.mapPoints(pts, 0, pts, 0, pts.length >> 1);
+        cvtMatrix.mapPoints(pts);
     }
 
     public void pixelsToValues(float @NotNull [] pixels) {
-        invCvtMatrix.mapPoints(pixels, 0, pixels, 0, pixels.length >> 1);
+        invCvtMatrix.mapPoints(pixels);
     }
 
     public void onSizeChanged(float width, float height) {
@@ -119,13 +113,13 @@ public final class ViewPortHandler {
         matrixTouch.getValues(matrixBuffer);
 
         float curTransX = matrixBuffer[Matrix.MTRANS_X];
-        float curScaleX = matrixBuffer[Matrix.MSCALE_X];
-
         float curTransY = matrixBuffer[Matrix.MTRANS_Y];
+
+        float curScaleX = matrixBuffer[Matrix.MSCALE_X];
         float curScaleY = matrixBuffer[Matrix.MSCALE_Y];
 
-        scaleX = MyMath.clamp(curScaleX, minScaleX, maxScaleX);
-        scaleY = MyMath.clamp(curScaleY, minScaleY, maxScaleY);
+        scaleX = curScaleX;
+        scaleY = curScaleY;
 
         float width = content.width();
         float height = content.height();
@@ -145,56 +139,6 @@ public final class ViewPortHandler {
         matrixTouch.setValues(matrixBuffer);
 
         updateConvertMatrix();
-    }
-
-    public void setMinimumScaleX(float xScale) {
-        minScaleX = Math.max(xScale, 1f);
-
-        limitMatrixValues();
-    }
-
-    public void setMaximumScaleX(float xScale) {
-        if (xScale == 0f)
-            xScale = Float.MAX_VALUE;
-
-        maxScaleX = xScale;
-
-        limitMatrixValues();
-    }
-
-    public void setMinMaxScaleX(float minScaleX, float maxScaleX) {
-        if (maxScaleX == 0f)
-            maxScaleX = Float.MAX_VALUE;
-
-        this.minScaleX = Math.max(minScaleX, 1f);
-        this.maxScaleX = maxScaleX;
-
-        limitMatrixValues();
-    }
-
-    public void setMinimumScaleY(float yScale) {
-        minScaleY = Math.max(yScale, 1f);
-
-        limitMatrixValues();
-    }
-
-    public void setMaximumScaleY(float yScale) {
-        if (yScale == 0f)
-            yScale = Float.MAX_VALUE;
-
-        maxScaleY = yScale;
-
-        limitMatrixValues();
-    }
-
-    public void setMinMaxScaleY(float minScaleY, float maxScaleY) {
-        if (maxScaleY == 0f)
-            maxScaleY = Float.MAX_VALUE;
-
-        this.minScaleY = Math.max(minScaleY, 1f);
-        this.maxScaleY = maxScaleY;
-
-        limitMatrixValues();
     }
 
     public long stateHashCode() {
@@ -248,55 +192,11 @@ public final class ViewPortHandler {
         return scaleY;
     }
 
-    public float getMinScaleX() {
-        return minScaleX;
-    }
-
-    public float getMaxScaleX() {
-        return maxScaleX;
-    }
-
-    public float getMinScaleY() {
-        return minScaleY;
-    }
-
-    public float getMaxScaleY() {
-        return maxScaleY;
-    }
-
     public float getTransX() {
         return transX;
     }
 
     public float getTransY() {
         return transY;
-    }
-
-    public boolean isFullyZoomedOut() {
-        return isFullyZoomedOutX() && isFullyZoomedOutY();
-    }
-
-    public boolean isFullyZoomedOutY() {
-        return !(scaleY > minScaleY || minScaleY > 1f);
-    }
-
-    public boolean isFullyZoomedOutX() {
-        return !(scaleX > minScaleX || minScaleX > 1f);
-    }
-
-    public boolean canZoomOutMoreX() {
-        return scaleX > minScaleX;
-    }
-
-    public boolean canZoomInMoreX() {
-        return scaleX < maxScaleX;
-    }
-
-    public boolean canZoomOutMoreY() {
-        return scaleY > minScaleY;
-    }
-
-    public boolean canZoomInMoreY() {
-        return scaleY < maxScaleY;
     }
 }

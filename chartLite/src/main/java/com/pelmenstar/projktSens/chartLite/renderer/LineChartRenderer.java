@@ -31,6 +31,7 @@ public final class LineChartRenderer {
     private final SimpleChartAnimator animator;
     private final RectF clipRect = new RectF();
     private float[] computedPoints = EmptyArray.FLOAT;
+
     @Nullable
     private ChartData computedPointsData;
     private long computedPointsVphHash = 0;

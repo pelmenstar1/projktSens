@@ -39,9 +39,10 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
         return labelPaint;
     }
 
-    public abstract void computeAxis();
+    public final void computeAxis() {
+        float min = axis.getMin();
+        float max = axis.getMax();
 
-    protected final void computeAxisValues(float min, float max) {
         int labelCount = axis.getLabelCount();
 
         if (labelCount == 0 || max == min) {
