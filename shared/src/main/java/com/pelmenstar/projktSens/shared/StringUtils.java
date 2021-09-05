@@ -214,7 +214,7 @@ public final class StringUtils {
 
     public static void appendRound1(float number, @NotNull StringBuilder sb) {
         int i = (int) number;
-        if(i < 0) {
+        if(number < 0) {
             i = -i;
             number = -number;
             sb.append('-');
