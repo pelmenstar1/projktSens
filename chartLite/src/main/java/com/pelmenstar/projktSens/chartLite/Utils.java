@@ -37,4 +37,21 @@ public final class Utils {
 
         return shifted * invMagnitude;
     }
+
+    public static void drawAxisText(
+            float @NotNull [] entries, @NotNull String @Nullable [] labels,
+            @NotNull ValueFormatter valueFormatter,
+            int index,
+            float x, float textY,
+            @NotNull Paint paint,
+            @NotNull Canvas canvas
+    ) {
+        if(labels != null) {
+            String label = labels[index];
+            canvas.drawText(label, 0, label.length(), x, textY, paint);
+        } else {
+            char[] text = valueFormatter.formatToCharArray(entries[index]);
+            canvas.drawText(text, 0, text.length, x, textY, paint);
+        }
+    }
 }

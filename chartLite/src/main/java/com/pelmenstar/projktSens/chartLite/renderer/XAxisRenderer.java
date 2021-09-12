@@ -3,6 +3,7 @@ package com.pelmenstar.projktSens.chartLite.renderer;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import com.pelmenstar.projktSens.chartLite.Utils;
 import com.pelmenstar.projktSens.chartLite.ViewPortHandler;
 import com.pelmenstar.projktSens.chartLite.components.XAxis;
 import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
@@ -112,25 +113,27 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
                 if (pos == XAxis.POSITION_TOP || pos == XAxis.POSITION_BOTH_SIDED) {
                     float textY = textYOffset + contentTop - yOffset;
 
-                    if(labels != null) {
-                        String label = labels[eOffset];
-                        c.drawText(label, 0, label.length(), x, textY, labelPaint);
-                    } else {
-                        char[] text = valueFormatter.formatToCharArray(entries[eOffset]);
-                        c.drawText(text, 0, text.length, x, textY, labelPaint);
-                    }
+                    Utils.drawAxisText(
+                            entries, labels,
+                            valueFormatter,
+                            eOffset,
+                            x, textY,
+                            labelPaint,
+                            c
+                    );
                 }
 
                 if (pos == XAxis.POSITION_BOTTOM || pos == XAxis.POSITION_BOTH_SIDED) {
                     float textY = textYOffset + contentBottom + yOffset;
 
-                    if(labels != null) {
-                        String label = labels[eOffset];
-                        c.drawText(label, 0, label.length(), x, textY, labelPaint);
-                    } else {
-                        char[] text = valueFormatter.formatToCharArray(entries[eOffset]);
-                        c.drawText(text, 0, text.length, x, textY, labelPaint);
-                    }
+                    Utils.drawAxisText(
+                            entries, labels,
+                            valueFormatter,
+                            eOffset,
+                            x, textY,
+                            labelPaint,
+                            c
+                    );
                 }
             }
 

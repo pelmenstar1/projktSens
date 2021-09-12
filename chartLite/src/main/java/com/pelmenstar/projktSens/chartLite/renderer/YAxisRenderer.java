@@ -2,6 +2,7 @@ package com.pelmenstar.projktSens.chartLite.renderer;
 
 import android.graphics.Canvas;
 
+import com.pelmenstar.projktSens.chartLite.Utils;
 import com.pelmenstar.projktSens.chartLite.ViewPortHandler;
 import com.pelmenstar.projktSens.chartLite.components.YAxis;
 import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
@@ -102,25 +103,27 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
 
             if (drawLabels) {
                 if (pos == YAxis.POSITION_LEFT || pos == YAxis.POSITION_BOTH) {
-                    if(labels != null) {
-                        String label = labels[eOffset];
-                        c.drawText(label, 0, label.length(), 1f, y, labelPaint);
-                    } else {
-                        char[] text = valueFormatter.formatToCharArray(entries[eOffset]);
-                        c.drawText(text, 0, text.length, 1f, y, labelPaint);
-                    }
+                    Utils.drawAxisText(
+                            entries, labels,
+                            valueFormatter,
+                            eOffset,
+                            1f, y,
+                            labelPaint,
+                            c
+                    );
                 }
 
                 if (pos == YAxis.POSITION_RIGHT || pos == YAxis.POSITION_BOTH) {
                     float x = contentRight + xOffset;
 
-                    if(labels != null) {
-                        String label = labels[eOffset];
-                        c.drawText(label, 0, label.length(), x, y, labelPaint);
-                    } else {
-                        char[] text = valueFormatter.formatToCharArray(entries[eOffset]);
-                        c.drawText(text, 0, text.length, x, y, labelPaint);
-                    }
+                    Utils.drawAxisText(
+                            entries, labels,
+                            valueFormatter,
+                            eOffset,
+                            x, y,
+                            labelPaint,
+                            c
+                    );
                 }
             }
 
