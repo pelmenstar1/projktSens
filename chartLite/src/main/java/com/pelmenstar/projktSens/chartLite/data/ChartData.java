@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class ChartData {
     private static final DataSet[] EMPTY_DS = new DataSet[0];
+
     @NotNull
     private final DataSet[] dataSets;
     private float yMax = Float.MIN_VALUE;
@@ -20,7 +21,7 @@ public final class ChartData {
         this(new DataSet[]{dataSet});
     }
 
-    public ChartData(@NotNull DataSet... dataSets) {
+    public ChartData(@NotNull DataSet @NotNull ... dataSets) {
         this.dataSets = dataSets;
 
         for (DataSet set : dataSets) {
@@ -68,8 +69,7 @@ public final class ChartData {
         return xMax;
     }
 
-    @NotNull
-    public DataSet[] getDataSets() {
+    public @NotNull DataSet @NotNull [] getDataSets() {
         return dataSets;
     }
 
