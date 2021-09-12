@@ -28,20 +28,25 @@ public final class DataSet extends AppendableToStringBuilder {
     private final ValueFormatter valueFormatter;
     private int flags = FLAG_VISIBLE | FLAG_DRAW_VALUES | FLAG_DRAW_CIRCLES;
 
-    private float xMax = Float.MIN_VALUE;
-    private float xMin = Float.MAX_VALUE;
+    private final float xMin;
+    private final float xMax;
 
-    private float yMax = Float.MIN_VALUE;
-    private float yMin = Float.MAX_VALUE;
+    private final float yMin;
+    private final float yMax;
 
     @ColorInt
     private int color = Color.BLACK;
+
     @ColorInt
     private int valueTextColor = Color.BLACK;
+
     private float valueTextSize = 17f;
+
     @Nullable
     private Typeface valueTypeface;
+
     private float lineWidth = 2.5f;
+
     @ColorInt
     private int circleColor = Color.BLACK;
     private float circleRadius = 8f;
@@ -62,6 +67,11 @@ public final class DataSet extends AppendableToStringBuilder {
         } else {
             cachedStringLabels = null;
         }
+
+        float xMin = Float.MAX_VALUE;
+        float xMax = Float.MIN_VALUE;
+        float yMin = Float.MAX_VALUE;
+        float yMax = Float.MIN_VALUE;
 
         for (int i = 0; i < entries.length; i++) {
             long e = entries[i];
@@ -88,6 +98,11 @@ public final class DataSet extends AppendableToStringBuilder {
                 cachedStringLabels[i] = formatter.formatToString(ey);
             }
         }
+
+        this.xMin = xMin;
+        this.xMax = xMax;
+        this.yMin = yMin;
+        this.yMax = yMax;
     }
 
     public int getFlags() {

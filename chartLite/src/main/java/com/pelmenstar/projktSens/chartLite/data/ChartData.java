@@ -13,16 +13,23 @@ public final class ChartData extends AppendableToStringBuilder {
 
     @NotNull
     private final DataSet[] dataSets;
-    private float yMax = Float.MIN_VALUE;
-    private float yMin = Float.MAX_VALUE;
-    private float xMax = Float.MIN_VALUE;
-    private float xMin = Float.MAX_VALUE;
+
+    private final float xMin;
+    private final float xMax;
+
+    private final float yMin;
+    private final float yMax;
 
     private final int entryCount;
 
     public ChartData() {
         dataSets = EMPTY_DS;
         entryCount = 0;
+
+        xMin = Float.MAX_VALUE;
+        xMax = Float.MIN_VALUE;
+        yMin = Float.MAX_VALUE;
+        yMax = Float.MIN_VALUE;
     }
 
     public ChartData(@NotNull DataSet dataSet) {
@@ -31,6 +38,11 @@ public final class ChartData extends AppendableToStringBuilder {
 
     public ChartData(@NotNull DataSet @NotNull ... dataSets) {
         this.dataSets = dataSets;
+
+        float xMin = Float.MAX_VALUE;
+        float xMax = Float.MIN_VALUE;
+        float yMin = Float.MAX_VALUE;
+        float yMax = Float.MIN_VALUE;
 
         int entryCount = 0;
         for (DataSet set : dataSets) {
@@ -60,6 +72,10 @@ public final class ChartData extends AppendableToStringBuilder {
         }
 
         this.entryCount = entryCount;
+        this.xMin = xMin;
+        this.xMax = xMax;
+        this.yMin = yMin;
+        this.yMax = yMax;
     }
 
     public int length() {
