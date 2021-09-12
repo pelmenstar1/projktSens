@@ -1,11 +1,10 @@
 package com.pelmenstar.projktSens.chartLite;
 
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.os.Build;
 import android.util.FloatProperty;
 import android.util.Property;
-import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 import com.pelmenstar.projktSens.shared.MyMath;
@@ -19,7 +18,7 @@ public final class SimpleChartAnimator {
     private static final float[] ANIMATOR_VALUES = new float[]{0f, 1f};
 
     @NotNull
-    private final View chart;
+    private final LineChart chart;
 
     private float phaseX = 1f;
     private float phaseY = 1f;
@@ -32,11 +31,8 @@ public final class SimpleChartAnimator {
     @NotNull
     public static final Property<SimpleChartAnimator, Float> PHASE_Y;
 
-    @NotNull
-    private static final PropertyValuesHolder VALUES_HOLDER;
-
     static {
-        if(Build.VERSION.SDK_INT >= 24) {
+        if (Build.VERSION.SDK_INT >= 24) {
             PHASE_X = new FloatProperty<SimpleChartAnimator>("phaseX") {
                 @Override
                 public void setValue(@NotNull SimpleChartAnimator object, float value) {
@@ -87,8 +83,6 @@ public final class SimpleChartAnimator {
                 }
             };
         }
-
-        VALUES_HOLDER =  PropertyValuesHolder.ofFloat((Property<?, Float>) null, ANIMATOR_VALUES);
     }
 
     public SimpleChartAnimator(@NotNull LineChart chart) {
@@ -99,23 +93,28 @@ public final class SimpleChartAnimator {
             long duration,
             @NotNull Property<SimpleChartAnimator, Float> property
     ) {
-        VALUES_HOLDER.setProperty(property);
+        createAnimatedForAxis(duration, property).start();
+    }
 
-        ObjectAnimator animator = new ObjectAnimator();
-        animator.setTarget(this);
-        animator.setProperty(property);
+    @NotNull
+    private ObjectAnimator createAnimatedForAxis(
+            long duration,
+            @NotNull Property<SimpleChartAnimator, Float> property
+    ) {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(this, property, ANIMATOR_VALUES);
         animator.setDuration(duration);
-        animator.setValues(VALUES_HOLDER);
         animator.setInterpolator(LINEAR_INTERPOLATOR);
-        animator.start();
+
+        return animator;
     }
 
     public float getPhaseX() {
         return phaseX;
     }
 
-    public void setPhaseX(float phaseX) {
-        this.phaseX = MyMath.clamp(phaseX, 0f, 1f);
+    public void setPhaseX(float value) {
+        phaseX = value;
+        chart.computeChartPoints();
         chart.invalidate();
     }
 
@@ -123,8 +122,9 @@ public final class SimpleChartAnimator {
         return phaseY;
     }
 
-    public void setPhaseY(float phaseY) {
-        this.phaseY = MyMath.clamp(phaseY, 0f, 1f);
+    public void setPhaseY(float value) {
+        phaseY = value;
+        chart.computeChartPoints();
         chart.invalidate();
     }
 
@@ -134,5 +134,14 @@ public final class SimpleChartAnimator {
 
     public void animateY(long duration) {
         animateAxis(duration, PHASE_Y);
+    }
+
+    public void animatedXY(long duration) {
+        ObjectAnimator xAnimator = createAnimatedForAxis(duration, PHASE_X);
+        ObjectAnimator yAnimator = createAnimatedForAxis(duration, PHASE_Y);
+
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(xAnimator, yAnimator);
+        set.start();
     }
 }

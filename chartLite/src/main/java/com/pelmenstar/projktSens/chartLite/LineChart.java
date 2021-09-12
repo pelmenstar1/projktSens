@@ -25,7 +25,6 @@ public class LineChart extends View {
     private static final int FLAG_AUTO_ANIMATED = 1;
     private static final int FLAG_OFFSETS_CALCULATED = 1 << 1;
     private static final int FLAG_FIRST_RENDER = 1 << 2;
-    private static final int AUTO_ANIMATE_COND = FLAG_AUTO_ANIMATED | FLAG_FIRST_RENDER;
 
     @NotNull
     protected final DataRef dataRef;
@@ -183,9 +182,10 @@ public class LineChart extends View {
         yAxisRenderer.draw(c);
         renderer.draw(c);
 
-        if ((flags & AUTO_ANIMATE_COND) == AUTO_ANIMATE_COND) {
+        final int cond = FLAG_AUTO_ANIMATED | FLAG_FIRST_RENDER;
+        if ((flags & cond) == cond) {
             flags &= ~FLAG_FIRST_RENDER;
-            animateX(500);
+            animateXY(500);
         }
     }
 
@@ -210,6 +210,10 @@ public class LineChart extends View {
         yAxisRenderer.computeAxis();
 
         calculateOffsets();
+    }
+
+    void computeChartPoints() {
+        renderer.computePoints();
     }
 
     private void calculateOffsets() {
@@ -277,6 +281,10 @@ public class LineChart extends View {
      */
     public void animateY(long duration) {
         animator.animateY(duration);
+    }
+
+    public void animateXY(long duration) {
+        animator.animatedXY(duration);
     }
 
     public float getMinOffset() {
