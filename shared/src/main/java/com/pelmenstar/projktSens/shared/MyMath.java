@@ -1,7 +1,41 @@
 package com.pelmenstar.projktSens.shared;
 
 public final class MyMath {
+    private static final float[] POW_10_POSITIVE = new float[] {
+            1f,
+            10f,
+            100f,
+            1000f,
+            10000f,
+            100000f,
+            1000000f,
+            10000000f,
+            100000000f,
+    };
+
+    private static final float[] POW_10_NEGATIVE = new float[] {
+            1f,
+            1e-1f,
+            1e-2f,
+            1e-3f,
+            1e-4f,
+            1e-5f,
+            1e-6f,
+            1e-7f,
+            1e-8f,
+    };
+
     private MyMath() {
+    }
+
+    public static float pow10(int a) {
+        if(a >= 0 && a < 8) {
+            return POW_10_POSITIVE[a];
+        } else if(a < 0 && a > -8) {
+            return POW_10_NEGATIVE[-a];
+        } else {
+            return 100000000f;
+        }
     }
 
     /**

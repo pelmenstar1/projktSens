@@ -8,6 +8,7 @@ import com.pelmenstar.projktSens.chartLite.ViewPortHandler;
 import com.pelmenstar.projktSens.chartLite.components.AxisBase;
 import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
 import com.pelmenstar.projktSens.shared.EmptyArray;
+import com.pelmenstar.projktSens.shared.MyMath;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +32,7 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
 
         labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         axisLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        gridPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        gridPaint = new Paint();
     }
 
     @NotNull
@@ -90,7 +91,7 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
             }
 
             // Normalize interval
-            float intervalMagnitude = Utils.roundToNextSignificant((float) Math.pow(10, (int) Math.log10(interval)));
+            float intervalMagnitude = MyMath.pow10((int)Math.log10(interval));
             int intervalSigDigit = (int) (interval / intervalMagnitude);
             if (intervalSigDigit > 5) {
                 // Use one order of magnitude higher, to avoid intervals like 0.9 or 90
@@ -108,7 +109,7 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
                 last = 0f;
             } else {
                 first = (float) Math.ceil(min / interval) * interval;
-                last = (float) Math.floor(max / interval) * interval;
+                last = Math.nextUp((float) Math.floor(max / interval) * interval);
             }
 
             int n = 0;

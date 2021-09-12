@@ -113,7 +113,7 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
             chart.xAxis.apply {
                 axisMinimum = 0f
                 axisMaximum = (TimeConstants.SECONDS_IN_DAY - 1).toFloat()
-                granularity = 60f
+                granularity = 3600f
                 valueFormatter = TimeChartFormatter.INSTANCE
             }
 

@@ -2,8 +2,14 @@ package com.pelmenstar.projktSens.chartLite;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+
+import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
+import com.pelmenstar.projktSens.shared.MyMath;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class Utils {
     private Utils() {
@@ -22,11 +28,13 @@ public final class Utils {
             return 0f;
         }
 
-        double d = Math.ceil(Math.log10(Math.abs(number)));
-        double pw = 1.0 - d;
-        float magnitude = (float) Math.pow(10.0, pw);
+        int d = (int)Math.ceil(Math.log10(Math.abs(number)));
+        int pw = 1 - d;
+        float magnitude = MyMath.pow10(pw);
+        float invMagnitude = MyMath.pow10(-pw);
+
         int shifted = Math.round(number * magnitude);
 
-        return shifted / magnitude;
+        return shifted * invMagnitude;
     }
 }
