@@ -84,20 +84,28 @@ public final class YAxis extends AxisBase {
     public float getRequiredWidthSpace(@NotNull Paint p) {
         p.setTextSize(textSize);
         p.setTypeface(typeface);
-        String str = "";
 
+        float maxLabelWidth = Float.NEGATIVE_INFINITY;
         if(labels != null) {
             for (String label : labels) {
-                if (label.length() > str.length()) {
-                    str = label;
+                float labelWidth = p.measureText(label);
+
+                if(labelWidth > maxLabelWidth) {
+                    maxLabelWidth = labelWidth;
                 }
             }
         } else {
-            char[] text = valueFormatter.formatToCharArray(0f);
-            str = new String(text);
+            for(float value: entries) {
+                char[] text = valueFormatter.formatToCharArray(value);
+                float labelWidth = p.measureText(text, 0, text.length);
+
+                if(labelWidth > maxLabelWidth) {
+                    maxLabelWidth = labelWidth;
+                }
+            }
         }
 
-        float width = p.measureText(str, 0, str.length()) + getXOffset() * 2f;
+        float width = maxLabelWidth + xOffset * 2f;
 
         float minWidth = this.minWidth;
         float maxWidth = this.maxWidth;
