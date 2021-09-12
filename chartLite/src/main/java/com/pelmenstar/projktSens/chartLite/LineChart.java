@@ -22,10 +22,6 @@ import org.jetbrains.annotations.Nullable;
  * Chart that draws lines, circles, labels... Just line chart
  */
 public class LineChart extends View {
-    private static final int FLAG_AUTO_ANIMATED = 1;
-    private static final int FLAG_OFFSETS_CALCULATED = 1 << 1;
-    private static final int FLAG_FIRST_RENDER = 1 << 2;
-
     @NotNull
     protected final DataRef dataRef;
 
@@ -38,7 +34,10 @@ public class LineChart extends View {
     protected final YAxisRenderer yAxisRenderer;
     protected final SimpleChartAnimator animator;
 
-    protected int flags = FLAG_FIRST_RENDER;
+    private boolean isAutoAnimated;
+    private boolean isOffsetsCalculated;
+    private boolean isFirstRender;
+
     protected float minOffset = 15f;
 
     public LineChart(@NotNull Context context) {
@@ -71,30 +70,18 @@ public class LineChart extends View {
         yAxisRenderer = new YAxisRenderer(viewPortHandler, yAxis);
     }
 
-    private boolean isFlagEnabled(int flag) {
-        return (flags & flag) != 0;
-    }
-
-    private void setFlag(int flag, boolean state) {
-        if (state) {
-            flags |= flag;
-        } else {
-            flags &= ~flag;
-        }
-    }
-
     /**
      * Returns whether auto animations is enabled
      */
     public boolean isAutoAnimated() {
-        return isFlagEnabled(FLAG_AUTO_ANIMATED);
+        return isAutoAnimated;
     }
 
     /**
      * Sets state of auto animations in chart
      */
     public void setAutoAnimated(boolean value) {
-        setFlag(FLAG_AUTO_ANIMATED, value);
+        isAutoAnimated = value;
     }
 
     /**
@@ -110,7 +97,7 @@ public class LineChart extends View {
      */
     public void setData(@Nullable ChartData data) {
         dataRef.value = data;
-        flags &= ~FLAG_OFFSETS_CALCULATED;
+        isOffsetsCalculated = false;
 
         // let the chart know there is new data
         notifyDataChanged();
@@ -121,7 +108,7 @@ public class LineChart extends View {
      */
     public void clear() {
         dataRef.value = null;
-        flags &= ~FLAG_OFFSETS_CALCULATED;
+        isOffsetsCalculated = false;
 
         invalidate();
     }
@@ -173,18 +160,17 @@ public class LineChart extends View {
             return;
         }
 
-        if ((flags & FLAG_OFFSETS_CALCULATED) == 0) { // if offsets are not calculated
+        if (!isOffsetsCalculated) { // if offsets are not calculated
             calculateOffsets();
-            flags |= FLAG_OFFSETS_CALCULATED;
+            isOffsetsCalculated = true;
         }
 
         xAxisRenderer.draw(c);
         yAxisRenderer.draw(c);
         renderer.draw(c);
 
-        final int cond = FLAG_AUTO_ANIMATED | FLAG_FIRST_RENDER;
-        if ((flags & cond) == cond) {
-            flags &= ~FLAG_FIRST_RENDER;
+        if (isAutoAnimated && isFirstRender) {
+            isFirstRender = false;
             animateXY(500);
         }
     }
