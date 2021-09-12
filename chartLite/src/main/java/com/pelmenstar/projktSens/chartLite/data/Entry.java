@@ -39,4 +39,12 @@ public final class Entry {
     public static String toString(long e) {
         return "(" + getX(e) + ';' + getY(e) + ')';
     }
+
+    public static void append(long e, @NotNull StringBuilder sb) {
+        sb.append('(');
+        sb.append(getX(e));
+        sb.append(';');
+        sb.append(getY(e));
+        sb.append(')');
+    }
 }

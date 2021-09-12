@@ -7,11 +7,15 @@ import androidx.annotation.ColorInt;
 
 import com.pelmenstar.projktSens.chartLite.formatter.FloatValueFormatter;
 import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
+import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class DataSet {
+import java.util.Arrays;
+import java.util.Objects;
+
+public final class DataSet extends AppendableToStringBuilder {
     public static final int FLAG_VISIBLE = 1;
     public static final int FLAG_DRAW_VALUES = 1 << 1;
     public static final int FLAG_DRAW_CIRCLES = 1 << 2;
@@ -143,24 +147,6 @@ public final class DataSet {
         return entries.length;
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(toSimpleString());
-
-        for (long e : entries) {
-            buffer.append(Entry.toString(e)).append(' ');
-        }
-
-        return buffer.toString();
-    }
-
-    @NotNull
-    public String toSimpleString() {
-        return "DataSet, label: " + ", entries: " + entries.length;
-    }
-
     public float getYMin() {
         return yMin;
     }
@@ -189,6 +175,10 @@ public final class DataSet {
 
     public long @NotNull [] getEntries() {
         return entries;
+    }
+
+    public int getEntryCount() {
+        return entries.length;
     }
 
     public long get(int index) {
@@ -259,5 +249,55 @@ public final class DataSet {
         }
 
         return false;
+    }
+
+    @Override
+    public void append(@NotNull StringBuilder sb) {
+        sb.append("{entries=[");
+        if(entries.length > 0) {
+            int maxIdx = entries.length - 1;
+            for(int i = 0; i < maxIdx; i++) {
+                Entry.append(entries[i], sb);
+                sb.append(',');
+            }
+
+            Entry.append(entries[maxIdx], sb);
+        }
+        sb.append("]}");
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (other == null || getClass() != other.getClass()) return false;
+
+        DataSet o = (DataSet) other;
+
+        return flags == o.flags &&
+                color == o.color &&
+                valueTextColor == o.valueTextColor &&
+                valueTextSize == o.valueTextSize &&
+                lineWidth == o.lineWidth &&
+                circleColor == o.circleColor &&
+                circleRadius == o.circleRadius &&
+                Arrays.equals(entries, o.entries) &&
+                valueFormatter.equals(o.valueFormatter) &&
+                Objects.equals(valueTypeface, o.valueTypeface);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(entries);
+        result = 31 * result + valueFormatter.hashCode();
+        result = 31 * result + flags;
+        result = 31 * result + color;
+        result = 31 * result + valueTextColor;
+        result = 31 * result + Float.floatToIntBits(valueTextSize);
+        result = 31 * result + (valueTypeface != null ? valueTypeface.hashCode() : 0);
+        result = 31 * result + Float.floatToIntBits(lineWidth);
+        result = 31 * result + circleColor;
+        result = 31 * result + Float.floatToIntBits(circleRadius);
+
+        return result;
     }
 }

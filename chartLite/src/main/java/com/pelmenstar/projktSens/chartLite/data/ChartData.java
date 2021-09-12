@@ -1,9 +1,14 @@
 package com.pelmenstar.projktSens.chartLite.data;
 
+import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
+import com.pelmenstar.projktSens.shared.StringUtils;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class ChartData {
+import java.util.Arrays;
+
+public final class ChartData extends AppendableToStringBuilder {
     private static final DataSet[] EMPTY_DS = new DataSet[0];
 
     @NotNull
@@ -13,8 +18,11 @@ public final class ChartData {
     private float xMax = Float.MIN_VALUE;
     private float xMin = Float.MAX_VALUE;
 
+    private final int entryCount;
+
     public ChartData() {
         dataSets = EMPTY_DS;
+        entryCount = 0;
     }
 
     public ChartData(@NotNull DataSet dataSet) {
@@ -24,6 +32,7 @@ public final class ChartData {
     public ChartData(@NotNull DataSet @NotNull ... dataSets) {
         this.dataSets = dataSets;
 
+        int entryCount = 0;
         for (DataSet set : dataSets) {
             float dxMin = set.getXMin();
             float dxMax = set.getXMax();
@@ -46,7 +55,11 @@ public final class ChartData {
             if (dyMax > yMax) {
                 yMax = dyMax;
             }
+
+            entryCount += set.getEntryCount();
         }
+
+        this.entryCount = entryCount;
     }
 
     public int length() {
@@ -78,6 +91,10 @@ public final class ChartData {
         return dataSets[index];
     }
 
+    public int getEntryCount() {
+        return entryCount;
+    }
+
     public int indexOf(@Nullable DataSet dataSet) {
         for (int i = 0; i < dataSets.length; i++) {
             if (dataSets[i].equals(dataSet)) {
@@ -98,23 +115,25 @@ public final class ChartData {
         return false;
     }
 
-    public int getEntryCount() {
-        int count = 0;
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (other == null || getClass() != other.getClass()) return false;
 
-        for (DataSet set : dataSets) {
-            count += set.count();
-        }
+        ChartData o = (ChartData) other;
 
-        return count;
+        return Arrays.equals(dataSets, o.dataSets);
     }
 
-    public boolean isContainsAnyEntry() {
-        for (DataSet set : dataSets) {
-            if (set.count() > 0) {
-                return true;
-            }
-        }
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(dataSets);
+    }
 
-        return false;
+    @Override
+    public void append(@NotNull StringBuilder sb) {
+        sb.append("{dataSets=");
+        StringUtils.appendArray(dataSets, sb);
+        sb.append('}');
     }
 }

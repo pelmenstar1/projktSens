@@ -117,7 +117,7 @@ public class LineChart extends View {
      * Determines whether chart is empty
      */
     public boolean isEmpty() {
-        return dataRef.value == null || !dataRef.value.isContainsAnyEntry();
+        return dataRef.value == null || dataRef.value.getEntryCount() == 0;
     }
 
     /**
