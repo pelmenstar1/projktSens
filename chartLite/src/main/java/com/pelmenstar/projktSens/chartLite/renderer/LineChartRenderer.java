@@ -127,16 +127,15 @@ public final class LineChartRenderer {
                 ValueFormatter valueFormatter = dataSet.getValueFormatter();
 
                 long[] entries = dataSet.getEntries();
-                int eIndex = 0;
 
                 int maxIdx = entries.length - 1;
                 int maxLineIdx = entries.length - 2;
 
-                while (eIndex < entries.length) {
+                for(int i = 0; i < entries.length; i++) {
                     float x = points[pOffset];
                     float y = points[pOffset + 1];
 
-                    if (eIndex <= maxLineIdx) {
+                    if (i <= maxLineIdx) {
                         float nextX = points[pOffset + 2];
                         float nextY = points[pOffset + 3];
 
@@ -153,10 +152,10 @@ public final class LineChartRenderer {
                         );
                     }
 
-                    if (drawValues && eIndex > 0 && eIndex < maxIdx) {
+                    if (drawValues && i > 0 && i < maxIdx) {
                         float textY = y - valOffset;
                         if(labels != null) {
-                            String label = labels[eIndex];
+                            String label = labels[i];
 
                             c.drawText(label, 0, label.length(), x, textY, labelPaint);
                         } else {
@@ -166,7 +165,6 @@ public final class LineChartRenderer {
                         }
                     }
 
-                    eIndex++;
                     pOffset += 2;
                 }
             }
