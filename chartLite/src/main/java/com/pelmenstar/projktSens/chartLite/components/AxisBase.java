@@ -30,7 +30,7 @@ public abstract class AxisBase {
     protected static final int FLAG_ENABLED = 1 << 7;
 
     public float @NotNull [] entries = EmptyArray.FLOAT;
-    public long entriesHash = 0;
+    public int entriesHash = 0;
 
     public @NotNull String @Nullable [] labels = EmptyArray.STRING;
 

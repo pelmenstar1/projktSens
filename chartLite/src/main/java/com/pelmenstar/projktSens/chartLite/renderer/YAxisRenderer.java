@@ -12,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 public final class YAxisRenderer extends AxisRenderer<YAxis> {
     private float[] computedPoints = EmptyArray.FLOAT;
-    private long computedPointsAxisEntriesHash = 0;
-    private long computedPointsVphHash = 0;
+    private int computedPointsAxisEntriesHash = 0;
+    private int computedPointsVphHash = 0;
 
     public YAxisRenderer(@NotNull ViewPortHandler viewPortHandler, @NotNull YAxis yAxis) {
         super(viewPortHandler, yAxis);
@@ -21,8 +21,8 @@ public final class YAxisRenderer extends AxisRenderer<YAxis> {
 
     @Override
     public void computePoints() {
-        long vphHash = viewPortHandler.stateHashCode();
-        long axisHash = axis.entriesHash;
+        int vphHash = viewPortHandler.stateHashCode();
+        int axisHash = axis.entriesHash;
 
         if (computedPointsAxisEntriesHash == axisHash && computedPointsVphHash == vphHash) {
             return;

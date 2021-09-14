@@ -14,7 +14,6 @@ import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
 import com.pelmenstar.projktSens.shared.EmptyArray;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public final class LineChartRenderer {
     private final Paint linePaint;
@@ -31,9 +30,8 @@ public final class LineChartRenderer {
     private final SimpleChartAnimator animator;
     private float[] computedPoints = EmptyArray.FLOAT;
 
-    @Nullable
-    private ChartData computedPointsData;
-    private long computedPointsVphHash = 0;
+    private int computedPointsEntriesHash;
+    private int computedPointsVphHash;
     private float computedPointsPhaseX;
     private float computedPointsPhaseY;
 
@@ -51,21 +49,25 @@ public final class LineChartRenderer {
 
     public void computePoints() {
         ChartData data = dataRef.value;
-        long vphHash = viewPortHandler.stateHashCode();
+        if(data == null) {
+            return;
+        }
+
+        int entriesHash = data.hashCode();
+        int vphHash = viewPortHandler.stateHashCode();
 
         float phaseX = animator.getPhaseX();
         float phaseY = animator.getPhaseY();
 
-        if (data == null || (
-                computedPointsData == data &&
-                        computedPointsVphHash == vphHash &&
-                        computedPointsPhaseX == phaseX &&
-                        computedPointsPhaseY == phaseY
-        )) {
+        if (computedPointsEntriesHash == entriesHash &&
+                computedPointsVphHash == vphHash &&
+                computedPointsPhaseX == phaseX &&
+                computedPointsPhaseY == phaseY
+        ) {
             return;
         }
 
-        computedPointsData = data;
+        computedPointsEntriesHash = entriesHash;
         computedPointsVphHash = vphHash;
         computedPointsPhaseX = phaseX;
         computedPointsPhaseY = phaseY;

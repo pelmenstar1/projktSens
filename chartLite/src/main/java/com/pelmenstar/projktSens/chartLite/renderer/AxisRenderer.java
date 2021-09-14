@@ -69,7 +69,7 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
 
             float v = min;
 
-            long hash = 0;
+            int hash = 0;
 
             for (int i = 0; i < labelCount; i++) {
                 entries[i] = v;
@@ -130,7 +130,7 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
             }
 
             float v = first;
-            long hash = 0;
+            int hash = 0;
 
             for(int i = 0; i < n; i++) {
                 entries[i] = v;

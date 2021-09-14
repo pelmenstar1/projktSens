@@ -90,8 +90,8 @@ public final class ViewPortHandler {
         return chartWidth;
     }
 
-    public long stateHashCode() {
-        long hash = content.hashCode();
+    public int stateHashCode() {
+        int hash = content.hashCode();
         hash = 31 * hash + Float.floatToIntBits(transX);
         hash = 31 * hash + Float.floatToIntBits(transY);
         hash = 31 * hash + Float.floatToIntBits(scaleX);

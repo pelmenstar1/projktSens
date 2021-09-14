@@ -14,6 +14,8 @@ public final class ChartData extends AppendableToStringBuilder {
     @NotNull
     private final DataSet[] dataSets;
 
+    private final int hash;
+
     private final float xMin;
     private final float xMax;
 
@@ -30,6 +32,7 @@ public final class ChartData extends AppendableToStringBuilder {
         xMax = Float.MIN_VALUE;
         yMin = Float.MAX_VALUE;
         yMax = Float.MIN_VALUE;
+        hash = 0;
     }
 
     public ChartData(@NotNull DataSet dataSet) {
@@ -43,6 +46,7 @@ public final class ChartData extends AppendableToStringBuilder {
         float xMax = Float.MIN_VALUE;
         float yMin = Float.MAX_VALUE;
         float yMax = Float.MIN_VALUE;
+        int hash = 0;
 
         int entryCount = 0;
         for (DataSet set : dataSets) {
@@ -69,8 +73,10 @@ public final class ChartData extends AppendableToStringBuilder {
             }
 
             entryCount += set.getEntryCount();
+            hash = 31 * hash + set.getEntriesHash();
         }
 
+        this.hash = hash;
         this.entryCount = entryCount;
         this.xMin = xMin;
         this.xMax = xMax;
@@ -143,7 +149,7 @@ public final class ChartData extends AppendableToStringBuilder {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(dataSets);
+        return hash;
     }
 
     @Override

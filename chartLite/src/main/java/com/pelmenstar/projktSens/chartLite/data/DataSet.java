@@ -8,6 +8,7 @@ import androidx.annotation.ColorInt;
 import com.pelmenstar.projktSens.chartLite.formatter.FloatValueFormatter;
 import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
+import com.pelmenstar.projktSens.shared.MyMath;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +24,7 @@ public final class DataSet extends AppendableToStringBuilder {
     public final @NotNull String @Nullable [] cachedStringLabels;
 
     private final long[] entries;
+    private final int entriesHash;
 
     @NotNull
     private final ValueFormatter valueFormatter;
@@ -72,6 +74,7 @@ public final class DataSet extends AppendableToStringBuilder {
         float xMax = Float.MIN_VALUE;
         float yMin = Float.MAX_VALUE;
         float yMax = Float.MIN_VALUE;
+        int entriesHash = 0;
 
         for (int i = 0; i < entries.length; i++) {
             long e = entries[i];
@@ -97,12 +100,15 @@ public final class DataSet extends AppendableToStringBuilder {
             if(formatToStringImplemented) {
                 cachedStringLabels[i] = formatter.formatToString(ey);
             }
+
+            entriesHash = entriesHash * 31 + MyMath.hashCodeLong(e);
         }
 
         this.xMin = xMin;
         this.xMax = xMax;
         this.yMin = yMin;
         this.yMax = yMax;
+        this.entriesHash = entriesHash;
     }
 
     public int getFlags() {
@@ -190,6 +196,10 @@ public final class DataSet extends AppendableToStringBuilder {
 
     public long @NotNull [] getEntries() {
         return entries;
+    }
+
+    public int getEntriesHash() {
+        return entriesHash;
     }
 
     public int getEntryCount() {

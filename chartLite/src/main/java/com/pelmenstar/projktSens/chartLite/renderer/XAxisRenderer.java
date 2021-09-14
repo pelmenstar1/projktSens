@@ -14,8 +14,8 @@ import org.jetbrains.annotations.NotNull;
 public final class XAxisRenderer extends AxisRenderer<XAxis> {
     private final Paint.FontMetrics labelFontMetrics = new Paint.FontMetrics();
     private float[] computedPoints = EmptyArray.FLOAT;
-    private long computedPointsAxisEntriesHash = 0;
-    private long computedPointsVphHash = 0;
+    private int computedPointsAxisEntriesHash = 0;
+    private int computedPointsVphHash = 0;
 
     public XAxisRenderer(@NotNull ViewPortHandler viewPortHandler, @NotNull XAxis xAxis) {
         super(viewPortHandler, xAxis);
@@ -25,8 +25,8 @@ public final class XAxisRenderer extends AxisRenderer<XAxis> {
 
     @Override
     public void computePoints() {
-        long vphHash = viewPortHandler.stateHashCode();
-        long axisHash = axis.entriesHash;
+        int vphHash = viewPortHandler.stateHashCode();
+        int axisHash = axis.entriesHash;
 
         if (computedPointsAxisEntriesHash == axisHash && computedPointsVphHash == vphHash) {
             return;
