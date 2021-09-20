@@ -3,6 +3,7 @@ package com.pelmenstar.projktSens.weather.app.ui.home.weatherView;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,21 +20,18 @@ import org.jetbrains.annotations.Nullable;
 public final class ComplexWeatherView extends View {
     public static final int STATE_DAY = 0;
     public static final int STATE_NIGHT = 1;
-    private static final float WEATHER_BLOCK_MARGIN_T_DP = 5;
-    private static final float WEATHER_BLOCK_MARGIN_L_DP = 5;
-    private static final float MOON_RATIO_X = 0.438095f;
-    private static final float MOON_RATIO_Y = 0.0434782f;
+
     private static final int DEFAULT_SUNRISE_TIME = 6 * TimeConstants.SECONDS_IN_HOUR;
     private static final int DEFAULT_SUNSET_TIME = 21 * TimeConstants.SECONDS_IN_HOUR;
-    private final float weatherBlockMarginTop;
+
+    private final float weatherBlockMarginTopBottom;
     private final float sunriseSunsetArcHeight;
     private final WeatherBlockSubcomponent weatherBlockSubcomponent;
-    private final WeatherBackgroundSubcomponent weatherBackgroundSubcomponent;
-    private final MoonSubcomponent moonSubcomponent;
     private final RetryGetLocationSubcomponent retryGetLocationSubcomponent;
     private final RequestLocationSubcomponent requestLocationSubcomponent;
     private final SunriseSunsetArcSubcomponent sunriseSunsetArcSubcomponent;
     private final Subcomponent[] subcomponents;
+
     // if we left it zero, in constructor setState() would fail,
     // because 0 is STATE_DAY
     private int state = -1;
@@ -55,31 +53,31 @@ public final class ComplexWeatherView extends View {
     public ComplexWeatherView(@NotNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
+        // Shadows is used in WeatherBlockSubcomponent.
+        // But hardware acceleration for drawing shapes (except text) is supported only from API 28
+        // So for any lower API level, hardware acceleration should be disabled
+        if(Build.VERSION.SDK_INT < 28) {
+            setLayerType(LAYER_TYPE_SOFTWARE, null);
+        }
+
         Resources res = context.getResources();
         float density = res.getDisplayMetrics().density;
 
-        weatherBlockMarginTop = WEATHER_BLOCK_MARGIN_T_DP * density;
-        float weatherBlockMarginLeft = WEATHER_BLOCK_MARGIN_L_DP * density;
+        weatherBlockMarginTopBottom = res.getDimension(R.dimen.weatherView_blockTopBottomMargin);
+        sunriseSunsetArcHeight = res.getDimension(R.dimen.sunriseSunsetArc_height);
+        float requestGpsSize = res.getDimension(R.dimen.weatherView_retrySize);
 
         weatherBlockSubcomponent = new WeatherBlockSubcomponent(context);
-        weatherBlockSubcomponent.setX(weatherBlockMarginLeft);
-
-        weatherBackgroundSubcomponent = new WeatherBackgroundSubcomponent(context);
-        moonSubcomponent = new MoonSubcomponent(context);
         retryGetLocationSubcomponent = new RetryGetLocationSubcomponent(context);
 
         sunriseSunsetArcSubcomponent = new SunriseSunsetArcSubcomponent(context);
-        sunriseSunsetArcHeight = res.getDimension(R.dimen.sunriseSunsetArc_height);
         sunriseSunsetArcSubcomponent.setHeight(sunriseSunsetArcHeight);
 
         requestLocationSubcomponent = new RequestLocationSubcomponent(context);
-        float requestGpsSize = res.getDimension(R.dimen.weatherView_retrySize);
         requestLocationSubcomponent.setSize(requestGpsSize, requestGpsSize);
 
         subcomponents = new Subcomponent[]{
-                weatherBackgroundSubcomponent, // background must be on bottom
                 weatherBlockSubcomponent,
-                moonSubcomponent,
                 retryGetLocationSubcomponent,
                 requestLocationSubcomponent,
                 sunriseSunsetArcSubcomponent
@@ -195,10 +193,6 @@ public final class ComplexWeatherView extends View {
         requestLocationSubcomponent.setRequestLocationPermissionHandler(handler);
     }
 
-    public void setMoonPhase(float phase) {
-        moonSubcomponent.setMoonPhase(phase);
-    }
-
     public void setWeather(@NotNull WeatherInfo value) {
         weatherBlockSubcomponent.setWeather(value);
     }
@@ -208,24 +202,38 @@ public final class ComplexWeatherView extends View {
         float retryX = w - retryGetLocationSubcomponent.getWidth();
         float reqLocX = w - requestLocationSubcomponent.getWidth();
 
-        weatherBackgroundSubcomponent.setSize(w, wbHeight);
         sunriseSunsetArcSubcomponent.setWidth(w);
 
+        float blockTopOffset;
+
         if (state == STATE_DAY) {
-            weatherBackgroundSubcomponent.setY(sunriseSunsetArcHeight);
             sunriseSunsetArcSubcomponent.setY(0f);
-            weatherBlockSubcomponent.setY(sunriseSunsetArcHeight + weatherBlockMarginTop);
+
+            blockTopOffset = sunriseSunsetArcHeight;
+
+            weatherBlockSubcomponent.setY(sunriseSunsetArcHeight + weatherBlockMarginTopBottom);
 
             retryGetLocationSubcomponent.setPosition(retryX, sunriseSunsetArcHeight);
             requestLocationSubcomponent.setPosition(reqLocX, sunriseSunsetArcHeight);
         } else {
-            weatherBackgroundSubcomponent.setY(0f);
             sunriseSunsetArcSubcomponent.setY(wbHeight);
-            weatherBlockSubcomponent.setY(weatherBlockMarginTop);
+
+            blockTopOffset = 0f;
+
+            weatherBlockSubcomponent.setY(weatherBlockMarginTopBottom);
 
             retryGetLocationSubcomponent.setPosition(retryX, 0);
             requestLocationSubcomponent.setPosition(reqLocX, 0);
         }
+
+        float blockWidth = w * 0.7f;
+        float blockHeight = wbHeight - (weatherBlockMarginTopBottom * 2);
+
+        weatherBlockSubcomponent.setPosition(
+                0.5f * (w - blockWidth),
+                blockTopOffset + weatherBlockMarginTopBottom + 0.5f * (wbHeight - blockHeight)
+        );
+        weatherBlockSubcomponent.setSize(blockWidth, blockHeight);
     }
 
     @Override
@@ -233,10 +241,6 @@ public final class ComplexWeatherView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
 
         updateComponentPositionsAffectedByDayState(w, h);
-
-        float moonX = MOON_RATIO_X * (float) w;
-        float moonY = MOON_RATIO_Y * ((float) h - sunriseSunsetArcHeight);
-        moonSubcomponent.setPosition(moonX, moonY);
     }
 
     @Override

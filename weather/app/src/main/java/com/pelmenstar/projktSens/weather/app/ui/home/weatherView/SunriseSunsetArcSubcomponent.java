@@ -49,17 +49,17 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
         Resources res = context.getResources();
         Resources.Theme theme = context.getTheme();
 
-        int textColor = ResourcesCompat.getColor(res, R.color.sunriseSunsetArc_textColor, theme);
+        int textColor = ResourcesCompat.getColor(res, R.color.weatherView_textColor, theme);
         primaryPadding = res.getDimension(R.dimen.sunriseSunsetArc_primaryPadding);
 
         dashedArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        dashedArcPaint.setColor(ResourcesCompat.getColor(res, R.color.sunriseSunsetArc_dashedArcColor, theme));
+        dashedArcPaint.setColor(ResourcesCompat.getColor(res, R.color.weatherView_sunriseSunsetArc_dashedArcColor, theme));
         dashedArcPaint.setStrokeWidth(res.getDimension(R.dimen.sunriseSunsetArc_dashedArcThickness));
         dashedArcPaint.setStyle(Paint.Style.STROKE);
         dashedArcPaint.setPathEffect(new DashPathEffect(new float[]{10f, 5f}, 5f));
 
         overArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        overArcPaint.setColor(ResourcesCompat.getColor(res, R.color.sunriseSunsetArc_overArcColor, theme));
+        overArcPaint.setColor(ResourcesCompat.getColor(res, R.color.weatherView_sunriseSunsetArc_overArcColor, theme));
         overArcPaint.setStrokeWidth(res.getDimension(R.dimen.sunriseSunsetArc_overArcThickness));
         overArcPaint.setStyle(Paint.Style.STROKE);
 

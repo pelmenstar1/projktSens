@@ -56,7 +56,6 @@ class AppModule(private val context: Context) {
         val protoConfig = protoConfig()
         return HomePresenter(
             sunInfoProvider(),
-            moonInfoProvider(),
             geolocationProvider(),
             dataSource(protoConfig),
             weatherChannelInfoProvider(protoConfig)

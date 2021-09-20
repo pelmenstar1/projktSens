@@ -30,7 +30,6 @@ interface HomeContract {
     interface View : DefaultContract.View {
         fun setCurrentTime(time: Int)
         fun setSunriseSunset(sunrise: Int, sunset: Int)
-        fun setMoonPhase(phase: Float)
         fun setWeather(value: WeatherInfo)
         fun setLocationLoaded(value: Boolean)
         fun setCanLoadLocation(value: Boolean)

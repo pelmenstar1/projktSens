@@ -14,9 +14,19 @@ public final class TextUtils {
     }
 
     public static long getTextSize(char @NotNull [] text, @NotNull Paint paint) {
-        Rect bounds = textBoundsCache;
+        paint.getTextBounds(text, 0, text.length, textBoundsCache);
 
-        paint.getTextBounds(text, 0, text.length, bounds);
+        return packTextBoundsCache();
+    }
+
+    public static long getTextSize(@NotNull String text, @NotNull Paint paint) {
+        paint.getTextBounds(text, 0, text.length(), textBoundsCache);
+
+        return packTextBoundsCache();
+    }
+
+    private static long packTextBoundsCache() {
+        Rect bounds = textBoundsCache;
 
         return PackedSize.create(bounds.width(), bounds.height());
     }

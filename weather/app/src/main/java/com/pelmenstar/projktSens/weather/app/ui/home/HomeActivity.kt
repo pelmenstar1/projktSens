@@ -149,8 +149,11 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
                     weatherView = ComplexWeatherView {
                         val height =
-                            res.getDimensionPixelSize(R.dimen.homeActivity_weatherViewHeight)
-                        linearLayoutParams(MATCH_PARENT, height)
+                            res.getDimensionPixelSize(R.dimen.homeActivity_weatherView_height)
+                        linearLayoutParams(MATCH_PARENT, height) {
+                            bottomMargin =
+                                res.getDimensionPixelOffset(R.dimen.homeActivity_weatherView_marginBottom)
+                        }
                     }
 
                     val goToContext = GoToButtonContext(context)
@@ -300,10 +303,6 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
     override fun setSunriseSunset(sunrise: Int, sunset: Int) {
         weatherView.setSunriseSunset(sunrise, sunset)
-    }
-
-    override fun setMoonPhase(phase: Float) {
-        weatherView.setMoonPhase(phase)
     }
 
     override fun setWeather(value: WeatherInfo) {

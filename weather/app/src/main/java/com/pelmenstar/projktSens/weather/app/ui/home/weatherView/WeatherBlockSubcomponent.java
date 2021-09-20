@@ -3,14 +3,17 @@ package com.pelmenstar.projktSens.weather.app.ui.home.weatherView;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 
 import androidx.core.content.res.ResourcesCompat;
 
 import com.pelmenstar.projktSens.shared.PackedPointF;
+import com.pelmenstar.projktSens.shared.PackedSize;
 import com.pelmenstar.projktSens.shared.StringUtils;
+import com.pelmenstar.projktSens.shared.android.CanvasUtils;
+import com.pelmenstar.projktSens.shared.android.TextUtils;
 import com.pelmenstar.projktSens.weather.app.AppPreferences;
 import com.pelmenstar.projktSens.weather.app.R;
 import com.pelmenstar.projktSens.weather.app.di.AppComponent;
@@ -25,21 +28,19 @@ import com.pelmenstar.projktSens.weather.models.WeatherInfo;
 import org.jetbrains.annotations.NotNull;
 
 public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcomponent {
-    private static final float TEMP_UNIT_MARGIN_L_DP = 4;
-    private static final float TEXT_MARGIN_T_DP = 5;
-
     private final Paint tempPaint;
     private final Paint tempUnitPaint;
     private final Paint humPressPaint;
+    private final Paint blockPaint;
+    private final Paint blockBorderPaint;
 
-    private final int dayTextColor;
-    private final int nightTextColor;
-
+    private final float tempMarginBottom;
     private final float tempUnitMarginLeft;
     private final float textMarginTop;
+    private final float roundRectRadius;
+    private final float borderThickness;
 
     private final UnitFormatter unitFormatter;
-    private final Rect textSizeBuffer = new Rect();
     private final AppPreferences preferences;
 
     private String tempUnitStr = "";
@@ -47,9 +48,9 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
     private String humStr = "";
     private String pressStr = "";
 
-    private float tempStrY;
-    private float humStrY;
-    private float pressStrY;
+    private long tempStrPos;
+    private long humStrPos;
+    private long pressStrPos;
     private long tempUnitStrPos;
 
     public WeatherBlockSubcomponent(@NotNull Context context) {
@@ -65,40 +66,54 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
 
         float density = res.getDisplayMetrics().density;
 
-        tempUnitMarginLeft = TEMP_UNIT_MARGIN_L_DP * density;
-        textMarginTop = TEXT_MARGIN_T_DP * density;
+        tempMarginBottom = res.getDimension(R.dimen.weatherView_block_tempBottomMargin);
+        tempUnitMarginLeft = res.getDimension(R.dimen.weatherView_block_tempUnitLeftMargin);
+        textMarginTop = res.getDimension(R.dimen.weatherView_block_textTopMargin);
+        roundRectRadius = res.getDimension(R.dimen.weatherView_block_roundRectRadius);
+        borderThickness = res.getDimension(R.dimen.weatherView_block_roundRectBorderStrokeThickness);
 
-        dayTextColor = ResourcesCompat.getColor(res, R.color.weatherView_textColor_day, theme);
-        nightTextColor = ResourcesCompat.getColor(res, R.color.weatherView_textColor_night, theme);
+        int textColor = ResourcesCompat.getColor(res, R.color.weatherView_textColor, theme);
+        int blockColor = ResourcesCompat.getColor(res, R.color.weatherView_blockColor, theme);
+        int colorPrimary = ResourcesCompat.getColor(res, R.color.colorPrimary, theme);
 
-        float tempTextSize = res.getDimensionPixelSize(R.dimen.weatherView_tempTextSize);
-        float tempUnitTextSize = res.getDimensionPixelSize(R.dimen.weatherView_tempUnitTextSize);
-        float humPressTextSize = res.getDimensionPixelSize(R.dimen.weatherView_humPressTextSize);
+        float tempTextSize = res.getDimension(R.dimen.weatherView_tempTextSize);
+        float tempUnitTextSize = res.getDimension(R.dimen.weatherView_tempUnitTextSize);
+        float humPressTextSize = res.getDimension(R.dimen.weatherView_humPressTextSize);
 
         Typeface textTypeface = loadTextTypeface(context);
 
         tempPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         tempPaint.setTextAlign(Paint.Align.LEFT);
         tempPaint.setTypeface(textTypeface);
-        tempPaint.setColor(dayTextColor);
+        tempPaint.setColor(textColor);
         tempPaint.setTextSize(tempTextSize);
 
         tempUnitPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         tempUnitPaint.setTextAlign(Paint.Align.LEFT);
         tempUnitPaint.setTypeface(textTypeface);
-        tempUnitPaint.setColor(dayTextColor);
+        tempUnitPaint.setColor(textColor);
         tempUnitPaint.setTextSize(tempUnitTextSize);
 
         humPressPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         humPressPaint.setTextAlign(Paint.Align.LEFT);
         humPressPaint.setTypeface(textTypeface);
-        humPressPaint.setColor(dayTextColor);
+        humPressPaint.setColor(textColor);
         humPressPaint.setTextSize(humPressTextSize);
+
+        blockPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        blockPaint.setColor(blockColor);
+        blockPaint.setStyle(Paint.Style.FILL);
+
+        blockBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        blockBorderPaint.setStyle(Paint.Style.STROKE);
+        blockBorderPaint.setColor(colorPrimary);
+        blockBorderPaint.setStrokeWidth(borderThickness);
+        blockBorderPaint.setShadowLayer(2f, 2f, 2f, ResourcesCompat.getColor(res, R.color.colorPrimaryDark, theme));
     }
 
     @NotNull
     private static Typeface loadTextTypeface(@NotNull Context context) {
-        Typeface notosans = ResourcesCompat.getFont(context, R.font.notosans_light);
+        Typeface notosans = ResourcesCompat.getFont(context, R.font.notosans_medium);
 
         if (notosans == null) {
             return Typeface.SANS_SERIF;
@@ -130,32 +145,85 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
     }
 
     private void invalidatePositions() {
-        tempPaint.getTextBounds(tempStr, 0, tempStr.length(), textSizeBuffer);
-        float tempStrWidth = textSizeBuffer.width();
-        float tempStrHeight = textSizeBuffer.height();
+        float width = getWidth();
+        float height = getHeight();
 
-        tempUnitPaint.getTextBounds(tempUnitStr, 0, tempUnitStr.length(), textSizeBuffer);
-        float tempUnitStrHeight = textSizeBuffer.height();
+        long tempSize = TextUtils.getTextSize(tempStr, tempPaint);
+        float tempWidth = PackedSize.getWidth(tempSize);
+        float tempHeight = PackedSize.getHeight(tempSize);
 
-        humPressPaint.getTextBounds(humStr, 0, humStr.length(), textSizeBuffer);
-        float humStrHeight = textSizeBuffer.height();
+        long tempUnitSize = TextUtils.getTextSize(tempUnitStr, tempUnitPaint);
+        float tempUnitWidth = PackedSize.getWidth(tempUnitSize);
+        float tempUnitHeight = PackedSize.getHeight(tempUnitSize);
 
-        tempStrY = tempStrHeight;
-        humStrY = textMarginTop + tempStrHeight * 2;
+        long humSize = TextUtils.getTextSize(humStr, humPressPaint);
+        float humWidth = PackedSize.getWidth(humSize);
+        float humHeight = PackedSize.getHeight(humSize);
 
-        pressStrY = textMarginTop + humStrY + humStrHeight;
-        tempUnitStrPos = PackedPointF.of(tempStrWidth + tempUnitMarginLeft, tempUnitStrHeight);
+        long pressSize = TextUtils.getTextSize(pressStr, humPressPaint);
+        float pressWidth = PackedSize.getWidth(pressSize);
+        float pressHeight = PackedSize.getHeight(pressSize);
+
+        float totalTextHeight = tempHeight + humHeight + pressHeight + (2 * textMarginTop);
+
+        float tempWidthWithUnit = tempWidth + tempUnitWidth + tempUnitMarginLeft;
+
+        float tempX = textCenterX(width, tempWidthWithUnit);
+
+        float tempTopY = 0.5f * (height - totalTextHeight);
+        float tempY = tempTopY + tempHeight;
+
+        tempStrPos = PackedPointF.of(tempX, tempY);
+
+        tempUnitStrPos = PackedPointF.of(
+                tempX + tempWidth + tempUnitMarginLeft,
+                tempTopY + tempUnitHeight
+        );
+
+        float humY = textMarginTop + tempY + humHeight + tempMarginBottom;
+        humStrPos = PackedPointF.of(
+                textCenterX(width, humWidth),
+                humY
+        );
+
+        float pressY = textMarginTop + humY + pressHeight;
+        pressStrPos = PackedPointF.of(
+                textCenterX(width, pressWidth),
+                pressY
+        );
+    }
+
+    private static float textCenterX(float width, float textWidth) {
+        return 0.5f * (width - textWidth);
     }
 
     @Override
     public void draw(@NotNull Canvas c) {
-        float x = getX();
-        float y = getY();
+        float left = getX();
+        float top = getY();
+        float right = left + getWidth();
+        float bottom = top + getHeight();
 
-        c.drawText(tempStr, x, y + tempStrY, tempPaint);
-        c.drawText(tempUnitStr, x + PackedPointF.getX(tempUnitStrPos), y + PackedPointF.getY(tempUnitStrPos), tempUnitPaint);
-        c.drawText(humStr, x, y + humStrY, humPressPaint);
-        c.drawText(pressStr, x, y + pressStrY, humPressPaint);
+        long offset = PackedPointF.of(left, top);
+
+        float halfThickness = borderThickness * 0.5f;
+
+        c.drawRoundRect(
+                left, top, right, bottom,
+                roundRectRadius, roundRectRadius,
+                blockPaint
+        );
+
+        c.drawRoundRect(
+                left + halfThickness, top + halfThickness, right - borderThickness, bottom - borderThickness,
+                roundRectRadius, roundRectRadius,
+                blockBorderPaint
+        );
+
+        CanvasUtils.drawTextWithOffset(c, tempStr, offset, tempStrPos, tempPaint);
+        CanvasUtils.drawTextWithOffset(c, tempUnitStr, offset, tempUnitStrPos, tempUnitPaint);
+        CanvasUtils.drawTextWithOffset(c, humStr, offset, humStrPos, humPressPaint);
+        CanvasUtils.drawTextWithOffset(c, pressStr, offset, pressStrPos, humPressPaint);
     }
 
     @Override
@@ -168,22 +236,6 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
 
     @Override
     protected void onDayStateChanged(int newState) {
-        switch (newState) {
-            case ComplexWeatherView.STATE_DAY: {
-                tempPaint.setColor(dayTextColor);
-                tempUnitPaint.setColor(dayTextColor);
-                humPressPaint.setColor(dayTextColor);
-
-                break;
-            }
-            case ComplexWeatherView.STATE_NIGHT: {
-                tempPaint.setColor(nightTextColor);
-                tempUnitPaint.setColor(nightTextColor);
-                humPressPaint.setColor(nightTextColor);
-
-                break;
-            }
-        }
     }
 
     @Override

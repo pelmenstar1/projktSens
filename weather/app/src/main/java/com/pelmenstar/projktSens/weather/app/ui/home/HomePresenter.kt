@@ -31,7 +31,6 @@ import kotlinx.coroutines.*
 
 class HomePresenter(
     private val sunInfoProvider: SunInfoProvider,
-    private val moonInfoProvider: MoonInfoProvider,
     private val geoProvider: GeolocationProvider,
     private val dataSource: WeatherDataSource,
     private val weatherChannelInfoProvider: WeatherChannelInfoProvider
@@ -145,22 +144,13 @@ class HomePresenter(
 
                     val sunrise = sunInfoProvider.getSunriseTime(dayOfYear, location)
                     val sunset = sunInfoProvider.getSunsetTime(dayOfYear, location)
-                    val moonPhase = moonInfoProvider.getMoonPhase(nowDate)
 
-                    postSetMoonPhase(moonPhase)
                     postSetSunriseSunset(sunrise, sunset)
                 }
 
                 delay(1000)
             }
         }
-    }
-
-    private fun postSetMoonPhase(phase: Float) {
-        mainThread.sendMessage(Message {
-            what = MSG_SET_MOON_PHASE
-            arg1 = phase.toBits()
-        })
     }
 
     private fun postSetCurrentTime(time: Int) {
@@ -331,9 +321,6 @@ class HomePresenter(
                 MSG_SET_SUNRISE_SUNSET -> {
                     p.view.setSunriseSunset(msg.arg1, msg.arg2)
                 }
-                MSG_SET_MOON_PHASE -> {
-                    p.view.setMoonPhase(msg.arg1.intBitsToFloat())
-                }
                 MSG_SET_LOCATION_LOADED -> {
                     p.view.setLocationLoaded(msg.arg1 == 1)
                 }
@@ -350,8 +337,7 @@ class HomePresenter(
         private const val MSG_ON_SERVER_AVAILABLE = 1
         private const val MSG_ON_WEATHER_RECEIVED = 2
         private const val MSG_SET_SUNRISE_SUNSET = 4
-        private const val MSG_SET_MOON_PHASE = 5
-        private const val MSG_SET_CURRENT_TIME = 6
-        private const val MSG_SET_LOCATION_LOADED = 7
+        private const val MSG_SET_CURRENT_TIME = 5
+        private const val MSG_SET_LOCATION_LOADED = 6
     }
 }

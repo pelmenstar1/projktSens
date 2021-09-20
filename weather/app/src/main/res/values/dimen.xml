@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="homeActivity_weatherViewHeight">250dp</dimen>
+    <dimen name="homeActivity_weatherView_height">250dp</dimen>
+    <dimen name="homeActivity_weatherView_marginBottom">10dp</dimen>
     <dimen name="homeActivity_serverUnavailable_sideMargin">3dp</dimen>
     <dimen name="homeActivity_serverUnavailable_topMargin">1dp</dimen>
     <dimen name="homeActivity_serverUnavailable_bottomMargin">10dp</dimen>
@@ -24,12 +25,18 @@
     <dimen name="materialChart_circleRadius">2dp</dimen>
     <dimen name="materialChart_lineWidth">1dp</dimen>
 
-    <dimen name="weatherView_tempTextSize">24sp</dimen>
+    <dimen name="weatherView_tempTextSize">32sp</dimen>
     <dimen name="weatherView_tempUnitTextSize">16sp</dimen>
     <dimen name="weatherView_humPressTextSize">15sp</dimen>
     <dimen name="weatherView_moonDiameter">40dp</dimen>
     <dimen name="weatherView_retrySize">30dp</dimen>
     <dimen name="weatherView_failedGetLocationTextSize">16sp</dimen>
+    <dimen name="weatherView_block_roundRectRadius">8dp</dimen>
+    <dimen name="weatherView_block_textTopMargin">7dp</dimen>
+    <dimen name="weatherView_block_tempBottomMargin">10dp</dimen>
+    <dimen name="weatherView_block_tempUnitLeftMargin">4dp</dimen>
+    <dimen name="weatherView_block_roundRectBorderStrokeThickness">2dp</dimen>
+    <dimen name="weatherView_blockTopBottomMargin">5dp</dimen>
 
     <dimen name="sunriseSunsetArc_dashedArcThickness">0.8dp</dimen>
     <dimen name="sunriseSunsetArc_overArcThickness">2.5dp</dimen>

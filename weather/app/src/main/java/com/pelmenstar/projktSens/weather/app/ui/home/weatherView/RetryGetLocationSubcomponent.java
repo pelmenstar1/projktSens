@@ -19,18 +19,17 @@ import org.jetbrains.annotations.Nullable;
 public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subcomponent {
     private static final float FAILED_GET_LOCATION_MARGIN_T_DP = 3;
     private static final float FAILED_GET_LOCATION_MARGIN_R_DP = 7;
+
     private final Drawable retryIcon;
     private final String failedGetLocationStr;
     private final Paint failedGetLocationPaint;
     private final float failedGetLocationHeight;
     private final float failedGetLocationMarginTop;
     private final float retrySize;
-    private final int dayTextColor;
-    private final int dayIconTint;
-    private final int nightTextColor;
-    private final int nightIconTint;
+
     private OnRetryGetLocationListener onRetryGetLocationListener;
     private float failedGetLocationY;
+
     public RetryGetLocationSubcomponent(@NotNull Context context) {
         Resources res = context.getResources();
         Resources.Theme theme = context.getTheme();
@@ -45,13 +44,10 @@ public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subco
         float failedGetLocationMarginRight = FAILED_GET_LOCATION_MARGIN_R_DP * density;
         failedGetLocationMarginTop = FAILED_GET_LOCATION_MARGIN_T_DP * density;
 
-        dayTextColor = ResourcesCompat.getColor(res, R.color.weatherView_textColor_day, theme);
-        dayIconTint = ResourcesCompat.getColor(res, R.color.weatherView_iconTint_day, theme);
+        int textColor = ResourcesCompat.getColor(res, R.color.weatherView_textColor, theme);
+        int iconTint = ResourcesCompat.getColor(res, R.color.weatherView_iconTint, theme);
 
-        nightTextColor = ResourcesCompat.getColor(res, R.color.weatherView_textColor_night, theme);
-        nightIconTint = ResourcesCompat.getColor(res, R.color.weatherView_iconTint_night, theme);
-
-        DrawableCompat.setTint(retryIcon, dayIconTint);
+        DrawableCompat.setTint(retryIcon, iconTint);
 
         float failedGetLocationTextSize = res.getDimension(R.dimen.weatherView_failedGetLocationTextSize);
 
@@ -59,7 +55,7 @@ public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subco
 
         failedGetLocationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         failedGetLocationPaint.setTypeface(loadDefaultTextTypeface(context));
-        failedGetLocationPaint.setColor(dayTextColor);
+        failedGetLocationPaint.setColor(textColor);
         failedGetLocationPaint.setTextSize(failedGetLocationTextSize);
 
         failedGetLocationPaint.getTextBounds(
@@ -121,13 +117,6 @@ public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subco
 
     @Override
     protected void onDayStateChanged(int newState) {
-        if (newState == ComplexWeatherView.STATE_DAY) {
-            failedGetLocationPaint.setColor(dayTextColor);
-            DrawableCompat.setTint(retryIcon, dayIconTint);
-        } else {
-            failedGetLocationPaint.setColor(nightTextColor);
-            DrawableCompat.setTint(retryIcon, nightIconTint);
-        }
     }
 
     @Override

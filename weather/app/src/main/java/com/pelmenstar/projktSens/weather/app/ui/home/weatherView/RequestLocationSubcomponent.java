@@ -15,20 +15,18 @@ import org.jetbrains.annotations.Nullable;
 
 public class RequestLocationSubcomponent extends ComplexWeatherView.Subcomponent {
     private final Drawable icon;
-    private final int dayIconTint;
-    private final int nightIconTint;
     private RequestLocationPermissionHandler requestLocationPermissionHandler;
+
     public RequestLocationSubcomponent(@NotNull Context context) {
         Resources res = context.getResources();
         Resources.Theme theme = context.getTheme();
 
-        dayIconTint = ResourcesCompat.getColor(res, R.color.weatherView_iconTint_day, theme);
-        nightIconTint = ResourcesCompat.getColor(res, R.color.weatherView_iconTint_night, theme);
+        int iconTint = ResourcesCompat.getColor(res, R.color.weatherView_iconTint, theme);
 
         icon = ResourcesCompat.getDrawable(res, R.drawable.ic_error, theme);
         if (icon == null) throw new NullPointerException();
 
-        DrawableCompat.setTint(icon, dayIconTint);
+        DrawableCompat.setTint(icon, iconTint);
     }
 
     @Nullable
@@ -63,11 +61,6 @@ public class RequestLocationSubcomponent extends ComplexWeatherView.Subcomponent
 
     @Override
     protected void onDayStateChanged(int newState) {
-        if (newState == ComplexWeatherView.STATE_DAY) {
-            DrawableCompat.setTint(icon, dayIconTint);
-        } else {
-            DrawableCompat.setTint(icon, nightIconTint);
-        }
     }
 
     @Override
