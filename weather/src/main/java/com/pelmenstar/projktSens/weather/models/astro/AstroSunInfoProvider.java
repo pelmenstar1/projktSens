@@ -12,7 +12,6 @@ import java.util.TimeZone;
  * Default astronomical implementation of {@link SunInfoProvider}
  */
 public final class AstroSunInfoProvider implements SunInfoProvider {
-    private static final int currentZoneOffsetSeconds = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000;
     private static final float D2R = (float) Math.PI / 180f;
     private static final float R2D = 180f / (float) Math.PI;
     private static final float ZENITH = 90.8888f;
@@ -97,8 +96,9 @@ public final class AstroSunInfoProvider implements SunInfoProvider {
         }
 
         int utcTime = (int) ((hour - lnHour) * 3600.0f);
+        int zoneOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000;
 
-        return normalizeTime(utcTime + currentZoneOffsetSeconds);
+        return normalizeTime(utcTime + zoneOffset);
     }
 
     private static int normalizeTime(int time) {

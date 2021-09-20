@@ -35,8 +35,6 @@ public final class TimeUtils {
             335
     };
 
-    private static final long currentZoneOffsetMillis = TimeZone.getDefault().getOffset(System.currentTimeMillis());
-
     /**
      * Gets count of days in specified month of specified year
      */
@@ -83,6 +81,9 @@ public final class TimeUtils {
      * Returns UNIX epoch in milliseconds shifted with current time zone
      */
     public static long currentLocalTimeMillis() {
-        return System.currentTimeMillis() + currentZoneOffsetMillis;
+        long millis = System.currentTimeMillis();
+        int offset = TimeZone.getDefault().getOffset(millis);
+
+        return millis + offset;
     }
 }
