@@ -2,9 +2,11 @@ package com.pelmenstar.projktSens.chartLite.renderer;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 
 import com.pelmenstar.projktSens.chartLite.DataRef;
+import com.pelmenstar.projktSens.chartLite.GradientFill;
 import com.pelmenstar.projktSens.chartLite.SimpleChartAnimator;
 import com.pelmenstar.projktSens.chartLite.ViewPortHandler;
 import com.pelmenstar.projktSens.chartLite.data.ChartData;
@@ -12,6 +14,8 @@ import com.pelmenstar.projktSens.chartLite.data.DataSet;
 import com.pelmenstar.projktSens.chartLite.data.Entry;
 import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
 import com.pelmenstar.projktSens.shared.EmptyArray;
+import com.pelmenstar.projktSens.shared.FloatPair;
+import com.pelmenstar.projktSens.shared.PackedPointF;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -19,6 +23,9 @@ public final class LineChartRenderer {
     private final Paint linePaint;
     private final Paint circlePaint;
     private final Paint labelPaint;
+    private final Paint backgroundPaint;
+
+    private final Path backgroundPath;
 
     @NotNull
     private final DataRef dataRef;
@@ -45,6 +52,10 @@ public final class LineChartRenderer {
 
         labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         labelPaint.setTextAlign(Paint.Align.CENTER);
+
+        backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        backgroundPath = new Path();
     }
 
     public void computePoints() {
@@ -121,6 +132,8 @@ public final class LineChartRenderer {
                 boolean drawValues = dataSet.isDrawValuesEnabled();
                 boolean drawCircles = dataSet.isDrawCirclesEnabled();
 
+                drawBackground(c, dataSet, pOffset);
+
                 if (!drawCircles) {
                     valOffset *= 0.5f;
                 }
@@ -170,6 +183,53 @@ public final class LineChartRenderer {
                     pOffset += 2;
                 }
             }
+        }
+    }
+
+    private final RectF pathBounds = new RectF();
+
+    private void drawBackground(@NotNull Canvas c, @NotNull DataSet dataSet, int pOffset) {
+        GradientFill background = dataSet.getBackground();
+
+        if(!background.isTransparent()) {
+            long[] entries = dataSet.getEntries();
+            float[] points = computedPoints;
+
+            Path path = backgroundPath;
+            path.rewind();
+
+            float gradientOffset = 20f;
+
+            float firstX = points[pOffset];
+            float firstY = points[pOffset + 1];
+
+            int pEnd = pOffset + 2 * (entries.length - 1);
+
+            float lastX = points[pEnd];
+            float lastY = points[pEnd + 1];
+
+            path.moveTo(firstX, firstY + gradientOffset);
+            path.lineTo(firstX, firstY);
+
+            for(int i = pOffset + 2; i <= pEnd; i += 2) {
+                float x = points[i];
+                float y = points[i + 1];
+
+                path.lineTo(x, y);
+            }
+
+            for(int i = pEnd; i >= pOffset; i -= 2) {
+                float x = points[i];
+                float y = points[i + 1] + gradientOffset;
+
+                path.lineTo(x, y);
+            }
+
+            path.close();
+
+            path.computeBounds(pathBounds, false);
+            background.applyToPaint(pathBounds, backgroundPaint);
+            c.drawPath(path, backgroundPaint);
         }
     }
 }

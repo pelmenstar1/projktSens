@@ -2,9 +2,11 @@ package com.pelmenstar.projktSens.weather.app.ui.report
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
+import com.pelmenstar.projktSens.chartLite.GradientFill
 import com.pelmenstar.projktSens.chartLite.data.ChartData
 import com.pelmenstar.projktSens.chartLite.data.DataSet
 import com.pelmenstar.projktSens.chartLite.data.Entry
@@ -12,6 +14,7 @@ import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter
 import com.pelmenstar.projktSens.shared.StringUtils
 import com.pelmenstar.projktSens.shared.android.charts.DateChartFormatter
 import com.pelmenstar.projktSens.shared.android.ext.Intent
+import com.pelmenstar.projktSens.shared.android.ext.withAlpha
 import com.pelmenstar.projktSens.shared.android.ui.actionBar
 import com.pelmenstar.projktSens.shared.android.ui.requireIntent
 import com.pelmenstar.projktSens.shared.time.ShortDate
@@ -166,6 +169,10 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
     private fun DataSet.customizeOptions(color: Int): DataSet {
         this.color = color
         circleColor = color
+
+        background = GradientFill(
+            color.withAlpha(50), Color.TRANSPARENT, GradientFill.VERTICAL
+        )
 
         return this
     }

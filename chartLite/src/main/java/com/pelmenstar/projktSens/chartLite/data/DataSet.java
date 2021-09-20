@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 
 import androidx.annotation.ColorInt;
 
+import com.pelmenstar.projktSens.chartLite.GradientFill;
 import com.pelmenstar.projktSens.chartLite.formatter.FloatValueFormatter;
 import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
@@ -52,6 +53,9 @@ public final class DataSet extends AppendableToStringBuilder {
     @ColorInt
     private int circleColor = Color.BLACK;
     private float circleRadius = 8f;
+
+    @NotNull
+    private GradientFill background = GradientFill.TRANSPARENT;
 
     public DataSet(long @NotNull [] entries, @Nullable ValueFormatter formatter) {
         this.entries = entries;
@@ -264,6 +268,15 @@ public final class DataSet extends AppendableToStringBuilder {
 
     public void setVisible(boolean enabled) {
         setFlag(FLAG_VISIBLE, enabled);
+    }
+
+    @NotNull
+    public GradientFill getBackground() {
+        return background;
+    }
+
+    public void setBackground(@NotNull GradientFill background) {
+        this.background = background;
     }
 
     public boolean contains(long e) {
