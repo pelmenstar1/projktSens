@@ -75,7 +75,7 @@ public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subco
 
     @NotNull
     private Typeface loadDefaultTextTypeface(@NotNull Context context) {
-        Typeface notosans = ResourcesCompat.getFont(context, R.font.notosans_light);
+        Typeface notosans = ResourcesCompat.getFont(context, R.font.notosans_medium);
 
         if (notosans == null) {
             return Typeface.SANS_SERIF;
