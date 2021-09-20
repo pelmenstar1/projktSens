@@ -1,14 +1,17 @@
 package com.pelmenstar.projktSens.weather.app.formatters;
 
+import android.content.Context;
+
 import com.pelmenstar.projktSens.shared.MyMath;
+import com.pelmenstar.projktSens.weather.app.R;
 
 import org.jetbrains.annotations.NotNull;
 
 public final class MoonPhaseFormatter {
     private final String[] moonPhases;
 
-    public MoonPhaseFormatter(@NotNull String @NotNull [] moonPhases) {
-        this.moonPhases = moonPhases;
+    public MoonPhaseFormatter(@NotNull Context context) {
+        this.moonPhases = context.getResources().getStringArray(R.array.moonPhases);
     }
 
     @NotNull

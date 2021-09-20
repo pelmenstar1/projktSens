@@ -34,11 +34,11 @@ import java.net.InetSocketAddress
 @Module
 class AppModule(private val context: Context) {
     private val unitFormatter: UnitFormatter by lazy {
-        UnitFormatter(context.resources.getStringArray(R.array.units), prettyDateFormatter())
+        UnitFormatter(context, prettyDateFormatter())
     }
 
     private val moonPhaseFormatter: MoonPhaseFormatter by lazy {
-        MoonPhaseFormatter(context.resources.getStringArray(R.array.moonPhases))
+        MoonPhaseFormatter(context)
     }
 
     @Provides

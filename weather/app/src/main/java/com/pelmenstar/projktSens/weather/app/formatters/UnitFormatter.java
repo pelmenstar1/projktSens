@@ -1,7 +1,10 @@
 package com.pelmenstar.projktSens.weather.app.formatters;
 
+import android.content.Context;
+
 import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter;
+import com.pelmenstar.projktSens.weather.app.R;
 import com.pelmenstar.projktSens.weather.models.UnitValue;
 import com.pelmenstar.projktSens.weather.models.ValueWithDate;
 
@@ -14,8 +17,8 @@ public final class UnitFormatter {
     @NotNull
     private final PrettyDateFormatter dateFormatter;
 
-    public UnitFormatter(@NotNull String[] units, @NotNull PrettyDateFormatter dateFormatter) {
-        this.units = units;
+    public UnitFormatter(@NotNull Context context, @NotNull PrettyDateFormatter dateFormatter) {
+        this.units = context.getResources().getStringArray(R.array.units);
         this.dateFormatter = dateFormatter;
     }
 
