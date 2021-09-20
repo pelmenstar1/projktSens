@@ -10,10 +10,10 @@ import com.pelmenstar.projktSens.shared.android.ext.Message
 import com.pelmenstar.projktSens.shared.android.mvp.BasePresenter
 import com.pelmenstar.projktSens.shared.geo.Geolocation
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider
-import com.pelmenstar.projktSens.shared.intBitsToFloat
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
 import com.pelmenstar.projktSens.shared.time.ShortDateTime
+import com.pelmenstar.projktSens.shared.time.TimeConstants
 import com.pelmenstar.projktSens.weather.app.GeolocationCache
 import com.pelmenstar.projktSens.weather.app.PermissionUtils
 import com.pelmenstar.projktSens.weather.app.ui.RequestLocationPermissionDialog
@@ -25,7 +25,6 @@ import com.pelmenstar.projktSens.weather.app.ui.report.WeekReportActivity
 import com.pelmenstar.projktSens.weather.models.WeatherChannelInfoProvider
 import com.pelmenstar.projktSens.weather.models.WeatherDataSource
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
-import com.pelmenstar.projktSens.weather.models.astro.MoonInfoProvider
 import com.pelmenstar.projktSens.weather.models.astro.SunInfoProvider
 import kotlinx.coroutines.*
 
@@ -148,7 +147,7 @@ class HomePresenter(
                     postSetSunriseSunset(sunrise, sunset)
                 }
 
-                delay(1000)
+                delay(TimeConstants.MILLIS_IN_MINUTE.toLong())
             }
         }
     }
