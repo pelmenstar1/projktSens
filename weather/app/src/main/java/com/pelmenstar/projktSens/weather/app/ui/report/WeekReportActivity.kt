@@ -196,8 +196,10 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
         override fun formatToCharArray(value: Float): CharArray {
             val text = textCache
 
-            val month = (value / 31).toInt()
-            val day = (value - month * 31).toInt()
+            val monthDay = value.toInt()
+
+            val month = monthDay / 31
+            val day = monthDay - month * 31
             StringUtils.writeTwoDigits(text, 0, month)
             text[2] = '.'
             StringUtils.writeTwoDigits(text, 3, day)
