@@ -12,7 +12,6 @@ import androidx.annotation.RequiresApi
 import com.pelmenstar.projktSens.shared.android.ext.Message
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider
-import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.GeolocationCache
 import com.pelmenstar.projktSens.weather.app.PermissionUtils
 import com.pelmenstar.projktSens.weather.app.R
@@ -31,7 +30,6 @@ abstract class LocationDependentActivity : HomeButtonSupportActivity() {
 
     private val mainThread = MainThreadHandler(this)
 
-    private lateinit var prefs: AppPreferences
     private lateinit var locationProvider: GeolocationProvider
 
     private var isAppDetailsInfoSettingExists = false
@@ -46,7 +44,6 @@ abstract class LocationDependentActivity : HomeButtonSupportActivity() {
         }
 
         val component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
-        prefs = component.preferences()
         locationProvider = component.geolocationProvider()
 
         val location = GeolocationCache.get()
@@ -314,9 +311,6 @@ abstract class LocationDependentActivity : HomeButtonSupportActivity() {
         }
 
         if (grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
-            // now gps isn't denied
-            prefs.isGpsPermissionDenied = false
-
             startLoadingLocation()
         } else if (PermissionUtils.isNeverShowAgainOnLocation(this)) {
             setState(STATE_GPS_NEVER_SHOW_AGAIN)

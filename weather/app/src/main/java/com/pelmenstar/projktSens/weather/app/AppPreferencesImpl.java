@@ -22,7 +22,6 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
     private static final String KEY_CONTRACT = "contract";
     private static final String KEY_SERVER_PORT = "PORT";
     private static final String KEY_WEATHER_RECEIVE_INTERVAL = "weatherRcvInterval";
-    private static final String KEY_IS_GPS_PERMISSION_DENIED = "isGpsDenied";
     private static final String KEY_IS_FIRST_START = "isFirstStart";
     private static final String KEY_KEEP_HOME_SCREEN_ON = "keepHomeScreenOn";
 
@@ -61,12 +60,9 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
         int serverPort = prefs.getInt(KEY_SERVER_PORT, -1);
         int weatherReceiveInterval = prefs.getInt(KEY_WEATHER_RECEIVE_INTERVAL, -1);
 
-        boolean isGpsDeniedExists = prefs.contains(KEY_IS_GPS_PERMISSION_DENIED);
-
         if (!ValueUnitsPacked.isValid(units) ||
                 !prefs.contains(KEY_SERVER_HOST) ||
                 !prefs.contains(KEY_KEEP_HOME_SCREEN_ON) ||
-                !isGpsDeniedExists ||
                 (contractType | serverPort | weatherReceiveInterval) < 0) {
             writeDefault();
         }
@@ -80,7 +76,6 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
                 .putInt(KEY_CONTRACT, ContractType.RAW)
                 .putInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT)
                 .putInt(KEY_WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL)
-                .putBoolean(KEY_IS_GPS_PERMISSION_DENIED, false)
                 .putBoolean(KEY_KEEP_HOME_SCREEN_ON, false)
                 .apply();
     }
@@ -105,14 +100,10 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
 
     @Override
     public boolean getBoolean(int id) {
-        switch (id) {
-            case IS_GPS_PERMISSION_DENIED:
-                return isGpsPermissionDenied();
-            case KEEP_HOME_SCREEN_ON:
-                return isKeepHomeScreenOn();
-            default:
-                throw new IllegalArgumentException("Option " + id + " isn't boolean");
+        if (id == KEEP_HOME_SCREEN_ON) {
+            return isKeepHomeScreenOn();
         }
+        throw new IllegalArgumentException("Option " + id + " isn't boolean");
     }
 
     @Override
@@ -140,15 +131,10 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
 
     @Override
     public void setBoolean(int id, boolean value) {
-        switch (id) {
-            case IS_GPS_PERMISSION_DENIED:
-                setGpsPermissionDenied(value);
-                break;
-            case KEEP_HOME_SCREEN_ON:
-                setKeepHomeScreenOn(value);
-                break;
-            default:
-                throw new IllegalArgumentException("Option " + id + " isn't boolean");
+        if (id == KEEP_HOME_SCREEN_ON) {
+            setKeepHomeScreenOn(value);
+        } else {
+            throw new IllegalArgumentException("Option " + id + " isn't boolean");
         }
     }
 
@@ -203,16 +189,6 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
 
     public void setWeatherReceiveInterval(int interval) {
         safePutInt(KEY_WEATHER_RECEIVE_INTERVAL, WEATHER_RECEIVE_INTERVAL, interval);
-    }
-
-    @Override
-    public boolean isGpsPermissionDenied() {
-        return safeGetBoolean(KEY_IS_GPS_PERMISSION_DENIED, IS_GPS_PERMISSION_DENIED, true);
-    }
-
-    @Override
-    public void setGpsPermissionDenied(boolean value) {
-        safePutBoolean(KEY_IS_GPS_PERMISSION_DENIED, IS_GPS_PERMISSION_DENIED, value);
     }
 
     @Override
