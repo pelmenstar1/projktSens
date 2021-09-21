@@ -228,6 +228,7 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
 
     @Override
     protected void onSizeChanged(float width, float height) {
+        invalidatePositions();
     }
 
     @Override

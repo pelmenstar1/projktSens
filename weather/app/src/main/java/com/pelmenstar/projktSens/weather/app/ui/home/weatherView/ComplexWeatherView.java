@@ -198,42 +198,44 @@ public final class ComplexWeatherView extends View {
     }
 
     private void updateComponentPositionsAffectedByDayState(float w, float h) {
-        float wbHeight = h - sunriseSunsetArcHeight;
-        float retryX = w - retryGetLocationSubcomponent.getWidth();
-        float reqLocX = w - requestLocationSubcomponent.getWidth();
+        if(w > 0f && h > 0f) {
+            float wbHeight = h - sunriseSunsetArcHeight;
+            float retryX = w - retryGetLocationSubcomponent.getWidth();
+            float reqLocX = w - requestLocationSubcomponent.getWidth();
 
-        sunriseSunsetArcSubcomponent.setWidth(w);
+            sunriseSunsetArcSubcomponent.setWidth(w);
 
-        float blockTopOffset;
+            float blockTopOffset;
 
-        if (state == STATE_DAY) {
-            sunriseSunsetArcSubcomponent.setY(0f);
+            if (state == STATE_DAY) {
+                sunriseSunsetArcSubcomponent.setY(0f);
 
-            blockTopOffset = sunriseSunsetArcHeight;
+                blockTopOffset = sunriseSunsetArcHeight;
 
-            weatherBlockSubcomponent.setY(sunriseSunsetArcHeight + weatherBlockMarginTopBottom);
+                weatherBlockSubcomponent.setY(sunriseSunsetArcHeight + weatherBlockMarginTopBottom);
 
-            retryGetLocationSubcomponent.setPosition(retryX, sunriseSunsetArcHeight);
-            requestLocationSubcomponent.setPosition(reqLocX, sunriseSunsetArcHeight);
-        } else {
-            sunriseSunsetArcSubcomponent.setY(wbHeight);
+                retryGetLocationSubcomponent.setPosition(retryX, sunriseSunsetArcHeight);
+                requestLocationSubcomponent.setPosition(reqLocX, sunriseSunsetArcHeight);
+            } else {
+                sunriseSunsetArcSubcomponent.setY(wbHeight);
 
-            blockTopOffset = 0f;
+                blockTopOffset = 0f;
 
-            weatherBlockSubcomponent.setY(weatherBlockMarginTopBottom);
+                weatherBlockSubcomponent.setY(weatherBlockMarginTopBottom);
 
-            retryGetLocationSubcomponent.setPosition(retryX, 0);
-            requestLocationSubcomponent.setPosition(reqLocX, 0);
+                retryGetLocationSubcomponent.setPosition(retryX, 0);
+                requestLocationSubcomponent.setPosition(reqLocX, 0);
+            }
+
+            float blockWidth = w * 0.7f;
+            float blockHeight = wbHeight - (weatherBlockMarginTopBottom * 2);
+
+            weatherBlockSubcomponent.setPosition(
+                    0.5f * (w - blockWidth),
+                    blockTopOffset + weatherBlockMarginTopBottom + 0.5f * (wbHeight - blockHeight)
+            );
+            weatherBlockSubcomponent.setSize(blockWidth, blockHeight);
         }
-
-        float blockWidth = w * 0.7f;
-        float blockHeight = wbHeight - (weatherBlockMarginTopBottom * 2);
-
-        weatherBlockSubcomponent.setPosition(
-                0.5f * (w - blockWidth),
-                blockTopOffset + weatherBlockMarginTopBottom + 0.5f * (wbHeight - blockHeight)
-        );
-        weatherBlockSubcomponent.setSize(blockWidth, blockHeight);
     }
 
     @Override
