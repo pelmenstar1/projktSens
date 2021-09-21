@@ -15,10 +15,7 @@ class SunriseSunsetCalendarPresenter(
     private var location: Geolocation? = null
 
     override fun onLocationPresent() {
-        location = GeolocationCache.get()
-        if (location == null) {
-            throw IllegalStateException("GeolocationCache.get() is null")
-        }
+        location = GeolocationCache.getNotNullOrThrow()
 
         onDaySelected(ShortDate.getDayOfYear(ShortDate.now()))
     }

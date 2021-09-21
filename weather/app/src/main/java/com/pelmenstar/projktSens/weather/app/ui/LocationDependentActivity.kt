@@ -46,16 +46,19 @@ abstract class LocationDependentActivity : HomeButtonSupportActivity() {
         val component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
         locationProvider = component.geolocationProvider()
 
-        val location = GeolocationCache.get()
-        if (location == null) {
-            if (Build.VERSION.SDK_INT < 23 || PermissionUtils.isLocationGranted(this)) {
-                startLoadingLocation()
+        synchronized(GeolocationCache.lock()) {
+            val location = GeolocationCache.get()
+
+            if (location == null) {
+                if (Build.VERSION.SDK_INT < 23 || PermissionUtils.isLocationGranted(this)) {
+                    startLoadingLocation()
+                } else {
+                    setState(STATE_GPS_NOT_GRANTED)
+                }
             } else {
-                setState(STATE_GPS_NOT_GRANTED)
+                setContentView(createMainContent())
+                onLocationPresent()
             }
-        } else {
-            setContentView(createMainContent())
-            onLocationPresent()
         }
     }
 
