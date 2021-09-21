@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
 import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartActivity
@@ -11,6 +12,8 @@ import com.pelmenstar.projktSens.weather.app.ui.home.HomeActivity
 
 class StartupActivity : Activity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme)
+
         super.onCreate(savedInstanceState)
 
         val component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
@@ -19,6 +22,7 @@ class StartupActivity : Activity() {
         if (prefs.isFirstStart) {
             val intent = FirstStartActivity.intent(this)
             startActivityForResult(intent, REQUEST_CODE_FIRST_START)
+            overridePendingTransition(0, 0)
         } else {
             startHomeActivityAndFinish()
         }
@@ -30,7 +34,9 @@ class StartupActivity : Activity() {
         val intent = Intent(this, HomeActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
         }
+
         startActivity(intent)
+        overridePendingTransition(0, 0)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
