@@ -11,6 +11,8 @@ import android.graphics.drawable.Drawable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
+import com.pelmenstar.projktSens.shared.PackedSize;
+import com.pelmenstar.projktSens.shared.android.TextUtils;
 import com.pelmenstar.projktSens.weather.app.R;
 
 import org.jetbrains.annotations.NotNull;
@@ -51,23 +53,15 @@ public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subco
 
         float failedGetLocationTextSize = res.getDimension(R.dimen.weatherView_failedGetLocationTextSize);
 
-        Rect textSizeBuffer = new Rect();
-
         failedGetLocationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         failedGetLocationPaint.setTypeface(loadDefaultTextTypeface(context));
         failedGetLocationPaint.setColor(textColor);
         failedGetLocationPaint.setTextSize(failedGetLocationTextSize);
 
-        failedGetLocationPaint.getTextBounds(
-                failedGetLocationStr,
-                0,
-                failedGetLocationStr.length(),
-                textSizeBuffer
-        );
+        long size = TextUtils.getTextSize(failedGetLocationStr, failedGetLocationPaint);
 
-        failedGetLocationHeight = textSizeBuffer.height();
-
-        float failedGetLocationWidth = textSizeBuffer.width();
+        float failedGetLocationWidth = PackedSize.getWidth(size);
+        failedGetLocationHeight = PackedSize.getHeight(size);
 
         setWidth(retrySize + failedGetLocationMarginRight + failedGetLocationWidth);
         setHeight(Math.max(failedGetLocationHeight, retrySize));
