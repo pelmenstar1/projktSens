@@ -50,9 +50,6 @@
             android:name=".ui.moon.MoonCalendarActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="com.pelmenstar.projktSens.shared.android.ui.requestPermissions.RequestPermissionsActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
             android:name=".ui.report.DayReportActivity"
             android:configChanges="orientation|screenSize" />
         <activity
