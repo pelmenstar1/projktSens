@@ -25,6 +25,8 @@ interface HomeContract {
 
         fun connectToWeatherChannel()
         fun disconnectFromWeatherChannel()
+
+        fun refreshLocationPermissionGrantedState()
     }
 
     interface View : DefaultContract.View {

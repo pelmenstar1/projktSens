@@ -67,8 +67,7 @@ class HomePresenter(
             val dialog = RequestLocationPermissionDialog()
             dialog.onDismissCallback = {
                 if (dialog.isLocationPermissionGranted) {
-                    view.setCanLoadLocation(true)
-                    startLoadingLocation()
+                    onLocationPermissionGranted()
                 }
             }
             dialog.show((context as FragmentActivity).supportFragmentManager, null)
@@ -94,6 +93,17 @@ class HomePresenter(
         mainThread.presenter = null
 
         scope.cancel()
+    }
+
+    private fun onLocationPermissionGranted() {
+        view.setCanLoadLocation(true)
+        startLoadingLocation()
+    }
+
+    override fun refreshLocationPermissionGrantedState() {
+        if(Build.VERSION.SDK_INT >= 23 && PermissionUtils.isLocationGranted(view.context)) {
+            onLocationPermissionGranted()
+        }
     }
 
     private fun startLoadingLocation() {

@@ -230,6 +230,12 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
         presenter?.connectToWeatherChannel()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        presenter?.refreshLocationPermissionGrantedState()
+    }
+
     override fun onStop() {
         super.onStop()
 
