@@ -56,8 +56,7 @@
     <string name="gpsIsNotGranted">GPS permission isn\'t granted</string>
     <string name="allowGps">Allow</string>
     <string name="locDependentActivity_requestLocPerm_gpsNeverShowAgain">
-        You\'ve checked \'Never show again\'. \n
-        To use this feature, you have to go to the settings.
+        You\'ve checked \'Never show again\'. \nTo use this feature, you have to go to the settings.
     </string>
     <string name="goToSettings">Go to the settings</string>
 

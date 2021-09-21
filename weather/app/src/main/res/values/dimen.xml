@@ -44,8 +44,9 @@
     <dimen name="sunriseSunsetArc_primaryPadding">5dp</dimen>
     <dimen name="sunriseSunsetArc_textSize">14sp</dimen>
 
-    <dimen name="requestLocPerm_contentPadding">20dp</dimen>
+    <dimen name="requestLocPerm_contentPadding">30dp</dimen>
     <dimen name="requestLocPerm_actionTopMargin">10dp</dimen>
+    <dimen name="requestLocPerm_roundRectStrokeWidth">2dp</dimen>
 
     <dimen name="locationDependentActivity_transitionViewSize">200dp</dimen>
     <dimen name="locationDependentActivity_retryButtonSize">40dp</dimen>

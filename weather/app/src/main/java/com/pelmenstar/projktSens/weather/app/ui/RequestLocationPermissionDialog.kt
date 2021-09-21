@@ -2,6 +2,7 @@ package com.pelmenstar.projktSens.weather.app.ui
 
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -13,8 +14,11 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.setPadding
 import androidx.fragment.app.DialogFragment
+import com.pelmenstar.projktSens.shared.android.RectDrawable
+import com.pelmenstar.projktSens.shared.android.ext.obtainStyledAttributes
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.weather.app.PermissionUtils
 import com.pelmenstar.projktSens.weather.app.R
@@ -48,8 +52,24 @@ class RequestLocationPermissionDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return FrameLayout(requireContext()) {
+        val context = requireContext()
+        val theme = context.theme
+        val res = context.resources
+
+        return FrameLayout(context) {
             content = this
+
+            val fillColor: Int
+            theme.obtainStyledAttributes(R.style.AppTheme, android.R.attr.colorBackground) {
+                fillColor = it.getColor(0, Color.BLACK)
+            }
+
+            val strokeColor = ResourcesCompat.getColor(res, R.color.colorPrimary, theme)
+
+            background = RectDrawable.strokeAndFill(
+                strokeColor, res.getDimension(R.dimen.requestLocPerm_roundRectStrokeWidth),
+                fillColor
+            )
         }
     }
 

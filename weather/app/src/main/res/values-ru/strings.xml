@@ -57,8 +57,7 @@
     <string name="gpsIsNotGranted">Приложение не может использовать GPS</string>
     <string name="allowGps">Разрешить</string>
     <string name="locDependentActivity_requestLocPerm_gpsNeverShowAgain">
-        Вы выбрали \'Не запитувати нову\' \n
-        Щоб продовжити, потрібно перейти в налаштування.
+        Вы выбрали \'Не запитувати нову\' \nЩоб продовжити, потрібно перейти в налаштування.
     </string>
     <string name="goToSettings">В налаштування</string>
 

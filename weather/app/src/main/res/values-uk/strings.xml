@@ -57,8 +57,7 @@
     <string name="gpsIsNotGranted">Застосунок не може використовувати GPS</string>
     <string name="allowGps">Дозволити</string>
     <string name="locDependentActivity_requestLocPerm_gpsNeverShowAgain">
-        You\'ve checked \'Never show again\'. \n
-        To continue you have to go to the settings.
+        You\'ve checked \'Never show again\'. \nTo continue you have to go to the settings.
     </string>
     <string name="goToSettings">Go to the settings</string>
 
