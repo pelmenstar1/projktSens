@@ -3,13 +3,6 @@
     <string name="serverUnavailable">Проблеми з сервером</string>
     <string name="appName">Погода</string>
 
-    <string name="permissionGps_userDescription">Треба GPS</string>
-    <string name="permissionGps_whyText">
-        Застосунок викрористовую GPS, щоб дізнатися де Ви.
-        Ваше місцезнаходженя буде використано, щоб визначить час сходу та заходу Сонця.
-        Без GPS, застосунок не зможе давати вам цю інформацію.
-    </string>
-
     <string name="sunsetSunriseActionBarTitle">Схід-Захід</string>
 
     <string name="weather">Погода</string>

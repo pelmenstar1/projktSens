@@ -1,14 +1,6 @@
 <resources>
-
     <string name="serverUnavailable">Server is unavailable</string>
     <string name="appName">Weather</string>
-
-    <string name="permissionGps_userDescription">Need GPS to work</string>
-    <string name="permissionGps_whyText">
-        App needs GPS to determine where you are.
-        Your location will be used to determine time of sunrise, sunset in your location.
-        Without location we won\'t be able to provide you such information.
-    </string>
 
     <string name="sunsetSunriseActionBarTitle">Sunrise-sunset</string>
 
