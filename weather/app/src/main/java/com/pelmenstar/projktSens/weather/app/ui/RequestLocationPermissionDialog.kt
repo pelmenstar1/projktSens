@@ -9,6 +9,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -20,7 +21,6 @@ import com.pelmenstar.projktSens.weather.app.R
 
 @RequiresApi(23)
 class RequestLocationPermissionDialog : DialogFragment() {
-    private lateinit var content: LinearLayout
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
@@ -31,12 +31,16 @@ class RequestLocationPermissionDialog : DialogFragment() {
         }
     }
 
-    private var notGrantedContent: View? = null
-    private var neverShowAgainContent: View? = null
+    private lateinit var content: FrameLayout
+    private val notGrantedContent: View by lazy { createNotGrantedContent() }
+    private val neverShowAgainContent: View by lazy { createNeverShowAgainContent() }
 
     private lateinit var defTextAppearance: TextAppearance
 
-    var isLocationPermissionGranted: Boolean = false
+    private var _isLocPermGranted = false
+    val isLocationPermissionGranted: Boolean
+        get() = _isLocPermGranted
+
     var onDismissCallback: (() -> Unit)? = null
 
     override fun onCreateView(
@@ -44,7 +48,7 @@ class RequestLocationPermissionDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return LinearLayout(requireContext()) {
+        return FrameLayout(requireContext()) {
             content = this
         }
     }
@@ -61,23 +65,17 @@ class RequestLocationPermissionDialog : DialogFragment() {
     }
 
     private fun setState(state: Int) {
-        content.removeAllViews()
+        val c = content
+
+        c.removeAllViews()
 
         when (state) {
             STATE_NOT_GRANTED -> {
-                if (notGrantedContent == null) {
-                    notGrantedContent = createNotGrantedContent()
-                }
-
-                content.addView(notGrantedContent)
+                c.addView(notGrantedContent)
             }
 
             STATE_NEVER_SHOW_AGAIN -> {
-                if (neverShowAgainContent == null) {
-                    neverShowAgainContent = createNeverShowAgainContent()
-                }
-
-                content.addView(neverShowAgainContent)
+                c.addView(neverShowAgainContent)
             }
         }
     }
@@ -105,10 +103,7 @@ class RequestLocationPermissionDialog : DialogFragment() {
                 }
 
                 setText(R.string.allowGps)
-
-                setOnClickListener {
-                    requestGps()
-                }
+                setOnClickListener { requestGps() }
             }
         }
     }
@@ -136,10 +131,7 @@ class RequestLocationPermissionDialog : DialogFragment() {
                 }
 
                 setText(R.string.goToSettings)
-
-                setOnClickListener {
-                    goToSettingPermissions()
-                }
+                setOnClickListener { goToSettingPermissions() }
             }
         }
     }
@@ -158,7 +150,7 @@ class RequestLocationPermissionDialog : DialogFragment() {
     }
 
     private fun dismissWithLocationGranted() {
-        isLocationPermissionGranted = true
+        _isLocPermGranted = true
         dismiss()
     }
 
