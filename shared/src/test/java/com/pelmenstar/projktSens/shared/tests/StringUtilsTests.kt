@@ -1,9 +1,7 @@
 package com.pelmenstar.projktSens.shared.tests
 
 import com.pelmenstar.projktSens.shared.StringUtils
-import com.pelmenstar.projktSens.shared.round
 import org.junit.Test
-import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 
