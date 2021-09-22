@@ -6,7 +6,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteStatement
 import android.os.CancellationSignal
-import com.pelmenstar.projktSens.shared.UnitResult
+import com.pelmenstar.projktSens.shared.resumeWithSuccess
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.suspendCoroutine
@@ -47,7 +47,7 @@ suspend inline fun SQLiteStatement.executeUpdateDeleteSuspend() {
     return suspendCoroutine { cont ->
         executeUpdateDelete()
 
-        cont.resumeWith(UnitResult.SUCCESS)
+        cont.resumeWithSuccess()
     }
 }
 
@@ -59,6 +59,6 @@ suspend inline fun SQLiteStatement.executeInsertSuspend() {
     return suspendCoroutine { cont ->
         executeInsert()
 
-        cont.resumeWith(UnitResult.SUCCESS)
+        cont.resumeWithSuccess()
     }
 }

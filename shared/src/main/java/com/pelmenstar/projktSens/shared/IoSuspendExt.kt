@@ -16,14 +16,14 @@ import kotlin.math.min
 suspend fun Socket.connectSuspend(address: SocketAddress) {
     suspendCoroutine<Unit> { cont ->
         connect(address)
-        cont.resumeWith(UnitResult.SUCCESS)
+        cont.resumeWithSuccess()
     }
 }
 
 suspend fun Socket.connectSuspend(address: SocketAddress, timeout: Int) {
     suspendCoroutine<Unit> { cont ->
         connect(address, timeout)
-        cont.resumeWith(UnitResult.SUCCESS)
+        cont.resumeWithSuccess()
     }
 }
 
@@ -33,7 +33,7 @@ suspend fun Socket.connectSuspend(address: SocketAddress, timeout: Int) {
 suspend fun ServerSocket.bindSuspend(address: SocketAddress, backlog: Int) {
     suspendCoroutine<Unit> { cont ->
         bind(address, backlog)
-        cont.resumeWith(UnitResult.SUCCESS)
+        cont.resumeWithSuccess()
     }
 }
 
@@ -54,7 +54,7 @@ suspend fun ServerSocket.acceptSuspend(): Socket {
 suspend fun OutputStream.writeSuspend(buffer: ByteArray) {
     suspendCoroutine<Unit> { cont ->
         write(buffer, 0, buffer.size)
-        cont.resumeWith(UnitResult.SUCCESS)
+        cont.resumeWithSuccess()
     }
 }
 
@@ -109,7 +109,7 @@ suspend fun InputStream.readSuspendAndThrowIfNotEnough(
             throw IOException("Cannot read data")
         }
 
-        cont.resumeWith(UnitResult.SUCCESS)
+        cont.resumeWithSuccess()
     }
 }
 

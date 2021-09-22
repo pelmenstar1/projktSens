@@ -1,15 +1,12 @@
 package com.pelmenstar.projktSens.shared
 
-/**
- * Contains types of result, value of which is represented in [Unit].
- * The main reason to use [UnitResult.SUCCESS] and not to use [Result.success] is that
- * all the same [Unit] contains no value,
- * so constant reference can be passed to methods that require [Result] of [Unit] type
- */
-object UnitResult {
-    /**
-     * Read-only reference to [Result] of [Unit] type
-     */
-    @JvmField
-    val SUCCESS = Result.success(Unit)
+import kotlin.coroutines.Continuation
+
+
+private val UNIT_RESULT = Result.success(Unit)
+
+fun unitResult(): Result<Unit> = UNIT_RESULT
+
+fun Continuation<Unit>.resumeWithSuccess() {
+    resumeWith(UNIT_RESULT)
 }
