@@ -14,6 +14,7 @@ import com.pelmenstar.projktSens.shared.android.ext.Message
 import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
 import com.pelmenstar.projktSens.shared.serialization.Serializable
+import com.pelmenstar.projktSens.shared.smartLazy
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
@@ -35,10 +36,10 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(
 
     private var transitionView: TransitionView? = null
 
-    private var loadingView: View? = null
-    private var noDataView: View? = null
-    private var errorView: View? = null
-    private var noNetworkView: View? = null
+    private var loadingView = smartLazy { createLoadingView() }
+    private var noDataView = smartLazy { createNoDataView() }
+    private var errorView = smartLazy { createErrorView() }
+    private var noNetworkView = smartLazy { createNoNetworkView() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,33 +129,17 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(
 
         when (status) {
             STATUS_NO_NETWORK -> {
-                if (noNetworkView == null) {
-                    noNetworkView = createNoNetworkView()
-                }
-
-                setContentView(noNetworkView)
+                setContentView(noNetworkView.get())
             }
             STATUS_LOADING -> {
-                if (loadingView == null) {
-                    loadingView = createLoadingView()
-                }
-
                 transitionView?.startTransition()
-                setContentView(loadingView)
+                setContentView(loadingView.get())
             }
             STATUS_NO_DATA -> {
-                if (noDataView == null) {
-                    noDataView = createNoDataView()
-                }
-
-                setContentView(noDataView)
+                setContentView(noDataView.get())
             }
             STATUS_ERROR -> {
-                if (errorView == null) {
-                    errorView = createErrorView()
-                }
-
-                setContentView(errorView)
+                setContentView(errorView.get())
             }
             STATUS_OK -> {
                 val r = synchronized(lock) {
@@ -168,10 +153,10 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(
 
                 transitionView = null
 
-                noDataView = null
-                errorView = null
-                loadingView = null
-                noNetworkView = null
+                noDataView.setNull()
+                errorView.setNull()
+                loadingView.setNull()
+                noNetworkView.setNull()
 
                 setContentView(createChartView(r))
             }
