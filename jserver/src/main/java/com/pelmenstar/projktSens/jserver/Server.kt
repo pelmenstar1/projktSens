@@ -142,7 +142,18 @@ class Server(
                         return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
-                    val date = arg as Int
+                    val date: Int
+
+                    if(arg is Request.Argument.Integer) {
+                        date = arg.value
+                    } else {
+                        log error {
+                            append("Invalid type of argument (")
+                            append(Request.Argument.typeToString(arg.type))
+                            append(')')
+                        }
+                        return Response.error(Errors.INVALID_ARGUMENTS)
+                    }
 
                     if (!ShortDate.isValid(date)) {
                         return Response.error(Errors.INVALID_ARGUMENTS)
@@ -162,7 +173,17 @@ class Server(
                         return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
-                    val range = arg as ShortDateRange
+                    val range: ShortDateRange
+                    if(arg is Request.Argument.DateRange) {
+                        range = arg.value
+                    } else {
+                        log error {
+                            append("Invalid type of argument (")
+                            append(Request.Argument.typeToString(arg.type))
+                            append(')')
+                        }
+                        return Response.error(Errors.INVALID_ARGUMENTS)
+                    }
 
                     log info {
                         append("range=")

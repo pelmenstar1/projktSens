@@ -9,8 +9,8 @@ import com.pelmenstar.projktSens.jserver.repo.DbServerWeatherRepository
 import com.pelmenstar.projktSens.serverProtocol.ContractType
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfigImpl
-import com.pelmenstar.projktSens.weather.models.WeatherInfoProvider
-import com.pelmenstar.projktSens.weather.models.WeatherRepository
+import com.pelmenstar.projktSens.shared.time.ShortDateRange
+import com.pelmenstar.projktSens.weather.models.*
 import dagger.Module
 import dagger.Provides
 import java.net.InetAddress
@@ -19,7 +19,35 @@ import java.net.InetSocketAddress
 @Module
 open class AppModule(private val context: Context) {
     private val host by lazy { DeviceInetUtils.getInetAddress(context)!! }
-    private val weatherRepo by lazy { DbServerWeatherRepository.file(context) }
+    private val weatherRepo by lazy {
+        object: WeatherRepository {
+            override suspend fun putMany(values: Array<WeatherInfo>) {
+            }
+
+            override suspend fun put(weather: WeatherInfo) {
+            }
+
+            override suspend fun clear() {
+            }
+
+            override suspend fun getDayReport(date: Int): DayReport? {
+                return RandomWeatherDataSource.getDayReport(date)
+            }
+
+            override suspend fun getDayRangeReport(range: ShortDateRange): DayRangeReport? {
+                return RandomWeatherDataSource.getDayRangeReport(range)
+            }
+
+            override suspend fun getAvailableDateRange(): ShortDateRange? {
+                return RandomWeatherDataSource.getAvailableDateRange()
+            }
+
+            override suspend fun getLastWeather(): WeatherInfo? {
+                return RandomWeatherDataSource.getLastWeather()
+            }
+
+        }
+    }
     private val weatherProvider by lazy { SensorWeatherProvider() }
     private val loggerConfig by lazy {
         LoggerConfig(AndroidLogDelegate, minLogLevel = LogLevel.DEBUG)

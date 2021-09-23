@@ -5,6 +5,7 @@ package com.pelmenstar.projktSens.weather.app
 import com.pelmenstar.projktSens.serverProtocol.Client
 import com.pelmenstar.projktSens.serverProtocol.Commands
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
+import com.pelmenstar.projktSens.serverProtocol.Request
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
@@ -16,26 +17,31 @@ class NetworkDataSource(config: ProtoConfig) : WeatherDataSource {
     override suspend fun getDayReport(@ShortDateInt date: Int): DayReport? {
         require(ShortDate.isValid(date)) { "date" }
 
-        return useClient { request(Commands.GET_DAY_REPORT, date) }
+        return requestRethrow(
+            Commands.GET_DAY_REPORT, Request.Argument.Integer(date), DayReport::class.java
+        )
     }
 
     override suspend fun getDayRangeReport(range: ShortDateRange): DayRangeReport? {
-        return useClient { request(Commands.GET_DAY_RANGE_REPORT, range) }
+        return requestRethrow(
+            Commands.GET_DAY_RANGE_REPORT, Request.Argument.DateRange(range), DayRangeReport::class.java
+        )
     }
 
     override suspend fun getAvailableDateRange(): ShortDateRange? {
-        return useClient { request(Commands.GET_AVAILABLE_DATE_RANGE) }
+        return requestRethrow(Commands.GET_AVAILABLE_DATE_RANGE, null, ShortDateRange::class.java)
     }
 
     override suspend fun getLastWeather(): WeatherInfo? {
-        return useClient { request(Commands.GET_LAST_WEATHER) }
+        return requestRethrow(Commands.GET_LAST_WEATHER, null, WeatherInfo::class.java)
     }
 
-    private inline fun <T> useClient(
-        expr: Client.() -> T
-    ): T {
+    private suspend fun <T : Any> requestRethrow(
+        command: Int, arg: Request.Argument?,
+        responseClass: Class<T>
+    ): T? {
         return try {
-            expr(client)
+            client.request(Request(command, arg), responseClass)
         } catch (e: Exception) {
             throw DataSourceException(e)
         }

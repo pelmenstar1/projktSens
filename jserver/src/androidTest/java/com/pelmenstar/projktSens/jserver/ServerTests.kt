@@ -58,7 +58,9 @@ class ServerTests {
     @Test
     fun genDayReport_returns_invalid_args_error_if_date_was_invalid() {
         runBlocking {
-            val response = client.requestRawResponse<Any>(Commands.GET_DAY_REPORT, ShortDate.NONE)
+            val response = client.requestRawResponse<Any>(
+                Commands.GET_DAY_REPORT, Request.Argument.Integer(ShortDate.NONE)
+            )
             val error = (response as Response.Error).error
 
             assertEquals(Errors.INVALID_ARGUMENTS, error)
@@ -71,7 +73,9 @@ class ServerTests {
             val nowDate = ShortDate.now()
             weatherRepo.debugGenDb(nowDate, 48)
 
-            val report = client.request<DayReport>(Commands.GET_DAY_REPORT, nowDate)
+            val report = client.request<DayReport>(
+                Commands.GET_DAY_REPORT, Request.Argument.Integer(nowDate)
+            )
             assertNotNull(report)
         }
     }
@@ -82,7 +86,9 @@ class ServerTests {
             val nowDate = ShortDate.now()
             weatherRepo.clear()
 
-            val response = client.requestRawResponse<Any>(Commands.GET_DAY_REPORT, nowDate)
+            val response = client.requestRawResponse<Any>(
+                Commands.GET_DAY_REPORT, Request.Argument.Integer(nowDate)
+            )
 
             assertTrue(response.isEmpty())
         }
@@ -95,7 +101,7 @@ class ServerTests {
 
             val response = client.requestRawResponse<Any>(
                 Commands.GET_DAY_REPORT,
-                ShortDate.minusDays(nowDate, 3)
+                Request.Argument.Integer(ShortDate.minusDays(nowDate, 3))
             )
 
             assertTrue(response.isEmpty())
@@ -123,7 +129,7 @@ class ServerTests {
 
             val report = client.request<DayRangeReport>(
                 Commands.GET_DAY_RANGE_REPORT,
-                ShortDateRange(nowDate, ShortDate.plusDays(nowDate, 1))
+                Request.Argument.DateRange(nowDate, ShortDate.plusDays(nowDate, 1))
             )
 
             assertNotNull(report)
@@ -138,7 +144,7 @@ class ServerTests {
 
             val response = client.requestRawResponse<Any>(
                 Commands.GET_DAY_RANGE_REPORT,
-                ShortDateRange(nowDate, ShortDate.plusDays(nowDate, 1))
+                Request.Argument.DateRange(nowDate, ShortDate.plusDays(nowDate, 1))
             )
 
             assertTrue(response.isEmpty())
@@ -153,7 +159,10 @@ class ServerTests {
 
             val response = client.requestRawResponse<Any>(
                 Commands.GET_DAY_RANGE_REPORT,
-                ShortDateRange(ShortDate.minusDays(nowDate, 3), ShortDate.minusDays(nowDate, 2))
+                Request.Argument.DateRange(
+                    ShortDate.minusDays(nowDate, 3),
+                    ShortDate.minusDays(nowDate, 2)
+                )
             )
 
             assertTrue(response.isEmpty())

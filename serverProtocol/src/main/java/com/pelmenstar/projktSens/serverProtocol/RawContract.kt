@@ -3,8 +3,8 @@ package com.pelmenstar.projktSens.serverProtocol
 import com.pelmenstar.projktSens.shared.*
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
 import com.pelmenstar.projktSens.shared.serialization.Serializable
-import com.pelmenstar.projktSens.shared.serialization.ValueReader
 import com.pelmenstar.projktSens.shared.serialization.ValueWriter
+import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -26,20 +26,25 @@ object RawContract : Contract {
 
         val buffer: ByteArray
         if (arg == null) {
-            buffer = ByteArray(5)
+            buffer = ByteArray(2)
             buffer[0] = command
         } else {
-            val argClass = arg.javaClass
-            val argClassName = argClass.name
-            val serializer = Serializable.getSerializer(argClass)
-            val objectSize = serializer.getSerializedObjectSize(arg)
-
-            buffer = buildByteArray(objectSize + argClassName.length + 5) {
-                this[0] = command
-                writeShort(1, objectSize.toShort())
-                writeShort(3, argClassName.length.toShort())
-                serializer.writeObject(arg, ValueWriter(this, 5))
-                StringUtils.writeAsciiBytes(argClassName, this, objectSize + 5)
+            buffer = when(arg) {
+                is Request.Argument.Integer -> {
+                     buildByteArray(6) {
+                        this[0] = command
+                        this[1] = Request.Argument.TYPE_INTEGER.toByte()
+                        writeInt(2, arg.value)
+                    }
+                }
+                is Request.Argument.DateRange -> {
+                    buildByteArray(10) {
+                        this[0] = command
+                        this[1] = Request.Argument.TYPE_DATE_RANGE.toByte()
+                        writeInt(2, arg.value.start)
+                        writeInt(6, arg.value.endInclusive)
+                    }
+                }
             }
         }
 
@@ -47,28 +52,33 @@ object RawContract : Contract {
     }
 
     override suspend fun readRequest(input: InputStream): Request {
-        val header = input.readNSuspend(5)
+        val header = input.readNSuspend(2)
 
         val command = header[0].toInt() and 0xff
-        val argContentLength = header.getShort(1).toInt()
-        val argClassNameLength = header.getShort(3).toInt()
+        val argType = header[1].toInt() and 0xff
+        val arg: Request.Argument?
 
-        val argBytes: ByteArray
+        when(argType) {
+            Request.Argument.TYPE_NULL -> {
+                arg = null
+            }
+            Request.Argument.TYPE_INTEGER -> {
+                val buffer = input.readNSuspend(4)
 
-        when {
-            argContentLength == 0 -> {
-                return Request(command)
+                arg = Request.Argument.Integer(buffer.getInt(0))
             }
-            argContentLength > 0 -> {
-                argBytes = input.readNSuspend(argContentLength + argClassNameLength)
+            Request.Argument.TYPE_DATE_RANGE -> {
+                val buffer = input.readNSuspend(8)
+
+                val start = buffer.getInt(0)
+                val end = buffer.getInt(4)
+
+                arg = Request.Argument.DateRange(ShortDateRange(start, end))
             }
-            else -> throw IOException()
+            else -> {
+                throw RuntimeException("Invalid argType ($argType)")
+            }
         }
-
-        val argClassName = String(argBytes, argContentLength, argClassNameLength, Charsets.US_ASCII)
-
-        val serializer = Serializable.getSerializer(Class.forName(argClassName))
-        val arg = serializer.readObject(ValueReader(argBytes))
 
         return Request(command, arg)
     }

@@ -57,6 +57,10 @@ class Logger(val area: String, val config: LoggerConfig) {
         log(LogLevel.ERROR, message)
     }
 
+    infix fun error(messageBuilder: StringBuilder.() -> Unit) {
+        log(LogLevel.ERROR, messageBuilder)
+    }
+
     /**
      * Prints stacktrace of [Throwable] with [LogLevel.ERROR] priority
      */

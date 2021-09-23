@@ -1,5 +1,7 @@
 package com.pelmenstar.projktSens.serverProtocol
 
+import com.pelmenstar.projktSens.shared.time.ShortDate
+import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import org.junit.Test
 import kotlin.random.Random
 
@@ -20,15 +22,14 @@ class RawContractTests {
 
     @Test
     fun repoRequest_with_args() {
-        fun testCase(command: Int) {
-            val argsBytes = Random(0).nextBytes(64)
-            val request = Request(command, TestObject(argsBytes))
-
-            ContractTestUtils.test(RawContract, request)
+        fun testCase(command: Int, arg: Request.Argument? = null) {
+            ContractTestUtils.test(RawContract, Request(command, arg))
         }
 
-        testCase(Commands.GET_DAY_REPORT)
-        testCase(Commands.GET_DAY_RANGE_REPORT)
+        testCase(Commands.GET_DAY_REPORT, Request.Argument.Integer(123))
+        testCase(Commands.GET_DAY_RANGE_REPORT, Request.Argument.DateRange(
+            ShortDateRange(ShortDate.now(), ShortDate.nowAndPlusDays(1))
+        ))
         testCase(Commands.GET_AVAILABLE_DATE_RANGE)
         testCase(Commands.GET_LAST_WEATHER)
     }

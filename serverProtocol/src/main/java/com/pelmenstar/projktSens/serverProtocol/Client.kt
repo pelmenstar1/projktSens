@@ -15,7 +15,7 @@ class Client(config: ProtoConfig) {
         return request(Request(command), responseValueClass)
     }
 
-    suspend inline fun <T : Any> request(command: Int, arg: Any, responseValueClass: Class<T>): T? {
+    suspend inline fun <T : Any> request(command: Int, arg: Request.Argument, responseValueClass: Class<T>): T? {
         return request(Request(command, arg), responseValueClass)
     }
 
@@ -23,7 +23,7 @@ class Client(config: ProtoConfig) {
         return request(command, T::class.java)
     }
 
-    suspend inline fun <reified T : Any> request(command: Int, arg: Any): T? {
+    suspend inline fun <reified T : Any> request(command: Int, arg: Request.Argument): T? {
         return request(command, arg, T::class.java)
     }
 
@@ -60,7 +60,7 @@ class Client(config: ProtoConfig) {
         return requestRawResponse(command, T::class.java)
     }
 
-    suspend inline fun <reified T : Any> requestRawResponse(command: Int, arg: Any): Response {
+    suspend inline fun <reified T : Any> requestRawResponse(command: Int, arg: Request.Argument): Response {
         return requestRawResponse(command, arg, T::class.java)
     }
 
@@ -70,7 +70,7 @@ class Client(config: ProtoConfig) {
 
     suspend inline fun requestRawResponse(
         command: Int,
-        arg: Any,
+        arg: Request.Argument,
         responseValueClass: Class<*>
     ): Response {
         return requestRawResponse(Request(command, arg), responseValueClass)
