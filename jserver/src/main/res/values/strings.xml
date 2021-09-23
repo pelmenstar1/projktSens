@@ -17,6 +17,5 @@
 
     <string-array name="serverContracts">
         <item>Raw</item>
-        <item>JSON</item>
     </string-array>
 </resources>

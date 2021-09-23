@@ -139,7 +139,6 @@ class ServerContractSetting : Setting<ServerContractSetting.State>() {
             setSelection(
                 when (state.contractType) {
                     ContractType.RAW -> 0
-                    ContractType.JSON -> 1
                     else -> throw RuntimeException("Invalid state.contractType")
                 }
             )
@@ -153,8 +152,6 @@ class ServerContractSetting : Setting<ServerContractSetting.State>() {
                 ) {
                     state.contractType = when (position) {
                         0 -> ContractType.RAW
-                        1 -> ContractType.JSON
-
                         else -> return
                     }
                 }

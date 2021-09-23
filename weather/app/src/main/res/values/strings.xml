@@ -54,7 +54,6 @@
 
     <string-array name="serverContracts" translatable="false">
         <item>Raw</item>
-        <item>Json</item>
     </string-array>
 
     <string-array name="months">

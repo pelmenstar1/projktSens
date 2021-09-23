@@ -50,7 +50,6 @@ class ChooseServerContractScreen : FirstStartScreen<ChooseServerContractScreen.S
                 setSelection(
                     when (state.contractType) {
                         ContractType.RAW -> 0
-                        ContractType.JSON -> 1
                         else -> throw RuntimeException()
                     }
                 )
@@ -64,7 +63,6 @@ class ChooseServerContractScreen : FirstStartScreen<ChooseServerContractScreen.S
                     ) {
                         state.contractType = when (position) {
                             0 -> ContractType.RAW
-                            1 -> ContractType.JSON
                             else -> throw RuntimeException()
                         }
                     }
