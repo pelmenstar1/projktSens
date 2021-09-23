@@ -249,8 +249,6 @@ public final class DayRangeReport extends AppendableToStringBuilder {
             }
 
             if (currentDate != date || i == maxIdx) {
-                currentDate = date;
-
                 Entry e = new Entry(
                         currentDate,
                         dayMinTemp, dayMaxTemp,
@@ -271,6 +269,8 @@ public final class DayRangeReport extends AppendableToStringBuilder {
 
                 dayMinPress = Float.MAX_VALUE;
                 dayMaxPress = Float.MIN_VALUE;
+
+                currentDate = date;
             }
 
             // day min-max
