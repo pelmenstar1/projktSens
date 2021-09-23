@@ -195,6 +195,8 @@ public final class ComplexWeatherView extends View {
 
     public void setWeather(@NotNull WeatherInfo value) {
         weatherBlockSubcomponent.setWeather(value);
+
+        invalidate();
     }
 
     private void updateComponentPositionsAffectedByDayState(float w, float h) {
