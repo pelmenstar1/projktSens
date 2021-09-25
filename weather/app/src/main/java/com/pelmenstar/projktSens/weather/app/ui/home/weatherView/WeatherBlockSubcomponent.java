@@ -3,7 +3,6 @@ package com.pelmenstar.projktSens.weather.app.ui.home.weatherView;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 
@@ -173,21 +172,21 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
         float tempTopY = 0.5f * (height - totalTextHeight);
         float tempY = tempTopY + tempHeight;
 
-        tempStrPos = PackedPointF.of(tempX, tempY);
+        tempStrPos = PackedPointF.create(tempX, tempY);
 
-        tempUnitStrPos = PackedPointF.of(
+        tempUnitStrPos = PackedPointF.create(
                 tempX + tempWidth + tempUnitMarginLeft,
                 tempTopY + tempUnitHeight
         );
 
         float humY = textMarginTop + tempY + humHeight + tempMarginBottom;
-        humStrPos = PackedPointF.of(
+        humStrPos = PackedPointF.create(
                 textCenterX(width, humWidth),
                 humY
         );
 
         float pressY = textMarginTop + humY + pressHeight;
-        pressStrPos = PackedPointF.of(
+        pressStrPos = PackedPointF.create(
                 textCenterX(width, pressWidth),
                 pressY
         );
@@ -204,7 +203,7 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
         float right = left + getWidth();
         float bottom = top + getHeight();
 
-        long offset = PackedPointF.of(left, top);
+        long offset = PackedPointF.create(left, top);
 
         float halfThickness = borderThickness * 0.5f;
 

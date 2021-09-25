@@ -13,7 +13,7 @@ import kotlin.test.assertFails
 
 class ShortDateTimeTests {
     @Test
-    fun of() {
+    fun create() {
         val random = Random(0)
 
         repeat(50) {
@@ -21,10 +21,10 @@ class ShortDateTimeTests {
             val month = random.nextInt(1, 12)
             val day = random.nextInt(1, TimeUtils.getDaysInMonth(year, month) + 1)
 
-            val shortDate = ShortDate.of(year, month, day)
+            val shortDate = ShortDate.create(year, month, day)
             val time = random.nextInt(TimeConstants.SECONDS_IN_DAY)
 
-            val dateTime = ShortDateTime.of(shortDate, time)
+            val dateTime = ShortDateTime.create(shortDate, time)
 
             assertEquals(shortDate, ShortDateTime.getDate(dateTime))
             assertEquals(time, ShortDateTime.getTime(dateTime))
@@ -32,10 +32,10 @@ class ShortDateTimeTests {
     }
 
     @Test
-    fun of_fails_on_invalid_args() {
+    fun create_fails_on_invalid_args() {
         fun assertOfFails(year: Int, month: Int, day: Int, time: Int) {
             assertFails {
-                ShortDateTime.of(ShortDate.ofInternal(year, month, day), time)
+                ShortDateTime.create(ShortDate.createInternal(year, month, day), time)
             }
         }
 
@@ -70,7 +70,7 @@ class ShortDateTimeTests {
             val epoch = random.nextLong(UNTIL_9999_YEAR)
             val dateTime = LocalDateTime.ofEpochSecond(epoch, 0, ZoneOffset.UTC)
 
-            val input = ShortDateTime.of(
+            val input = ShortDateTime.create(
                     dateTime.year,
                     dateTime.monthValue,
                     dateTime.dayOfMonth,
@@ -90,7 +90,7 @@ class ShortDateTimeTests {
         repeat(100) {
             val input = random.nextLong(UNTIL_9999_YEAR)
             val dateTime = LocalDateTime.ofEpochSecond(input, 0, ZoneOffset.UTC)
-            val expected = ShortDateTime.of(
+            val expected = ShortDateTime.create(
                 dateTime.year,
                 dateTime.monthValue,
                 dateTime.dayOfMonth,

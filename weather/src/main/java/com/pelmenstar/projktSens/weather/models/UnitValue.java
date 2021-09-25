@@ -1,6 +1,5 @@
 package com.pelmenstar.projktSens.weather.models;
 
-import com.pelmenstar.projktSens.shared.FloatPair;
 import com.pelmenstar.projktSens.shared.IntPair;
 import com.pelmenstar.projktSens.shared.serialization.ValidationException;
 
@@ -12,14 +11,14 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class UnitValue {
     private static final long[] UNIT_RANGES = new long[] {
-            IntPair.of(-100, 100), // celsius
-            IntPair.of(-148, 212), // fahrenheit
-            IntPair.of(173, 373), // kelvin
+            IntPair.create(-100, 100), // celsius
+            IntPair.create(-148, 212), // fahrenheit
+            IntPair.create(173, 373), // kelvin
 
-            IntPair.of(0, 100), // humidity
+            IntPair.create(0, 100), // humidity
 
-            IntPair.of(0, 1000), // mm of mercury
-            IntPair.of(0, 133322) // pascal
+            IntPair.create(0, 1000), // mm of mercury
+            IntPair.create(0, 133322) // pascal
     };
 
     /**

@@ -88,9 +88,9 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
             val press = UnitValue.getValue(dayEntry.pressure, pressUnit, prefPressUnit)
             val x = time.toFloat()
 
-            tempEntries[i] = Entry.of(x, temp)
-            humEntries[i] = Entry.of(x, dayEntry.humidity)
-            pressEntries[i] = Entry.of(x, press)
+            tempEntries[i] = Entry.create(x, temp)
+            humEntries[i] = Entry.create(x, dayEntry.humidity)
+            pressEntries[i] = Entry.create(x, press)
         }
 
         val tempDataSet = DataSet(tempEntries, tempChartValueFormatter).customizeOptions(colorPrimary)

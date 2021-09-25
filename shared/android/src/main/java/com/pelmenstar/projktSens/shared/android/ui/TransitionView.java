@@ -332,7 +332,7 @@ public final class TransitionView extends View {
                 float sin = (float) Math.sin(dAngle);
                 float cos = (float) Math.cos(dAngle);
 
-                sinCosTable[i] = FloatPair.of(sin, cos);
+                sinCosTable[i] = FloatPair.create(sin, cos);
 
                 currentAngle += radPerSide;
             }

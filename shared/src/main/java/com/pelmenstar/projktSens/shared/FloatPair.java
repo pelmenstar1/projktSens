@@ -12,8 +12,8 @@ public final class FloatPair {
      * @param first  first float
      * @param second second float
      */
-    public static long of(float first, float second) {
-        return IntPair.of(Float.floatToIntBits(first), Float.floatToIntBits(second));
+    public static long create(float first, float second) {
+        return IntPair.create(Float.floatToIntBits(first), Float.floatToIntBits(second));
     }
 
     /**

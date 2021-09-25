@@ -10,8 +10,8 @@ public final class PackedPointF {
      * @param x x-axis value
      * @param y y-axis value
      */
-    public static long of(float x, float y) {
-        return FloatPair.of(x, y);
+    public static long create(float x, float y) {
+        return FloatPair.create(x, y);
     }
 
     /**

@@ -41,8 +41,8 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
         year = yearMonth / 12
         month = yearMonth - year * 12
 
-        startDate = ShortDate.of(year, month, 1)
-        endDate = ShortDate.of(year, month, TimeUtils.getDaysInMonth(year, month))
+        startDate = ShortDate.create(year, month, 1)
+        endDate = ShortDate.create(year, month, TimeUtils.getDaysInMonth(year, month))
 
         appComponent = DaggerAppComponent
             .builder()
@@ -104,12 +104,12 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
                 UnitValue.getValue(reportEntry.maxPressure, pressUnit, prefPressUnit)
             val x = ShortDate.getDayOfMonth(reportEntry.date).toFloat()
 
-            minTempEntries[i] = Entry.of(x, minTemp)
-            maxTempEntries[i] = Entry.of(x, maxTemp)
-            minHumEntries[i] = Entry.of(x, reportEntry.minHumidity)
-            maxHumEntries[i] = Entry.of(x, reportEntry.maxHumidity)
-            minPressEntries[i] = Entry.of(x, minPress)
-            maxPressEntries[i] = Entry.of(x, maxPress)
+            minTempEntries[i] = Entry.create(x, minTemp)
+            maxTempEntries[i] = Entry.create(x, maxTemp)
+            minHumEntries[i] = Entry.create(x, reportEntry.minHumidity)
+            maxHumEntries[i] = Entry.create(x, reportEntry.maxHumidity)
+            minPressEntries[i] = Entry.create(x, minPress)
+            maxPressEntries[i] = Entry.create(x, maxPress)
         }
 
         val tempFormatter = UnitChartValueFormatter(unitFormatter, prefTempUnit)

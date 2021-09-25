@@ -14,8 +14,8 @@ public final class Entry {
     /**
      * Packs given x and y value to long.
      */
-    public static long of(float x, float y) {
-        return FloatPair.of(x, y);
+    public static long create(float x, float y) {
+        return FloatPair.create(x, y);
     }
 
     /**

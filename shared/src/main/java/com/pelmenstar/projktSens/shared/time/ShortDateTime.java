@@ -24,7 +24,7 @@ public final class ShortDateTime {
      * @throws IllegalArgumentException if date or time are invalid
      */
     @ShortDateTimeLong
-    public static long of(@ShortDateInt int date, @TimeInt int time) {
+    public static long create(@ShortDateInt int date, @TimeInt int time) {
         if (!ShortDate.isValid(date)) {
             throw new IllegalArgumentException("date");
         }
@@ -33,7 +33,7 @@ public final class ShortDateTime {
             throw new IllegalArgumentException("time");
         }
 
-        return ofInternal(date, time);
+        return createInternal(date, time);
     }
 
     /**
@@ -46,15 +46,15 @@ public final class ShortDateTime {
      * @throws IllegalArgumentException if year, month, day of month or time are invalid
      */
     @ShortDateTimeLong
-    public static long of(int year, int month, int day, @TimeInt int time) {
+    public static long create(int year, int month, int day, @TimeInt int time) {
         if (!ShortTime.isValid(time)) {
             throw new IllegalArgumentException("time");
         }
 
-        return ofInternal(ShortDate.of(year, month, day), time);
+        return createInternal(ShortDate.create(year, month, day), time);
     }
 
-    private static long ofInternal(@ShortDateInt int date, @TimeInt int time) {
+    private static long createInternal(@ShortDateInt int date, @TimeInt int time) {
         return ((long) (date & 0x7FFFFF) << 17) | ((long) time & 0x1FFFF);
     }
 
@@ -70,7 +70,7 @@ public final class ShortDateTime {
             throw new IllegalArgumentException("date");
         }
 
-        return ofInternal(date, 0);
+        return createInternal(date, 0);
     }
 
     /**
@@ -85,7 +85,7 @@ public final class ShortDateTime {
             throw new IllegalArgumentException("date");
         }
 
-        return ofInternal(date, TimeConstants.SECONDS_IN_DAY - 1);
+        return createInternal(date, TimeConstants.SECONDS_IN_DAY - 1);
     }
 
     /**
@@ -138,7 +138,7 @@ public final class ShortDateTime {
         int epochDay = (int) (epochSecond / TimeConstants.SECONDS_IN_DAY);
         int secsOfDay = (int) (epochSecond - epochDay * TimeConstants.SECONDS_IN_DAY);
 
-        return ofInternal(ShortDate.ofEpochDay(epochDay), secsOfDay);
+        return createInternal(ShortDate.ofEpochDay(epochDay), secsOfDay);
     }
 
     /**
@@ -224,7 +224,7 @@ public final class ShortDateTime {
         int date = ShortDate.random(source);
         int time = source.nextInt(TimeConstants.SECONDS_IN_DAY);
 
-        return ofInternal(date, time);
+        return createInternal(date, time);
     }
 
     /**

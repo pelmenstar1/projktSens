@@ -12,7 +12,7 @@ public final class IntPair {
      * @param first  first int
      * @param second second int
      */
-    public static long of(int first, int second) {
+    public static long create(int first, int second) {
         return ((long) second << 32) | ((long) first & 0xffffffffL);
     }
 

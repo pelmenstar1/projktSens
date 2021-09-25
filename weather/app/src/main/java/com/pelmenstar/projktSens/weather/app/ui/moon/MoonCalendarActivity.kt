@@ -70,7 +70,7 @@ class MoonCalendarActivity : HomeButtonSupportActivity(), MoonCalendarContract.V
                     linearLayoutParams(MATCH_PARENT, MATCH_PARENT)
 
                     setOnDateChangeListener { _, year, month, dayOfMonth ->
-                        presenter?.onDateSelected(ShortDate.of(year, month + 1, dayOfMonth))
+                        presenter?.onDateSelected(ShortDate.create(year, month + 1, dayOfMonth))
                     }
                 }
             }

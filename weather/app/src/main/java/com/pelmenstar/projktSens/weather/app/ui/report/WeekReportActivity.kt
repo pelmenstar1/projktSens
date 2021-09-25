@@ -126,12 +126,12 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
                 else -> ShortDate.getDayOfMonth(date).toFloat()
             }
 
-            minTempEntries[i] = Entry.of(x, minTemp)
-            maxTempEntries[i] = Entry.of(x, maxTemp)
-            minHumEntries[i] = Entry.of(x, reportEntry.minHumidity)
-            maxHumEntries[i] = Entry.of(x, reportEntry.maxHumidity)
-            minPressEntries[i] = Entry.of(x, minPress)
-            maxPressEntries[i] = Entry.of(x, maxPress)
+            minTempEntries[i] = Entry.create(x, minTemp)
+            maxTempEntries[i] = Entry.create(x, maxTemp)
+            minHumEntries[i] = Entry.create(x, reportEntry.minHumidity)
+            maxHumEntries[i] = Entry.create(x, reportEntry.maxHumidity)
+            minPressEntries[i] = Entry.create(x, minPress)
+            maxPressEntries[i] = Entry.create(x, maxPress)
         }
 
         val tempFormatter = UnitChartValueFormatter(unitFormatter, prefTempUnit)

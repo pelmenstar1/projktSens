@@ -110,8 +110,8 @@ public final class GradientFill {
         long oldShaderP0 = shaderP0;
         long oldShaderP1 = shaderP1;
 
-        shaderP0 = PackedPointF.of(x0, y0);
-        shaderP1 = PackedPointF.of(x1, y1);
+        shaderP0 = PackedPointF.create(x0, y0);
+        shaderP1 = PackedPointF.create(x1, y1);
 
         if(oldShaderP0 != shaderP0 || oldShaderP1 != shaderP1) {
             shader = new LinearGradient(

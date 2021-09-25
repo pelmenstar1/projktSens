@@ -193,8 +193,8 @@ public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subco
             sunsetY = sunsetHeight + primaryPadding;
         }
 
-        sunrisePos = PackedPointF.of(x + sunriseX, y + sunriseY);
-        sunsetPos = PackedPointF.of(x + sunsetX, y + sunsetY);
+        sunrisePos = PackedPointF.create(x + sunriseX, y + sunriseY);
+        sunsetPos = PackedPointF.create(x + sunsetX, y + sunsetY);
     }
 
     private void updateArcBounds() {

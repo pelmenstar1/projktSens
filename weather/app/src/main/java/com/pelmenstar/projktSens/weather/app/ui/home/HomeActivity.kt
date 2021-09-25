@@ -193,7 +193,7 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
 
                         setOnDateChangeListener { _, year, month, dayOfMonth ->
                             presenter?.startDayReportView(
-                                ShortDate.of(
+                                ShortDate.create(
                                     year,
                                     month + 1,
                                     dayOfMonth

@@ -96,7 +96,7 @@ class SunriseSunsetCalendarActivity : LocationDependentActivity(),
                 }
 
                 setOnDateChangeListener { _, year, month, dayOfMonth ->
-                    val date = ShortDate.of(year, month + 1, dayOfMonth)
+                    val date = ShortDate.create(year, month + 1, dayOfMonth)
 
                     presenter?.onDaySelected(ShortDate.getDayOfYear(date))
                 }

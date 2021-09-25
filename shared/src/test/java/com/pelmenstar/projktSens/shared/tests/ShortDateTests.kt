@@ -10,7 +10,7 @@ import kotlin.test.assertFails
 
 class ShortDateTests {
     @Test
-    fun of() {
+    fun create() {
         val random = Random(0)
 
         repeat(10) {
@@ -18,7 +18,7 @@ class ShortDateTests {
             val month = random.nextInt(1, 13)
             val day = random.nextInt(1, TimeUtils.getDaysInMonth(year, month) + 1)
 
-            val shortDate = ShortDate.of(year, month, day)
+            val shortDate = ShortDate.create(year, month, day)
 
             assertEquals(year, ShortDate.getYear(shortDate))
             assertEquals(month, ShortDate.getMonth(shortDate))
@@ -27,10 +27,10 @@ class ShortDateTests {
     }
 
     @Test
-    fun of_fails_on_invalid_args() {
+    fun create_fails_on_invalid_args() {
         fun assertOfFails(year: Int, month: Int, day: Int) {
             assertFails {
-                ShortDate.of(year, month, day)
+                ShortDate.create(year, month, day)
             }
         }
 
@@ -59,7 +59,7 @@ class ShortDateTests {
         repeat(100) {
             val expected = random.nextInt(0, UNTIL_9999_YEAR_DAY)
             val date = LocalDate.ofEpochDay(expected.toLong())
-            val input = ShortDate.of(date.year, date.monthValue, date.dayOfMonth)
+            val input = ShortDate.create(date.year, date.monthValue, date.dayOfMonth)
 
             val actual = ShortDate.toEpochDay(input)
 
@@ -102,7 +102,7 @@ class ShortDateTests {
 
         repeat(100) {
             val date = randomLocalDate(random)
-            val input = ShortDate.of(date.year, date.monthValue, date.dayOfMonth)
+            val input = ShortDate.create(date.year, date.monthValue, date.dayOfMonth)
             val expectedDayOfYear = date.dayOfYear
 
             val actual = ShortDate.getDayOfYear(input)
@@ -122,7 +122,7 @@ class ShortDateTests {
 
         repeat(20) {
             val date = randomLocalDate(random)
-            val input = ShortDate.of(date.year, date.monthValue, date.dayOfMonth)
+            val input = ShortDate.create(date.year, date.monthValue, date.dayOfMonth)
             val expected = date.dayOfWeek.value
             val actual = ShortDate.getDayOfWeek(input)
 
@@ -138,7 +138,7 @@ class ShortDateTests {
     private fun assertDateInputMethodFails(method: (Int) -> Any) {
         fun assertMethodFails(year: Int, month: Int, day: Int) {
             assertFails("year: $year, month: $month, day: $day") {
-                method(ShortDate.ofInternal(year, month, day))
+                method(ShortDate.createInternal(year, month, day))
             }
         }
 

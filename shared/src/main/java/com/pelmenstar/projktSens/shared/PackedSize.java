@@ -8,7 +8,7 @@ public final class PackedSize {
      * Creates integer size, packed in long
      */
     public static long create(int width, int height) {
-        return IntPair.of(width, height);
+        return IntPair.create(width, height);
     }
 
     /**

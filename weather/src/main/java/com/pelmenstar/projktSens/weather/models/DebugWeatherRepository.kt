@@ -7,7 +7,7 @@ import java.util.*
 suspend fun WeatherRepository.debugGenDb(startDate: Int, hours: Int) {
     clear()
 
-    var current = ShortDateTime.of(startDate, 0)
+    var current = ShortDateTime.create(startDate, 0)
     val random = Random(0)
 
     repeat(hours) {

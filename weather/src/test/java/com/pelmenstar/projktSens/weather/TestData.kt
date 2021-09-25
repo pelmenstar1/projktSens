@@ -18,7 +18,7 @@ object TestData {
         val month = random.nextInt(1, 13)
         val day = random.nextInt(1, TimeUtils.getDaysInMonth(year, month) + 1)
 
-        return ShortDate.of(year, month, day)
+        return ShortDate.create(year, month, day)
     }
 
     @TimeInt
@@ -28,7 +28,7 @@ object TestData {
 
     @ShortDateTimeLong
     fun shortDateTime(): Long {
-        return ShortDateTime.of(shortDate(), shortTime())
+        return ShortDateTime.create(shortDate(), shortTime())
     }
 
     fun allUnitPackedCombinations(): IntArray {

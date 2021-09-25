@@ -36,17 +36,17 @@ public final class ShortDate {
      * @param dayOfMonth day in range of [1; *days in month*]
      */
     @ShortDateInt
-    public static int of(int year, int month, int dayOfMonth) {
+    public static int create(int year, int month, int dayOfMonth) {
         if (!isValid(year, month, dayOfMonth)) {
             throw new IllegalArgumentException("illegal date");
         }
 
-        return ofInternal(year, month, dayOfMonth);
+        return createInternal(year, month, dayOfMonth);
     }
 
     @ShortDateInt
     @TestOnly
-    public static int ofInternal(int year, int month, int dayOfMonth) {
+    public static int createInternal(int year, int month, int dayOfMonth) {
         return (year << 9) | (month << 5) | dayOfMonth;
     }
 
@@ -277,7 +277,7 @@ public final class ShortDate {
         int dom = marchDoy0 - (marchMonth0 * 306 + 5) / 10 + 1;
         yearEst += marchMonth0 / 10;
 
-        return ofInternal(yearEst, month, dom);
+        return createInternal(yearEst, month, dom);
     }
 
     /**
@@ -327,7 +327,7 @@ public final class ShortDate {
         int month = random.nextInt(12) + 1;
         int day = random.nextInt(TimeUtils.getDaysInMonth(year, month)) + 1;
 
-        return ofInternal(year, month, day);
+        return createInternal(year, month, day);
     }
 
     /**
