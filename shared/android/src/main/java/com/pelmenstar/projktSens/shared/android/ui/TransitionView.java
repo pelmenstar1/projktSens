@@ -9,7 +9,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -17,7 +16,7 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StyleRes;
 
-import com.pelmenstar.projktSens.shared.FloatPair;
+import com.pelmenstar.projktSens.shared.EmptyArray;
 import com.pelmenstar.projktSens.shared.InvokeOnFirstSet;
 
 import org.jetbrains.annotations.NotNull;
@@ -134,18 +133,17 @@ public final class TransitionView extends View {
                 // Then we connect all the points together and we get perfect shape.
                 // To determine position of point on circle, we use trigonometry.
                 int angles = Shape.getAnglesInEquilateralShape(shape);
-                long[] sinCosTable = Shape.computeShapeSinCosTable(angles);
+                int startIndex = Shape.getPositionInSinCosTable(angles);
+                int[] tableValues = Shape.sinCosTable.values;
 
-                for (int i = 0; i < angles; i++) {
-                    long sinCos = sinCosTable[i];
-
-                    float sin = FloatPair.getFirst(sinCos);
-                    float cos = FloatPair.getSecond(sinCos);
+                for (int i = startIndex; i < startIndex + angles * 2; i += 2) {
+                    float sin = Float.intBitsToFloat(tableValues[i]);
+                    float cos = Float.intBitsToFloat(tableValues[i + 1]);
 
                     float px = halfSize * (sin + 1);
                     float py = halfSize * (cos + 1);
 
-                    if (i == 0) {
+                    if (i == startIndex) {
                         path.moveTo(px, py);
                     } else {
                         path.lineTo(px, py);
@@ -314,32 +312,32 @@ public final class TransitionView extends View {
                 RHOMBUS,
         };
 
-        private static final SparseArray<long[]> sinCosTableCache = new SparseArray<>();
+        private static final FlatSinCosTable sinCosTable = new FlatSinCosTable();
 
-        public static long @NotNull [] computeShapeSinCosTable(int angles) {
-            int cacheIndex = sinCosTableCache.indexOfKey(angles);
+        private static int getPositionInSinCosTable(int angles) {
+            int cacheIndex = sinCosTable.getIndex(angles);
             if(cacheIndex >= 0) {
-                return sinCosTableCache.valueAt(cacheIndex);
+                return cacheIndex;
             }
 
             float radPerSide = (2 * (float) Math.PI) / angles;
 
             float currentAngle = radPerSide * 0.5f;
-            long[] sinCosTable = new long[angles];
+            int startIndex = sinCosTable.allocateNewBlock(angles);
+            int[] values = sinCosTable.values;
 
-            for (int i = 0; i < angles; i++) {
+            for(int i = startIndex; i < startIndex + angles * 2; i += 2) {
                 double dAngle = currentAngle;
                 float sin = (float) Math.sin(dAngle);
                 float cos = (float) Math.cos(dAngle);
 
-                sinCosTable[i] = FloatPair.create(sin, cos);
+                values[i] = Float.floatToRawIntBits(sin);
+                values[i + 1] = Float.floatToRawIntBits(cos);
 
                 currentAngle += radPerSide;
             }
 
-            sinCosTableCache.put(angles, sinCosTable);
-
-            return sinCosTable;
+            return startIndex;
         }
 
         public static int createEquilateralShape(int angles) {
@@ -360,6 +358,36 @@ public final class TransitionView extends View {
 
         public static boolean isEquilateral(int shape) {
             return (shape & EQUILATERAL_SHAPE_BIT) != 0;
+        }
+    }
+
+    private static final class FlatSinCosTable {
+        private int[] values = EmptyArray.INT;
+
+        public int allocateNewBlock(int angles) {
+            int startIndex = values.length + 1;
+            int[] newValues = new int[startIndex + angles * 2];
+            System.arraycopy(values, 0, newValues, 0, values.length);
+            newValues[values.length] = angles;
+
+            values = newValues;
+
+            return startIndex;
+        }
+
+        public int getIndex(int angles) {
+            int index = 0;
+            while(index < values.length) {
+                int blockAngles = values[index];
+
+                if(angles == blockAngles) {
+                    return index + 1;
+                }
+
+                index += blockAngles * 2 + 1;
+            }
+
+            return -1;
         }
     }
 
