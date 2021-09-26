@@ -132,8 +132,9 @@ abstract class ReportActivityBase<TReport : Any> protected constructor(
                 setContentView(noNetworkView.get())
             }
             STATUS_LOADING -> {
+                val lv = loadingView.get()
                 transitionView?.startTransition()
-                setContentView(loadingView.get())
+                setContentView(lv)
             }
             STATUS_NO_DATA -> {
                 setContentView(noDataView.get())
