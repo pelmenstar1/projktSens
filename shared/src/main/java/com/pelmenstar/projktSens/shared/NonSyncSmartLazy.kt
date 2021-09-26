@@ -1,12 +1,12 @@
 package com.pelmenstar.projktSens.shared
 
-class NonSyncSmartLazy<T : Any>(private val creator: () -> T) {
+abstract class NonSyncSmartLazy<T : Any> {
     private var value: T? = null
 
     fun get(): T {
         var v = value
         if(v == null) {
-            v = creator()
+            v = create()
             value = v
         }
 
@@ -16,8 +16,12 @@ class NonSyncSmartLazy<T : Any>(private val creator: () -> T) {
     fun setNull() {
         value = null
     }
+
+    protected abstract fun create(): T
 }
 
-fun<T : Any> smartLazy(creator: () -> T): NonSyncSmartLazy<T> {
-    return NonSyncSmartLazy(creator)
+inline fun<T : Any> smartLazy(crossinline creator: () -> T): NonSyncSmartLazy<T> {
+    return object: NonSyncSmartLazy<T>() {
+        override fun create(): T = creator()
+    }
 }
