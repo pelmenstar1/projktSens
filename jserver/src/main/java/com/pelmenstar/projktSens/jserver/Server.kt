@@ -173,9 +173,12 @@ class Server(
                         return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
-                    val range: ShortDateRange
+                    val start: Int
+                    val end: Int
+
                     if(arg is Request.Argument.DateRange) {
-                        range = arg.value
+                        start = arg.start
+                        end = arg.endInclusive
                     } else {
                         log error {
                             append("Invalid type of argument (")
@@ -186,11 +189,14 @@ class Server(
                     }
 
                     log info {
-                        append("range=")
-                        append(range)
+                        append("range={start=")
+                        ShortDate.append(start, this)
+                        append(", end=")
+                        ShortDate.append(end, this)
+                        append("}}")
                     }
 
-                    val report = weatherRepo.getDayRangeReport(range)
+                    val report = weatherRepo.getDayRangeReport(start, end)
 
                     Response.okOrEmpty(report)
                 }

@@ -59,7 +59,7 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
     }
 
     override suspend fun loadReport(dataSource: WeatherDataSource): DayRangeReport? {
-        return dataSource.getDayRangeReport(ShortDateRange(startDate, endDate))
+        return dataSource.getDayRangeReport(startDate, endDate)
     }
 
     override fun createChartView(report: DayRangeReport): View {

@@ -248,6 +248,12 @@ public final class ShortDate {
         return ofEpochDay(endEpochDay - startEpochDay);
     }
 
+    public static int ofEpochSecond(long epochSecond) {
+        int epochDay = (int)(epochSecond / TimeConstants.SECONDS_IN_DAY);
+
+        return ofEpochDay(epochDay);
+    }
+
     /**
      * Converts epoch day to date-int
      *

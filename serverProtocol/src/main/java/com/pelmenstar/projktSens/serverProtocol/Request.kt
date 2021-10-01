@@ -12,7 +12,6 @@ import com.pelmenstar.projktSens.shared.time.ShortDateRange
  */
 class Request(val command: Int, val argument: Argument? = null) : AppendableToStringBuilder() {
     constructor(command: Int, value: Int): this(command, Argument.Integer(value))
-    constructor(command: Int, value: ShortDateRange): this(command, Argument.DateRange(value))
 
     sealed class Argument(val type: Int): AppendableToStringBuilder() {
         class Integer(val value: Int) : Argument(TYPE_INTEGER) {
@@ -33,24 +32,34 @@ class Request(val command: Int, val argument: Argument? = null) : AppendableToSt
             }
         }
 
-        class DateRange(val value: ShortDateRange) : Argument(TYPE_DATE_RANGE) {
-            constructor(@ShortDateInt start: Int, @ShortDateInt endInclusive: Int):
-                    this(ShortDateRange(start, endInclusive))
+        class DateRange(
+            @ShortDateInt val start: Int,
+            @ShortDateInt val endInclusive: Int
+        ) : Argument(TYPE_DATE_RANGE) {
+            init {
+                require(ShortDate.isValid(start)) { "start" }
+                require(ShortDate.isValid(endInclusive)) { "endInclusive" }
+            }
 
             override fun equals(other: Any?): Boolean {
                 return equalsPattern(other) { o ->
-                    value == o.value
+                    start == o.start && endInclusive == o.endInclusive
                 }
             }
 
             override fun hashCode(): Int {
-                return value.hashCode()
+                var result = start
+                result = 31 * result + endInclusive
+
+                return result
             }
 
             override fun append(sb: StringBuilder) {
-                sb.append("{type=DATE_RANGE, value=")
-                value.append(sb)
-                sb.append('}')
+                sb.append("{type=DATE_RANGE, value={start=")
+                ShortDate.append(start, sb)
+                sb.append(", endInclusive=")
+                ShortDate.append(endInclusive, sb)
+                sb.append("}}")
             }
         }
 

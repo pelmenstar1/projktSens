@@ -41,8 +41,8 @@ object RawContract : Contract {
                     buildByteArray(10) {
                         this[0] = command
                         this[1] = Request.Argument.TYPE_DATE_RANGE.toByte()
-                        writeInt(2, arg.value.start)
-                        writeInt(6, arg.value.endInclusive)
+                        writeInt(2, arg.start)
+                        writeInt(6, arg.endInclusive)
                     }
                 }
             }
@@ -73,7 +73,7 @@ object RawContract : Contract {
                 val start = buffer.getInt(0)
                 val end = buffer.getInt(4)
 
-                arg = Request.Argument.DateRange(ShortDateRange(start, end))
+                arg = Request.Argument.DateRange(start, end)
             }
             else -> {
                 throw RuntimeException("Invalid argType ($argType)")

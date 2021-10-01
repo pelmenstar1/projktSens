@@ -76,8 +76,8 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
         }
     }
 
-    override suspend fun getDayRangeReport(range: ShortDateRange): DayRangeReport? {
-        val sql = createDayRangeQuery(range)
+    override suspend fun getDayRangeReport(@ShortDateInt start: Int, @ShortDateInt end: Int): DayRangeReport? {
+        val sql = createDayRangeQuery(start, end)
 
         return db.querySuspend(sql).use { c ->
             if (c.count == 0) {
@@ -91,18 +91,14 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
     override suspend fun getAvailableDateRange(): ShortDateRange? {
         db.querySuspend(QUERY_AVAILABLE_DATE_RANGE).use { c ->
             c.moveToPosition(0)
-
             if (c.isNull(0) || c.isNull(1)) {
                 return null
             }
 
-            val minDateTime = ShortDateTime.ofEpochSecond(c.getLong(0))
-            val maxDateTime = ShortDateTime.ofEpochSecond(c.getLong(1))
+            val minDate = ShortDate.ofEpochSecond(c.getLong(0))
+            val maxDate = ShortDate.ofEpochSecond(c.getLong(1))
 
-            return ShortDateRange(
-                ShortDateTime.getDate(minDateTime),
-                ShortDateTime.getDate(maxDateTime)
-            )
+            return ShortDateRange(minDate, maxDate)
         }
     }
 
@@ -175,9 +171,9 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
             return dateRangeQuery(startDateTime, endDateTime)
         }
 
-        private fun createDayRangeQuery(range: ShortDateRange): String {
-            val startDateTime = ShortDateTime.startOfDayToEpochSecond(range.start)
-            val endDateTime = ShortDateTime.endOfDayToEpochSecond(range.endInclusive)
+        private fun createDayRangeQuery(start: Int, end: Int): String {
+            val startDateTime = ShortDateTime.startOfDayToEpochSecond(start)
+            val endDateTime = ShortDateTime.endOfDayToEpochSecond(end)
 
             return dateRangeQuery(startDateTime, endDateTime)
         }

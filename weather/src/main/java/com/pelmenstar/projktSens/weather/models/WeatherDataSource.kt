@@ -16,7 +16,7 @@ interface WeatherDataSource {
     /**
      * Gets [DayRangeReport] taking data at specified date range, can be null if source doesn't contain data at given range
      */
-    suspend fun getDayRangeReport(range: ShortDateRange): DayRangeReport?
+    suspend fun getDayRangeReport(@ShortDateInt start: Int, @ShortDateInt end: Int): DayRangeReport?
 
     /**
      * Gets available range that contains the source, can be null if source is empty

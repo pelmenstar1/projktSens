@@ -22,9 +22,13 @@ class NetworkDataSource(config: ProtoConfig) : WeatherDataSource {
         )
     }
 
-    override suspend fun getDayRangeReport(range: ShortDateRange): DayRangeReport? {
+    override suspend fun getDayRangeReport(
+        @ShortDateInt start: Int, @ShortDateInt end: Int
+    ): DayRangeReport? {
         return requestRethrow(
-            Commands.GET_DAY_RANGE_REPORT, Request.Argument.DateRange(range), DayRangeReport::class.java
+            Commands.GET_DAY_RANGE_REPORT,
+            Request.Argument.DateRange(start, end),
+            DayRangeReport::class.java
         )
     }
 
