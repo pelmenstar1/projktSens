@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import com.pelmenstar.projktSens.jserver.logging.Logger
 import com.pelmenstar.projktSens.jserver.logging.LoggerConfig
 import com.pelmenstar.projktSens.serverProtocol.*
+import com.pelmenstar.projktSens.shared.AppendableToStringBuilder
 import com.pelmenstar.projktSens.shared.acceptSuspend
 import com.pelmenstar.projktSens.shared.bindSuspend
 import com.pelmenstar.projktSens.shared.time.ShortDate
@@ -13,13 +14,12 @@ import com.pelmenstar.projktSens.weather.models.DayRangeReport
 import com.pelmenstar.projktSens.weather.models.DayReport
 import com.pelmenstar.projktSens.weather.models.WeatherRepository
 import kotlinx.coroutines.*
+import java.io.Closeable
 import java.net.InetSocketAddress
 import java.net.ServerSocket
 import java.net.Socket
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
-import java.nio.channels.Selector
-import java.nio.channels.ServerSocketChannel
 
 /**
  * Server that connects server weather repository and client.
@@ -48,7 +48,15 @@ class Server(
     private var serverSocket: ServerSocket? = null
 
     @Volatile
+    private var serverChannel: AsynchronousServerSocketChannel? = null
+
+    @Volatile
     private var job: Job? = null
+    private val lock = Any()
+
+    @Volatile
+    private var isStarted: Boolean = false
+    private val isStartedLock = Any()
 
     var weatherMonitor: WeatherMonitor? = null
 
@@ -58,12 +66,22 @@ class Server(
     private val log: Logger = Logger(javaClass.simpleName, loggerConfig)
 
     fun startOnNewThread() {
-        job = scope.launch {
-            startOnCurrentThread()
+        synchronized(lock) {
+            job = scope.launch {
+                startOnCurrentThread()
+            }
         }
     }
 
     private suspend fun startOnCurrentThread() {
+        synchronized(isStartedLock) {
+            if(isStarted) {
+               throw RuntimeException("Server is already started")
+            }
+
+            isStarted = true
+        }
+
         if(Build.VERSION.SDK_INT >= 26) {
             startOnCurrentThreadAsync()
         } else {
@@ -75,54 +93,46 @@ class Server(
         try {
             ServerSocket().use { server ->
                 server.bindSuspend(address, BACKLOG)
-                log info "server started"
+                logServerStarted()
 
-                serverSocket = server
+                synchronized(lock) {
+                    serverSocket = server
+                }
 
                 while (true) {
                     val client = server.acceptSuspend()
 
-                    scope.launch {
-                        try {
-                            client.use {
-                                processClientSync(client)
-                            }
-                        } catch (e: Throwable) {
-                            log.error(e)
-                        }
-                    }
+                    launchAndProcessClient(client, ::processClientSync)
                 }
             }
         } catch (e: Throwable) {
             log error e
+
+            stop()
         }
     }
 
     @RequiresApi(26)
     private suspend fun startOnCurrentThreadAsync() {
-        val serverSocket = AsynchronousServerSocketChannel.open()
-
         try {
-            serverSocket.bind(address, BACKLOG)
-            log info "server started"
+            AsynchronousServerSocketChannel.open().use { server ->
+                server.bind(address, BACKLOG)
+                logServerStarted()
 
-            while(true) {
-                val client = serverSocket.acceptSuspend()
+                synchronized(lock) {
+                    serverChannel = server
+                }
 
-                scope.launch {
-                    try {
-                        client.use {
-                            processClientAsync(client)
-                        }
-                    } catch (e: Throwable) {
-                        log.error(e)
-                    }
+                while(true) {
+                    val client = server.acceptSuspend()
+
+                    launchAndProcessClient(client, ::processClientAsync)
                 }
             }
         } catch (e: Throwable) {
             log error e
-        } finally {
-            serverSocket.close()
+
+            stop()
         }
     }
 
@@ -131,13 +141,35 @@ class Server(
      */
     fun stop() {
         try {
-            job?.cancel()
-            job = null
+            synchronized(lock) {
+                job?.cancel()
+                job = null
 
-            serverSocket?.close()
-            serverSocket = null
+                serverSocket?.close()
+                serverSocket = null
+
+                serverChannel?.close()
+                serverChannel = null
+
+                synchronized(isStartedLock) {
+                    isStarted = false
+                }
+            }
         } catch (e: Exception) {
-            log.error(e)
+            log error e
+        }
+    }
+
+    private inline fun <T : Closeable> launchAndProcessClient(
+        client: T,
+        crossinline block: suspend (T) -> Unit
+    ) {
+        scope.launch {
+            try {
+                block(client)
+            } catch (e: Exception) {
+                log error e
+            }
         }
     }
 
@@ -145,17 +177,10 @@ class Server(
     private suspend fun processClientAsync(client: AsynchronousSocketChannel) {
         try {
             val request = contract.readRequest(client)
-            log info {
-                append("request=")
-                request.append(this)
-            }
+            logAppendable("request", request)
 
             val response = processRequest(request)
-
-            log info {
-                append("response=")
-                response.append(this)
-            }
+            logAppendable("response", response)
 
             contract.writeResponse(response, client)
         } catch (e: Exception) {
@@ -169,17 +194,10 @@ class Server(
             val out = client.getOutputStream()
 
             val request = contract.readRequest(input)
-            log info {
-                append("request=")
-                request.append(this)
-            }
+            logAppendable("request", request)
 
             val response = processRequest(request)
-
-            log info {
-                append("response=")
-                response.append(this)
-            }
+            logAppendable("response", response)
 
             contract.writeResponse(response, out)
         } catch (e: Exception) {
@@ -207,11 +225,8 @@ class Server(
                     if(arg is Request.Argument.Integer) {
                         date = arg.value
                     } else {
-                        log error {
-                            append("Invalid type of argument (")
-                            append(Request.Argument.typeToString(arg.type))
-                            append(')')
-                        }
+                        logInvalidTypeOfArgument(arg.type)
+
                         return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
@@ -220,7 +235,7 @@ class Server(
                     }
 
                     log info {
-                        append("date: ")
+                        append("date=")
                         ShortDate.append(date, this)
                     }
 
@@ -240,11 +255,8 @@ class Server(
                         start = arg.start
                         end = arg.endInclusive
                     } else {
-                        log error {
-                            append("Invalid type of argument (")
-                            append(Request.Argument.typeToString(arg.type))
-                            append(')')
-                        }
+                        logInvalidTypeOfArgument(arg.type)
+
                         return Response.error(Errors.INVALID_ARGUMENTS)
                     }
 
@@ -277,6 +289,26 @@ class Server(
 
             Response.error(e)
         }
+    }
+
+    private fun logAppendable(prefix: String, obj: AppendableToStringBuilder) {
+        log info {
+            append(prefix)
+            append('=')
+            obj.append(this)
+        }
+    }
+
+    private fun logInvalidTypeOfArgument(type: Int) {
+        log error {
+            append("Invalid type of argument (")
+            append(Request.Argument.typeToString(type))
+            append(')')
+        }
+    }
+
+    private fun logServerStarted() {
+        log info "Server has been started successfully"
     }
 
     companion object {
