@@ -14,8 +14,6 @@ import java.nio.channels.AsynchronousByteChannel
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -162,9 +160,8 @@ suspend fun AsynchronousSocketChannel.connectSuspend(address: SocketAddress) {
 }
 
 suspend fun AsynchronousSocketChannel.connectSuspend(address: SocketAddress, timeout: Int) {
-    suspendCoroutine<Unit> { cont ->
-        connect(address).get(timeout.toLong(), TimeUnit.MILLISECONDS)
-        cont.resumeWithSuccess()
+    withTimeout(timeout.toLong()) {
+        connectSuspend(address)
     }
 }
 
