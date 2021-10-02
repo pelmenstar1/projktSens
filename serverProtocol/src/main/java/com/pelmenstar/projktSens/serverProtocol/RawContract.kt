@@ -1,13 +1,18 @@
 package com.pelmenstar.projktSens.serverProtocol
 
 import com.pelmenstar.projktSens.shared.*
+import com.pelmenstar.projktSens.shared.readNBufferedSuspend
+import com.pelmenstar.projktSens.shared.readNSuspend
+import com.pelmenstar.projktSens.shared.writeSuspend
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
 import com.pelmenstar.projktSens.shared.serialization.Serializable
 import com.pelmenstar.projktSens.shared.serialization.ValueWriter
-import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.channels.AsynchronousByteChannel
 
 /**
  * Writes and reads [Request], [Response] in raw non-human readable compact binary form.
@@ -18,9 +23,9 @@ object RawContract : Contract {
     private const val STATUS_ERROR: Byte = 1
     private const val STATUS_OK: Byte = 2
 
-    private val RESPONSE_STATE_EMPTY_BUFFER = byteArrayOf(STATUS_EMPTY)
+    private val RESPONSE_STATE_EMPTY_ARRAY = byteArrayOf(STATUS_EMPTY)
 
-    override suspend fun writeRequest(request: Request, output: OutputStream) {
+    private fun createRequestData(request: Request): ByteArray {
         val command = request.command.toByte()
         val arg = request.argument
 
@@ -31,7 +36,7 @@ object RawContract : Contract {
         } else {
             buffer = when(arg) {
                 is Request.Argument.Integer -> {
-                     buildByteArray(6) {
+                    buildByteArray(6) {
                         this[0] = command
                         this[1] = Request.Argument.TYPE_INTEGER.toByte()
                         writeInt(2, arg.value)
@@ -48,7 +53,17 @@ object RawContract : Contract {
             }
         }
 
-        output.writeSuspend(buffer)
+        return buffer
+    }
+
+    override suspend fun writeRequest(request: Request, output: OutputStream) {
+        output.writeSuspend(createRequestData(request))
+    }
+
+    override suspend fun writeRequest(request: Request, channel: AsynchronousByteChannel) {
+        val buffer = ByteBuffer.wrap(createRequestData(request))
+
+        channel.writeSuspend(buffer)
     }
 
     override suspend fun readRequest(input: InputStream): Request {
@@ -83,39 +98,75 @@ object RawContract : Contract {
         return Request(command, arg)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override suspend fun writeResponse(response: Response, output: OutputStream) {
-        when (response) {
-            Response.Empty -> {
-                output.writeSuspend(RESPONSE_STATE_EMPTY_BUFFER)
-            }
+    override suspend fun readRequest(channel: AsynchronousByteChannel): Request {
+        val header = channel.readNSuspend(2)
 
+        val command = header[0].toInt() and 0xff
+        val argType = header[1].toInt() and 0xff
+        val arg: Request.Argument?
+
+        when(argType) {
+            Request.Argument.TYPE_NULL -> {
+                arg = null
+            }
+            Request.Argument.TYPE_INTEGER -> {
+                val buffer = channel.readNSuspend(4)
+
+                arg = Request.Argument.Integer(buffer.int)
+            }
+            Request.Argument.TYPE_DATE_RANGE -> {
+                val buffer = channel.readNSuspend(8)
+
+                val start = buffer.int
+                val end = buffer.int
+
+                arg = Request.Argument.DateRange(start, end)
+            }
+            else -> {
+                throw RuntimeException("Invalid argType ($argType)")
+            }
+        }
+
+        return Request(command, arg)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun createResponseData(response: Response): ByteArray {
+        return when(response) {
+            Response.Empty -> RESPONSE_STATE_EMPTY_ARRAY
             is Response.Error -> {
-                output.writeSuspend(buildByteArray(5) {
+                buildByteArray(5) {
                     this[0] = STATUS_ERROR
                     writeInt(1, response.error)
-                })
+                }
             }
-
             is Response.Ok<*> -> {
                 val value = response.value
                 val serializer =
                     Serializable.getSerializer(value.javaClass) as ObjectSerializer<Any>
                 val objectSize = serializer.getSerializedObjectSize(response.value)
 
-                output.writeSuspend(buildByteArray(objectSize + 3) {
+                buildByteArray(objectSize + 3) {
                     this[0] = STATUS_OK
                     writeShort(1, objectSize.toShort())
                     serializer.writeObject(
                         value,
-                        ValueWriter(
-                            this,
-                            3
-                        )
+                        ValueWriter(this, 3)
                     )
-                })
+                }
             }
+
         }
+    }
+
+    override suspend fun writeResponse(response: Response, output: OutputStream) {
+        output.writeSuspend(createResponseData(response))
+    }
+
+    override suspend fun writeResponse(response: Response, channel: AsynchronousByteChannel) {
+        val buffer = ByteBuffer.wrap(createResponseData(response))
+
+        channel.writeSuspend(buffer)
     }
 
     override suspend fun <T : Any> readResponse(
@@ -140,6 +191,35 @@ object RawContract : Contract {
 
                 val serializer = Serializable.getSerializer(valueClass)
                 val value = Serializable.ofByteArray(data, serializer)
+
+                Response.ok(value)
+            }
+            else -> throw IOException("Illegal state of response. $state")
+        }
+    }
+
+    override suspend fun <T : Any> readResponse(
+        channel: AsynchronousByteChannel,
+        valueClass: Class<T>
+    ): Response {
+        val stateBuffer = channel.readNSuspend(1)
+
+        return when (val state = stateBuffer[0]) {
+            STATUS_EMPTY -> Response.Empty
+            STATUS_ERROR -> {
+                val errorBuffer = channel.readNSuspend(4)
+                val error = errorBuffer.int
+
+                Response.error(error)
+            }
+            STATUS_OK -> {
+                val dataSizeBuffer = channel.readNSuspend(2)
+                val dataSize = dataSizeBuffer.getShort(0).toInt()
+
+                val data = channel.readNBufferedSuspend(dataSize, RESPONSE_BUFFER_SIZE)
+
+                val serializer = Serializable.getSerializer(valueClass)
+                val value = Serializable.ofByteBuffer(data, serializer)
 
                 Response.ok(value)
             }

@@ -1,8 +1,11 @@
 package com.pelmenstar.projktSens.serverProtocol
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.pelmenstar.projktSens.shared.connectSuspend
 import java.io.IOException
 import java.net.Socket
+import java.nio.channels.AsynchronousSocketChannel
 
 /**
  * Represents client for repo-server
@@ -82,12 +85,30 @@ class Client(config: ProtoConfig) {
      * Unlike [request], returns [Response] without additional mappings
      */
     suspend fun requestRawResponse(request: Request, responseValueClass: Class<*>): Response {
+        return if(Build.VERSION.SDK_INT >= 26) {
+            requestRawResponseAsync(request, responseValueClass)
+        } else {
+            requestRawResponseSync(request, responseValueClass)
+        }
+    }
+
+    private suspend fun requestRawResponseSync(request: Request, valueClass: Class<*>): Response {
         return Socket().use { socket ->
             socket.soTimeout = 5000
             socket.connectSuspend(address, 5000)
 
             contract.writeRequest(request, socket.getOutputStream())
-            contract.readResponse(socket.getInputStream(), responseValueClass)
+            contract.readResponse(socket.getInputStream(), valueClass)
+        }
+    }
+
+    @RequiresApi(26)
+    private suspend fun requestRawResponseAsync(request: Request, valueClass: Class<*>): Response {
+        return AsynchronousSocketChannel.open().use { channel ->
+            channel.connectSuspend(address, 5000)
+
+            contract.writeRequest(request, channel)
+            contract.readResponse(channel, valueClass)
         }
     }
 }

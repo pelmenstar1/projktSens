@@ -1,12 +1,24 @@
+@file:Suppress("NewApi")
 package com.pelmenstar.projktSens.shared
 
+import kotlinx.coroutines.withTimeout
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketAddress
-import java.nio.charset.Charset
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.channels.AsynchronousByteChannel
+import java.nio.channels.AsynchronousServerSocketChannel
+import java.nio.channels.AsynchronousSocketChannel
+import java.nio.channels.CompletionHandler
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.min
 
@@ -143,19 +155,121 @@ suspend fun InputStream.readNBufferedSuspend(size: Int, bufferSize: Int = 1024):
     return bytes
 }
 
-suspend fun OutputStream.writeString(str: String, charset: Charset) {
-    val bytes = str.toByteArray(charset)
-
-    writeSuspend(buildByteArray(bytes.size + 4) {
-        writeInt(0, bytes.size)
-        System.arraycopy(bytes, 0, this, 4, bytes.size)
-    })
+suspend fun AsynchronousSocketChannel.connectSuspend(address: SocketAddress) {
+    suspendCoroutine<Unit> { cont ->
+        connect(address, cont, ConnectCompletionHandler)
+    }
 }
 
-suspend fun InputStream.readString(charset: Charset, bufferSize: Int = 1024): String {
-    val byteLengthBuffer = readNSuspend(4)
-    val byteLength = byteLengthBuffer.getInt(0)
-    val bytes = readNBufferedSuspend(byteLength, bufferSize)
+suspend fun AsynchronousSocketChannel.connectSuspend(address: SocketAddress, timeout: Int) {
+    suspendCoroutine<Unit> { cont ->
+        connect(address).get(timeout.toLong(), TimeUnit.MILLISECONDS)
+        cont.resumeWithSuccess()
+    }
+}
 
-    return String(bytes, charset)
+suspend fun AsynchronousServerSocketChannel.acceptSuspend(): AsynchronousSocketChannel {
+    return suspendCoroutine { cont ->
+        accept(cont, AcceptCompletionHandler)
+    }
+}
+
+suspend fun AsynchronousByteChannel.readSuspend(buffer: ByteBuffer): Int {
+    return suspendCoroutine { cont ->
+        read(buffer, cont, IntIntUnitCompletionHandler)
+    }
+}
+
+suspend fun AsynchronousByteChannel.readNSuspend(n: Int): ByteBuffer {
+    val buffer = ByteBuffer.allocate(n)
+    buffer.order(ByteOrder.LITTLE_ENDIAN)
+    readSuspendAndThrowIfNotEnough(buffer)
+    buffer.rewind()
+
+    return buffer
+}
+
+suspend fun AsynchronousByteChannel.readSuspendAndThrowIfNotEnough(buffer: ByteBuffer) {
+    suspendCoroutine<Unit> { c ->
+        val initialRemaining = buffer.remaining()
+        val initialPos = buffer.position()
+
+        read(buffer, c, object: CompletionHandler<Int, Continuation<Unit>> {
+            override fun completed(bytesRead: Int, cont: Continuation<Unit>) {
+                val result: Result<Unit> = if(bytesRead == initialRemaining) {
+                    unitResult()
+                } else {
+                    Result.failure(IOException("Cannot read data"))
+                }
+
+                buffer.position(initialPos)
+                cont.resumeWith(result)
+            }
+
+            override fun failed(th: Throwable, cont: Continuation<Unit>) {
+                cont.resumeWithException(th)
+            }
+        })
+    }
+}
+
+suspend fun AsynchronousByteChannel.readNBufferedSuspend(size: Int, bufferSize: Int = 1024): ByteBuffer {
+    return if (size < bufferSize) {
+        readNSuspend(size)
+    } else {
+        val buffer = ByteBuffer.allocateDirect(bufferSize)
+        buffer.order(ByteOrder.LITTLE_ENDIAN)
+
+        var offset = 0
+        while (offset < size) {
+            val expectedToRead = min(size - offset, bufferSize)
+            readSuspendAndThrowIfNotEnough(buffer)
+            offset += expectedToRead
+            buffer.position(offset)
+        }
+
+        buffer.rewind()
+        buffer
+    }
+}
+
+suspend fun AsynchronousByteChannel.writeSuspend(buffer: ByteBuffer) {
+    suspendCoroutine<Unit> { c ->
+        write(buffer, c, IntUnitCompletionHandler)
+    }
+}
+
+private object ConnectCompletionHandler: CompletionHandler<Void, Continuation<Unit>> {
+    override fun completed(p0: Void?, cont: Continuation<Unit>) {
+        cont.resumeWithSuccess()
+    }
+
+    override fun failed(th: Throwable, cont: Continuation<Unit>) {
+        cont.resumeWithException(th)
+    }
+}
+
+private object AcceptCompletionHandler:
+    CompletionHandler<AsynchronousSocketChannel, Continuation<AsynchronousSocketChannel>> {
+
+    override fun completed(
+        client: AsynchronousSocketChannel,
+        cont: Continuation<AsynchronousSocketChannel>
+    ) {
+        cont.resume(client)
+    }
+
+    override fun failed(th: Throwable, cont: Continuation<AsynchronousSocketChannel>) {
+        cont.resumeWithException(th)
+    }
+}
+
+private object IntIntUnitCompletionHandler: CompletionHandler<Int, Continuation<Int>> {
+    override fun completed(arg: Int, cont: Continuation<Int>) = cont.resume(arg)
+    override fun failed(th: Throwable, cont: Continuation<Int>) = cont.resumeWithException(th)
+}
+
+private object IntUnitCompletionHandler: CompletionHandler<Int, Continuation<Unit>> {
+    override fun completed(p0: Int?, cont: Continuation<Unit>) = cont.resumeWithSuccess()
+    override fun failed(th: Throwable, cont: Continuation<Unit>) = cont.resumeWithException(th)
 }

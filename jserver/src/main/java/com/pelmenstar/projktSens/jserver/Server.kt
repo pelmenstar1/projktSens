@@ -1,5 +1,7 @@
 package com.pelmenstar.projktSens.jserver
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.pelmenstar.projktSens.jserver.logging.Logger
 import com.pelmenstar.projktSens.jserver.logging.LoggerConfig
 import com.pelmenstar.projktSens.serverProtocol.*
@@ -14,6 +16,10 @@ import kotlinx.coroutines.*
 import java.net.InetSocketAddress
 import java.net.ServerSocket
 import java.net.Socket
+import java.nio.channels.AsynchronousServerSocketChannel
+import java.nio.channels.AsynchronousSocketChannel
+import java.nio.channels.Selector
+import java.nio.channels.ServerSocketChannel
 
 /**
  * Server that connects server weather repository and client.
@@ -57,14 +63,18 @@ class Server(
         }
     }
 
-    fun startOnCurrentThreadBlocking() {
-        runBlocking { startOnCurrentThread() }
+    private suspend fun startOnCurrentThread() {
+        if(Build.VERSION.SDK_INT >= 26) {
+            startOnCurrentThreadAsync()
+        } else {
+            startOnCurrentThreadSync()
+        }
     }
 
-    suspend fun startOnCurrentThread() {
+    private suspend fun startOnCurrentThreadSync() {
         try {
             ServerSocket().use { server ->
-                server.bindSuspend(address, 5)
+                server.bindSuspend(address, BACKLOG)
                 log info "server started"
 
                 serverSocket = server
@@ -75,7 +85,7 @@ class Server(
                     scope.launch {
                         try {
                             client.use {
-                                processClient(client)
+                                processClientSync(client)
                             }
                         } catch (e: Throwable) {
                             log.error(e)
@@ -85,6 +95,34 @@ class Server(
             }
         } catch (e: Throwable) {
             log error e
+        }
+    }
+
+    @RequiresApi(26)
+    private suspend fun startOnCurrentThreadAsync() {
+        val serverSocket = AsynchronousServerSocketChannel.open()
+
+        try {
+            serverSocket.bind(address, BACKLOG)
+            log info "server started"
+
+            while(true) {
+                val client = serverSocket.acceptSuspend()
+
+                scope.launch {
+                    try {
+                        client.use {
+                            processClientAsync(client)
+                        }
+                    } catch (e: Throwable) {
+                        log.error(e)
+                    }
+                }
+            }
+        } catch (e: Throwable) {
+            log error e
+        } finally {
+            serverSocket.close()
         }
     }
 
@@ -103,7 +141,29 @@ class Server(
         }
     }
 
-    private suspend fun processClient(client: Socket) {
+    @RequiresApi(26)
+    private suspend fun processClientAsync(client: AsynchronousSocketChannel) {
+        try {
+            val request = contract.readRequest(client)
+            log info {
+                append("request=")
+                request.append(this)
+            }
+
+            val response = processRequest(request)
+
+            log info {
+                append("response=")
+                response.append(this)
+            }
+
+            contract.writeResponse(response, client)
+        } catch (e: Exception) {
+            log error e
+        }
+    }
+
+    private suspend fun processClientSync(client: Socket) {
         try {
             val input = client.getInputStream()
             val out = client.getOutputStream()
@@ -221,5 +281,6 @@ class Server(
 
     companion object {
         private val scope = CoroutineScope(Dispatchers.IO)
+        private const val BACKLOG = 5
     }
 }

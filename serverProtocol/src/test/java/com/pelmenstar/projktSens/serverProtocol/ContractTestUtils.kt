@@ -3,6 +3,7 @@ package com.pelmenstar.projktSens.serverProtocol
 import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.nio.channels.AsynchronousByteChannel
 import kotlin.test.assertEquals
 
 object ContractTestUtils {

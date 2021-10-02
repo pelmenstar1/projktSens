@@ -1,102 +1,72 @@
 package com.pelmenstar.projktSens.shared.serialization;
 
-import com.pelmenstar.projktSens.shared.Bytes;
-
 import org.jetbrains.annotations.NotNull;
+
+import java.nio.ByteBuffer;
 
 /**
  * Responsible for reading primitive values from byte buffer. Values in read in little-endian
  */
-public final class ValueReader {
-    private final byte @NotNull [] data;
-    private int position;
-
-    /**
-     * Initializes instance of {@link ValueReader} using byte array.
-     * Position of cursor is set to 0
-     *
-     * @param data byte array from which values will be read
-     */
-    public ValueReader(byte @NotNull [] data) {
-        this.data = data;
+public abstract class ValueReader {
+    @NotNull
+    public static ValueReader ofByteArray(byte @NotNull [] buffer) {
+        return ofByteArray(buffer, 0);
     }
 
-    /**
-     * Initializes instance of {@link ValueReader} using byte array and initial position of cursor
-     *
-     * @param data   byte array from which values will be read
-     * @param offset initial position of cursor
-     * @throws IndexOutOfBoundsException if offset is less than 0 or greater than length of byte array
-     */
-    public ValueReader(byte @NotNull [] data, int offset) {
-        if (offset < 0 || offset > data.length) {
-            throw new IndexOutOfBoundsException("offset");
-        }
+    @NotNull
+    public static ValueReader ofByteArray(byte @NotNull [] buffer, int position) {
+        return new ByteArrayValueReader(buffer, position);
+    }
 
-        this.data = data;
-        position = offset;
+    @NotNull
+    public static ValueReader ofByteBuffer(@NotNull ByteBuffer buffer) {
+        return new ByteBufferValueReader(buffer);
     }
 
     /**
      * Determines whether cursor is in end of the buffer
      */
-    public boolean inEnd() {
-        return position == data.length;
+    public final boolean inEnd() {
+        return position() == size();
     }
 
     /**
      * Returns current position of cursor
      */
-    public int position() {
-        return position;
-    }
+    public abstract int position();
 
     /**
      * Returns size of internal byte array
      */
-    public int size() {
-        return data.length;
-    }
+    public abstract int size();
 
     /**
      * Reads byte from the buffer and moves cursor for 1 byte
      *
      * @throws IndexOutOfBoundsException if there is lack of data
      */
-    public byte readInt8() {
-        return data[position++];
-    }
+    public abstract byte readInt8();
 
     /**
      * Reads short from the internal buffer and moves cursor for 2 bytes
      *
      * @throws IndexOutOfBoundsException if there is lack of data
      */
-    public short readInt16() {
-        short s = Bytes.readShort(data, position);
-        position += 2;
-
-        return s;
-    }
+    public abstract short readInt16();
 
     /**
      * Reads int from the buffer and moves cursor for 4 bytes
      *
      * @throws IndexOutOfBoundsException if there is lack of data
      */
-    public int readInt32() {
-        int i = Bytes.readInt(data, position);
-        position += 4;
-
-        return i;
-    }
+    public abstract int readInt32();
 
     /**
      * Reads float from the buffer and moves cursor for 4 bytes
      *
      * @throws IndexOutOfBoundsException if there is lack of data
      */
-    public float readFloat() {
+    public final float readFloat() {
         return Float.intBitsToFloat(readInt32());
     }
 
@@ -105,37 +75,21 @@ public final class ValueReader {
      *
      * @throws IndexOutOfBoundsException if there is lack of data
      */
-    public long readInt64() {
-        long l = Bytes.readLong(data, position);
-        position += 8;
-
-        return l;
-    }
+    public abstract long readInt64();
 
     /**
      * Reads only 24 bits from the buffer.
      *
      * @throws IndexOutOfBoundsException if there is lack of data
      */
-    public int readInt24() {
-        int i = Bytes.readInt24(data, position);
-        position += 3;
-
-
-        return i;
-    }
+    public abstract int readInt24();
 
     /**
      * Reads only 40 bits from the buffer.
      *
      * @throws IndexOutOfBoundsException if there is lack of data
      */
-    public long readInt40() {
-        long l = Bytes.readInt40(data, position);
-        position += 5;
-
-        return l;
-    }
+    public abstract long readInt40();
 
     /**
      * Reads byte array with specified size from the internal buffer and moves cursor for size of byte array.
@@ -144,15 +98,5 @@ public final class ValueReader {
      * @throws IllegalArgumentException  if size less or equals to 0
      * @throws IndexOutOfBoundsException if there are lack of data
      */
-    public byte @NotNull [] readByteArray(int size) {
-        if (size <= 0) {
-            throw new IllegalArgumentException("size=" + size);
-        }
-
-        byte[] array = new byte[size];
-        System.arraycopy(data, position, array, 0, size);
-        position += size;
-
-        return array;
-    }
+    public abstract byte @NotNull [] readByteArray(int size);
 }

@@ -1,7 +1,9 @@
 package com.pelmenstar.projktSens.serverProtocol
 
+import androidx.annotation.RequiresApi
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.channels.AsynchronousByteChannel
 
 /**
  * A contract between client and server, that describes in what way interpret byte data.
@@ -13,10 +15,16 @@ interface Contract {
      */
     suspend fun writeRequest(request: Request, output: OutputStream)
 
+    @RequiresApi(26)
+    suspend fun writeRequest(request: Request, channel: AsynchronousByteChannel)
+
     /**
      * Reads [Request] from [input].
      */
     suspend fun readRequest(input: InputStream): Request
+
+    @RequiresApi(26)
+    suspend fun readRequest(channel: AsynchronousByteChannel): Request
 
     /**
      * Writes [response] to [output].
@@ -24,12 +32,18 @@ interface Contract {
      */
     suspend fun writeResponse(response: Response, output: OutputStream)
 
+    @RequiresApi(26)
+    suspend fun writeResponse(response: Response, channel: AsynchronousByteChannel)
+
     /**
      * Reads [Response] from [input].
      *
      * @param valueClass expected class of data stored in [Request]
      */
     suspend fun <T : Any> readResponse(input: InputStream, valueClass: Class<T>): Response
+
+    @RequiresApi(26)
+    suspend fun <T : Any> readResponse(channel: AsynchronousByteChannel, valueClass: Class<T>): Response
 }
 
 /**
