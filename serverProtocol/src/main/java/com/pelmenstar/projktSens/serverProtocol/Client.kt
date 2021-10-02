@@ -10,7 +10,7 @@ import java.nio.channels.AsynchronousSocketChannel
 /**
  * Represents client for repo-server
  */
-class Client(config: ProtoConfig) {
+class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
     private val contract = config.contract
     private val address = config.socketAddress
 
@@ -85,16 +85,15 @@ class Client(config: ProtoConfig) {
      * Unlike [request], returns [Response] without additional mappings
      */
     suspend fun requestRawResponse(request: Request, responseValueClass: Class<*>): Response {
-        return if(Build.VERSION.SDK_INT >= 26) {
+        return if(Build.VERSION.SDK_INT >= 26 && !forceBlocking) {
             requestRawResponseAsync(request, responseValueClass)
         } else {
-            requestRawResponseSync(request, responseValueClass)
+            requestRawResponseBlocking(request, responseValueClass)
         }
     }
 
-    private suspend fun requestRawResponseSync(request: Request, valueClass: Class<*>): Response {
+    private suspend fun requestRawResponseBlocking(request: Request, valueClass: Class<*>): Response {
         return Socket().use { socket ->
-            socket.soTimeout = 5000
             socket.connectSuspend(address, 5000)
 
             contract.writeRequest(request, socket.getOutputStream())

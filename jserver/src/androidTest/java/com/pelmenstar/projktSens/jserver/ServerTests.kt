@@ -1,5 +1,6 @@
 package com.pelmenstar.projktSens.jserver
 
+import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.pelmenstar.projktSens.jserver.di.DaggerAppComponent
@@ -16,16 +17,17 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-// Tests only the server request-response logic, not exactly repository logic
 @RunWith(AndroidJUnit4::class)
+//@Ignore
 class ServerTests {
     //
     // getAvailableDateRange
     //
     @Test
     fun getAvailableDateRange_returns_empty_response_if_db_is_empty() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             weatherRepo.clear()
+
             val response = client.requestRawResponse<Any>(Commands.GET_AVAILABLE_DATE_RANGE)
 
             assertTrue(response.isEmpty())
@@ -34,7 +36,7 @@ class ServerTests {
 
     @Test
     fun getAvailableDateRange_returns_valid_ok_response_if_db_is_not_empty() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             weatherRepo.debugGenDb(ShortDate.now(), 48)
 
             val range = client.request<ShortDateRange>(Commands.GET_AVAILABLE_DATE_RANGE)
@@ -47,7 +49,7 @@ class ServerTests {
     //
     @Test
     fun genDayReport_returns_invalid_args_error_if_no_arguments_were_given() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             val response = client.requestRawResponse<Any>(Commands.GET_DAY_REPORT)
             val error = (response as Response.Error).error
 
@@ -57,7 +59,7 @@ class ServerTests {
 
     @Test
     fun genDayReport_returns_invalid_args_error_if_date_was_invalid() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             val response = client.requestRawResponse<Any>(
                 Commands.GET_DAY_REPORT, Request.Argument.Integer(ShortDate.NONE)
             )
@@ -69,7 +71,7 @@ class ServerTests {
 
     @Test
     fun genDayReport_returns_valid_report() {
-        runBlocking<Unit> {
+        runWithBlockingAndAsyncClients { client ->
             val nowDate = ShortDate.now()
             weatherRepo.debugGenDb(nowDate, 48)
 
@@ -82,7 +84,7 @@ class ServerTests {
 
     @Test
     fun genDayReport_returns_empty_response_if_db_is_empty() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             val nowDate = ShortDate.now()
             weatherRepo.clear()
 
@@ -96,7 +98,7 @@ class ServerTests {
 
     @Test
     fun genDayReport_returns_empty_response_if_date_out_of_range() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             val nowDate = ShortDate.now()
 
             val response = client.requestRawResponse<Any>(
@@ -113,7 +115,7 @@ class ServerTests {
     //
     @Test
     fun genDayRangeReport_returns_invalid_args_error_if_no_arguments_were_given() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             val response = client.requestRawResponse<Any>(Commands.GET_DAY_RANGE_REPORT)
             val error = (response as Response.Error).error
 
@@ -123,7 +125,7 @@ class ServerTests {
 
     @Test
     fun genDayRangeReport_returns_valid_report() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             val nowDate = ShortDate.now()
             weatherRepo.debugGenDb(nowDate, 24 * 4)
 
@@ -138,7 +140,7 @@ class ServerTests {
 
     @Test
     fun genDayRangeReport_returns_empty_response_if_db_is_empty() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             val nowDate = ShortDate.now()
             weatherRepo.clear()
 
@@ -153,7 +155,7 @@ class ServerTests {
 
     @Test
     fun genDayRangeReport_returns_empty_response_if_date_range_out_of_range() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             val nowDate = ShortDate.now()
             weatherRepo.debugGenDb(nowDate, 48)
 
@@ -174,7 +176,7 @@ class ServerTests {
     //
     @Test
     fun getLastWeather_returns_empty_response_if_db_is_empty() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             weatherRepo.clear()
 
             val response = client.requestRawResponse<Any>(Commands.GET_LAST_WEATHER)
@@ -185,7 +187,7 @@ class ServerTests {
 
     @Test
     fun getLastWeather_returns_valid_weather() {
-        runBlocking {
+        runWithBlockingAndAsyncClients { client ->
             weatherRepo.debugGenDb(ShortDate.now(), 48)
 
             assertNotNull(client.request<WeatherInfo>(Commands.GET_LAST_WEATHER))
@@ -194,19 +196,25 @@ class ServerTests {
 
     companion object {
         private val context = InstrumentationRegistry.getInstrumentation().context
-        private lateinit var client: Client
+
         private lateinit var weatherRepo: WeatherRepository
         private lateinit var server: Server
+        private lateinit var blockingClient: Client
+        private lateinit var asyncClient: Client
 
         @BeforeClass
         @JvmStatic
         fun before() {
             val component = DaggerAppComponent.builder().appModule(TestAppModule(context)).build()
-            client = Client(component.protoConfig())
+
+            val protoConfig = component.protoConfig()
+            blockingClient = Client(protoConfig, true)
+            asyncClient = Client(protoConfig, false)
 
             weatherRepo = component.weatherRepository()
             server = component.server().also {
                 it.startOnNewThread()
+                Thread.sleep(2000)
             }
         }
 
@@ -214,6 +222,15 @@ class ServerTests {
         @JvmStatic
         fun after() {
             server.stop()
+        }
+
+        private fun runWithBlockingAndAsyncClients(block: suspend (Client) -> Unit) {
+            runBlocking {
+                block(blockingClient)
+                if(Build.VERSION.SDK_INT >= 26) {
+                    block(asyncClient)
+                }
+            }
         }
     }
 }
