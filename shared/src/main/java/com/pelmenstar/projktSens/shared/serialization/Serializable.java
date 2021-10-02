@@ -18,12 +18,6 @@ public final class Serializable {
     private Serializable() {
     }
 
-    static {
-        // common serializers
-        cachedSerializers.put(Integer.class, new PrimitiveSerializers.Int32());
-        cachedSerializers.put(Long.class, new PrimitiveSerializers.Int64());
-    }
-
     /**
      * Gets a serializer for specified {@link Class}.
      * Requirements for class is described in {@link ObjectSerializer}
