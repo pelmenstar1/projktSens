@@ -25,8 +25,6 @@ object RawContract : Contract {
         this[0] = TYPE_EMPTY
     }
 
-    private val RESPONSE_TYPE_EMPTY_BUFFER = ByteBuffer.wrap(RESPONSE_TYPE_EMPTY_ARRAY)
-
     private fun createRequestData(request: Request): ByteArray {
         val command = request.command.toByte()
         val arg = request.argument
@@ -160,21 +158,14 @@ object RawContract : Contract {
             }
         }
     }
-
-    private fun createResponseDataBuffer(response: Response): ByteBuffer {
-        if(response === Response.Empty) {
-            return RESPONSE_TYPE_EMPTY_BUFFER
-        }
-
-        return ByteBuffer.wrap(createResponseDataArray(response))
-    }
-
     override suspend fun writeResponse(response: Response, output: OutputStream) {
         output.writeSuspend(createResponseDataArray(response))
     }
 
     override suspend fun writeResponse(response: Response, channel: AsynchronousByteChannel) {
-        channel.writeSuspend(createResponseDataBuffer(response))
+        val buffer = ByteBuffer.wrap(createResponseDataArray(response))
+
+        channel.writeSuspend(buffer)
     }
 
     override suspend fun <T : Any> readResponse(
