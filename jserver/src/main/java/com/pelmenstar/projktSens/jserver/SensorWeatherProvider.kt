@@ -24,11 +24,11 @@ class SensorWeatherProvider : WeatherInfoProvider {
         return if(Build.VERSION.SDK_INT >= 26) {
             getWeatherAsync()
         } else {
-            getWeatherSync()
+            getWeatherBlocking()
         }
     }
 
-    private suspend fun getWeatherSync(): WeatherInfo {
+    private suspend fun getWeatherBlocking(): WeatherInfo {
         try {
             return Socket().use { socket ->
                 socket.connectSuspend(address, 5000)

@@ -85,11 +85,11 @@ class Server(
         if(Build.VERSION.SDK_INT >= 26) {
             startOnCurrentThreadAsync()
         } else {
-            startOnCurrentThreadSync()
+            startOnCurrentThreadBlocking()
         }
     }
 
-    private suspend fun startOnCurrentThreadSync() {
+    private suspend fun startOnCurrentThreadBlocking() {
         try {
             ServerSocket().use { server ->
                 server.bindSuspend(address, BACKLOG)
