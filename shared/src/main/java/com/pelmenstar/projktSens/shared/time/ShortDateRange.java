@@ -101,15 +101,15 @@ public final class ShortDateRange extends AppendableToStringBuilder {
 
         @Override
         public void writeObject(@NotNull ShortDateRange value, @NotNull ValueWriter writer) {
-            writer.emitInt32(value.start);
-            writer.emitInt32(value.endInclusive);
+            writer.int32(value.start);
+            writer.int32(value.endInclusive);
         }
 
         @NotNull
         @Override
         public ShortDateRange readObject(@NotNull ValueReader reader) throws ValidationException {
-            int start = reader.readInt32();
-            int end = reader.readInt32();
+            int start = reader.int32();
+            int end = reader.int32();
 
             return new ShortDateRange(start, end);
         }

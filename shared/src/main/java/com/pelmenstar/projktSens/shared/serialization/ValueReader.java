@@ -36,36 +36,36 @@ public final class ValueReader {
         return data.length;
     }
 
-    public byte readInt8() {
+    public byte int8() {
         return data[position++];
     }
 
-    public short readInt16() {
+    public short int16() {
         short s = Bytes.readShort(data, position);
         position += 2;
 
         return s;
     }
 
-    public int readInt32() {
+    public int int32() {
         int i = Bytes.readInt(data, position);
         position += 4;
 
         return i;
     }
 
-    public float readFloat() {
-        return Float.intBitsToFloat(readInt32());
+    public float float32() {
+        return Float.intBitsToFloat(int32());
     }
 
-    public long readInt64() {
+    public long int64() {
         long l = Bytes.readLong(data, position);
         position += 8;
 
         return l;
     }
 
-    public int readInt24() {
+    public int int24() {
         int i = Bytes.readInt24(data, position);
         position += 3;
 
@@ -73,14 +73,14 @@ public final class ValueReader {
         return i;
     }
 
-    public long readInt40() {
+    public long int40() {
         long l = Bytes.readInt40(data, position);
         position += 5;
 
         return l;
     }
 
-    public byte @NotNull [] readByteArray(int size) {
+    public byte @NotNull [] byteArray(int size) {
         if (size <= 0) {
             throw new IllegalArgumentException("size=" + size);
         }

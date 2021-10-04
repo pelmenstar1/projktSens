@@ -14,14 +14,14 @@ class DataRWTests {
         val reader =
             ValueReader(buffer, 1)
 
-        writer.emitInt8(1)
-        writer.emitInt16(2)
-        writer.emitInt32(3)
-        writer.emitInt64(4)
+        writer.int8(1)
+        writer.int16(2)
+        writer.int32(3)
+        writer.int64(4)
 
-        assertEquals(1, reader.readInt8())
-        assertEquals(2, reader.readInt16())
-        assertEquals(3, reader.readInt32())
-        assertEquals(4, reader.readInt64())
+        assertEquals(1, reader.int8())
+        assertEquals(2, reader.int16())
+        assertEquals(3, reader.int32())
+        assertEquals(4, reader.int64())
     }
 }

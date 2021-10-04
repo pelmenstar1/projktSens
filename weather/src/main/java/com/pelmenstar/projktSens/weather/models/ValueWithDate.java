@@ -93,15 +93,15 @@ public final class ValueWithDate extends AppendableToStringBuilder {
 
         @Override
         public void writeObject(@NotNull ValueWithDate value, @NotNull ValueWriter writer) {
-            writer.emitInt40(value.dateTime);
-            writer.emitFloat(value.value);
+            writer.int40(value.dateTime);
+            writer.float32(value.value);
         }
 
         @NotNull
         @Override
         public ValueWithDate readObject(@NotNull ValueReader reader) throws ValidationException {
-            long dateTime = reader.readInt40();
-            float value = reader.readFloat();
+            long dateTime = reader.int40();
+            float value = reader.float32();
 
             if (!ShortDateTime.isValid(dateTime)) {
                 throw ValidationException.invalidValue("dateTime", dateTime);

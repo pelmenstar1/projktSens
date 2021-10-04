@@ -107,7 +107,7 @@ public final class ReportStats extends AppendableToStringBuilder {
 
         @Override
         public void writeObject(@NotNull ReportStats value, @NotNull ValueWriter writer) {
-            writer.emitInt32(value.units);
+            writer.int32(value.units);
             ParameterStats.SERIALIZER.writeObject(value.temperature, writer);
             ParameterStats.SERIALIZER.writeObject(value.humidity, writer);
             ParameterStats.SERIALIZER.writeObject(value.pressure, writer);
@@ -116,7 +116,7 @@ public final class ReportStats extends AppendableToStringBuilder {
         @NotNull
         @Override
         public ReportStats readObject(@NotNull ValueReader reader) throws ValidationException {
-            int units = reader.readInt32();
+            int units = reader.int32();
             if (!ValueUnitsPacked.isValid(units)) {
                 throw ValidationException.invalidValue("units", units);
             }

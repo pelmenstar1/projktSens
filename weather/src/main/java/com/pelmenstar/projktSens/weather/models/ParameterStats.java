@@ -84,8 +84,8 @@ public final class ParameterStats extends AppendableToStringBuilder {
         public void writeObject(@NotNull ParameterStats value, @NotNull ValueWriter writer) {
             ValueWithDate.SERIALIZER.writeObject(value.min, writer);
             ValueWithDate.SERIALIZER.writeObject(value.max, writer);
-            writer.emitFloat(value.avg);
-            writer.emitFloat(value.median);
+            writer.float32(value.avg);
+            writer.float32(value.median);
         }
 
         @NotNull
@@ -93,8 +93,8 @@ public final class ParameterStats extends AppendableToStringBuilder {
         public ParameterStats readObject(@NotNull ValueReader reader) throws ValidationException {
             ValueWithDate min = ValueWithDate.SERIALIZER.readObject(reader);
             ValueWithDate max = ValueWithDate.SERIALIZER.readObject(reader);
-            float avg = reader.readFloat();
-            float median = reader.readFloat();
+            float avg = reader.float32();
+            float median = reader.float32();
 
             return new ParameterStats(min, max, avg, median);
         }

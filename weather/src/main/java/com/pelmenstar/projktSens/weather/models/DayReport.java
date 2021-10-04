@@ -289,13 +289,13 @@ public final class DayReport extends AppendableToStringBuilder {
         @Override
         public void writeObject(@NotNull DayReport value, @NotNull ValueWriter writer) {
             ReportStats.SERIALIZER.writeObject(value.stats, writer);
-            writer.emitInt16((short) value.entries.length);
+            writer.int16((short) value.entries.length);
 
             for (Entry e : value.entries) {
-                writer.emitInt24(e.time);
-                writer.emitFloat(e.temperature);
-                writer.emitFloat(e.humidity);
-                writer.emitFloat(e.pressure);
+                writer.int24(e.time);
+                writer.float32(e.temperature);
+                writer.float32(e.humidity);
+                writer.float32(e.pressure);
             }
         }
 
@@ -304,14 +304,14 @@ public final class DayReport extends AppendableToStringBuilder {
         public DayReport readObject(@NotNull ValueReader reader) throws ValidationException {
             ReportStats stats = ReportStats.SERIALIZER.readObject(reader);
 
-            int entriesLength = reader.readInt16();
+            int entriesLength = reader.int16();
             Entry[] entries = new Entry[entriesLength];
 
             for (int i = 0; i < entriesLength; i++) {
-                int time = reader.readInt24();
-                float temp = reader.readFloat();
-                float hum = reader.readFloat();
-                float press = reader.readFloat();
+                int time = reader.int24();
+                float temp = reader.float32();
+                float hum = reader.float32();
+                float press = reader.float32();
 
                 entries[i] = new Entry(time, temp, hum, press);
             }

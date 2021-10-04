@@ -62,7 +62,7 @@ public final class ValueWriter {
      *
      * @throws IndexOutOfBoundsException if cursor is in the end of buffer
      */
-    public void emitInt8(byte value) {
+    public void int8(byte value) {
         data[position++] = value;
     }
 
@@ -71,7 +71,7 @@ public final class ValueWriter {
      *
      * @throws IndexOutOfBoundsException if cursor is in {@code size() - 1} position or further
      */
-    public void emitInt16(short value) {
+    public void int16(short value) {
         Bytes.writeShort(value, data, position);
         position += 2;
     }
@@ -81,7 +81,7 @@ public final class ValueWriter {
      *
      * @throws IndexOutOfBoundsException if cursor is in {@code size() - 3} position or further
      */
-    public void emitInt32(int value) {
+    public void int32(int value) {
         Bytes.writeInt(value, data, position);
         position += 4;
     }
@@ -91,8 +91,8 @@ public final class ValueWriter {
      *
      * @throws IndexOutOfBoundsException if cursor is in {@code size() - 3} position or further
      */
-    public void emitFloat(float value) {
-        emitInt32(Float.floatToIntBits(value));
+    public void float32(float value) {
+        int32(Float.floatToIntBits(value));
     }
 
     /**
@@ -100,7 +100,7 @@ public final class ValueWriter {
      *
      * @throws IndexOutOfBoundsException if cursor is in {@code size() - 7} position or further
      */
-    public void emitInt64(long value) {
+    public void int64(long value) {
         Bytes.writeLong(value, data, position);
         position += 8;
     }
@@ -108,7 +108,7 @@ public final class ValueWriter {
     /**
      * Writes only 24 bits of specified value and moves cursor for 3 bytes
      */
-    public void emitInt24(int value) {
+    public void int24(int value) {
         Bytes.writeInt24(value, data, position);
         position += 3;
     }
@@ -116,7 +116,7 @@ public final class ValueWriter {
     /**
      * Writes only 40 bits of specified value and moves cursor for 5 bytes
      */
-    public void emitInt40(long value) {
+    public void int40(long value) {
         Bytes.writeInt40(value, data, position);
         position += 5;
     }
@@ -126,7 +126,7 @@ public final class ValueWriter {
      *
      * @throws IndexOutOfBoundsException if cursor is in {@code size() - array.valuesLength - 1} position or further
      */
-    public void emitByteArray(byte @NotNull [] array) {
+    public void byteArray(byte @NotNull [] array) {
         System.arraycopy(array, 0, data, position, array.length);
         position += array.length;
     }

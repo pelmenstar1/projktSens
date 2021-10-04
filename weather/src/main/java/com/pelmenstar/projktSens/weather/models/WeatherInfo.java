@@ -126,21 +126,21 @@ public final class WeatherInfo extends AppendableToStringBuilder {
 
         @Override
         public void writeObject(@NotNull WeatherInfo value, @NotNull ValueWriter writer) {
-            writer.emitInt32(value.units);
-            writer.emitInt40(value.dateTime);
-            writer.emitFloat(value.temperature);
-            writer.emitFloat(value.humidity);
-            writer.emitFloat(value.pressure);
+            writer.int32(value.units);
+            writer.int40(value.dateTime);
+            writer.float32(value.temperature);
+            writer.float32(value.humidity);
+            writer.float32(value.pressure);
         }
 
         @NotNull
         @Override
         public WeatherInfo readObject(@NotNull ValueReader reader) throws ValidationException {
-            int units = reader.readInt32();
-            long dateTime = reader.readInt40();
-            float temperature = reader.readFloat();
-            float humidity = reader.readFloat();
-            float pressure = reader.readFloat();
+            int units = reader.int32();
+            long dateTime = reader.int40();
+            float temperature = reader.float32();
+            float humidity = reader.float32();
+            float pressure = reader.float32();
 
             return new WeatherInfo(units, dateTime, temperature, humidity, pressure);
         }

@@ -396,19 +396,19 @@ public final class DayRangeReport extends AppendableToStringBuilder {
         @Override
         public void writeObject(@NotNull DayRangeReport value, @NotNull ValueWriter writer) {
             ReportStats.SERIALIZER.writeObject(value.stats, writer);
-            writer.emitInt16((short) value.entries.length);
+            writer.int16((short) value.entries.length);
 
             for (Entry e : value.entries) {
-                writer.emitInt24(e.date);
+                writer.int24(e.date);
 
-                writer.emitFloat(e.minTemperature);
-                writer.emitFloat(e.maxTemperature);
+                writer.float32(e.minTemperature);
+                writer.float32(e.maxTemperature);
 
-                writer.emitFloat(e.minHumidity);
-                writer.emitFloat(e.maxHumidity);
+                writer.float32(e.minHumidity);
+                writer.float32(e.maxHumidity);
 
-                writer.emitFloat(e.minPressure);
-                writer.emitFloat(e.maxPressure);
+                writer.float32(e.minPressure);
+                writer.float32(e.maxPressure);
             }
         }
 
@@ -418,20 +418,20 @@ public final class DayRangeReport extends AppendableToStringBuilder {
             ReportStats stats = ReportStats.SERIALIZER.readObject(reader);
 
 
-            int entriesLength = reader.readInt16();
+            int entriesLength = reader.int16();
             Entry[] data = new Entry[entriesLength];
 
             for (int i = 0; i < entriesLength; i++) {
-                int date = reader.readInt24();
+                int date = reader.int24();
 
-                float minTemp = reader.readFloat();
-                float maxTemp = reader.readFloat();
+                float minTemp = reader.float32();
+                float maxTemp = reader.float32();
 
-                float minHum = reader.readFloat();
-                float maxHum = reader.readFloat();
+                float minHum = reader.float32();
+                float maxHum = reader.float32();
 
-                float minPress = reader.readFloat();
-                float maxPress = reader.readFloat();
+                float minPress = reader.float32();
+                float maxPress = reader.float32();
 
                 data[i] = new Entry(
                         date,
