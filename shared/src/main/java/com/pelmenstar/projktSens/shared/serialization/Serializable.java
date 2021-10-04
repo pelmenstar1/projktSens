@@ -99,17 +99,7 @@ public final class Serializable {
 
     @NotNull
     public static <T> T ofByteArray(byte @NotNull [] data, @NotNull ObjectSerializer<T> serializer) {
-        return serializer.readObject(ValueReader.ofByteArray(data));
-    }
-
-    @NotNull
-    public static <T> T ofByteBuffer(@NotNull ByteBuffer buffer, @NotNull Class<T> objClass) {
-        return ofByteBuffer(buffer, getSerializer(objClass));
-    }
-
-    @NotNull
-    public static <T> T ofByteBuffer(@NotNull ByteBuffer buffer, @NotNull ObjectSerializer<T> serializer) {
-        return serializer.readObject(ValueReader.ofByteBuffer(buffer));
+        return serializer.readObject(new ValueReader(data));
     }
 
     /**
@@ -124,16 +114,5 @@ public final class Serializable {
         serializer.writeObject(obj, new ValueWriter(buffer));
 
         return buffer;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static<T> void writeObject(
-            @NotNull T obj,
-            byte @NotNull [] outBuffer, int offset
-    ) {
-        Class<T> objClass = (Class<T>)obj.getClass();
-        ObjectSerializer<T> serializer = getSerializer(objClass);
-
-        serializer.writeObject(obj, new ValueWriter(outBuffer, offset));
     }
 }
