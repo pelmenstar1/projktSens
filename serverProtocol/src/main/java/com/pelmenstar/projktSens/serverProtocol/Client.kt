@@ -3,6 +3,8 @@ package com.pelmenstar.projktSens.serverProtocol
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.pelmenstar.projktSens.shared.connectSuspend
+import com.pelmenstar.projktSens.shared.io.SmartInputStream
+import com.pelmenstar.projktSens.shared.io.SmartOutputStream
 import java.io.IOException
 import java.net.Socket
 import java.nio.channels.AsynchronousSocketChannel
@@ -92,22 +94,41 @@ class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
         }
     }
 
-    private suspend fun requestRawResponseBlocking(request: Request, valueClass: Class<*>): Response {
+    private suspend fun requestRawResponseBlocking(
+        request: Request, valueClass: Class<*>
+    ): Response {
         return Socket().use { socket ->
             socket.connectSuspend(address, 5000)
 
-            contract.writeRequest(request, socket.getOutputStream())
-            contract.readResponse(socket.getInputStream(), valueClass)
+            writeRequestAndReadResponse(
+                request, valueClass,
+                SmartInputStream.toSmart(socket), SmartOutputStream.toSmart(socket)
+            )
         }
     }
 
     @RequiresApi(26)
-    private suspend fun requestRawResponseAsync(request: Request, valueClass: Class<*>): Response {
+    private suspend fun requestRawResponseAsync(
+        request: Request, valueClass: Class<*>
+    ): Response {
         return AsynchronousSocketChannel.open().use { channel ->
             channel.connectSuspend(address, 5000)
 
-            contract.writeRequest(request, channel)
-            contract.readResponse(channel, valueClass)
+            writeRequestAndReadResponse(
+                request, valueClass,
+                SmartInputStream.toSmart(channel), SmartOutputStream.toSmart(channel)
+            )
         }
+    }
+
+    private suspend fun writeRequestAndReadResponse(
+        request: Request,
+        valueClass: Class<*>,
+        input: SmartInputStream,
+        output: SmartOutputStream
+    ): Response {
+        contract.writeRequest(request, output)
+
+        return contract.readResponse(input, valueClass)
     }
 }

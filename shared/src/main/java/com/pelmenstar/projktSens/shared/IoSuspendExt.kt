@@ -171,19 +171,35 @@ suspend fun AsynchronousServerSocketChannel.acceptSuspend(): AsynchronousSocketC
     }
 }
 
+suspend fun AsynchronousByteChannel.readSuspend(buffer: ByteArray): Int {
+    return readSuspend(ByteBuffer.wrap(buffer))
+}
+
 suspend fun AsynchronousByteChannel.readSuspend(buffer: ByteBuffer): Int {
     return suspendCoroutine { cont ->
         read(buffer, cont, IntIntUnitCompletionHandler)
     }
 }
 
-suspend fun AsynchronousByteChannel.readNSuspend(n: Int): ByteBuffer {
+suspend fun AsynchronousByteChannel.readToBufferSuspend(n: Int): ByteBuffer {
     val buffer = ByteBuffer.allocate(n)
     buffer.order(ByteOrder.LITTLE_ENDIAN)
     readSuspendAndThrowIfNotEnough(buffer)
     buffer.rewind()
 
     return buffer
+}
+
+suspend fun AsynchronousByteChannel.readToArraySuspend(n: Int): ByteArray {
+    val array = ByteArray(n)
+    val buffer = ByteBuffer.wrap(array)
+    readSuspendAndThrowIfNotEnough(buffer)
+    
+    return array
+}
+
+suspend fun AsynchronousByteChannel.readSuspendAndThrowIfNotEnough(buffer: ByteArray) {
+    readSuspendAndThrowIfNotEnough(ByteBuffer.wrap(buffer))
 }
 
 suspend fun AsynchronousByteChannel.readSuspendAndThrowIfNotEnough(buffer: ByteBuffer) {
@@ -210,9 +226,17 @@ suspend fun AsynchronousByteChannel.readSuspendAndThrowIfNotEnough(buffer: ByteB
     }
 }
 
-suspend fun AsynchronousByteChannel.readNBufferedSuspend(size: Int, bufferSize: Int = 1024): ByteBuffer {
+suspend fun AsynchronousByteChannel.readNBufferedToByteArraySuspend(
+    size: Int, bufferSize: Int = 1024
+): ByteArray {
+    val buffer = readNBufferedToByteBufferSuspend(size, bufferSize)
+
+    return buffer.array()
+}
+
+suspend fun AsynchronousByteChannel.readNBufferedToByteBufferSuspend(size: Int, bufferSize: Int = 1024): ByteBuffer {
     return if (size < bufferSize) {
-        readNSuspend(size)
+        readToBufferSuspend(size)
     } else {
         val buffer = ByteBuffer.allocateDirect(bufferSize)
         buffer.order(ByteOrder.LITTLE_ENDIAN)
@@ -228,6 +252,10 @@ suspend fun AsynchronousByteChannel.readNBufferedSuspend(size: Int, bufferSize: 
         buffer.rewind()
         buffer
     }
+}
+
+suspend fun AsynchronousByteChannel.writeSuspend(buffer: ByteArray) {
+    writeSuspend(ByteBuffer.wrap(buffer))
 }
 
 suspend fun AsynchronousByteChannel.writeSuspend(buffer: ByteBuffer) {

@@ -2,11 +2,8 @@ package com.pelmenstar.projktSens.jserver
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.pelmenstar.projktSens.shared.connectSuspend
-import com.pelmenstar.projktSens.shared.getFloat
-import com.pelmenstar.projktSens.shared.readNSuspend
+import com.pelmenstar.projktSens.shared.*
 import com.pelmenstar.projktSens.shared.time.ShortDateTime
-import com.pelmenstar.projktSens.shared.writeSuspend
 import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
 import com.pelmenstar.projktSens.weather.models.WeatherInfoProvider
@@ -40,11 +37,7 @@ class SensorWeatherProvider : WeatherInfoProvider {
 
                 val buffer = input.readNSuspend(12)
 
-                val temp = buffer.getFloat(0)
-                val hum = buffer.getFloat(4)
-                val press = buffer.getFloat(8)
-
-                createWeather(temp, hum, press)
+                parse(buffer)
             }
         } catch (e: IOException) {
             throw RuntimeException("Cannot receive weather", e)
@@ -58,20 +51,20 @@ class SensorWeatherProvider : WeatherInfoProvider {
                 channel.connectSuspend(address, 5000)
 
                 channel.writeSuspend(MSG_BUFFER)
-                val buffer = channel.readNSuspend(12)
+                val buffer = channel.readToArraySuspend(12)
 
-                val temp = buffer.float
-                val hum = buffer.float
-                val press = buffer.float
-
-                createWeather(temp, hum, press)
+                parse(buffer)
             }
         } catch (e: IOException) {
             throw RuntimeException("Cannot receive weather", e)
         }
     }
 
-    private fun createWeather(temp: Float, hum: Float, press: Float): WeatherInfo {
+    private fun parse(data: ByteArray): WeatherInfo {
+        val temp = data.getFloat(0)
+        val hum = data.getFloat(4)
+        val press = data.getFloat(8)
+
         return WeatherInfo(
             ValueUnitsPacked.CELSIUS_MM_OF_MERCURY,
             ShortDateTime.now(),

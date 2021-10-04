@@ -8,6 +8,8 @@ import com.pelmenstar.projktSens.serverProtocol.*
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder
 import com.pelmenstar.projktSens.shared.acceptSuspend
 import com.pelmenstar.projktSens.shared.bindSuspend
+import com.pelmenstar.projktSens.shared.io.SmartInputStream
+import com.pelmenstar.projktSens.shared.io.SmartOutputStream
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.weather.models.DayRangeReport
@@ -17,9 +19,7 @@ import kotlinx.coroutines.*
 import java.io.Closeable
 import java.net.InetSocketAddress
 import java.net.ServerSocket
-import java.net.Socket
 import java.nio.channels.AsynchronousServerSocketChannel
-import java.nio.channels.AsynchronousSocketChannel
 
 /**
  * Server that connects server weather repository and client.
@@ -102,7 +102,11 @@ class Server(
                 while (true) {
                     val client = server.acceptSuspend()
 
-                    launchAndProcessClient(client, ::processClientSync)
+                    launchAndProcessClient(
+                        client,
+                        SmartInputStream.toSmart(client),
+                        SmartOutputStream.toSmart(client)
+                    )
                 }
             }
         } catch (e: Throwable) {
@@ -126,7 +130,11 @@ class Server(
                 while(true) {
                     val client = server.acceptSuspend()
 
-                    launchAndProcessClient(client, ::processClientAsync)
+                    launchAndProcessClient(
+                        client,
+                        SmartInputStream.toSmart(client),
+                        SmartOutputStream.toSmart(client)
+                    )
                 }
             }
         } catch (e: Throwable) {
@@ -160,46 +168,32 @@ class Server(
         }
     }
 
-    private inline fun <T : Closeable> launchAndProcessClient(
-        client: T,
-        crossinline block: suspend (T) -> Unit
+    private fun launchAndProcessClient(
+        client: Closeable,
+        input: SmartInputStream, output: SmartOutputStream
     ) {
         scope.launch {
-            try {
-                block(client)
-            } catch (e: Exception) {
-                log error e
+            client.use {
+                try {
+                    processClient(input, output)
+                } catch (e: Exception) {
+                    log error e
+                }
             }
         }
     }
 
-    @RequiresApi(26)
-    private suspend fun processClientAsync(client: AsynchronousSocketChannel) {
+    private suspend fun processClient(
+        input: SmartInputStream, output: SmartOutputStream
+    ) {
         try {
-            val request = contract.readRequest(client)
-            logAppendable("request", request)
-
-            val response = processRequest(request)
-            logAppendable("response", response)
-
-            contract.writeResponse(response, client)
-        } catch (e: Exception) {
-            log error e
-        }
-    }
-
-    private suspend fun processClientSync(client: Socket) {
-        try {
-            val input = client.getInputStream()
-            val out = client.getOutputStream()
-
             val request = contract.readRequest(input)
             logAppendable("request", request)
 
             val response = processRequest(request)
             logAppendable("response", response)
 
-            contract.writeResponse(response, out)
+            contract.writeResponse(response, output)
         } catch (e: Exception) {
             log error e
         }
