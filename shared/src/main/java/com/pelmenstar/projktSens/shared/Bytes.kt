@@ -20,63 +20,42 @@ inline fun buildByteArray(size: Int, builder: ByteArray.() -> Unit): ByteArray {
  * Writes [Int] to [ByteArray] as 4 bytes starting from [offset]. Little endian
  */
 inline fun ByteArray.writeInt(offset: Int, value: Int) {
-    this[offset] = value.toByte()
-    this[offset + 1] = (value shr 8).toByte()
-    this[offset + 2] = (value shr 16).toByte()
-    this[offset + 3] = (value shr 24).toByte()
+    Bytes.writeInt(value, this, offset)
 }
 
 /**
  * Reads [Int] from [ByteArray] starting from [offset]. Little endian
  */
 inline fun ByteArray.getInt(offset: Int): Int {
-    return this[offset].toInt() and 0xFF or
-            (this[offset + 1].toInt() and 0xFF shl 8) or
-            (this[offset + 2].toInt() and 0xFF shl 16) or
-            (this[offset + 3].toInt() and 0xFF shl 24)
+    return Bytes.readInt(this, offset)
 }
 
 /**
  * Writes [Long] to [ByteArray] as 8 bytes starting from [offset]. Little endian
  */
 inline fun ByteArray.writeLong(offset: Int, value: Long) {
-    this[offset] = value.toByte()
-    this[offset + 1] = (value shr 8).toByte()
-    this[offset + 2] = (value shr 16).toByte()
-    this[offset + 3] = (value shr 24).toByte()
-    this[offset + 4] = (value shr 32).toByte()
-    this[offset + 5] = (value shr 40).toByte()
-    this[offset + 6] = (value shr 48).toByte()
-    this[offset + 7] = (value shr 56).toByte()
+    Bytes.writeLong(value, this, offset)
 }
 
 /**
  * Reads [Long] from [ByteArray] starting from [offset]. Little endian
  */
 inline fun ByteArray.getLong(offset: Int): Long {
-    return this[offset].toLong() and 0xFF or
-            (this[offset + 1].toLong() and 0xFF shl 8) or
-            (this[offset + 2].toLong() and 0xFF shl 16) or
-            (this[offset + 3].toLong() and 0xFF shl 24) or
-            (this[offset + 4].toLong() and 0xFF shl 32) or
-            (this[offset + 5].toLong() and 0xFF shl 40) or
-            (this[offset + 6].toLong() and 0xFF shl 48) or
-            (this[offset + 7].toLong() and 0xFF shl 56)
+    return Bytes.readLong(this, offset)
 }
 
 /**
  * Writes [Short] to [ByteArray] as 2 bytes starting from [offset]. Little endian
  */
 inline fun ByteArray.writeShort(offset: Int, value: Short) {
-    this[offset] = value.toByte()
-    this[offset + 1] = (value.toInt() shr 8).toByte()
+    Bytes.writeShort(value, this, offset)
 }
 
 /**
  * Reads [Short] from [ByteArray] starting from [offset]. Little endian
  */
 inline fun ByteArray.getShort(offset: Int): Short {
-    return (this[offset].toInt() and 0xFF or (this[offset + 1].toInt() and 0xFF shl 8)).toShort()
+    return Bytes.readShort(this, offset)
 }
 
 /**
