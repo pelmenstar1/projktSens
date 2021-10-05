@@ -240,7 +240,7 @@ public final class TransitionView extends View {
             }
         }
 
-        long minTimeBetweenFrames = 1_000_000_000 / transition.getFramesPerColor();
+        long minTimeBetweenFrames = 1_000_000_000 / LinearColorTransition.TRANSITION_FRAMES;
         long lastFrameTime = System.nanoTime();
         while (transitionRunning.get() == 1) {
             long currentTime = System.nanoTime();

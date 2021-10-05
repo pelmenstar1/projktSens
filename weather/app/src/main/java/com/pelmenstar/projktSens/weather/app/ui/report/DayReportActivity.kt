@@ -2,11 +2,9 @@ package com.pelmenstar.projktSens.weather.app.ui.report
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
-import com.pelmenstar.projktSens.chartLite.GradientFill
 import com.pelmenstar.projktSens.chartLite.LineChart
 import com.pelmenstar.projktSens.chartLite.data.ChartData
 import com.pelmenstar.projktSens.chartLite.data.DataSet
@@ -108,9 +106,7 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
         circleColor = colorPrimary
         color = colorPrimary
 
-        background = GradientFill(
-            colorPrimary.withAlpha(50), Color.TRANSPARENT, GradientFill.VERTICAL
-        )
+        background = colorPrimary.withAlpha(50)
 
         return this
     }

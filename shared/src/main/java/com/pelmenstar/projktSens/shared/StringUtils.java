@@ -48,15 +48,18 @@ public final class StringUtils {
         return sb.toString();
     }
 
-    public static void appendHexColors(int @NotNull [] colors, @NotNull StringBuilder sb) {
-        sb.ensureCapacity(sb.length() + hexColorsLength(colors.length));
+    public static void appendHexColors(
+            int @NotNull [] colors, int offset, int length,
+            @NotNull StringBuilder sb
+    ) {
+        sb.ensureCapacity(sb.length() + hexColorsLength(length));
 
         sb.append('[');
         if (colors.length > 0) {
-            int maxIdx = colors.length - 1;
+            int maxIdx = offset + length - 1;
 
             synchronized (hexBuffer) {
-                for (int i = 0; i < maxIdx; i++) {
+                for (int i = offset; i < maxIdx; i++) {
                     appendHexThroughBufferLocked(colors[i], sb);
                     sb.append(',');
                 }
@@ -65,6 +68,13 @@ public final class StringUtils {
             }
         }
         sb.append(']');
+    }
+
+    public static void appendHexColors(
+            int @NotNull [] colors,
+            @NotNull StringBuilder sb
+    ) {
+        appendHexColors(colors, 0, colors.length, sb);
     }
 
     private static void appendHexThroughBufferLocked(int value, @NotNull StringBuilder sb) {

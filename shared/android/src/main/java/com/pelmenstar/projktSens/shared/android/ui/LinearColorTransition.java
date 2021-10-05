@@ -2,15 +2,16 @@ package com.pelmenstar.projktSens.shared.android.ui;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.SparseArray;
 
 import androidx.annotation.ArrayRes;
 import androidx.annotation.ColorInt;
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
+import com.pelmenstar.projktSens.shared.EmptyArray;
 import com.pelmenstar.projktSens.shared.StringUtils;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -18,69 +19,68 @@ import java.util.Arrays;
  * Represents a linear color transition
  */
 public final class LinearColorTransition extends AppendableToStringBuilder implements Cloneable {
-    private static final class CacheEntry extends AppendableToStringBuilder {
-        public final int @NotNull [] colors;
-        public final int framesPerColor;
+    private static final class FlatCache {
+        private int[] array = EmptyArray.INT;
 
-        private CacheEntry(int @NotNull [] colors, int framesPerColor) {
-            this.colors = colors;
-            this.framesPerColor = framesPerColor;
+        public int addAndAllocSize(int key, int dataSize) {
+            int dataStartPos = array.length + 2;
+            int[] newArray = new int[dataStartPos + dataSize];
+            System.arraycopy(array, 0, newArray, 0, array.length);
+            newArray[array.length] = key;
+            newArray[array.length + 1] = dataSize;
+
+            array = newArray;
+
+            return dataStartPos;
         }
 
-        @Override
-        public boolean equals(Object other) {
-            if (this == other) return true;
-            if (other == null || getClass() != other.getClass()) return false;
+        @Nullable
+        public LinearColorTransition createTransitionIfInCache(int key) {
+            int pos = 0;
 
-            CacheEntry o = (CacheEntry) other;
+            while(pos < array.length) {
+                int currentKey = array[pos];
+                int currentDataSize = array[pos + 1];
 
-            return framesPerColor == o.framesPerColor && Arrays.equals(colors, o.colors);
-        }
+                if(currentKey == key) {
+                    return new LinearColorTransition(array, pos + 2, currentDataSize);
+                }
 
-        @Override
-        public int hashCode() {
-            int result = Arrays.hashCode(colors);
-            result = 31 * result + framesPerColor;
+                pos += currentDataSize + 2;
+            }
 
-            return result;
-        }
-
-        @Override
-        public void append(@NotNull StringBuilder sb) {
-            sb.append("{colors=");
-            StringUtils.appendHexColors(colors, sb);
-            sb.append(", framesPerColor=");
-            sb.append(framesPerColor);
-            sb.append('}');
+            return null;
         }
     }
 
-    private static final SparseArray<CacheEntry> transitionCacheByHash = new SparseArray<>(4);
-    private static final SparseArray<CacheEntry> transitionCacheByResId = new SparseArray<>(4);
+    private static final FlatCache transitionCacheByHash = new FlatCache();
+    private static final FlatCache transitionCacheByResId = new FlatCache();
 
-    private static final int[] EMPTY_TCOLORS = new int[1];
-    private static final int DEFAULT_TRANSITION_FRAMES = 60;
+    private static final int[] EMPTY_DATA = new int[1];
+    public static final int TRANSITION_FRAMES = 60;
+    private static final float INV_TRANSITION_FRAMES = 1f / (float) TRANSITION_FRAMES;
 
-    private final int[] transColors;
-    private final int framesPerColor;
+    private final int[] data;
+    private final int offset;
+    private final int length;
 
     private int index = 0;
     private int step = 1;
-    private int forwardLimitMask = 0xffffffff;
 
+    private int limitMask = 0xffffffff;
     private int limit;
 
-    private final int forwardLimit;
+    private LinearColorTransition(int @NotNull [] data, int offset, int length) {
+        this.data = data;
+        this.offset = offset;
+        this.length = length;
 
-    private LinearColorTransition(int @NotNull [] transColors, int framesPerColor) {
-        this.transColors = transColors;
-        this.framesPerColor = framesPerColor;
-        forwardLimit = limit = transColors.length - 1;
+        recomputeLimit();
     }
 
     @SuppressWarnings("CopyConstructorMissesField")
     public LinearColorTransition(@NotNull LinearColorTransition other) {
-        this(other.transColors, other.framesPerColor);
+        this(other.data, other.offset, other.length);
     }
 
     /**
@@ -88,7 +88,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
      */
     @NotNull
     public static LinearColorTransition empty() {
-        return new LinearColorTransition(EMPTY_TCOLORS, 1);
+        return new LinearColorTransition(EMPTY_DATA, 0, 1);
     }
 
     /**
@@ -100,68 +100,41 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
      */
     @NotNull
     public static LinearColorTransition biColor(@ColorInt int start, @ColorInt int end) {
-        return biColor(start, end, DEFAULT_TRANSITION_FRAMES, true);
-    }
-
-    @NotNull
-    public static LinearColorTransition biColor(@ColorInt int start, @ColorInt int end, int frames) {
-        return biColor(start, end, frames, true);
-    }
-
-    /**
-     * Creates transition between two colors.
-     * The transition will put to the cache.
-     *
-     * @param start      start color
-     * @param end        end color
-     * @param putToCache determines whether transition should be put to the cache
-     */
-    @NotNull
-    public static LinearColorTransition biColor(
-            @ColorInt int start, @ColorInt int end,
-            int frames,
-            boolean putToCache
-    ) {
         int hash = 31 * (31 + start) + end;
 
-        CacheEntry cacheEntry = transitionCacheByHash.get(hash, null);
-        if (cacheEntry != null) {
-            if(cacheEntry.framesPerColor == frames) {
-                return new LinearColorTransition(cacheEntry.colors, frames);
-            }
+        LinearColorTransition cached = transitionCacheByHash.createTransitionIfInCache(hash);
+
+        if(cached != null) {
+            return cached;
         }
 
-        int[] tColors = new int[frames];
+        int startPos = transitionCacheByHash.addAndAllocSize(hash, TRANSITION_FRAMES);
 
-        biColorInternal(start, end, tColors, 0, frames);
+        biColorInternal(start, end, transitionCacheByHash.array, startPos);
 
-        if (putToCache) {
-            transitionCacheByHash.put(hash, new CacheEntry(tColors, frames));
-        }
-
-        return new LinearColorTransition(tColors, frames);
+        return new LinearColorTransition(
+                transitionCacheByHash.array, startPos, TRANSITION_FRAMES
+        );
     }
 
     private static void biColorInternal(
             @ColorInt int start, @ColorInt int end,
             int @NotNull [] colors,
-            int index,
-            int frames
+            int index
     ) {
         int sr = Color.red(start);
         int sg = Color.green(start);
         int sb = Color.blue(start);
 
-        float invFrames = 1f / frames;
-        float mr = (float) (Color.red(end) - sr) * invFrames;
-        float mg = (float) (Color.green(end) - sg) * invFrames;
-        float mb = (float) (Color.blue(end) - sb) * invFrames;
+        float mr = (float) (Color.red(end) - sr) * INV_TRANSITION_FRAMES;
+        float mg = (float) (Color.green(end) - sg) * INV_TRANSITION_FRAMES;
+        float mb = (float) (Color.blue(end) - sb) * INV_TRANSITION_FRAMES;
 
         float result_r = sr;
         float result_g = sg;
         float result_b = sb;
 
-        int endIdx = index + frames;
+        int endIdx = index + TRANSITION_FRAMES;
         for (int i = index; i < endIdx; i++) {
             int c = Color.rgb((int) result_r, (int) result_g, (int) result_b);
 
@@ -181,102 +154,57 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
      */
     @NotNull
     public static LinearColorTransition multiple(@ColorInt int @NotNull [] colors) {
-        return multiple(colors, DEFAULT_TRANSITION_FRAMES, true);
-    }
-
-    @NotNull
-    public static LinearColorTransition multiple(@ColorInt int @NotNull [] colors, int framesPerColor) {
-        return multiple(colors, framesPerColor, true);
-    }
-
-    /**
-     * Creates a transition between given colors.
-     * Unlike {@link LinearColorTransition#biColor(int, int)}, this method gives more control on transition.
-     * The transition is still linear.
-     *
-     * @param putToCache determines whether transition should be put to the cache
-     */
-    @NotNull
-    public static LinearColorTransition multiple(
-            @ColorInt int @NotNull [] colors,
-            int framesPerColor,
-            boolean putToCache
-    ) {
         if (colors.length <= 1) {
             throw new IllegalArgumentException("Colors valuesLength must be > 1");
         }
 
-        if (colors.length == 2) {
-            return biColor(colors[0], colors[1], framesPerColor, putToCache);
-        }
-
         int hash = Arrays.hashCode(colors);
-        CacheEntry cacheEntry = transitionCacheByHash.get(hash, null);
-        if (cacheEntry != null) {
-            if(cacheEntry.framesPerColor == framesPerColor) {
-                return new LinearColorTransition(cacheEntry.colors, framesPerColor);
-            }
+        LinearColorTransition cached = transitionCacheByHash.createTransitionIfInCache(
+                hash
+        );
+
+        if(cached != null) {
+            return cached;
         }
 
-        int idx = 0;
         int maxColors = colors.length - 1;
 
-        int[] tColors = new int[maxColors * framesPerColor];
+        int tColorsLength = maxColors * TRANSITION_FRAMES;
+        int startPos = transitionCacheByHash.addAndAllocSize(hash, tColorsLength);
+        int tColorPos = startPos;
+        int[] data = transitionCacheByHash.array;
 
-        int i = 0;
-
-        while (i < maxColors) {
+        for(int i = 0; i < maxColors; i++) {
             int start = colors[i];
-            i++;
-            int end = colors[i];
+            int end = colors[i + 1];
 
-            biColorInternal(start, end, tColors, idx, framesPerColor);
-            idx += framesPerColor;
+            biColorInternal(start, end, data, tColorPos);
+            tColorPos += TRANSITION_FRAMES;
         }
 
-        if (putToCache) {
-            transitionCacheByResId.put(hash, new CacheEntry(tColors, framesPerColor));
-        }
-
-        return new LinearColorTransition(tColors, framesPerColor);
+        return new LinearColorTransition(
+                transitionCacheByHash.array, startPos, tColorsLength
+        );
     }
 
     @NotNull
     public static LinearColorTransition fromArrayRes(@NotNull Context context, @ArrayRes int colorsRes) {
-        return fromArrayRes(context, colorsRes, DEFAULT_TRANSITION_FRAMES, true);
-    }
-
-    @NotNull
-    public static LinearColorTransition fromArrayRes(
-            @NotNull Context context,
-            @ArrayRes int colorsRes,
-            int frames
-    ) {
-        return fromArrayRes(context, colorsRes, frames, true);
-    }
-
-    @NotNull
-    public static LinearColorTransition fromArrayRes(
-            @NotNull Context context,
-            @ArrayRes int colorsRes,
-            int frames,
-            boolean putToCache) {
-        CacheEntry cacheEntry = transitionCacheByResId.get(colorsRes, null);
-        if (cacheEntry != null) {
-            if(frames == cacheEntry.framesPerColor) {
-                return new LinearColorTransition(cacheEntry.colors, frames);
-            }
+        LinearColorTransition cached = transitionCacheByResId.createTransitionIfInCache(colorsRes);
+        if(cached != null) {
+            return cached;
         }
 
         int[] colors = context.getResources().getIntArray(colorsRes);
-        LinearColorTransition transition = multiple(colors, frames, putToCache);
+        LinearColorTransition transition = multiple(colors);
 
-        if (putToCache) {
-            transitionCacheByResId.put(
-                    colorsRes,
-                    new CacheEntry(transition.transColors, frames)
-            );
-        }
+        int startPos = transitionCacheByResId.addAndAllocSize(
+                colorsRes, transition.length
+        );
+        System.arraycopy(
+                transition.data, transition.offset,
+                transitionCacheByResId.array, startPos,
+                transition.length
+        );
 
         return transition;
     }
@@ -286,47 +214,25 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
      */
     @ColorInt
     public int nextColor() {
-        int s = step;
         if (index == limit) {
-            int newMask = ~forwardLimitMask;
-            limit = forwardLimit & newMask;
+            limitMask = ~limitMask;
+            step = -step;
 
-            s = -s;
-            step = s;
-            forwardLimitMask = newMask;
+            recomputeLimit();
         }
-        index += s;
+        index += step;
 
-        return transColors[index];
+        return data[index];
     }
 
-    public int getFramesPerColor() {
-        return framesPerColor;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) return true;
-        if (other == null || getClass() != other.getClass()) return false;
-
-        LinearColorTransition o = (LinearColorTransition) other;
-
-        return Arrays.equals(transColors, o.transColors) &&
-                framesPerColor == o.framesPerColor;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Arrays.hashCode(transColors);
-        result = result * 31 + framesPerColor;
-
-        return result;
+    private void recomputeLimit() {
+        limit = offset + ((length - 1) & limitMask);
     }
 
     @Override
     public void append(@NotNull StringBuilder sb) {
         sb.append("{resultColors=");
-        StringUtils.appendHexColors(transColors, sb);
+        StringUtils.appendHexColors(data, offset, length, sb);
         sb.append('}');
     }
 }

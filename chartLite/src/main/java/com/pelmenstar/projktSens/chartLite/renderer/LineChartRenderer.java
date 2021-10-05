@@ -1,12 +1,12 @@
 package com.pelmenstar.projktSens.chartLite.renderer;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 
 import com.pelmenstar.projktSens.chartLite.DataRef;
-import com.pelmenstar.projktSens.chartLite.GradientFill;
 import com.pelmenstar.projktSens.chartLite.SimpleChartAnimator;
 import com.pelmenstar.projktSens.chartLite.ViewPortHandler;
 import com.pelmenstar.projktSens.chartLite.data.ChartData;
@@ -14,8 +14,6 @@ import com.pelmenstar.projktSens.chartLite.data.DataSet;
 import com.pelmenstar.projktSens.chartLite.data.Entry;
 import com.pelmenstar.projktSens.chartLite.formatter.ValueFormatter;
 import com.pelmenstar.projktSens.shared.EmptyArray;
-import com.pelmenstar.projktSens.shared.FloatPair;
-import com.pelmenstar.projktSens.shared.PackedPointF;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -189,9 +187,9 @@ public final class LineChartRenderer {
     private final RectF pathBounds = new RectF();
 
     private void drawBackground(@NotNull Canvas c, @NotNull DataSet dataSet, int pOffset) {
-        GradientFill background = dataSet.getBackground();
+        int background = dataSet.getBackground();
 
-        if(!background.isTransparent()) {
+        if(Color.alpha(background) > 0) {
             long[] entries = dataSet.getEntries();
             float[] points = computedPoints;
 
@@ -228,7 +226,7 @@ public final class LineChartRenderer {
             path.close();
 
             path.computeBounds(pathBounds, false);
-            background.applyToPaint(pathBounds, backgroundPaint);
+            backgroundPaint.setColor(background);
             c.drawPath(path, backgroundPaint);
         }
     }
