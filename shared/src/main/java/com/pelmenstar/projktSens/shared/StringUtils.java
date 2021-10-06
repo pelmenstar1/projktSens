@@ -321,18 +321,4 @@ public final class StringUtils {
             writeThreeDigits(buffer, offset, value);
         }
     }
-
-    public static void writeAsciiBytes(@NotNull String str, byte @NotNull [] outBuffer, int offset) {
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            byte mapped;
-            if (c > 0x7f) {
-                mapped = '?';
-            } else {
-                mapped = (byte) c;
-            }
-
-            outBuffer[offset + i] = mapped;
-        }
-    }
 }
