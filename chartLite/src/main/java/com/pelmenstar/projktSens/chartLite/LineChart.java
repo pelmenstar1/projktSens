@@ -32,11 +32,8 @@ public class LineChart extends View {
     protected final YAxis yAxis;
     protected final XAxisRenderer xAxisRenderer;
     protected final YAxisRenderer yAxisRenderer;
-    protected final SimpleChartAnimator animator;
 
-    private boolean isAutoAnimated;
     private boolean isOffsetsCalculated;
-    private boolean isFirstRender;
 
     protected float minOffset = 15f;
 
@@ -57,31 +54,16 @@ public class LineChart extends View {
 
         setWillNotDraw(false);
 
-        animator = new SimpleChartAnimator(this);
         dataRef = new DataRef();
         viewPortHandler = new ViewPortHandler();
 
-        renderer = new LineChartRenderer(viewPortHandler, animator, dataRef);
+        renderer = new LineChartRenderer(viewPortHandler, dataRef);
 
         xAxis = new XAxis(context);
         xAxisRenderer = new XAxisRenderer(viewPortHandler, xAxis);
 
         yAxis = new YAxis(context);
         yAxisRenderer = new YAxisRenderer(viewPortHandler, yAxis);
-    }
-
-    /**
-     * Returns whether auto animations is enabled
-     */
-    public boolean isAutoAnimated() {
-        return isAutoAnimated;
-    }
-
-    /**
-     * Sets state of auto animations in chart
-     */
-    public void setAutoAnimated(boolean value) {
-        isAutoAnimated = value;
     }
 
     /**
@@ -168,11 +150,6 @@ public class LineChart extends View {
         xAxisRenderer.draw(c);
         yAxisRenderer.draw(c);
         renderer.draw(c);
-
-        if (isAutoAnimated && isFirstRender) {
-            isFirstRender = false;
-            animateXY(500);
-        }
     }
 
     private void prepareTransMatrix() {
@@ -241,36 +218,6 @@ public class LineChart extends View {
                 Math.max(minOffset, offsetBottom));
 
         prepareTransMatrix();
-    }
-
-    /**
-     * Returns {@link SimpleChartAnimator} that connected with chart
-     */
-    @NotNull
-    public SimpleChartAnimator getAnimator() {
-        return animator;
-    }
-
-    /**
-     * Animates x-axis
-     *
-     * @param duration duration of animation in milliseconds
-     */
-    public void animateX(long duration) {
-        animator.animateX(duration);
-    }
-
-    /**
-     * Animates y-axis
-     *
-     * @param duration duration of animation in milliseconds
-     */
-    public void animateY(long duration) {
-        animator.animateY(duration);
-    }
-
-    public void animateXY(long duration) {
-        animator.animatedXY(duration);
     }
 
     public float getMinOffset() {

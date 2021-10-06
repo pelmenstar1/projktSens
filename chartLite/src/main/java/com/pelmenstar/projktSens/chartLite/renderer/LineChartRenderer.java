@@ -7,7 +7,6 @@ import android.graphics.Path;
 import android.graphics.RectF;
 
 import com.pelmenstar.projktSens.chartLite.DataRef;
-import com.pelmenstar.projktSens.chartLite.SimpleChartAnimator;
 import com.pelmenstar.projktSens.chartLite.ViewPortHandler;
 import com.pelmenstar.projktSens.chartLite.data.ChartData;
 import com.pelmenstar.projktSens.chartLite.data.DataSet;
@@ -31,18 +30,13 @@ public final class LineChartRenderer {
     @NotNull
     private final ViewPortHandler viewPortHandler;
 
-    @NotNull
-    private final SimpleChartAnimator animator;
     private float[] computedPoints = EmptyArray.FLOAT;
 
     private int computedPointsEntriesHash;
     private int computedPointsVphHash;
-    private float computedPointsPhaseX;
-    private float computedPointsPhaseY;
 
-    public LineChartRenderer(@NotNull ViewPortHandler viewPortHandler, @NotNull SimpleChartAnimator animator, @NotNull DataRef dataRef) {
+    public LineChartRenderer(@NotNull ViewPortHandler viewPortHandler, @NotNull DataRef dataRef) {
         this.viewPortHandler = viewPortHandler;
-        this.animator = animator;
         this.dataRef = dataRef;
 
         linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -65,21 +59,13 @@ public final class LineChartRenderer {
         int entriesHash = data.hashCode();
         int vphHash = viewPortHandler.stateHashCode();
 
-        float phaseX = animator.getPhaseX();
-        float phaseY = animator.getPhaseY();
-
         if (computedPointsEntriesHash == entriesHash &&
-                computedPointsVphHash == vphHash &&
-                computedPointsPhaseX == phaseX &&
-                computedPointsPhaseY == phaseY
-        ) {
+                computedPointsVphHash == vphHash) {
             return;
         }
 
         computedPointsEntriesHash = entriesHash;
         computedPointsVphHash = vphHash;
-        computedPointsPhaseX = phaseX;
-        computedPointsPhaseY = phaseY;
 
         int totalPointsLength = data.getEntryCount() * 2;
         if (computedPoints.length != totalPointsLength) {
@@ -92,8 +78,8 @@ public final class LineChartRenderer {
 
         for (DataSet dataSet : data.getDataSets()) {
             for (long e : dataSet.getEntries()) {
-                points[pOffset] = Entry.getX(e) * phaseX;
-                points[pOffset + 1] = Entry.getY(e) * phaseY;
+                points[pOffset] = Entry.getX(e);
+                points[pOffset + 1] = Entry.getY(e);
 
                 pOffset += 2;
             }
