@@ -191,16 +191,18 @@ public final class StringUtils {
 
     public static int getRound1Length(float number) {
         int i = (int)number;
-        int length = MyMath.decimalDigitCount(i) + 2;
-        if(i < 0) {
-            length++;
+        int length;
+        if(number > 0) {
+            length = MyMath.decimalDigitCount(i) + 2;
+        } else {
+            length = MyMath.decimalDigitCount(-i) + 3;
         }
 
         return length;
     }
 
     public static int getSignedRound1Length(float number) {
-        return MyMath.decimalDigitCount((int)number) + 3;
+        return MyMath.decimalDigitCount((int)Math.abs(number)) + 3;
     }
 
     @NotNull
