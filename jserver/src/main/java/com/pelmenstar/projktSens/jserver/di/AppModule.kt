@@ -8,7 +8,6 @@ import com.pelmenstar.projktSens.jserver.logging.LoggerConfig
 import com.pelmenstar.projktSens.jserver.repo.DbServerWeatherRepository
 import com.pelmenstar.projktSens.serverProtocol.ContractType
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
-import com.pelmenstar.projktSens.serverProtocol.ProtoConfigImpl
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.weather.models.*
 import dagger.Module
@@ -30,19 +29,19 @@ open class AppModule(private val context: Context) {
             override suspend fun clear() {
             }
 
-            override suspend fun getDayReport(date: Int): DayReport? {
+            override suspend fun getDayReport(date: Int): DayReport {
                 return RandomWeatherDataSource.getDayReport(date)
             }
 
-            override suspend fun getDayRangeReport(range: ShortDateRange): DayRangeReport? {
-                return RandomWeatherDataSource.getDayRangeReport(range)
+            override suspend fun getDayRangeReport(start: Int, end: Int): DayRangeReport {
+                return RandomWeatherDataSource.getDayRangeReport(start, end)
             }
 
-            override suspend fun getAvailableDateRange(): ShortDateRange? {
+            override suspend fun getAvailableDateRange(): ShortDateRange {
                 return RandomWeatherDataSource.getAvailableDateRange()
             }
 
-            override suspend fun getLastWeather(): WeatherInfo? {
+            override suspend fun getLastWeather(): WeatherInfo {
                 return RandomWeatherDataSource.getLastWeather()
             }
 
@@ -59,7 +58,7 @@ open class AppModule(private val context: Context) {
     @Provides
     open fun protoConfig(): ProtoConfig {
         val prefs = AppPreferences.of(context)
-        return ProtoConfigImpl(
+        return ProtoConfig(
             InetSocketAddress(host, prefs.serverPort),
             prefs.weatherSendInterval,
             ContractType.toObject(prefs.serverContract)

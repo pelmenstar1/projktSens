@@ -19,7 +19,6 @@ import com.pelmenstar.projktSens.weather.app.formatters.ResourcesPrettyDateForma
 import com.pelmenstar.projktSens.weather.models.WeatherChannelInfoProvider
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.shared.InetAddressUtils
-import com.pelmenstar.projktSens.serverProtocol.ProtoConfigImpl
 import com.pelmenstar.projktSens.serverProtocol.ContractType
 import com.pelmenstar.projktSens.weather.app.*
 import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartContract
@@ -74,7 +73,7 @@ class AppModule(private val context: Context) {
 
     @Provides
     fun dataSource(protoConfig: ProtoConfig): WeatherDataSource {
-        return NetworkDataSource(protoConfig)
+        return RandomWeatherDataSource
     }
 
     @Provides
@@ -104,7 +103,12 @@ class AppModule(private val context: Context) {
 
     @Provides
     fun weatherChannelInfoProvider(protoConfig: ProtoConfig): WeatherChannelInfoProvider {
-        return NetworkWeatherChannelInfoProvider(protoConfig)
+        return object: WeatherChannelInfoProvider {
+            override val receiveInterval: Long
+                get() = 5000
+
+            override suspend fun getNextWeatherTime(): Long = 0
+        }
     }
 
     @Provides
@@ -117,7 +121,7 @@ class AppModule(private val context: Context) {
         val prefs = preferences()
         val inetAddress = InetAddressUtils.parseInt(prefs.serverHostInt)
 
-        return ProtoConfigImpl(
+        return ProtoConfig(
             InetSocketAddress(inetAddress, prefs.serverPort),
             prefs.weatherReceiveInterval,
             ContractType.toObject(prefs.contractType)
