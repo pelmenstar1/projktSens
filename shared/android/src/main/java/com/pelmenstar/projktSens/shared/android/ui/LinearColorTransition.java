@@ -19,17 +19,26 @@ import java.util.Arrays;
  * Represents a linear color transition
  */
 public final class LinearColorTransition extends AppendableToStringBuilder implements Cloneable {
+    private static final class IntArrayRef {
+        private int @NotNull [] value;
+
+        public IntArrayRef(int @NotNull [] initialValue) {
+            value = initialValue;
+        }
+    }
+
     private static final class FlatCache {
-        private int[] array = EmptyArray.INT;
+        private final IntArrayRef arrayRef = new IntArrayRef(EmptyArray.INT);
 
         public int addAndAllocSize(int key, int dataSize) {
+            int[] array = arrayRef.value;
             int dataStartPos = array.length + 2;
             int[] newArray = new int[dataStartPos + dataSize];
             System.arraycopy(array, 0, newArray, 0, array.length);
             newArray[array.length] = key;
             newArray[array.length + 1] = dataSize;
 
-            array = newArray;
+            arrayRef.value = newArray;
 
             return dataStartPos;
         }
@@ -37,13 +46,14 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
         @Nullable
         public LinearColorTransition createTransitionIfInCache(int key) {
             int pos = 0;
+            int[] array = arrayRef.value;
 
             while(pos < array.length) {
                 int currentKey = array[pos];
                 int currentDataSize = array[pos + 1];
 
                 if(currentKey == key) {
-                    return new LinearColorTransition(array, pos + 2, currentDataSize);
+                    return new LinearColorTransition(arrayRef, pos + 2, currentDataSize);
                 }
 
                 pos += currentDataSize + 2;
@@ -56,11 +66,11 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
     private static final FlatCache transitionCacheByHash = new FlatCache();
     private static final FlatCache transitionCacheByResId = new FlatCache();
 
-    private static final int[] EMPTY_DATA = new int[1];
+    private static final IntArrayRef EMPTY_DATA_REF = new IntArrayRef(new int[1]);
     public static final int TRANSITION_FRAMES = 60;
     private static final float INV_TRANSITION_FRAMES = 1f / (float) TRANSITION_FRAMES;
 
-    private final int[] data;
+    private final IntArrayRef dataRef;
     private final int offset;
     private final int length;
 
@@ -70,8 +80,8 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
     private int limitMask = 0xffffffff;
     private int limit;
 
-    private LinearColorTransition(int @NotNull [] data, int offset, int length) {
-        this.data = data;
+    private LinearColorTransition(@NotNull IntArrayRef dataRef, int offset, int length) {
+        this.dataRef = dataRef;
         this.offset = offset;
         this.length = length;
 
@@ -80,7 +90,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
 
     @SuppressWarnings("CopyConstructorMissesField")
     public LinearColorTransition(@NotNull LinearColorTransition other) {
-        this(other.data, other.offset, other.length);
+        this(other.dataRef, other.offset, other.length);
     }
 
     /**
@@ -88,7 +98,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
      */
     @NotNull
     public static LinearColorTransition empty() {
-        return new LinearColorTransition(EMPTY_DATA, 0, 1);
+        return new LinearColorTransition(EMPTY_DATA_REF, 0, 1);
     }
 
     /**
@@ -110,10 +120,10 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
 
         int startPos = transitionCacheByHash.addAndAllocSize(hash, TRANSITION_FRAMES);
 
-        biColorInternal(start, end, transitionCacheByHash.array, startPos);
+        biColorInternal(start, end, transitionCacheByHash.arrayRef.value, startPos);
 
         return new LinearColorTransition(
-                transitionCacheByHash.array, startPos, TRANSITION_FRAMES
+                transitionCacheByHash.arrayRef, startPos, TRANSITION_FRAMES
         );
     }
 
@@ -172,7 +182,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
         int tColorsLength = maxColors * TRANSITION_FRAMES;
         int startPos = transitionCacheByHash.addAndAllocSize(hash, tColorsLength);
         int tColorPos = startPos;
-        int[] data = transitionCacheByHash.array;
+        int[] data = transitionCacheByHash.arrayRef.value;
 
         for(int i = 0; i < maxColors; i++) {
             int start = colors[i];
@@ -183,7 +193,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
         }
 
         return new LinearColorTransition(
-                transitionCacheByHash.array, startPos, tColorsLength
+                transitionCacheByHash.arrayRef, startPos, tColorsLength
         );
     }
 
@@ -201,8 +211,8 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
                 colorsRes, transition.length
         );
         System.arraycopy(
-                transition.data, transition.offset,
-                transitionCacheByResId.array, startPos,
+                transition.dataRef.value, transition.offset,
+                transitionCacheByResId.arrayRef.value, startPos,
                 transition.length
         );
 
@@ -222,7 +232,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
         }
         index += step;
 
-        return data[index];
+        return dataRef.value[index];
     }
 
     private void recomputeLimit() {
@@ -232,7 +242,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
     @Override
     public void append(@NotNull StringBuilder sb) {
         sb.append("{resultColors=");
-        StringUtils.appendHexColors(data, offset, length, sb);
+        StringUtils.appendHexColors(dataRef.value, offset, length, sb);
         sb.append('}');
     }
 }
