@@ -4,7 +4,7 @@ import android.os.Bundle
 import com.pelmenstar.projktSens.shared.android.mvp.BasePresenter
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
-import com.pelmenstar.projktSens.weather.models.astro.MoonInfoProvider
+import com.pelmenstar.projktSens.weather.app.astro.MoonInfoProvider
 
 class MoonCalendarPresenter(
     private val moonInfoProvider: MoonInfoProvider

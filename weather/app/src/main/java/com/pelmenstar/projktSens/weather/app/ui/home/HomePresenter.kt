@@ -25,7 +25,8 @@ import com.pelmenstar.projktSens.weather.app.ui.report.WeekReportActivity
 import com.pelmenstar.projktSens.weather.models.WeatherChannelInfoProvider
 import com.pelmenstar.projktSens.weather.models.WeatherDataSource
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
-import com.pelmenstar.projktSens.weather.models.astro.SunInfoProvider
+import com.pelmenstar.projktSens.weather.app.astro.SunInfoProvider
+import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import kotlinx.coroutines.*
 
 class HomePresenter(

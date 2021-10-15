@@ -5,7 +5,7 @@ import com.pelmenstar.projktSens.shared.android.mvp.BasePresenter
 import com.pelmenstar.projktSens.shared.geo.Geolocation
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.weather.app.GeolocationCache
-import com.pelmenstar.projktSens.weather.models.astro.SunInfoProvider
+import com.pelmenstar.projktSens.weather.app.astro.SunInfoProvider
 
 class SunriseSunsetCalendarPresenter(
     private val sunInfoProvider: SunInfoProvider

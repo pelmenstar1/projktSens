@@ -1,4 +1,4 @@
-package com.pelmenstar.projktSens.weather.models.astro;
+package com.pelmenstar.projktSens.weather.app.astro;
 
 import com.pelmenstar.projktSens.shared.time.ShortDateInt;
 

@@ -12,8 +12,8 @@ import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarContract
 import com.pelmenstar.projktSens.weather.app.ui.sunriseSunset.SunriseSunsetCalendarContract
 import com.pelmenstar.projktSens.weather.models.WeatherChannelInfoProvider
 import com.pelmenstar.projktSens.weather.models.WeatherDataSource
-import com.pelmenstar.projktSens.weather.models.astro.MoonInfoProvider
-import com.pelmenstar.projktSens.weather.models.astro.SunInfoProvider
+import com.pelmenstar.projktSens.weather.app.astro.MoonInfoProvider
+import com.pelmenstar.projktSens.weather.app.astro.SunInfoProvider
 import dagger.Component
 
 @Component(modules = [AppModule::class])
