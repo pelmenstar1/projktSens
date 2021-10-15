@@ -27,10 +27,20 @@ public class LineChart extends View {
 
     @NotNull
     protected final LineChartRenderer renderer;
+
+    @NotNull
     protected final ViewPortHandler viewPortHandler;
+
+    @NotNull
     protected final XAxis xAxis;
+
+    @NotNull
     protected final YAxis yAxis;
+
+    @NotNull
     protected final XAxisRenderer xAxisRenderer;
+
+    @NotNull
     protected final YAxisRenderer yAxisRenderer;
 
     private boolean isOffsetsCalculated;

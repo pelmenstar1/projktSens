@@ -27,10 +27,19 @@ import com.pelmenstar.projktSens.weather.models.WeatherInfo;
 import org.jetbrains.annotations.NotNull;
 
 public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcomponent {
+    @NotNull
     private final Paint tempPaint;
+
+    @NotNull
     private final Paint tempUnitPaint;
+
+    @NotNull
     private final Paint humPressPaint;
+
+    @NotNull
     private final Paint blockPaint;
+
+    @NotNull
     private final Paint blockBorderPaint;
 
     private final float tempMarginBottom;
@@ -39,12 +48,22 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
     private final float roundRectRadius;
     private final float borderThickness;
 
+    @NotNull
     private final UnitFormatter unitFormatter;
+
+    @NotNull
     private final AppPreferences preferences;
 
+    @NotNull
     private String tempUnitStr = "";
+
+    @NotNull
     private String tempStr = "";
+
+    @NotNull
     private String humStr = "";
+
+    @NotNull
     private String pressStr = "";
 
     private long tempStrPos;
@@ -57,6 +76,7 @@ public final class WeatherBlockSubcomponent extends ComplexWeatherView.Subcompon
                 .builder()
                 .appModule(new AppModule(context))
                 .build();
+
         unitFormatter = appComponent.unitFormatter();
         preferences = appComponent.preferences();
 

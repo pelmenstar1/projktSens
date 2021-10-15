@@ -13,6 +13,7 @@ import java.util.HashMap;
 public final class Serializable {
     private static final int REQUIRED_SERIALIZER_MODS = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
 
+    @NotNull
     private static final HashMap<Class<?>, ObjectSerializer<?>> cachedSerializers = new HashMap<>();
 
     private Serializable() {

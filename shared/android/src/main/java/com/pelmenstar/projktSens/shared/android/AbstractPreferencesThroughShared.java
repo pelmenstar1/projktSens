@@ -28,6 +28,7 @@ public abstract class AbstractPreferencesThroughShared implements Preferences {
         }
     }
 
+    @NotNull
     private final String tag = getClass().getName();
 
     @Nullable

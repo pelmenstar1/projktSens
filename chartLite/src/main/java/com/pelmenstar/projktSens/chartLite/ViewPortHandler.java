@@ -6,10 +6,12 @@ import android.graphics.RectF;
 import org.jetbrains.annotations.NotNull;
 
 public final class ViewPortHandler {
+    @NotNull
     private final Matrix cvtMatrix = new Matrix();
 
+    @NotNull
     private final RectF content = new RectF();
-    private final float[] matrixBuffer = new float[9];
+    private final float @NotNull [] matrixBuffer = new float[9];
     private float chartWidth = 0f;
     private float chartHeight = 0f;
 

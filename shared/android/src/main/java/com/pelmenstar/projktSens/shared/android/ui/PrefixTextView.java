@@ -43,7 +43,11 @@ public final class PrefixTextView extends MaterialTextView {
         this(context, attrs, defStyleAttr, 0);
     }
 
-    public PrefixTextView(@NotNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr, @StyleRes int defStyleRes) {
+    public PrefixTextView(
+            @NotNull Context context,
+            @Nullable AttributeSet attrs,
+            @AttrRes int defStyleAttr, @StyleRes int defStyleRes
+    ) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
         if (attrs != null) {
@@ -77,18 +81,12 @@ public final class PrefixTextView extends MaterialTextView {
         invalidateText();
     }
 
-    /**
-     * Sets prefix
-     */
     public void setPrefix(@NotNull String prefix) {
         this.prefix = prefix;
 
         invalidateText();
     }
 
-    /**
-     * Sets value
-     */
     public void setValue(@NotNull String value) {
         this.value = value;
 
@@ -102,7 +100,7 @@ public final class PrefixTextView extends MaterialTextView {
         invalidateText();
     }
 
-    private char[] textCache = EmptyArray.CHAR;
+    private char @NotNull [] textCache = EmptyArray.CHAR;
 
     private void invalidateText() {
         int prefixLength = prefix.length();

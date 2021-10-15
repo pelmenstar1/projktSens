@@ -12,8 +12,10 @@ import com.pelmenstar.projktSens.shared.EmptyArray;
 import org.jetbrains.annotations.NotNull;
 
 public final class XAxisRenderer extends AxisRenderer<XAxis> {
+    @NotNull
     private final Paint.FontMetrics labelFontMetrics = new Paint.FontMetrics();
-    private float[] computedPoints = EmptyArray.FLOAT;
+    private float @NotNull [] computedPoints = EmptyArray.FLOAT;
+
     private int computedPointsAxisEntriesHash = 0;
     private int computedPointsVphHash = 0;
 

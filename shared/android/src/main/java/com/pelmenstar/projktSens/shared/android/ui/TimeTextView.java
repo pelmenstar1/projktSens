@@ -22,7 +22,7 @@ public final class TimeTextView extends MaterialTextView {
     @TimeInt
     private int time = -1;
 
-    private final char[] textCache = new char[8];
+    private final char @NotNull [] textCache = new char[8];
 
     public TimeTextView(@NotNull Context context) {
         this(context, null, android.R.attr.textViewStyle, 0);

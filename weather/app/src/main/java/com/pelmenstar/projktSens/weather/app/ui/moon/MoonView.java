@@ -19,9 +19,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class MoonView extends View {
+    @NotNull
     private final Paint visiblePartPaint;
 
+    @NotNull
     private final Path invisiblePartPath = new Path();
+
     private float moonPhase = 0f;
 
     public MoonView(@NotNull Context context) {

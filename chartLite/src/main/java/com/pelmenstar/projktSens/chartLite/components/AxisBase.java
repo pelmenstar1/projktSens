@@ -48,6 +48,7 @@ public abstract class AxisBase {
     @Nullable
     protected Typeface typeface = null;
     protected float textSize;
+
     @ColorInt
     protected int textColor = Color.BLACK;
 

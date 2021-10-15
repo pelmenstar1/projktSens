@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 
 public final class ParameterStats extends AppendableToStringBuilder {
     public static final int SERIALIZED_OBJECT_SIZE = 8 + 2 * ValueWithDate.SERIALIZED_OBJECT_SIZE;
+
+    @NotNull
     public static final ObjectSerializer<ParameterStats> SERIALIZER;
 
     @NotNull

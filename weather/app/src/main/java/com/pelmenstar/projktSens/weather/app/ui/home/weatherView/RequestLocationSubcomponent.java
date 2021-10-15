@@ -13,8 +13,13 @@ import com.pelmenstar.projktSens.weather.app.R;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class RequestLocationSubcomponent extends ComplexWeatherView.Subcomponent {
+    @NotNull
     private final Drawable icon;
+
+    @Nullable
     private RequestLocationPermissionHandler requestLocationPermissionHandler;
 
     public RequestLocationSubcomponent(@NotNull Context context) {
@@ -23,8 +28,7 @@ public class RequestLocationSubcomponent extends ComplexWeatherView.Subcomponent
 
         int iconTint = ResourcesCompat.getColor(res, R.color.weatherView_iconTint, theme);
 
-        icon = ResourcesCompat.getDrawable(res, R.drawable.ic_error, theme);
-        if (icon == null) throw new NullPointerException();
+        icon = Objects.requireNonNull(ResourcesCompat.getDrawable(res, R.drawable.ic_error, theme));
 
         DrawableCompat.setTint(icon, iconTint);
     }

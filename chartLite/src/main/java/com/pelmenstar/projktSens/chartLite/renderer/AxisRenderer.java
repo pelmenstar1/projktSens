@@ -22,8 +22,13 @@ public abstract class AxisRenderer<TAxis extends AxisBase> {
     @NotNull
     protected final TAxis axis;
 
+    @NotNull
     protected final Paint gridPaint;
+
+    @NotNull
     protected final Paint axisLinePaint;
+
+    @NotNull
     protected final Paint labelPaint;
 
     public AxisRenderer(@NotNull ViewPortHandler viewPortHandler, @NotNull TAxis axis) {

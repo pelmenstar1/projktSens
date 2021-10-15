@@ -8,11 +8,14 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class RoundRectDrawable extends Drawable {
+    @NotNull
     private final Paint paint;
+
     private final float radius;
 
     public RoundRectDrawable(@ColorInt int color, float radius, boolean fill) {
@@ -24,7 +27,7 @@ public final class RoundRectDrawable extends Drawable {
     }
 
     @Override
-    public void draw(@NonNull Canvas canvas) {
+    public void draw(@NotNull Canvas canvas) {
         Rect bounds = getBounds();
 
         canvas.drawRoundRect(

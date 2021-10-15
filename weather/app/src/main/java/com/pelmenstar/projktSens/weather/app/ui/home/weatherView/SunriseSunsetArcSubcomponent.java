@@ -22,17 +22,29 @@ import com.pelmenstar.projktSens.weather.app.R;
 import org.jetbrains.annotations.NotNull;
 
 public final class SunriseSunsetArcSubcomponent extends ComplexWeatherView.Subcomponent {
+    @NotNull
     private final Paint dashedArcPaint;
+
+    @NotNull
     private final Paint overArcPaint;
+
+    @NotNull
     private final Paint textPaint;
+
     private final float primaryPadding;
-    private final char[] sunriseText;
-    private final char[] sunsetText;
+
+    private final char @NotNull [] sunriseText;
+    private final char @NotNull [] sunsetText;
+
+    @NotNull
     private final RectF arcBounds = new RectF();
+
     private int sunrise = ShortTime.NONE;
     private int sunset = ShortTime.NONE;
     private int time = ShortTime.NONE;
+
     private float overArcAngle;
+
     private long sunrisePos;
     private long sunsetPos;
     private long sunriseTextSize;

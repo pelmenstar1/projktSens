@@ -1,6 +1,7 @@
 package com.pelmenstar.projktSens.shared;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Writer;
 
@@ -9,6 +10,7 @@ import java.io.Writer;
  * Delegates all operations to {@link StringBuilder}
  */
 public final class StringBuilderWriter extends Writer {
+    @NotNull
     private final StringBuilder sb;
 
     public StringBuilderWriter(@NotNull StringBuilder sb) {
@@ -32,13 +34,13 @@ public final class StringBuilderWriter extends Writer {
     }
 
     @Override
-    public Writer append(CharSequence csq) {
+    public Writer append(@Nullable CharSequence csq) {
         sb.append(csq);
         return this;
     }
 
     @Override
-    public Writer append(CharSequence csq, int start, int end) {
+    public Writer append(@Nullable CharSequence csq, int start, int end) {
         sb.append(csq, start, end);
         return this;
     }

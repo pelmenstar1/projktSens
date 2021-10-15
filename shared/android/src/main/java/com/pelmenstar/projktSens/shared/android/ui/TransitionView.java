@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class TransitionView extends View {
+    @NotNull
     private static final String TAG = "TransitionView";
 
     private static int creationCounter = 0;
@@ -33,18 +34,27 @@ public final class TransitionView extends View {
 
     private int shape;
     private float shapeSize;
+
+    @NotNull
     private final Paint shapePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    @NotNull
     private final Path shapePath = new Path();
 
     @Nullable
     private volatile LinearColorTransition colorTransition;
 
+    @NotNull
     private final Object colorTransitionLock = new Object();
 
+    @NotNull
     private final AtomicInteger transitionRunning = new AtomicInteger();
     private boolean transitionStoppedByDetaching = false;
 
+    @NotNull
     private static final InvokeOnFirstSet<Handler> transThreadHandler = new InvokeOnFirstSet<>();
+
+    @NotNull
     private static final AtomicInteger isHandlerThreadStarted = new AtomicInteger();
 
     public TransitionView(@NotNull Context context) {
@@ -301,7 +311,7 @@ public final class TransitionView extends View {
         public static final int HEPTAGON = EQUILATERAL_SHAPE_BIT | 7;
         public static final int OCTAGON = EQUILATERAL_SHAPE_BIT | 8;
 
-        private static final int[] COMMON = new int[]{
+        private static final int @NotNull [] COMMON = new int[]{
                 RECT,
                 CIRCLE,
                 PENTAGON,
@@ -312,6 +322,7 @@ public final class TransitionView extends View {
                 RHOMBUS,
         };
 
+        @NotNull
         private static final FlatSinCosTable sinCosTable = new FlatSinCosTable();
 
         private static int getPositionInSinCosTable(int angles) {
@@ -362,7 +373,7 @@ public final class TransitionView extends View {
     }
 
     private static final class FlatSinCosTable {
-        private int[] values = EmptyArray.INT;
+        private int @NotNull [] values = EmptyArray.INT;
 
         public int allocateNewBlock(int angles) {
             int startIndex = values.length + 1;

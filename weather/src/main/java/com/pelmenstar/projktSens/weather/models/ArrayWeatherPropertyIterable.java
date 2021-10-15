@@ -3,7 +3,7 @@ package com.pelmenstar.projktSens.weather.models;
 import org.jetbrains.annotations.NotNull;
 
 public final class ArrayWeatherPropertyIterable implements WeatherPropertyIterable {
-    private final WeatherInfo[] values;
+    private final @NotNull WeatherInfo @NotNull [] values;
     private int index;
     private WeatherInfo current;
 

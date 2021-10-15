@@ -39,7 +39,7 @@ public final class Errors {
      */
     public static final int IO = 5;
 
-    private static final String[] ERROR_NAMES = new String[]{
+    private static final @NotNull String @NotNull [] ERROR_NAMES = new String[]{
             "NONE",
             "UNKNOWN",
             "INVALID_ARGUMENTS",

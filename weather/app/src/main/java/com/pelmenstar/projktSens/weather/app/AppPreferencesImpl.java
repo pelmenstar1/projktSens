@@ -10,7 +10,9 @@ import com.pelmenstar.projktSens.weather.models.ValueUnitsPacked;
 import org.jetbrains.annotations.NotNull;
 
 public class AppPreferencesImpl extends AbstractPreferencesThroughShared implements AppPreferences {
+    @NotNull
     public static final AppPreferencesImpl INSTANCE = new AppPreferencesImpl();
+
     private static final int DEFAULT_SEVER_ADDRESS_INT = 0;
     private static final int DEFAULT_SERVER_PORT = 10001;
     private static final int DEFAULT_WEATHER_RECEIVE_INTERVAL = 10 * 1000;

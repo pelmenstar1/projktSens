@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 
 public final class ArrayIterator<T> implements Iterator<T> {
-    private final T[] elements;
+    private final T @NotNull [] elements;
     private int index;
 
     public ArrayIterator(T @NotNull [] elements) {

@@ -22,6 +22,7 @@ public final class ReadonlyArrayAdapter<T> extends BaseAdapter implements Themed
 
     private final @NotNull T @NotNull [] objects;
 
+    @NotNull
     private final LayoutInflater inflater;
 
     @Nullable
@@ -93,7 +94,8 @@ public final class ReadonlyArrayAdapter<T> extends BaseAdapter implements Themed
             int position,
             @Nullable View convertView,
             @NotNull ViewGroup parent,
-            @LayoutRes int res) {
+            @LayoutRes int res
+    ) {
         View view;
 
         if (convertView == null) {

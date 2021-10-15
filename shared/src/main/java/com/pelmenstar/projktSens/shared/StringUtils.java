@@ -9,7 +9,7 @@ import java.util.Arrays;
  * Represents a helper class that efficiently build strings
  */
 public final class StringUtils {
-    private static final byte[] DIGITS = {
+    private static final byte @NotNull [] DIGITS = {
             0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0x10,
             0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x20,
             0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x30,
@@ -24,7 +24,7 @@ public final class StringUtils {
             0xffffff99,
     };
 
-    private static final char[] hexBuffer = new char[8];
+    private static final char @NotNull [] hexBuffer = new char[8];
 
     private StringUtils() {
     }
@@ -156,7 +156,10 @@ public final class StringUtils {
      * @param array array to append to {@link StringBuilder}
      * @param sb    receiver
      */
-    public static void appendArray(@Nullable AppendableToStringBuilder @Nullable [] array, @NotNull StringBuilder sb) {
+    public static void appendArray(
+            @Nullable AppendableToStringBuilder @Nullable [] array,
+            @NotNull StringBuilder sb
+    ) {
         if (array == null) {
             appendNull(sb);
         } else {

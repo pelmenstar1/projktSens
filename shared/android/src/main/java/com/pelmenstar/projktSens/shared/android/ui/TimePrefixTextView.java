@@ -32,7 +32,7 @@ public final class TimePrefixTextView extends MaterialTextView {
     @Nullable
     private CharacterStyle timeStyle;
 
-    private char[] textCache = EmptyArray.CHAR;
+    private char @NotNull [] textCache = EmptyArray.CHAR;
 
     public TimePrefixTextView(@NotNull Context context) {
         this(context, null, android.R.attr.textViewStyle, 0);
@@ -46,7 +46,11 @@ public final class TimePrefixTextView extends MaterialTextView {
         this(context, attrs, defStyleAttr, 0);
     }
 
-    public TimePrefixTextView(@NotNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr, @StyleRes int defStyleRes) {
+    public TimePrefixTextView(
+            @NotNull Context context,
+            @Nullable AttributeSet attrs,
+            @AttrRes int defStyleAttr, @StyleRes int defStyleRes
+    ) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
         if (attrs != null) {
@@ -80,36 +84,22 @@ public final class TimePrefixTextView extends MaterialTextView {
         timeStyle = style;
     }
 
-    /**
-     * Gets prefix of view, not null
-     */
     @NotNull
     public String getPrefix() {
         return prefix;
     }
 
-    /**
-     * Sets prefix, not null
-     */
     public void setPrefix(@NotNull String prefix) {
         this.prefix = prefix;
 
         updateText();
     }
 
-    /**
-     * Gets time
-     */
     @TimeInt
     public int getTime() {
         return time;
     }
 
-    /**
-     * Sets time
-     *
-     * @throws IllegalArgumentException if {@code time} is invalid ({@code time < 0 || time >= TimeConstants.SECONDS_IN_DAY})
-     */
     public void setTime(@TimeInt int time) {
         if (this.time == time) {
             return;

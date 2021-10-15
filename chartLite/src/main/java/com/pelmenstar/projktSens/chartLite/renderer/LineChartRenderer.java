@@ -17,11 +17,19 @@ import com.pelmenstar.projktSens.shared.EmptyArray;
 import org.jetbrains.annotations.NotNull;
 
 public final class LineChartRenderer {
+    @NotNull
     private final Paint linePaint;
+
+    @NotNull
     private final Paint circlePaint;
+
+    @NotNull
     private final Paint labelPaint;
+
+    @NotNull
     private final Paint backgroundPaint;
 
+    @NotNull
     private final Path backgroundPath;
 
     @NotNull
@@ -30,7 +38,7 @@ public final class LineChartRenderer {
     @NotNull
     private final ViewPortHandler viewPortHandler;
 
-    private float[] computedPoints = EmptyArray.FLOAT;
+    private float @NotNull [] computedPoints = EmptyArray.FLOAT;
 
     private int computedPointsEntriesHash;
     private int computedPointsVphHash;
@@ -170,8 +178,6 @@ public final class LineChartRenderer {
         }
     }
 
-    private final RectF pathBounds = new RectF();
-
     private void drawBackground(@NotNull Canvas c, @NotNull DataSet dataSet, int pOffset) {
         int background = dataSet.getBackground();
 
@@ -211,7 +217,6 @@ public final class LineChartRenderer {
 
             path.close();
 
-            path.computeBounds(pathBounds, false);
             backgroundPaint.setColor(background);
             c.drawPath(path, backgroundPaint);
         }

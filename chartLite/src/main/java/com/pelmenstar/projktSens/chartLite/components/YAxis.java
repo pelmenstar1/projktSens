@@ -23,6 +23,7 @@ public final class YAxis extends AxisBase {
     private float minWidth = 0f;
     private float maxWidth = Float.POSITIVE_INFINITY;
 
+    @NotNull
     private final Context context;
 
     public YAxis(@NotNull Context context) {

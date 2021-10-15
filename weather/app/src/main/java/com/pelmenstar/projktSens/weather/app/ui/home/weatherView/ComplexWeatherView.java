@@ -8,6 +8,9 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.AttrRes;
+import androidx.annotation.StyleRes;
+
 import com.pelmenstar.projktSens.shared.time.ShortTime;
 import com.pelmenstar.projktSens.shared.time.TimeConstants;
 import com.pelmenstar.projktSens.shared.time.TimeInt;
@@ -26,11 +29,20 @@ public final class ComplexWeatherView extends View {
 
     private final float weatherBlockMarginTopBottom;
     private final float sunriseSunsetArcHeight;
+
+    @NotNull
     private final WeatherBlockSubcomponent weatherBlockSubcomponent;
+
+    @NotNull
     private final RetryGetLocationSubcomponent retryGetLocationSubcomponent;
+
+    @NotNull
     private final RequestLocationSubcomponent requestLocationSubcomponent;
+
+    @NotNull
     private final SunriseSunsetArcSubcomponent sunriseSunsetArcSubcomponent;
-    private final Subcomponent[] subcomponents;
+
+    private final @NotNull Subcomponent @NotNull [] subcomponents;
 
     // if we left it zero, in constructor setState() would fail,
     // because 0 is STATE_DAY
@@ -46,11 +58,19 @@ public final class ComplexWeatherView extends View {
         this(context, attrs, 0, 0);
     }
 
-    public ComplexWeatherView(@NotNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ComplexWeatherView(
+            @NotNull Context context,
+            @Nullable AttributeSet attrs,
+            @AttrRes int defStyleAttr
+    ) {
         this(context, attrs, defStyleAttr, 0);
     }
 
-    public ComplexWeatherView(@NotNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public ComplexWeatherView(
+            @NotNull Context context,
+            @Nullable AttributeSet attrs,
+            @AttrRes int defStyleAttr, @StyleRes int defStyleRes
+    ) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
         // Shadows is used in WeatherBlockSubcomponent.
@@ -249,8 +269,6 @@ public final class ComplexWeatherView extends View {
 
     @Override
     protected void onDraw(@NotNull Canvas c) {
-        super.onDraw(c);
-
         for (Subcomponent sc : subcomponents) {
             if (sc.isVisible) {
                 sc.draw(c);

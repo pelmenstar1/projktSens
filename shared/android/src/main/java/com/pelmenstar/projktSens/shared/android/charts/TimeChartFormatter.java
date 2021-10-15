@@ -9,7 +9,7 @@ public final class TimeChartFormatter extends ValueFormatter {
     @NotNull
     public static final TimeChartFormatter INSTANCE = new TimeChartFormatter();
 
-    private final char[] textCache = new char[5];
+    private final char @NotNull [] textCache = new char[5];
 
     private TimeChartFormatter() {
         super(true);

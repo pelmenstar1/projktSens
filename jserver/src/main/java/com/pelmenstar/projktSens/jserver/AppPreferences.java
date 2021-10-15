@@ -10,6 +10,7 @@ import com.pelmenstar.projktSens.shared.android.Preferences;
 import org.jetbrains.annotations.NotNull;
 
 public final class AppPreferences extends AbstractPreferencesThroughShared implements Preferences {
+    @NotNull
     public static final AppPreferences INSTANCE = new AppPreferences();
 
     private static final int DEFAULT_SERVER_PORT = 10001;
@@ -21,12 +22,13 @@ public final class AppPreferences extends AbstractPreferencesThroughShared imple
     private static final String KEY_WEATHER_SEND_INTERVAL = "weatherSendInterval";
 
     public static final int SERVER_PORT = 0;
-    public static final int SERVER_CONTRACT = 2;
-    public static final int WEATHER_SEND_INTERVAL = 3;
+    public static final int SERVER_CONTRACT = 1;
+    public static final int WEATHER_SEND_INTERVAL = 2;
 
     private AppPreferences() {
     }
 
+    @NotNull
     public static AppPreferences of(@NotNull Context context) {
         INSTANCE.initialize(context);
         return INSTANCE;

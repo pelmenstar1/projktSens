@@ -9,10 +9,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public final class ChartData extends AppendableToStringBuilder {
-    private static final DataSet[] EMPTY_DS = new DataSet[0];
+    private static final @NotNull DataSet @NotNull [] EMPTY_DS = new DataSet[0];
 
-    @NotNull
-    private final DataSet[] dataSets;
+    private final @NotNull DataSet @NotNull [] dataSets;
 
     private final int hash;
 

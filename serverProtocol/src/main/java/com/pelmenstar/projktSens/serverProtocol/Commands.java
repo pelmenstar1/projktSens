@@ -33,7 +33,7 @@ public final class Commands {
 
     private static final int MAX_COMMAND = GET_NEXT_WEATHER_TIME;
 
-    private static final String[] COMMAND_NAMES = new String[]{
+    private static final @NotNull String @NotNull [] COMMAND_NAMES = new String[]{
             "GET_DAY_REPORT",
             "GET_DAY_RANGE_REPORT",
             "GET_AVAILABLE_DATE_RANGE",

@@ -9,7 +9,7 @@ public final class DateChartFormatter extends ValueFormatter {
     @NotNull
     public static final DateChartFormatter INSTANCE = new DateChartFormatter();
 
-    private final char[] textCache = new char[10];
+    private final char @NotNull [] textCache = new char[10];
 
     private DateChartFormatter() {
         super(true);

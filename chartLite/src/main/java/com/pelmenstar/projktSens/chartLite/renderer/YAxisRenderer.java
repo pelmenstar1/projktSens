@@ -11,7 +11,7 @@ import com.pelmenstar.projktSens.shared.EmptyArray;
 import org.jetbrains.annotations.NotNull;
 
 public final class YAxisRenderer extends AxisRenderer<YAxis> {
-    private float[] computedPoints = EmptyArray.FLOAT;
+    private float @NotNull [] computedPoints = EmptyArray.FLOAT;
     private int computedPointsAxisEntriesHash = 0;
     private int computedPointsVphHash = 0;
 

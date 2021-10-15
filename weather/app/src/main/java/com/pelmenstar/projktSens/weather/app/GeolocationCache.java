@@ -9,6 +9,7 @@ public final class GeolocationCache {
     @Nullable
     private static volatile Geolocation lastGeolocation;
 
+    @NotNull
     private static final Object lock = new Object();
 
     @NotNull

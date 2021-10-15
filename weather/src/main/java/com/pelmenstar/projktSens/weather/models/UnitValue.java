@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * This class responsible for creating this union and helping to use it.
  */
 public final class UnitValue {
-    private static final long[] UNIT_RANGES = new long[] {
+    private static final long @NotNull [] UNIT_RANGES = new long[] {
             IntPair.create(-100, 100), // celsius
             IntPair.create(-148, 212), // fahrenheit
             IntPair.create(173, 373), // kelvin

@@ -18,17 +18,25 @@ import com.pelmenstar.projktSens.weather.app.R;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subcomponent {
     private static final float FAILED_GET_LOCATION_MARGIN_T_DP = 3;
     private static final float FAILED_GET_LOCATION_MARGIN_R_DP = 7;
 
+    @NotNull
     private final Drawable retryIcon;
+
+    @NotNull
     private final String failedGetLocationStr;
+
+    @NotNull
     private final Paint failedGetLocationPaint;
     private final float failedGetLocationHeight;
     private final float failedGetLocationMarginTop;
     private final float retrySize;
 
+    @Nullable
     private OnRetryGetLocationListener onRetryGetLocationListener;
     private float failedGetLocationY;
 
@@ -38,8 +46,7 @@ public final class RetryGetLocationSubcomponent extends ComplexWeatherView.Subco
         float density = res.getDisplayMetrics().density;
 
         retrySize = res.getDimension(R.dimen.weatherView_retrySize);
-        retryIcon = ResourcesCompat.getDrawable(res, R.drawable.ic_retry, theme);
-        if (retryIcon == null) throw new NullPointerException();
+        retryIcon = Objects.requireNonNull(ResourcesCompat.getDrawable(res, R.drawable.ic_retry, theme));
 
         failedGetLocationStr = res.getString(R.string.failedToGetLocation);
 

@@ -8,6 +8,7 @@ import com.pelmenstar.projktSens.shared.PackedSize;
 import org.jetbrains.annotations.NotNull;
 
 public final class TextUtils {
+    @NotNull
     private static final Rect textBoundsCache = new Rect();
 
     private TextUtils() {

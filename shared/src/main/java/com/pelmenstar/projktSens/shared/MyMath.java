@@ -1,7 +1,9 @@
 package com.pelmenstar.projktSens.shared;
 
+import org.jetbrains.annotations.NotNull;
+
 public final class MyMath {
-    private static final float[] POW_10_POSITIVE = new float[] {
+    private static final float @NotNull [] POW_10_POSITIVE = new float[] {
             1f,
             10f,
             100f,
@@ -13,7 +15,7 @@ public final class MyMath {
             100000000f,
     };
 
-    private static final float[] POW_10_NEGATIVE = new float[] {
+    private static final float @NotNull [] POW_10_NEGATIVE = new float[] {
             1f,
             1e-1f,
             1e-2f,

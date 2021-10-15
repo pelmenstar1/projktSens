@@ -28,6 +28,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
     }
 
     private static final class FlatCache {
+        @NotNull
         private final IntArrayRef arrayRef = new IntArrayRef(EmptyArray.INT);
 
         public int addAndAllocSize(int key, int dataSize) {
@@ -63,13 +64,19 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
         }
     }
 
+    @NotNull
     private static final FlatCache transitionCacheByHash = new FlatCache();
+
+    @NotNull
     private static final FlatCache transitionCacheByResId = new FlatCache();
 
+    @NotNull
     private static final IntArrayRef EMPTY_DATA_REF = new IntArrayRef(new int[1]);
+
     public static final int TRANSITION_FRAMES = 60;
     private static final float INV_TRANSITION_FRAMES = 1f / (float) TRANSITION_FRAMES;
 
+    @NotNull
     private final IntArrayRef dataRef;
     private final int offset;
     private final int length;
@@ -129,7 +136,7 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
 
     private static void biColorInternal(
             @ColorInt int start, @ColorInt int end,
-            int @NotNull [] colors,
+            @ColorInt int @NotNull [] colors,
             int index
     ) {
         int sr = Color.red(start);
