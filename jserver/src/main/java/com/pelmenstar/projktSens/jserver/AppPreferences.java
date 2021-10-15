@@ -45,7 +45,8 @@ public final class AppPreferences extends AbstractPreferencesThroughShared imple
 
     @Override
     protected void checkIfCorrupted() {
-        SharedPreferences prefs = preferences;
+        SharedPreferences prefs = preferences();
+
         int serverPort = prefs.getInt(KEY_SERVER_PORT, -1);
         int serverContract = prefs.getInt(KEY_SERVER_CONTRACT, -1);
         int weatherSendInterval = prefs.getInt(KEY_WEATHER_SEND_INTERVAL, -1);
@@ -56,7 +57,7 @@ public final class AppPreferences extends AbstractPreferencesThroughShared imple
     }
 
     private void writeDefault() {
-        preferences.edit()
+        preferences().edit()
                 .putInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT)
                 .putInt(KEY_SERVER_CONTRACT, DEFAULT_SERVER_CONTRACT)
                 .putInt(KEY_WEATHER_SEND_INTERVAL, DEFAULT_WEATHER_SEND_INTERVAL)
@@ -105,15 +106,15 @@ public final class AppPreferences extends AbstractPreferencesThroughShared imple
     }
 
     public int getServerPort() {
-        return safeGetInt(KEY_SERVER_PORT, SERVER_PORT, DEFAULT_SERVER_PORT);
+        return getInt(KEY_SERVER_PORT, SERVER_PORT, DEFAULT_SERVER_PORT);
     }
 
     public void setServerPort(int port) {
-        safePutInt(KEY_SERVER_PORT, SERVER_PORT, port);
+        putInt(KEY_SERVER_PORT, SERVER_PORT, port);
     }
 
     public int getServerContract() {
-        return safeGetInt(KEY_SERVER_CONTRACT, SERVER_CONTRACT, DEFAULT_SERVER_CONTRACT);
+        return getInt(KEY_SERVER_CONTRACT, SERVER_CONTRACT, DEFAULT_SERVER_CONTRACT);
     }
 
     public void setServerContract(int contractType) {
@@ -121,14 +122,14 @@ public final class AppPreferences extends AbstractPreferencesThroughShared imple
             throw new IllegalArgumentException("contractType");
         }
 
-        safePutInt(KEY_SERVER_CONTRACT, SERVER_CONTRACT, contractType);
+        putInt(KEY_SERVER_CONTRACT, SERVER_CONTRACT, contractType);
     }
 
     public int getWeatherSendInterval() {
-        return safeGetInt(KEY_WEATHER_SEND_INTERVAL, WEATHER_SEND_INTERVAL, DEFAULT_WEATHER_SEND_INTERVAL);
+        return getInt(KEY_WEATHER_SEND_INTERVAL, WEATHER_SEND_INTERVAL, DEFAULT_WEATHER_SEND_INTERVAL);
     }
 
     public void setWeatherSendInterval(int interval) {
-        safePutInt(KEY_WEATHER_SEND_INTERVAL, WEATHER_SEND_INTERVAL, interval);
+        putInt(KEY_WEATHER_SEND_INTERVAL, WEATHER_SEND_INTERVAL, interval);
     }
 }

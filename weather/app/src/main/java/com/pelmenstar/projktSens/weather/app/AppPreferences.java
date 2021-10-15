@@ -7,9 +7,9 @@ public interface AppPreferences extends Preferences {
     int SERVER_HOST_INT = 1;
     int CONTRACT = 2;
     int SERVER_PORT = 3;
-    int WEATHER_RECEIVE_INTERVAL = 5;
-    int IS_FIRST_START = 7;
-    int KEEP_HOME_SCREEN_ON = 8;
+    int WEATHER_RECEIVE_INTERVAL = 4;
+    int IS_FIRST_START = 5;
+    int KEEP_HOME_SCREEN_ON = 6;
 
     int getUnits();
     void setUnits(int units);

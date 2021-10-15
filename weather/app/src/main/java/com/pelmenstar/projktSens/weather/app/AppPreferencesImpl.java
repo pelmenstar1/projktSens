@@ -49,12 +49,12 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
 
     @Override
     protected int getPreferenceValuesCount() {
-        return 6;
+        return 7;
     }
 
     @Override
     protected void checkIfCorrupted() {
-        SharedPreferences prefs = preferences;
+        SharedPreferences prefs = preferences();
         int units = prefs.getInt(KEY_UNITS, ValueUnitsPacked.NONE);
         int contractType = prefs.getInt(KEY_CONTRACT, -1);
         int serverPort = prefs.getInt(KEY_SERVER_PORT, -1);
@@ -70,7 +70,7 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
 
     // writes default preferences
     private void writeDefault() {
-        preferences.edit()
+        preferences().edit()
                 .putInt(KEY_UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY)
                 .putInt(KEY_SERVER_HOST, DEFAULT_SEVER_ADDRESS_INT)
                 .putInt(KEY_CONTRACT, ContractType.RAW)
@@ -142,7 +142,7 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
      * Gets packed units which was saved in {@link SharedPreferences}
      */
     public int getUnits() {
-        return safeGetInt(KEY_UNITS, UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY);
+        return getInt(KEY_UNITS, UNITS, ValueUnitsPacked.CELSIUS_MM_OF_MERCURY);
     }
 
     public void setUnits(int units) {
@@ -150,21 +150,21 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
             throw new IllegalArgumentException("units");
         }
 
-        safePutInt(KEY_UNITS, UNITS, units);
+        putInt(KEY_UNITS, UNITS, units);
     }
 
     @Override
     public int getServerHostInt() {
-        return safeGetInt(KEY_SERVER_HOST, SERVER_HOST_INT, DEFAULT_SEVER_ADDRESS_INT);
+        return getInt(KEY_SERVER_HOST, SERVER_HOST_INT, DEFAULT_SEVER_ADDRESS_INT);
     }
 
     @Override
     public void setServerHostInt(int value) {
-        safePutInt(KEY_SERVER_HOST, SERVER_HOST_INT, value);
+        putInt(KEY_SERVER_HOST, SERVER_HOST_INT, value);
     }
 
     public int getContractType() {
-        return safeGetInt(KEY_CONTRACT, CONTRACT, DEFAULT_CONTRACT_TYPE);
+        return getInt(KEY_CONTRACT, CONTRACT, DEFAULT_CONTRACT_TYPE);
     }
 
     public void setContractType(int contractType) {
@@ -172,42 +172,42 @@ public class AppPreferencesImpl extends AbstractPreferencesThroughShared impleme
             throw new IllegalArgumentException("contractType");
         }
 
-        safePutInt(KEY_CONTRACT, CONTRACT, contractType);
+        putInt(KEY_CONTRACT, CONTRACT, contractType);
     }
 
     public int getServerPort() {
-        return safeGetInt(KEY_SERVER_PORT, SERVER_PORT, DEFAULT_SERVER_PORT);
+        return getInt(KEY_SERVER_PORT, SERVER_PORT, DEFAULT_SERVER_PORT);
     }
 
     public void setServerPort(int port) {
-        safePutInt(KEY_SERVER_PORT, SERVER_PORT, port);
+        putInt(KEY_SERVER_PORT, SERVER_PORT, port);
     }
 
     public int getWeatherReceiveInterval() {
-        return safeGetInt(KEY_WEATHER_RECEIVE_INTERVAL, WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL);
+        return getInt(KEY_WEATHER_RECEIVE_INTERVAL, WEATHER_RECEIVE_INTERVAL, DEFAULT_WEATHER_RECEIVE_INTERVAL);
     }
 
     public void setWeatherReceiveInterval(int interval) {
-        safePutInt(KEY_WEATHER_RECEIVE_INTERVAL, WEATHER_RECEIVE_INTERVAL, interval);
+        putInt(KEY_WEATHER_RECEIVE_INTERVAL, WEATHER_RECEIVE_INTERVAL, interval);
     }
 
     @Override
     public boolean isFirstStart() {
-        return safeGetBoolean(KEY_IS_FIRST_START, IS_FIRST_START, true);
+        return getBoolean(KEY_IS_FIRST_START, IS_FIRST_START, true);
     }
 
     @Override
     public void setFirstStart(boolean value) {
-        safePutBoolean(KEY_IS_FIRST_START, IS_FIRST_START, value);
+        putBoolean(KEY_IS_FIRST_START, IS_FIRST_START, value);
     }
 
     @Override
     public boolean isKeepHomeScreenOn() {
-        return safeGetBoolean(KEY_KEEP_HOME_SCREEN_ON, KEEP_HOME_SCREEN_ON, false);
+        return getBoolean(KEY_KEEP_HOME_SCREEN_ON, KEEP_HOME_SCREEN_ON, false);
     }
 
     @Override
     public void setKeepHomeScreenOn(boolean value) {
-        safePutBoolean(KEY_KEEP_HOME_SCREEN_ON, KEEP_HOME_SCREEN_ON, value);
+        putBoolean(KEY_KEEP_HOME_SCREEN_ON, KEEP_HOME_SCREEN_ON, value);
     }
 }
