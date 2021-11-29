@@ -14,6 +14,7 @@ import com.pelmenstar.projktSens.shared.android.ui.*
 import com.pelmenstar.projktSens.shared.android.ui.settings.SettingsActivity
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter
 import com.pelmenstar.projktSens.shared.time.ShortDate
+import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppComponent
 import com.pelmenstar.projktSens.weather.app.di.AppModule
@@ -293,6 +294,14 @@ class HomeActivity : HomeButtonSupportActivity(), HomeContract.View {
         }
 
         return true
+    }
+
+    override fun setCalendarState(state: Int) {
+        calendarView.setState(state)
+    }
+
+    override fun setCalendarMinMax(minDate: Int, maxDate: Int) {
+        calendarView.setMinMax(minDate, maxDate)
     }
 
     override fun setLocationLoaded(value: Boolean) {

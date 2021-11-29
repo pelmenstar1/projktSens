@@ -2,6 +2,7 @@ package com.pelmenstar.projktSens.weather.app.ui.home
 
 import com.pelmenstar.projktSens.shared.android.mvp.DefaultContract
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
+import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.RequestLocationSubcomponent
 import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.RetryGetLocationSubcomponent
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
@@ -35,6 +36,9 @@ interface HomeContract {
         fun setWeather(value: WeatherInfo)
         fun setLocationLoaded(value: Boolean)
         fun setCanLoadLocation(value: Boolean)
+
+        fun setCalendarMinMax(@ShortDateInt minDate: Int, @ShortDateInt maxDate: Int)
+        fun setCalendarState(state: Int)
 
         fun onServerAvailable()
         fun onServerUnavailable()

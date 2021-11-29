@@ -57,7 +57,8 @@ class AppModule(private val context: Context) {
             sunInfoProvider(),
             geolocationProvider(),
             dataSource(protoConfig),
-            weatherChannelInfoProvider(protoConfig)
+            weatherChannelInfoProvider(protoConfig),
+            protoConfig
         )
     }
 

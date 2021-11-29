@@ -27,18 +27,21 @@ import com.pelmenstar.projktSens.weather.models.WeatherDataSource
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
 import com.pelmenstar.projktSens.weather.app.astro.SunInfoProvider
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
+import com.pelmenstar.projktSens.shared.IntPair
 import kotlinx.coroutines.*
 
 class HomePresenter(
     private val sunInfoProvider: SunInfoProvider,
     private val geoProvider: GeolocationProvider,
     private val dataSource: WeatherDataSource,
-    private val weatherChannelInfoProvider: WeatherChannelInfoProvider
+    private val weatherChannelInfoProvider: WeatherChannelInfoProvider,
+    private val protoConfig: ProtoConfig
 ) : BasePresenter<HomeContract.View>(), HomeContract.Presenter {
     private val mainThread = MainThreadHandler(this)
 
     private var refreshAstroJob: Job? = null
     private var weatherChannelJob: Job? = null
+    private var refreshCalendarMinMaxJob: Job? = null
 
     @Volatile
     private var isInUnavailableState = false
@@ -79,6 +82,7 @@ class HomePresenter(
         super.attach(view)
 
         connectToWeatherChannel()
+        startRefreshingCalendarMinMax()
 
         if (Build.VERSION.SDK_INT < 23 || PermissionUtils.isLocationGranted(view.context)) {
             startLoadingLocation()
@@ -161,7 +165,58 @@ class HomePresenter(
 
                 delay(TimeConstants.MILLIS_IN_MINUTE.toLong())
             }
+        }.also {
+            it.invokeOnCompletion {
+                refreshAstroJob = null
+            }
         }
+    }
+
+    private fun startRefreshingCalendarMinMax() {
+        if(refreshCalendarMinMaxJob != null) {
+            Log.w(TAG, "refreshCalendarMinMaxJob is running")
+            return
+        }
+
+        refreshCalendarMinMaxJob = scope.launch {
+            val interval = 5 * protoConfig.weatherChannelReceiveInterval.toLong()
+            while(isActive) {
+                postSetCalendarState(LazyLoadingCalendarView.STATE_LOADING)
+                try {
+                    val range = dataSource.getAvailableDateRange()
+                    if (range != null) {
+                        postSetCalendarState(LazyLoadingCalendarView.STATE_LOADED)
+                        postSetCalendarMinMax(range.start, range.endInclusive)
+                    } else {
+                        postSetCalendarState(LazyLoadingCalendarView.STATE_NO_DATA)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, null, e)
+                    postSetCalendarState(LazyLoadingCalendarView.STATE_FAILED_TO_LOAD)
+                }
+
+                delay(interval)
+            }
+        }.also {
+            it.invokeOnCompletion {
+                refreshCalendarMinMaxJob = null
+            }
+        }
+    }
+
+    private fun postSetCalendarState(state: Int) {
+        mainThread.sendMessage(Message {
+            what = MSG_SET_CALENDAR_STATE
+            arg1 = state
+        })
+    }
+
+    private fun postSetCalendarMinMax(minDate: Int, maxDate: Int) {
+        mainThread.sendMessage(Message {
+            what = MSG_SET_CALENDAR_MIN_MAX
+            arg1 = minDate
+            arg2 = maxDate
+        })
     }
 
     private fun postSetCurrentTime(time: Int) {
@@ -208,6 +263,10 @@ class HomePresenter(
                     Log.e(TAG, "in weather channel", e)
                     postOnServerUnavailable()
                 }
+            }
+        }.also {
+            it.invokeOnCompletion {
+                weatherChannelJob = null
             }
         }
     }
@@ -335,6 +394,12 @@ class HomePresenter(
                 MSG_SET_LOCATION_LOADED -> {
                     p.view.setLocationLoaded(msg.arg1 == 1)
                 }
+                MSG_SET_CALENDAR_STATE -> {
+                    p.view.setCalendarState(msg.arg1)
+                }
+                MSG_SET_CALENDAR_MIN_MAX -> {
+                    p.view.setCalendarMinMax(msg.arg1, msg.arg2)
+                }
             }
         }
     }
@@ -350,5 +415,8 @@ class HomePresenter(
         private const val MSG_SET_SUNRISE_SUNSET = 4
         private const val MSG_SET_CURRENT_TIME = 5
         private const val MSG_SET_LOCATION_LOADED = 6
+
+        private const val MSG_SET_CALENDAR_STATE = 7
+        private const val MSG_SET_CALENDAR_MIN_MAX = 8
     }
 }

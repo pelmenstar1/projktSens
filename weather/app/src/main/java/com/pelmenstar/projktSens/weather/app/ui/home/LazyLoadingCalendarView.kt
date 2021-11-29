@@ -116,7 +116,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
                     val range = handler.load()
 
                     val newState = if (range != null) {
-                        postSetCalendarMinMax(range.start, range.endInclusive)
+                        postSetMinMax(range.start, range.endInclusive)
 
                         STATE_LOADED
                     } else {
@@ -134,7 +134,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
         }
     }
 
-    private fun setState(state: Int) {
+    fun setState(state: Int) {
         removeAllViewsInLayout()
         if (state != STATE_LOADING) {
             transitionView?.stopTransition()
@@ -181,7 +181,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
         }
     }
 
-    private fun postSetState(state: Int) {
+    fun postSetState(state: Int) {
         mainThread.sendMessage(Message {
             what = MSG_SET_STATE
             obj = this@LazyLoadingCalendarView
@@ -189,12 +189,12 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
         })
     }
 
-    private fun setCalendarMinMax(@ShortDateInt minDate: Int, @ShortDateInt maxDate: Int) {
+    fun setMinMax(@ShortDateInt minDate: Int, @ShortDateInt maxDate: Int) {
         calendarView.minDate = ShortDateTime.startOfDayToEpochSecond(minDate) * 1000
         calendarView.maxDate = ShortDateTime.endOfDayToEpochSecond(maxDate) * 1000
     }
 
-    private fun postSetCalendarMinMax(@ShortDateInt minDate: Int, @ShortDateInt maxDate: Int) {
+    fun postSetMinMax(@ShortDateInt minDate: Int, @ShortDateInt maxDate: Int) {
         mainThread.sendMessage(Message {
             what = MSG_SET_CALENDAR_MIN_MAX
             obj = this@LazyLoadingCalendarView
@@ -216,7 +216,7 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
                 }
                 MSG_SET_CALENDAR_MIN_MAX -> {
                     val v = msg.obj as LazyLoadingCalendarView
-                    v.setCalendarMinMax(msg.arg1, msg.arg2)
+                    v.setMinMax(msg.arg1, msg.arg2)
                 }
             }
         }
@@ -226,10 +226,10 @@ class LazyLoadingCalendarView @JvmOverloads constructor(
         private val scope = CoroutineScope(Dispatchers.Default)
         private const val TAG = "LazyLdCalendar"
 
-        private const val STATE_LOADING = 0
-        private const val STATE_LOADED = 1
-        private const val STATE_FAILED_TO_LOAD = 2
-        private const val STATE_NO_DATA = 3
+        const val STATE_LOADING = 0
+        const val STATE_LOADED = 1
+        const val STATE_FAILED_TO_LOAD = 2
+        const val STATE_NO_DATA = 3
 
         private const val MSG_SET_STATE = 0
         private const val MSG_SET_CALENDAR_MIN_MAX = 1
