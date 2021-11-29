@@ -19,7 +19,6 @@ class FirstStartPresenter(
 
     private val screens: Array<out FirstStartScreen<*>> = arrayOf(
         ChooseAddressAndPortScreen(),
-        ChooseServerContractScreen()
     )
     private val tempStateBundle = Bundle()
 
