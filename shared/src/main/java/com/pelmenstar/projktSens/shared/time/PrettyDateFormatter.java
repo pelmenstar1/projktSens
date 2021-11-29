@@ -47,8 +47,10 @@ public abstract class PrettyDateFormatter {
         time -= hour * 3600;
         int minute = time / 60;
 
+        //sb.append(hour);
         StringUtils.appendTwoDigits(hour, sb);
         sb.append(':');
+       // sb.append(minute);
         StringUtils.appendTwoDigits(minute, sb);
     }
 
