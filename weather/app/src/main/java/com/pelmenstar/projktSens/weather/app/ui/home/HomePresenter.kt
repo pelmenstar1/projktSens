@@ -152,8 +152,9 @@ class HomePresenter(
 
                     val dayOfYear = ShortDate.getDayOfYear(nowDate)
 
-                    val sunrise = sunInfoProvider.getSunriseTime(dayOfYear, location)
-                    val sunset = sunInfoProvider.getSunsetTime(dayOfYear, location)
+                    val sunriseSunset = sunInfoProvider.getSunriseSunset(dayOfYear, location)
+                    val sunrise = IntPair.getFirst(sunriseSunset)
+                    val sunset = IntPair.getSecond(sunriseSunset)
 
                     postSetSunriseSunset(sunrise, sunset)
                 }

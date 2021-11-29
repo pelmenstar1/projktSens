@@ -13,6 +13,10 @@ public final class AstroMoonInfoProvider implements MoonInfoProvider {
     private static final float MMLONG = 64.975464f;
     private static final float MMLONGP = 349.383063f;
 
+    static {
+        System.loadLibrary("weather-app");
+    }
+
     private static float fixAngle(float a) {
         return a - (360.0f * (float) Math.floor(a / 360.0f));
     }
@@ -65,4 +69,14 @@ public final class AstroMoonInfoProvider implements MoonInfoProvider {
 
         return (1.0f - (float) Math.cos(moonAge * D2R)) * 0.5f;
     }
+
+    public static float getMoonPhaseNative(@ShortDateInt int date) {
+        if(!ShortDate.isValid(date)) {
+            throw new RuntimeException();
+        }
+
+        return nGetMoonPhase(ShortDate.getYear(date), ShortDate.getMonth(date), ShortDate.getDayOfMonth(date));
+    }
+
+    private static native float nGetMoonPhase(int year, int month, int day);
 }

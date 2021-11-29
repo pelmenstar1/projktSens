@@ -13,6 +13,7 @@ shared/build/
 shared/android/build/
 
 weather/build/
+weather/app/.cxx/
 weather/app/build
 
 #keystore

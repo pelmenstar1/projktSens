@@ -1,6 +1,7 @@
 package com.pelmenstar.projktSens.weather.app.ui.sunriseSunset
 
 import android.os.Bundle
+import com.pelmenstar.projktSens.shared.IntPair
 import com.pelmenstar.projktSens.shared.android.mvp.BasePresenter
 import com.pelmenstar.projktSens.shared.geo.Geolocation
 import com.pelmenstar.projktSens.shared.time.ShortDate
@@ -40,8 +41,9 @@ class SunriseSunsetCalendarPresenter(
         val location = location
 
         if (location != null) {
-            val sunrise = sunInfoProvider.getSunriseTime(dayOfYear, location)
-            val sunset = sunInfoProvider.getSunsetTime(dayOfYear, location)
+            val range = sunInfoProvider.getSunriseSunset(dayOfYear, location)
+            val sunrise = IntPair.getFirst(range)
+            val sunset = IntPair.getSecond(range)
             val dayLength = sunset - sunrise
 
             view.run {
