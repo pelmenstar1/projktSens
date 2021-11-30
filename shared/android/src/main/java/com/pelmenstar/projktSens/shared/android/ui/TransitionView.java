@@ -30,6 +30,9 @@ public final class TransitionView extends View {
 
     private static int creationCounter = 0;
 
+    private static final int ANIMATION_CYCLE_DURATION = 2000;
+    private static final float INV_ANIMATION_CYCLE_DURATION = 1f / ANIMATION_CYCLE_DURATION;
+
     private static final int MSG_START_TRANS_ON_CURRENT_THREAD = 0;
 
     private int shape;
@@ -250,21 +253,37 @@ public final class TransitionView extends View {
             }
         }
 
-        long minTimeBetweenFrames = 1_000_000_000 / LinearColorTransition.TRANSITION_FRAMES;
-        long lastFrameTime = System.nanoTime();
+        long startTime = System.currentTimeMillis();
+        boolean forward = true;
+
         while (transitionRunning.get() == 1) {
-            long currentTime = System.nanoTime();
+            long nowTime = System.currentTimeMillis();
 
-            if ((currentTime - lastFrameTime) >= minTimeBetweenFrames) {
-                int color = transition.nextColor();
-                shapePaint.setColor(color);
+            float k = (float)(nowTime - startTime) * INV_ANIMATION_CYCLE_DURATION;
 
-                postInvalidate();
-                lastFrameTime = currentTime;
+            if(forward) {
+                if(k >= 1) {
+                    startTime = nowTime;
+                    k = 0.99f;
+                    forward = false;
+                }
+            } else {
+                k = 1 - k;
+                if(k <= 0) {
+                    startTime = nowTime;
+                    k = 0;
+                    forward = true;
+                }
             }
+
+            int color = transition.colorAt(k);
+            shapePaint.setColor(color);
+
+            postInvalidate();
+
             try {
                 //noinspection BusyWait
-                Thread.sleep(1);
+                Thread.sleep(13);
             } catch (InterruptedException e) {
                 // why to handle this?
             }

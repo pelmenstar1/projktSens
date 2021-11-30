@@ -81,21 +81,12 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
     private final int offset;
     private final int length;
 
-    private int index = 0;
-    private int step = 1;
-
-    private int limitMask = 0xffffffff;
-    private int limit;
-
     private LinearColorTransition(@NotNull IntArrayRef dataRef, int offset, int length) {
         this.dataRef = dataRef;
         this.offset = offset;
         this.length = length;
-
-        recomputeLimit();
     }
 
-    @SuppressWarnings("CopyConstructorMissesField")
     public LinearColorTransition(@NotNull LinearColorTransition other) {
         this(other.dataRef, other.offset, other.length);
     }
@@ -226,24 +217,9 @@ public final class LinearColorTransition extends AppendableToStringBuilder imple
         return transition;
     }
 
-    /**
-     * Returns a next color of transition, and moves cursor to next. More helpful in loop
-     */
     @ColorInt
-    public int nextColor() {
-        if (index == limit) {
-            limitMask = ~limitMask;
-            step = -step;
-
-            recomputeLimit();
-        }
-        index += step;
-
-        return dataRef.value[index];
-    }
-
-    private void recomputeLimit() {
-        limit = offset + ((length - 1) & limitMask);
+    public int colorAt(float k) {
+        return dataRef.value[offset + (int)(k * length)];
     }
 
     @Override
