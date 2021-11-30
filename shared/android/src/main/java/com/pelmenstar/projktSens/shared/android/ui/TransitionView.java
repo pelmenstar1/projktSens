@@ -135,47 +135,34 @@ public final class TransitionView extends View {
     private void refreshShapePath() {
         float size = shapeSize;
         if (size > 0) {
-            if (Shape.isEquilateral(shape)) {
-                Path path = shapePath;
-                path.rewind();
+            Path path = shapePath;
+            path.rewind();
 
-                float halfSize = size * 0.5f;
+            float halfSize = size * 0.5f;
 
-                // Equilateral shape, whose sides are equal, can be drawn using circle.
-                // We have to divide circle to equal parts. Count of parts = amount of sides of shape.
-                // Then we connect all the points together and we get perfect shape.
-                // To determine position of point on circle, we use trigonometry.
-                int angles = Shape.getAnglesInEquilateralShape(shape);
-                int startIndex = Shape.getPositionInSinCosTable(angles);
-                int[] tableValues = Shape.sinCosTable.values;
+            // Equilateral shape, whose sides are equal, can be drawn using circle.
+            // We have to divide circle to equal parts. Count of parts = amount of sides of shape.
+            // Then we connect all the points together and we get perfect shape.
+            // To determine position of point on circle, we use trigonometry.
+            int angles = shape;
+            int startIndex = Shape.getPositionInSinCosTable(angles);
+            int[] tableValues = Shape.sinCosTable.values;
 
-                for (int i = startIndex; i < startIndex + angles * 2; i += 2) {
-                    float sin = Float.intBitsToFloat(tableValues[i]);
-                    float cos = Float.intBitsToFloat(tableValues[i + 1]);
+            for (int i = startIndex; i < startIndex + angles * 2; i += 2) {
+                float sin = Float.intBitsToFloat(tableValues[i]);
+                float cos = Float.intBitsToFloat(tableValues[i + 1]);
 
-                    float px = halfSize * (sin + 1);
-                    float py = halfSize * (cos + 1);
+                float px = halfSize * (sin + 1);
+                float py = halfSize * (cos + 1);
 
-                    if (i == startIndex) {
-                        path.moveTo(px, py);
-                    } else {
-                        path.lineTo(px, py);
-                    }
+                if (i == startIndex) {
+                    path.moveTo(px, py);
+                } else {
+                    path.lineTo(px, py);
                 }
-
-                path.close();
-            } else if (shape == Shape.RHOMBUS) {
-                Path path = shapePath;
-                path.rewind();
-
-                float halfSize = size * 0.5f;
-
-                path.moveTo(size, halfSize);
-                path.lineTo(halfSize, 0f);
-                path.lineTo(0f, halfSize);
-                path.lineTo(halfSize, size);
-                path.close();
             }
+
+            path.close();
         }
     }
 
@@ -184,13 +171,10 @@ public final class TransitionView extends View {
     }
 
     public void setShape(int shape) {
-        int oldShape = this.shape;
-        if (Shape.isEquilateral(oldShape) || oldShape == Shape.RHOMBUS) {
-            shapePath.rewind();
+        if (this.shape != shape) {
+            this.shape = shape;
+            refreshShapePath();
         }
-
-        this.shape = shape;
-        refreshShapePath();
     }
 
     private void setNextShapeInSequence() {
@@ -298,47 +282,22 @@ public final class TransitionView extends View {
 
     @Override
     protected void onDraw(@NotNull Canvas c) {
-        float size = shapeSize;
-        int s = shape;
-
-        switch (s) {
-            case Shape.RECT: {
-                c.drawRect(0f, 0f, size, size, shapePaint);
-                break;
-            }
-            case Shape.CIRCLE: {
-                c.drawOval(0f, 0f, size, size, shapePaint);
-                break;
-            }
-        }
-
-        if (Shape.isEquilateral(s) || shape == Shape.RHOMBUS) {
-            c.drawPath(shapePath, shapePaint);
-        }
+        c.drawPath(shapePath, shapePaint);
     }
 
     public static final class Shape {
-        private static final int EQUILATERAL_SHAPE_BIT = 1 << 31;
-
-        public static final int RECT = 0;
-        public static final int CIRCLE = 1;
-        public static final int RHOMBUS = 2;
-
-        public static final int TRIANGLE = EQUILATERAL_SHAPE_BIT | 3;
-        public static final int PENTAGON = EQUILATERAL_SHAPE_BIT | 5;
-        public static final int HEXAGON = EQUILATERAL_SHAPE_BIT | 6;
-        public static final int HEPTAGON = EQUILATERAL_SHAPE_BIT | 7;
-        public static final int OCTAGON = EQUILATERAL_SHAPE_BIT | 8;
+        public static final int TRIANGLE = 3;
+        public static final int PENTAGON = 5;
+        public static final int HEXAGON = 6;
+        public static final int HEPTAGON = 7;
+        public static final int OCTAGON = 8;
 
         private static final int @NotNull [] COMMON = new int[]{
-                RECT,
-                CIRCLE,
                 PENTAGON,
                 HEXAGON,
                 HEPTAGON,
                 TRIANGLE,
                 OCTAGON,
-                RHOMBUS,
         };
 
         @NotNull
@@ -371,23 +330,11 @@ public final class TransitionView extends View {
         }
 
         public static int createEquilateralShape(int angles) {
-            if (angles < 3 || angles == 4) {
+            if (angles < 3) {
                 throw new IllegalArgumentException("angles");
             }
 
-            return EQUILATERAL_SHAPE_BIT | angles;
-        }
-
-        public static int getAnglesInEquilateralShape(int shape) {
-            if (!isEquilateral(shape)) {
-                throw new IllegalArgumentException("shape is not equilateral");
-            }
-
-            return shape & (~EQUILATERAL_SHAPE_BIT);
-        }
-
-        public static boolean isEquilateral(int shape) {
-            return (shape & EQUILATERAL_SHAPE_BIT) != 0;
+            return angles;
         }
     }
 
