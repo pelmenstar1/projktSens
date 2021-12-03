@@ -3,10 +3,11 @@
 
 #include <cmath>
 
-static const double
+static constexpr uint32_t SIGN_BIT = 1 << 31;
+static constexpr float
 	pio2 = 1.570796326794896558e+00;
 
-static const float
+static constexpr float
 /* coefficients for R(x^2) */
 pS0 = 1.6666586697e-01,
 	pS1 = -4.2743422091e-02,
@@ -14,15 +15,15 @@ pS0 = 1.6666586697e-01,
 	qS1 = -7.0662963390e-01;
 
 static float32x2_t RV(float32x2_t z) {
-	float32x2_t p = z * (pS0 + z * (pS1 + z * pS2));
-	float32x2_t q = 1.0f + z * qS1;
+	float32x2_t p = z * vfma_f32(vdup_n_f32(pS0), z, vfma_f32(vdup_n_f32(pS1), z, vdup_n_f32(pS2)));
+	float32x2_t q = vfma_f32(vdup_n_f32(1.0f), z, vdup_n_f32(qS1));
+
 	return p / q;
 }
 
 static float R(float z) {
-	float p, q;
-	p = z * (pS0 + z * (pS1 + z * pS2));
-	q = 1.0f + z * qS1;
+	float p = z * fma(z, fma(z, pS2, pS1), pS0);
+	float q = fma(z, qS1, 1.0f);
 	return p / q;
 }
 
@@ -55,7 +56,7 @@ float32x2_t v_asinf(float32x2_t x) {
 			return x;
 		} else if ((c[0] | c[1]) != 0) {
 			float32x2_t res = x;
-#define FALLBACK(i) if(c[i] != 0) { res[i] = (x[i] + x[i] * R(x[i] * x[i])); }
+#define FALLBACK(i) if(c[i] != 0) { float t = res[i]; res[i] = fma(t, R(t * t), t); }
 
 			FALLBACK(0)
 			FALLBACK(1)
@@ -63,23 +64,18 @@ float32x2_t v_asinf(float32x2_t x) {
 
 			return res;
 		} else {
-			return x + x * RV(x * x);
+			return vfma_f32(x, x, RV(x * x));
 		}
 	} else if ((lessCond[0] | lessCond[1]) != 0) {
 		return {asinf(x[0]), asinf(x[1])};
 	}
 
-	float32x2_t z = (1 - vabs_f32(x)) * 0.5f;
+	float32x2_t z = vfma_f32(vdup_n_f32(0.5f), vdup_n_f32(-0.5f), vabs_f32(x));
 	float32x2_t s = vsqrt_f32(z);
-	x = pio2 - 2 * (s + s * RV(z));
+	float32x2_t result = vfma_f32(vdup_n_f32(pio2), vdup_n_f32(-2.0f), vfma_f32(s, s, RV(z)));
 
 	uint32x2_t c = (hx >> 31) != 0;
-	if(c[0] != 0) {
-		x[0] = -x[0];
-	}
-	if(c[1] != 0) {
-		x[1] = -x[1];
-	}
+	result = vreinterpret_f32_u32(vreinterpret_u32_f32(x) | (SIGN_BIT & c));
 
 	return x;
 }

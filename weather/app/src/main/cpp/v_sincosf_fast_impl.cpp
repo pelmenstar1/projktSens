@@ -12,6 +12,7 @@ struct sincos_t {
   float hpi;
   float c0, c1, c2, c3, c4;
   float s1, s2, s3;
+  float hpi_neg;
 };
 
 static const float sincos_sign[4] = {
@@ -29,7 +30,8 @@ static const sincos_t sincosf_table[2] = {
 		0x1.99343027bf8c3p-16,
 		-0x1.555545995a603p-3,
 		0x1.1107605230bc4p-7,
-		-0x1.994eb3774cf24p-13
+		-0x1.994eb3774cf24p-13,
+		-0x1.921FB54442D18p0
 	},
 	{
 		0x1.45F306DC9C883p-1,
@@ -41,7 +43,8 @@ static const sincos_t sincosf_table[2] = {
 		-0x1.99343027bf8c3p-16,
 		-0x1.555545995a603p-3,
 		0x1.1107605230bc4p-7,
-		-0x1.994eb3774cf24p-13
+		-0x1.994eb3774cf24p-13,
+		-0x1.921FB54442D18p0
 	}
 };
 static const uint32_t inv_pio4[] = {
@@ -74,7 +77,7 @@ static constexpr inline uint32_t abs_top12(uint32_t x) {
 static inline float reduce_fast(float x, const sincos_t *p, int *np) {
 	float r = x * p->hpi_inv;
 	*np = (int)lround(r);
-	return x - round(r) * p->hpi;
+	return fma(round(r), p->hpi_neg, x);
 }
 
 static inline float reduce_large(uint32_t xi, int *np) {
