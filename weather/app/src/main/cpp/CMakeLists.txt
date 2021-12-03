@@ -16,7 +16,6 @@ add_library(weather-app
         v_cosf_impl.cpp
         v_sincosf_fast_impl.cpp
         v_asinf_impl.cpp
-        v_acosf_impl.cpp
         )
 
 set(BUILD_TESTING OFF)
