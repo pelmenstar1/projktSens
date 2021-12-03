@@ -106,7 +106,7 @@ class HomePresenter(
     }
 
     override fun refreshLocationPermissionGrantedState() {
-        if(Build.VERSION.SDK_INT >= 23 && PermissionUtils.isLocationGranted(view.context)) {
+        if(Build.VERSION.SDK_INT >= 23 && lastGeolocation == null && PermissionUtils.isLocationGranted(view.context)) {
             onLocationPermissionGranted()
         }
     }
