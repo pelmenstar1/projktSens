@@ -52,12 +52,81 @@ class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
      * @throws ServerException is repo-server responded error
      * @throws IOException if IO error happened while exchanging data through network
      */
-    @Suppress("UNCHECKED_CAST")
     suspend fun <T : Any> request(request: Request, responseValueClass: Class<T>): T? {
-        return when (val response = requestRawResponse(request, responseValueClass)) {
+        return handleRawResponseCast(requestRawResponse(request, responseValueClass))
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun<T : Any> handleRawResponseCast(response: Response): T? {
+        return handleRawResponse(response) as T?
+    }
+
+    private fun handleRawResponse(response: Response): Any? {
+        return when(response) {
             Response.Empty -> null
             is Response.Error -> throw ServerException(response.error)
-            is Response.Ok<*> -> response.value as T
+            is Response.Ok<*> -> response.value
+        }
+    }
+
+    suspend fun requestMultiple(
+        requests: Array<Request>,
+        valueClasses: Array<Class<*>>
+    ): Array<Any?> {
+        return if(Build.VERSION.SDK_INT >= 26) {
+            requestMultipleAsync(requests, valueClasses)
+        } else {
+            requestMultipleBlocking(requests, valueClasses)
+        }
+    }
+
+    @RequiresApi(26)
+    private suspend fun requestMultipleAsync(
+        requests: Array<Request>,
+        valueClasses: Array<Class<*>>
+    ): Array<Any?> {
+        return AsynchronousSocketChannel.open().use { channel ->
+            channel.connectSuspend(address, 5000)
+
+            val input = SmartInputStream.toSmart(channel)
+            val output = SmartOutputStream.toSmart(channel)
+
+            handleRequestMultiple(input, output, requests, valueClasses)
+        }
+    }
+
+    private suspend fun requestMultipleBlocking(
+        requests: Array<Request>,
+        valueClasses: Array<Class<*>>
+    ): Array<Any?> {
+        return Socket().use { socket ->
+            socket.connectSuspend(address, 5000)
+
+            val input = SmartInputStream.toSmart(socket)
+            val output = SmartOutputStream.toSmart(socket)
+
+            handleRequestMultiple(input, output, requests, valueClasses)
+        }
+    }
+
+    private suspend fun handleRequestMultiple(
+        input: SmartInputStream,
+        output: SmartOutputStream,
+        requests: Array<Request>,
+        valueClasses: Array<Class<*>>
+    ): Array<Any?> {
+        contract.openSession(output, requests.size)
+        return Array(requests.size) { i ->
+            val request = requests[i]
+
+            val response = writeRequestAndReadResponse(
+                request,
+                valueClasses[i],
+                input,
+                output
+            )
+
+            handleRawResponse(response)
         }
     }
 
@@ -100,9 +169,16 @@ class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
         return Socket().use { socket ->
             socket.connectSuspend(address, 5000)
 
+            val input = SmartInputStream.toSmart(socket)
+            val output = SmartOutputStream.toSmart(socket)
+
+            contract.openSession(output, 1)
+
             writeRequestAndReadResponse(
-                request, valueClass,
-                SmartInputStream.toSmart(socket), SmartOutputStream.toSmart(socket)
+                request,
+                valueClass,
+                input,
+                output
             )
         }
     }
@@ -114,9 +190,16 @@ class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
         return AsynchronousSocketChannel.open().use { channel ->
             channel.connectSuspend(address, 5000)
 
+            val input = SmartInputStream.toSmart(channel)
+            val output = SmartOutputStream.toSmart(channel)
+
+            contract.openSession(output, 1)
+
             writeRequestAndReadResponse(
-                request, valueClass,
-                SmartInputStream.toSmart(channel), SmartOutputStream.toSmart(channel)
+                request,
+                valueClass,
+                input,
+                output
             )
         }
     }

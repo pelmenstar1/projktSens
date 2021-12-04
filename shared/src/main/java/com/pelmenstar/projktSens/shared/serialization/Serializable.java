@@ -16,6 +16,11 @@ public final class Serializable {
     @NotNull
     private static final HashMap<Class<?>, ObjectSerializer<?>> cachedSerializers = new HashMap<>();
 
+    static {
+        cachedSerializers.put(Integer.class, PrimitiveSerializers.INT_32);
+        cachedSerializers.put(Long.class, PrimitiveSerializers.INT_64);
+    }
+
     private Serializable() {
     }
 

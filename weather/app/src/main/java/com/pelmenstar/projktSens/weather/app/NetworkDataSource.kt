@@ -10,8 +10,13 @@ import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.weather.models.*
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.isActive
 
-class NetworkDataSource(config: ProtoConfig) : WeatherDataSource {
+class NetworkDataSource(private val config: ProtoConfig) : WeatherFlowDataSource {
     private val client = Client(config)
 
     override suspend fun getDayReport(@ShortDateInt date: Int): DayReport? {
@@ -37,7 +42,42 @@ class NetworkDataSource(config: ProtoConfig) : WeatherDataSource {
     }
 
     override suspend fun getLastWeather(): WeatherInfo? {
-        return requestRethrow(Commands.GET_LAST_WEATHER, null, WeatherInfo::class.java)
+        return requestRethrow(
+            Commands.GET_LAST_WEATHER,
+            null,
+            WeatherInfo::class.java
+        )
+    }
+
+    override fun weatherFlow(): Flow<WeatherInfo?> {
+        return flow {
+            val values = client.requestMultiple(arrayOf(
+                Request(Commands.GET_NEXT_WEATHER_TIME),
+                Request(Commands.GET_LAST_WEATHER)
+            ), arrayOf(
+                Long::class.java,
+                WeatherInfo::class.java
+            ))
+
+            var correction = values[0] as Long
+            correction -= System.currentTimeMillis()
+            if(correction < 0) {
+                correction = 0
+            }
+
+            val interval = config.weatherChannelReceiveInterval.toLong()
+
+            val firstWeather = values[0] as WeatherInfo?
+            emit(firstWeather)
+            delay(interval - correction)
+
+            while(currentCoroutineContext().isActive) {
+                val value = getLastWeather()
+                emit(value)
+
+                delay(interval)
+            }
+        }
     }
 
     private suspend fun <T : Any> requestRethrow(

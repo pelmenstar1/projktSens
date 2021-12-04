@@ -2,6 +2,10 @@ package com.pelmenstar.projktSens.weather.models
 
 import com.pelmenstar.projktSens.shared.time.ShortDateInt
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Responsible for getting data from some source like network, internal db or others.
@@ -27,4 +31,6 @@ interface WeatherDataSource {
      * Gets last added weather, can be null if source is empty
      */
     suspend fun getLastWeather(): WeatherInfo?
+
+
 }

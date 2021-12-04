@@ -9,14 +9,12 @@ import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarPresenter
 import com.pelmenstar.projktSens.weather.app.ui.home.HomePresenter
 import com.pelmenstar.projktSens.weather.app.ui.sunriseSunset.SunriseSunsetCalendarPresenter
 import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartPresenter
-import com.pelmenstar.projktSens.weather.models.WeatherDataSource
 import com.pelmenstar.projktSens.weather.app.astro.SunInfoProvider
 import com.pelmenstar.projktSens.weather.app.astro.AstroSunInfoProvider
 import com.pelmenstar.projktSens.shared.geo.GeolocationProvider
 import com.pelmenstar.projktSens.shared.geo.ConstGeolocationProvider
 import com.pelmenstar.projktSens.shared.time.PrettyDateFormatter
 import com.pelmenstar.projktSens.weather.app.formatters.ResourcesPrettyDateFormatter
-import com.pelmenstar.projktSens.weather.models.WeatherChannelInfoProvider
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.shared.InetAddressUtils
 import com.pelmenstar.projktSens.serverProtocol.ContractType
@@ -26,6 +24,7 @@ import com.pelmenstar.projktSens.weather.app.ui.home.HomeContract
 import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarContract
 import com.pelmenstar.projktSens.weather.app.ui.sunriseSunset.SunriseSunsetCalendarContract
 import com.pelmenstar.projktSens.weather.models.RandomWeatherDataSource
+import com.pelmenstar.projktSens.weather.models.WeatherFlowDataSource
 import dagger.Module
 import dagger.Provides
 import java.net.InetSocketAddress
@@ -57,7 +56,6 @@ class AppModule(private val context: Context) {
             sunInfoProvider(),
             geolocationProvider(),
             dataSource(protoConfig),
-            weatherChannelInfoProvider(protoConfig),
             protoConfig
         )
     }
@@ -73,8 +71,8 @@ class AppModule(private val context: Context) {
     }
 
     @Provides
-    fun dataSource(protoConfig: ProtoConfig): WeatherDataSource {
-        return RandomWeatherDataSource
+    fun dataSource(protoConfig: ProtoConfig): WeatherFlowDataSource {
+        return NetworkDataSource(protoConfig)
     }
 
     @Provides
@@ -100,16 +98,6 @@ class AppModule(private val context: Context) {
     @Provides
     fun moonPhaseFormatter(): MoonPhaseFormatter {
         return moonPhaseFormatter
-    }
-
-    @Provides
-    fun weatherChannelInfoProvider(protoConfig: ProtoConfig): WeatherChannelInfoProvider {
-        return object: WeatherChannelInfoProvider {
-            override val receiveInterval: Long
-                get() = 5000
-
-            override suspend fun getNextWeatherTime(): Long = 0
-        }
     }
 
     @Provides

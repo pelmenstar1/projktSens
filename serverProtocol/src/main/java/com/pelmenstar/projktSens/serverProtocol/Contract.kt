@@ -7,6 +7,8 @@ import com.pelmenstar.projktSens.shared.io.SmartOutputStream
  * A contract between client and server, that describes in what way interpret byte data.
  */
 interface Contract {
+    suspend fun openSession(output: SmartOutputStream, reqCount: Int)
+
     /**
      * Writes [request] to [output].
      * If run [readRequest] on written data, it will return the same request.

@@ -187,13 +187,21 @@ class Server(
         input: SmartInputStream, output: SmartOutputStream
     ) {
         try {
-            val request = contract.readRequest(input)
-            logAppendable("request", request)
+            val reqCount = input.readN(1)[0].toInt()
+            if(reqCount <= 0) {
+                contract.writeResponse(Response.error(Errors.INVALID_ARGUMENTS), output)
+                return
+            }
 
-            val response = processRequest(request)
-            logAppendable("response", response)
+            repeat(reqCount) {
+                val request = contract.readRequest(input)
+                logAppendable("request", request)
 
-            contract.writeResponse(response, output)
+                val response = processRequest(request)
+                logAppendable("response", response)
+
+                contract.writeResponse(response, output)
+            }
         } catch (e: Exception) {
             log error e
         }

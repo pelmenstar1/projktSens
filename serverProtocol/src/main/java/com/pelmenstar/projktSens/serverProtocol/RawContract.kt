@@ -26,6 +26,18 @@ object RawContract : Contract {
         this[1] = type.toByte()
     }
 
+    override suspend fun openSession(output: SmartOutputStream, reqCount: Int) {
+        if(reqCount <= 0) {
+            throw RuntimeException("Request count <= 0")
+        }
+
+        if(reqCount > 127) {
+            throw RuntimeException("Request count limit exceeded (limit=128, current=${reqCount})")
+        }
+
+        output.write(buildByteArray(1) { this[0] = reqCount.toByte() })
+    }
+
     override suspend fun writeRequest(request: Request, output: SmartOutputStream) {
         val command = request.command
         val arg = request.argument

@@ -10,10 +10,9 @@ import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartContract
 import com.pelmenstar.projktSens.weather.app.ui.home.HomeContract
 import com.pelmenstar.projktSens.weather.app.ui.moon.MoonCalendarContract
 import com.pelmenstar.projktSens.weather.app.ui.sunriseSunset.SunriseSunsetCalendarContract
-import com.pelmenstar.projktSens.weather.models.WeatherChannelInfoProvider
-import com.pelmenstar.projktSens.weather.models.WeatherDataSource
 import com.pelmenstar.projktSens.weather.app.astro.MoonInfoProvider
 import com.pelmenstar.projktSens.weather.app.astro.SunInfoProvider
+import com.pelmenstar.projktSens.weather.models.WeatherFlowDataSource
 import dagger.Component
 
 @Component(modules = [AppModule::class])
@@ -23,7 +22,7 @@ interface AppComponent {
     fun moonCalendarPresenter(): MoonCalendarContract.Presenter
     fun firstStartPresenter(): FirstStartContract.Presenter
 
-    fun dataSource(): WeatherDataSource
+    fun dataSource(): WeatherFlowDataSource
 
     fun sunInfoProvider(): SunInfoProvider
     fun moonInfoProvider(): MoonInfoProvider
@@ -34,7 +33,6 @@ interface AppComponent {
     fun unitFormatter(): UnitFormatter
     fun moonPhaseFormatter(): MoonPhaseFormatter
 
-    fun weatherChannelInfoProvider(): WeatherChannelInfoProvider
     fun protoConfig(): ProtoConfig
     fun preferences(): AppPreferences
 }

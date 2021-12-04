@@ -22,19 +22,18 @@ import com.pelmenstar.projktSens.weather.app.ui.home.weatherView.RetryGetLocatio
 import com.pelmenstar.projktSens.weather.app.ui.report.DayReportActivity
 import com.pelmenstar.projktSens.weather.app.ui.report.MonthReportActivity
 import com.pelmenstar.projktSens.weather.app.ui.report.WeekReportActivity
-import com.pelmenstar.projktSens.weather.models.WeatherChannelInfoProvider
-import com.pelmenstar.projktSens.weather.models.WeatherDataSource
 import com.pelmenstar.projktSens.weather.models.WeatherInfo
 import com.pelmenstar.projktSens.weather.app.astro.SunInfoProvider
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.shared.IntPair
+import com.pelmenstar.projktSens.weather.models.WeatherFlowDataSource
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 
 class HomePresenter(
     private val sunInfoProvider: SunInfoProvider,
     private val geoProvider: GeolocationProvider,
-    private val dataSource: WeatherDataSource,
-    private val weatherChannelInfoProvider: WeatherChannelInfoProvider,
+    private val dataSource: WeatherFlowDataSource,
     private val protoConfig: ProtoConfig
 ) : BasePresenter<HomeContract.View>(), HomeContract.Presenter {
     private val mainThread = MainThreadHandler(this)
@@ -243,20 +242,10 @@ class HomePresenter(
         weatherChannelJob?.cancel()
         weatherChannelJob = scope.launch(Dispatchers.IO) {
             try {
-                val interval = weatherChannelInfoProvider.receiveInterval
-                val nextTime = weatherChannelInfoProvider.getNextWeatherTime()
-                val waitTime = nextTime - System.currentTimeMillis()
-                if (waitTime > 0) {
-                    delay(waitTime)
-                }
-
-                while (isActive) {
-                    val value = dataSource.getLastWeather()
-                    if (value != null) {
-                        postOnWeatherReceived(value)
+                dataSource.weatherFlow().collect {
+                    if(it != null) {
+                        postOnWeatherReceived(it)
                     }
-
-                    delay(interval)
                 }
             } catch (e: Exception) {
                 if (isActive) {
