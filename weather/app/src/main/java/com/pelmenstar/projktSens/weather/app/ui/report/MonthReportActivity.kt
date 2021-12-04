@@ -34,9 +34,8 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
     override fun onCreate(savedInstanceState: Bundle?) {
         val intent = requireIntent()
 
-        val yearMonth = intent.getIntExtra(EXTRA_YEAR_MONTH, 0)
-        year = yearMonth / 12
-        month = yearMonth - year * 12
+        year = intent.getIntExtra(EXTRA_YEAR, 1)
+        month = intent.getIntExtra(EXTRA_MONTH, 1)
 
         startDate = ShortDate.create(year, month, 1)
         endDate = ShortDate.create(year, month, TimeUtils.getDaysInMonth(year, month))
@@ -147,11 +146,13 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
     }
 
     companion object {
-        private const val EXTRA_YEAR_MONTH = "MonthReportActivity:yearMonth"
+        private const val EXTRA_YEAR = "MonthReportActivity:year"
+        private const val EXTRA_MONTH = "MonthReportActivity:month"
 
         fun intent(context: Context, year: Int, month: Int): Intent {
             return Intent(context, MonthReportActivity::class.java) {
-                putExtra(EXTRA_YEAR_MONTH, year * 12 + month)
+                putExtra(EXTRA_YEAR, year)
+                putExtra(EXTRA_MONTH, month)
             }
         }
     }
