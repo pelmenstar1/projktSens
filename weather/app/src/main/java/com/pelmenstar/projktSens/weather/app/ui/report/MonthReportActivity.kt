@@ -130,8 +130,6 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
                 axisMaximum = daysInMonth
                 valueFormatter = IntValueFormatter.INSTANCE
             }
-
-            chart.yAxis.granularity = 1f
         }
     }
 

@@ -26,6 +26,9 @@ import com.pelmenstar.projktSens.weather.app.formatters.UnitFormatter
 import com.pelmenstar.projktSens.weather.app.ui.MaterialChart
 import com.pelmenstar.projktSens.weather.models.*
 
+typealias CommonChartOptionsFunc = (chart: LineChart) -> Unit
+typealias ParamChartOptionsFunc = (chart: LineChart, unit: Int) -> Unit
+
 private class ParameterStatsPrefixStrings(
     @JvmField val min: String,
     @JvmField val max: String,
@@ -115,7 +118,8 @@ private fun ViewGroup.ParamStatsBlock(
     statsUnit: Int, prefUnit: Int,
     @StringRes headerRes: Int,
     data: ChartData,
-    creationContext: ChartViewCreationContext
+    creationContext: ChartViewCreationContext,
+    customChartOptionsFunc: ParamChartOptionsFunc?,
 ) {
     val strings = creationContext.strings
 
@@ -153,8 +157,11 @@ private fun ViewGroup.ParamStatsBlock(
         MaterialChart {
             layoutParams = creationContext.chartLayoutParams
 
-            creationContext.chartOptions(this)
             this.data = data
+
+            creationContext.chartOptions(this)
+            customChartOptionsFunc?.invoke(this, prefUnit)
+
         }
     }
 }
@@ -165,7 +172,8 @@ fun createChartView(
     temperatureData: ChartData,
     humidityData: ChartData,
     pressureData: ChartData,
-    chartOptions: (LineChart) -> Unit
+
+    commonChartOptions: CommonChartOptionsFunc,
 ): View {
     val component = DaggerAppComponent
         .builder()
@@ -212,7 +220,7 @@ fun createChartView(
         headerAppearance, paramAppearance,
         unitFormatter,
         strings,
-        chartOptions,
+        commonChartOptions,
         blockBackgroundColor,
         blockPadding,
         blockRadius
@@ -228,21 +236,24 @@ fun createChartView(
                 stats.temperature,
                 statsTempUnit, prefTempUnit,
                 R.string.temperature, temperatureData,
-                creationContext
+                creationContext,
+                ParamChartOptions.TEMPERATURE
             )
 
             ParamStatsBlock(
                 stats.humidity,
                 ValueUnit.HUMIDITY, ValueUnit.HUMIDITY,
                 R.string.humidity, humidityData,
-                creationContext
+                creationContext,
+                ParamChartOptions.HUMIDITY,
             )
 
             ParamStatsBlock(
                 stats.pressure,
                 statsPressUnit, prefPressUnit,
                 R.string.pressure, pressureData,
-                creationContext
+                creationContext,
+                ParamChartOptions.PRESSURE
             )
         }
     }

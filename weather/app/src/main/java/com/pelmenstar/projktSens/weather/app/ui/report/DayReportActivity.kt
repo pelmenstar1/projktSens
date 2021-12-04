@@ -99,7 +99,11 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
         val humData = ChartData(humDataSet)
         val pressData = ChartData(pressDataSet)
 
-        return createChartView(this, report.stats, tempData, humData, pressData, CHART_OPTIONS)
+        return createChartView(
+            this,
+            report.stats,
+            tempData, humData, pressData,
+            CHART_OPTIONS)
     }
 
     private fun DataSet.customizeOptions(colorPrimary: Int): DataSet {
@@ -107,20 +111,19 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
         color = colorPrimary
 
         background = colorPrimary.withAlpha(50)
+        setDrawValues(false)
 
         return this
     }
 
     companion object {
-        private val CHART_OPTIONS: (LineChart) -> Unit = { chart ->
+        private val CHART_OPTIONS: CommonChartOptionsFunc = { chart ->
             chart.xAxis.apply {
                 axisMinimum = 0f
                 axisMaximum = (TimeConstants.SECONDS_IN_DAY - 1).toFloat()
                 granularity = 3600f
-                valueFormatter = TimeChartFormatter.INSTANCE
+                valueFormatter = TimeChartFormatter.withRoundingToHour()
             }
-
-            chart.yAxis.granularity = 1f
         }
 
         private const val EXTRA_DATE = "DayReportActivity:date"
