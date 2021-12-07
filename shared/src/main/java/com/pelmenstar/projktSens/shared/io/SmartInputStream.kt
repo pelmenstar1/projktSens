@@ -10,10 +10,7 @@ import java.nio.channels.AsynchronousByteChannel
 abstract class SmartInputStream {
     private class FromInputStream(private val inputStream: InputStream): SmartInputStream() {
         override suspend fun readN(n: Int): ByteArray {
-            return inputStream.readNSuspend(n)
-        }
-        override suspend fun readNBuffered(n: Int, bufferSize: Int): ByteArray {
-            return inputStream.readNBufferedSuspend(n, bufferSize)
+            return inputStream.readNBufferedSuspend(n)
         }
     }
 
@@ -21,14 +18,9 @@ abstract class SmartInputStream {
         override suspend fun readN(n: Int): ByteArray {
             return channel.readNBufferedToByteArraySuspend(n)
         }
-
-        override suspend fun readNBuffered(n: Int, bufferSize: Int): ByteArray {
-            return channel.readNBufferedToByteArraySuspend(n, bufferSize)
-        }
     }
 
     abstract suspend fun readN(n: Int): ByteArray
-    abstract suspend fun readNBuffered(n: Int, bufferSize: Int = 1024): ByteArray
 
     companion object {
         fun toSmart(socket: Socket): SmartInputStream {

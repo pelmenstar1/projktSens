@@ -10,7 +10,6 @@ import com.pelmenstar.projktSens.shared.serialization.ValueWriter
  * Writes and reads [Request], [Response] in raw non-human readable compact binary form.
  */
 object RawContract : Contract {
-    private const val RESPONSE_BUFFER_SIZE = 1024
     private const val TYPE_EMPTY: Byte = 0
     private const val TYPE_ERROR: Byte = 1
     private const val TYPE_OK: Byte = 2
@@ -145,7 +144,7 @@ object RawContract : Contract {
                 throw RuntimeException("dataSize < 0 (dataSize=$dataSize)")
             }
 
-            val data = input.readNBuffered(dataSize, RESPONSE_BUFFER_SIZE)
+            val data = input.readN(dataSize)
 
             when(type) {
                 TYPE_ERROR -> {
