@@ -1,8 +1,8 @@
 package com.pelmenstar.projktSens.serverProtocol
 
 import com.pelmenstar.projktSens.shared.*
-import com.pelmenstar.projktSens.shared.io.SmartInputStream
-import com.pelmenstar.projktSens.shared.io.SmartOutputStream
+import com.pelmenstar.projktSens.shared.io.Input
+import com.pelmenstar.projktSens.shared.io.Output
 import com.pelmenstar.projktSens.shared.serialization.Serializable
 import com.pelmenstar.projktSens.shared.serialization.ValueWriter
 
@@ -25,7 +25,7 @@ object RawContract : Contract {
         this[1] = type.toByte()
     }
 
-    override suspend fun openSession(output: SmartOutputStream, reqCount: Int) {
+    override suspend fun openSession(output: Output, reqCount: Int) {
         if(reqCount <= 0) {
             throw RuntimeException("Request count <= 0")
         }
@@ -37,7 +37,7 @@ object RawContract : Contract {
         output.write(buildByteArray(1) { this[0] = reqCount.toByte() })
     }
 
-    override suspend fun writeRequest(request: Request, output: SmartOutputStream) {
+    override suspend fun writeRequest(request: Request, output: Output) {
         val command = request.command
         val arg = request.argument
 
@@ -66,7 +66,7 @@ object RawContract : Contract {
         output.write(buffer)
     }
 
-    override suspend fun readRequest(input: SmartInputStream): Request {
+    override suspend fun readRequest(input: Input): Request {
         val header = input.readN(REQUEST_HEADER_SEC_LENGTH)
 
         val command = header[0].toInt()
@@ -99,7 +99,7 @@ object RawContract : Contract {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override suspend fun writeResponse(response: Response, output: SmartOutputStream) {
+    override suspend fun writeResponse(response: Response, output: Output) {
         val buffer = when(response) {
             Response.Empty -> RESPONSE_TYPE_EMPTY_ARRAY
             is Response.Error -> {
@@ -130,7 +130,7 @@ object RawContract : Contract {
     }
 
     override suspend fun <T : Any> readResponse(
-        input: SmartInputStream,
+        input: Input,
         valueClass: Class<T>
     ): Response {
         val header = input.readN(5)

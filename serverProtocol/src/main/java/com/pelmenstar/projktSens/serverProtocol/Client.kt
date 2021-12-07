@@ -3,8 +3,8 @@ package com.pelmenstar.projktSens.serverProtocol
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.pelmenstar.projktSens.shared.connectSuspend
-import com.pelmenstar.projktSens.shared.io.SmartInputStream
-import com.pelmenstar.projktSens.shared.io.SmartOutputStream
+import com.pelmenstar.projktSens.shared.io.Input
+import com.pelmenstar.projktSens.shared.io.Output
 import java.io.IOException
 import java.net.Socket
 import java.nio.channels.AsynchronousSocketChannel
@@ -88,8 +88,8 @@ class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
         return AsynchronousSocketChannel.open().use { channel ->
             channel.connectSuspend(address, 5000)
 
-            val input = SmartInputStream.toSmart(channel)
-            val output = SmartOutputStream.toSmart(channel)
+            val input = Input.of(channel)
+            val output = Output.of(channel)
 
             handleRequestMultiple(input, output, requests, valueClasses)
         }
@@ -102,16 +102,16 @@ class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
         return Socket().use { socket ->
             socket.connectSuspend(address, 5000)
 
-            val input = SmartInputStream.toSmart(socket)
-            val output = SmartOutputStream.toSmart(socket)
+            val input = Input.of(socket)
+            val output = Output.of(socket)
 
             handleRequestMultiple(input, output, requests, valueClasses)
         }
     }
 
     private suspend fun handleRequestMultiple(
-        input: SmartInputStream,
-        output: SmartOutputStream,
+        input: Input,
+        output: Output,
         requests: Array<Request>,
         valueClasses: Array<Class<*>>
     ): Array<Any?> {
@@ -169,8 +169,8 @@ class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
         return Socket().use { socket ->
             socket.connectSuspend(address, 5000)
 
-            val input = SmartInputStream.toSmart(socket)
-            val output = SmartOutputStream.toSmart(socket)
+            val input = Input.of(socket)
+            val output = Output.of(socket)
 
             contract.openSession(output, 1)
 
@@ -190,8 +190,8 @@ class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
         return AsynchronousSocketChannel.open().use { channel ->
             channel.connectSuspend(address, 5000)
 
-            val input = SmartInputStream.toSmart(channel)
-            val output = SmartOutputStream.toSmart(channel)
+            val input = Input.of(channel)
+            val output = Output.of(channel)
 
             contract.openSession(output, 1)
 
@@ -207,8 +207,8 @@ class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
     private suspend fun writeRequestAndReadResponse(
         request: Request,
         valueClass: Class<*>,
-        input: SmartInputStream,
-        output: SmartOutputStream
+        input: Input,
+        output: Output
     ): Response {
         contract.writeRequest(request, output)
 

@@ -8,8 +8,8 @@ import com.pelmenstar.projktSens.serverProtocol.*
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder
 import com.pelmenstar.projktSens.shared.acceptSuspend
 import com.pelmenstar.projktSens.shared.bindSuspend
-import com.pelmenstar.projktSens.shared.io.SmartInputStream
-import com.pelmenstar.projktSens.shared.io.SmartOutputStream
+import com.pelmenstar.projktSens.shared.io.Input
+import com.pelmenstar.projktSens.shared.io.Output
 import com.pelmenstar.projktSens.shared.time.ShortDate
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
 import com.pelmenstar.projktSens.weather.models.DayRangeReport
@@ -104,8 +104,8 @@ class Server(
 
                     launchAndProcessClient(
                         client,
-                        SmartInputStream.toSmart(client),
-                        SmartOutputStream.toSmart(client)
+                        Input.of(client),
+                        Output.of(client)
                     )
                 }
             }
@@ -132,8 +132,8 @@ class Server(
 
                     launchAndProcessClient(
                         client,
-                        SmartInputStream.toSmart(client),
-                        SmartOutputStream.toSmart(client)
+                        Input.of(client),
+                        Output.of(client)
                     )
                 }
             }
@@ -170,7 +170,7 @@ class Server(
 
     private fun launchAndProcessClient(
         client: Closeable,
-        input: SmartInputStream, output: SmartOutputStream
+        input: Input, output: Output
     ) {
         scope.launch {
             client.use {
@@ -184,7 +184,7 @@ class Server(
     }
 
     private suspend fun processClient(
-        input: SmartInputStream, output: SmartOutputStream
+        input: Input, output: Output
     ) {
         try {
             val reqCount = input.readN(1)[0].toInt()
