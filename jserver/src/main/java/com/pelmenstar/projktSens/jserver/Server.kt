@@ -6,6 +6,7 @@ import com.pelmenstar.projktSens.jserver.logging.Logger
 import com.pelmenstar.projktSens.jserver.logging.LoggerConfig
 import com.pelmenstar.projktSens.serverProtocol.*
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder
+import com.pelmenstar.projktSens.shared.StringUtils
 import com.pelmenstar.projktSens.shared.acceptSuspend
 import com.pelmenstar.projktSens.shared.bindSuspend
 import com.pelmenstar.projktSens.shared.io.SmartInputStream
@@ -187,21 +188,19 @@ class Server(
         input: SmartInputStream, output: SmartOutputStream
     ) {
         try {
-            val reqCount = input.readN(1)[0].toInt()
-            if(reqCount <= 0) {
-                contract.writeResponse(Response.error(Errors.INVALID_ARGUMENTS), output)
-                return
+            val requests = contract.readRequests(input)
+            log info {
+                append("requests=")
+                StringUtils.appendArray(requests, this)
             }
 
-            repeat(reqCount) {
-                val request = contract.readRequest(input)
-                logAppendable("request", request)
-
-                val response = processRequest(request)
-                logAppendable("response", response)
-
-                contract.writeResponse(response, output)
+            val responses = Array(requests.size) { i -> processRequest(requests[i]) }
+            log info {
+                append("responses=")
+                StringUtils.appendArray(requests, this)
             }
+
+            contract.writeResponses(responses, output)
         } catch (e: Exception) {
             log error e
         }
@@ -290,14 +289,6 @@ class Server(
             log error e
 
             Response.error(e)
-        }
-    }
-
-    private fun logAppendable(prefix: String, obj: AppendableToStringBuilder) {
-        log info {
-            append(prefix)
-            append('=')
-            obj.append(this)
         }
     }
 

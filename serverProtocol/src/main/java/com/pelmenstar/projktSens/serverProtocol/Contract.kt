@@ -7,29 +7,24 @@ import com.pelmenstar.projktSens.shared.io.SmartOutputStream
  * A contract between client and server, that describes in what way interpret byte data.
  */
 interface Contract {
-    suspend fun openSession(output: SmartOutputStream, reqCount: Int)
+    suspend fun writeRequests(requests: Array<Request>, output: SmartOutputStream)
 
-    /**
-     * Writes [request] to [output].
-     * If run [readRequest] on written data, it will return the same request.
-     */
-    suspend fun writeRequest(request: Request, output: SmartOutputStream)
+    suspend fun readRequests(
+        input: SmartInputStream,
+    ): Array<Request>
 
-    /**
-     * Reads [Request] from [input].
-     */
-    suspend fun readRequest(input: SmartInputStream): Request
+    suspend fun writeResponses(responses: Array<Response>, output: SmartOutputStream)
 
-    /**
-     * Writes [response] to [output].
-     * If [readResponse] is invoked on written data, it must return the same response
-     */
-    suspend fun writeResponse(response: Response, output: SmartOutputStream)
+    suspend fun readResponses(
+        input: SmartInputStream,
+        valueClasses: Array<Class<*>>
+    ): Array<Response>
+}
 
-    /**
-     * Reads [Response] from [input].
-     *
-     * @param valueClass expected class of data stored in [Request]
-     */
-    suspend fun <T : Any> readResponse(input: SmartInputStream, valueClass: Class<T>): Response
+suspend fun Contract.writeRequest(request: Request, output: SmartOutputStream) {
+    writeRequests(arrayOf(request), output)
+}
+
+suspend fun Contract.writeResponse(response: Response, output: SmartOutputStream) {
+    writeResponses(arrayOf(response), output)
 }
