@@ -25,17 +25,17 @@ class SensorWeatherProvider : WeatherInfoProvider {
         }
     }
 
-    private suspend fun getWeatherBlocking(): WeatherInfo {
+    private fun getWeatherBlocking(): WeatherInfo {
         try {
             return Socket().use { socket ->
-                socket.connectSuspend(address, 5000)
+                socket.connect(address, 5000)
 
                 val input = socket.getInputStream()
                 val output = socket.getOutputStream()
 
-                output.writeSuspend(MSG)
+                output.write(MSG)
 
-                val buffer = input.readNSuspend(12)
+                val buffer = input.readN(12)
 
                 parse(buffer)
             }

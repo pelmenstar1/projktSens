@@ -100,7 +100,7 @@ class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
         valueClasses: Array<Class<*>>
     ): Array<Any?> {
         return Socket().use { socket ->
-            socket.connectSuspend(address, 5000)
+            socket.connect(address, 5000)
 
             val input = Input.of(socket)
             val output = Output.of(socket)
@@ -167,7 +167,7 @@ class Client(config: ProtoConfig, private val forceBlocking: Boolean = false) {
         request: Request, valueClass: Class<*>
     ): Response {
         return Socket().use { socket ->
-            socket.connectSuspend(address, 5000)
+            socket.connect(address, 5000)
 
             val input = Input.of(socket)
             val output = Output.of(socket)

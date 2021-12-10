@@ -37,10 +37,10 @@ class ServerAvailabilityProvider(
         }
     }
 
-    private suspend fun isAvailableBlocking(): Boolean {
+    private fun isAvailableBlocking(): Boolean {
         return try {
             val socket = Socket()
-            socket.connectSuspend(address, 5000)
+            socket.connect(address, 5000)
 
             true
         } catch (e: Exception) {

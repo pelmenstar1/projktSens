@@ -1,6 +1,6 @@
 package com.pelmenstar.projktSens.shared.io
 
-import com.pelmenstar.projktSens.shared.readNBufferedSuspend
+import com.pelmenstar.projktSens.shared.readNBuffered
 import com.pelmenstar.projktSens.shared.readNBufferedToByteArraySuspend
 import java.io.InputStream
 import java.net.Socket
@@ -9,7 +9,7 @@ import java.nio.channels.AsynchronousByteChannel
 abstract class Input {
     private class OfInputStream(private val inputStream: InputStream): Input() {
         override suspend fun readN(n: Int): ByteArray {
-            return inputStream.readNBufferedSuspend(n)
+            return inputStream.readNBuffered(n)
         }
     }
 

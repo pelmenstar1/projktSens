@@ -8,7 +8,7 @@ import java.nio.channels.AsynchronousByteChannel
 abstract class Output {
     private class OfOutputStream(private val outStream: OutputStream): Output() {
         override suspend fun write(buffer: ByteArray) {
-            outStream.writeSuspend(buffer)
+            outStream.write(buffer)
         }
     }
 

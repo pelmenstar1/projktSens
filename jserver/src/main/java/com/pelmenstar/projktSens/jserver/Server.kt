@@ -89,10 +89,10 @@ class Server(
         }
     }
 
-    private suspend fun startOnCurrentThreadBlocking() {
+    private fun startOnCurrentThreadBlocking() {
         try {
             ServerSocket().use { server ->
-                server.bindSuspend(address, BACKLOG)
+                server.bind(address, BACKLOG)
                 logServerStarted()
 
                 synchronized(lock) {
@@ -100,7 +100,7 @@ class Server(
                 }
 
                 while (true) {
-                    val client = server.acceptSuspend()
+                    val client = server.accept()
 
                     launchAndProcessClient(
                         client,
