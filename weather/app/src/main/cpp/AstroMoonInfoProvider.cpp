@@ -72,9 +72,9 @@ float getMoonPhase(uint32_t year, uint32_t month, uint32_t day) {
 
 	float ec = kepler(m);
 	ec = 1.01686011182f * tanf(ec * 0.5f);
-	ec = 2.0f * D2R * atanf(ec);
+	ec = fma(2.0f * D2R, atanf(ec), ELONGP);
 
-	float lambdaSun = fixAngle(ec + ELONGP);
+	float lambdaSun = fixAngle(ec);
 	float ml = fixAngle(fma(13.1763966f, dayF, MMLONG));
 	float mm = fixAngle(ml - fma(0.1114041f, dayF, MMLONGP));
 	float ev = 1.2739f * sinf(D2R * 2.0f * (ml - lambdaSun) - mm);
@@ -87,10 +87,7 @@ float getMoonPhase(uint32_t year, uint32_t month, uint32_t day) {
 	mEc_a4_vec = v_sinf(mEc_a4_vec);
 	mEc_a4_vec *= float32x2_t { 6.2886f, 0.214f };
 
-	float mEc = mEc_a4_vec[0];
-	float a4 = mEc_a4_vec[1];
-
-	float lP = ml + ev + mEc - ae + a4;
+	float lP = ml + ev - ae + vaddv_f32(mEc_a4_vec);
 	float lPP = fma(0.6583f, sinf(2.0f * D2R * (lP - lambdaSun)), lP);
 
 	float moonAge = lPP - lambdaSun;
