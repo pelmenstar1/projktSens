@@ -5,9 +5,7 @@ import androidx.annotation.RequiresApi
 import com.pelmenstar.projktSens.jserver.logging.Logger
 import com.pelmenstar.projktSens.jserver.logging.LoggerConfig
 import com.pelmenstar.projktSens.serverProtocol.*
-import com.pelmenstar.projktSens.shared.AppendableToStringBuilder
 import com.pelmenstar.projktSens.shared.acceptSuspend
-import com.pelmenstar.projktSens.shared.bindSuspend
 import com.pelmenstar.projktSens.shared.io.Input
 import com.pelmenstar.projktSens.shared.io.Output
 import com.pelmenstar.projktSens.shared.time.ShortDate
@@ -187,21 +185,10 @@ class Server(
         input: Input, output: Output
     ) {
         try {
-            val reqCount = input.readN(1)[0].toInt()
-            if(reqCount <= 0) {
-                contract.writeResponse(Response.error(Errors.INVALID_ARGUMENTS), output)
-                return
-            }
+            val requests = contract.readRequests(input)
+            val responses = Array(requests.size) { i -> processRequest(requests[i]) }
 
-            repeat(reqCount) {
-                val request = contract.readRequest(input)
-                logAppendable("request", request)
-
-                val response = processRequest(request)
-                logAppendable("response", response)
-
-                contract.writeResponse(response, output)
-            }
+            contract.writeResponses(responses, output)
         } catch (e: Exception) {
             log error e
         }
@@ -290,14 +277,6 @@ class Server(
             log error e
 
             Response.error(e)
-        }
-    }
-
-    private fun logAppendable(prefix: String, obj: AppendableToStringBuilder) {
-        log info {
-            append(prefix)
-            append('=')
-            obj.append(this)
         }
     }
 

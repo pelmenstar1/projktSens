@@ -3,7 +3,9 @@ package com.pelmenstar.projktSens.serverProtocol
 import com.pelmenstar.projktSens.shared.*
 import com.pelmenstar.projktSens.shared.io.Input
 import com.pelmenstar.projktSens.shared.io.Output
+import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer
 import com.pelmenstar.projktSens.shared.serialization.Serializable
+import com.pelmenstar.projktSens.shared.serialization.ValueReader
 import com.pelmenstar.projktSens.shared.serialization.ValueWriter
 
 /**
@@ -14,114 +16,161 @@ object RawContract : Contract {
     private const val TYPE_ERROR: Byte = 1
     private const val TYPE_OK: Byte = 2
 
-    private const val REQUEST_HEADER_SEC_LENGTH = 2
-
-    private val RESPONSE_TYPE_EMPTY_ARRAY = ByteArray(5).apply {
-        this[0] = TYPE_EMPTY
-    }
-
-    private fun ByteArray.writeRequestHeader(command: Int, type: Int) {
-        this[0] = command.toByte()
-        this[1] = type.toByte()
-    }
-
-    override suspend fun openSession(output: Output, reqCount: Int) {
-        if(reqCount <= 0) {
-            throw RuntimeException("Request count <= 0")
+    override suspend fun writeRequests(requests: Array<Request>, output: Output) {
+        if(requests.isEmpty()) {
+            throw RuntimeException("Requests are empty")
+        }
+        if(requests.size > 127) {
+            throw RuntimeException("Limit of requests exceeded")
         }
 
-        if(reqCount > 127) {
-            throw RuntimeException("Request count limit exceeded (limit=128, current=${reqCount})")
-        }
-
-        output.write(buildByteArray(1) { this[0] = reqCount.toByte() })
-    }
-
-    override suspend fun writeRequest(request: Request, output: Output) {
-        val command = request.command
-        val arg = request.argument
-
-        val buffer: ByteArray
-        if (arg == null) {
-            buffer = ByteArray(REQUEST_HEADER_SEC_LENGTH)
-            buffer.writeRequestHeader(command, Request.Argument.TYPE_NULL)
-        } else {
-            buffer = when(arg) {
-                is Request.Argument.Integer -> {
-                    buildByteArray(REQUEST_HEADER_SEC_LENGTH + 4) {
-                        writeRequestHeader(command, Request.Argument.TYPE_INTEGER)
-                        writeInt(REQUEST_HEADER_SEC_LENGTH, arg.value)
-                    }
-                }
-                is Request.Argument.DateRange -> {
-                    buildByteArray(REQUEST_HEADER_SEC_LENGTH + 8) {
-                        writeRequestHeader(command, Request.Argument.TYPE_DATE_RANGE)
-                        writeInt(REQUEST_HEADER_SEC_LENGTH, arg.start)
-                        writeInt(REQUEST_HEADER_SEC_LENGTH + 4, arg.endInclusive)
-                    }
+        var bufferSize = requests.size * 2
+        for(request in requests) {
+            val arg = request.argument
+            if(arg != null) {
+                bufferSize += when(arg.type) {
+                    Request.Argument.TYPE_INTEGER -> 4
+                    Request.Argument.TYPE_DATE_RANGE -> 8
+                    else -> throw RuntimeException("Invalid arg type")
                 }
             }
+        }
+        val buffer = ByteArray(bufferSize + 3)
+        buffer.writeShort(0, bufferSize.toShort())
+        buffer[2] = requests.size.toByte()
+        var index = 3
+
+        for(request in requests) {
+            buffer[index] = request.command.toByte()
+
+            val arg = request.argument
+            if(arg != null) {
+                buffer[index + 1] = arg.type.toByte()
+
+                when(arg) {
+                    is Request.Argument.Integer -> {
+                        buffer.writeInt(index + 2, arg.value)
+
+                        index += 4
+                    }
+                    is Request.Argument.DateRange -> {
+                        buffer.writeInt(index + 2, arg.start)
+                        buffer.writeInt(index + 6, arg.endInclusive)
+
+                        index += 8
+                    }
+                }
+            } else {
+                buffer[index + 1] = Request.Argument.TYPE_NULL.toByte()
+            }
+
+            index += 2
         }
 
         output.write(buffer)
     }
 
-    override suspend fun readRequest(input: Input): Request {
-        val header = input.readN(REQUEST_HEADER_SEC_LENGTH)
+    override suspend fun readRequests(input: Input): Array<Request> {
+        val header = input.readN(3)
+        val bufferSize = header.getShort(0).toInt()
+        val reqCount = header[2].toInt()
 
-        val command = header[0].toInt()
-        val argType = header[1].toInt()
-        val arg: Request.Argument?
-
-        when(argType) {
-            Request.Argument.TYPE_NULL -> {
-                arg = null
-            }
-            Request.Argument.TYPE_INTEGER -> {
-                val buffer = input.readN(4)
-
-                arg = Request.Argument.Integer(buffer.getInt(0))
-            }
-            Request.Argument.TYPE_DATE_RANGE -> {
-                val buffer = input.readN(8)
-
-                val start = buffer.getInt(0)
-                val end = buffer.getInt(4)
-
-                arg = Request.Argument.DateRange(start, end)
-            }
-            else -> {
-                throw RuntimeException("Invalid argType ($argType)")
-            }
+        if(bufferSize <= 0) {
+            throw RuntimeException("bufferSize <= 0")
+        }
+        if(reqCount <= 0) {
+            throw RuntimeException("reqCount <= 0")
         }
 
-        return Request(command, arg)
+        val buffer = input.readN(bufferSize)
+        var index = 0
+
+        return Array(reqCount) {
+            val command = buffer[index].toInt()
+            val argType = buffer[index + 1].toInt()
+            index += 2
+
+            var arg: Request.Argument? = null
+
+            if(argType != Request.Argument.TYPE_NULL) {
+                arg = when(argType) {
+                    Request.Argument.TYPE_INTEGER -> {
+                        val value = buffer.getInt(index)
+                        index += 4
+
+                        Request.Argument.Integer(value)
+                    }
+                    Request.Argument.TYPE_DATE_RANGE -> {
+                        val start = buffer.getInt(index)
+                        val end = buffer.getInt(index + 4)
+                        index += 8
+
+                        Request.Argument.DateRange(start, end)
+                    }
+                    else -> throw RuntimeException("Invalid argType")
+                }
+            }
+
+            Request(command, arg)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
-    override suspend fun writeResponse(response: Response, output: Output) {
-        val buffer = when(response) {
-            Response.Empty -> RESPONSE_TYPE_EMPTY_ARRAY
-            is Response.Error -> {
-                buildByteArray(9) {
-                    this[0] = TYPE_ERROR
-                    writeInt(1, 4 /* length of data */)
-                    writeInt(5, response.error)
+    override suspend fun writeResponses(responses: Array<Response>, output: Output) {
+        if(responses.isEmpty()) {
+            throw RuntimeException("Responses are empty")
+        }
+        if(responses.size > 127) {
+            throw RuntimeException("Limit of responses exceeded")
+        }
+
+        var bufferSize = responses.size
+        for(response in responses) {
+            when(response) {
+                is Response.Error -> {
+                    bufferSize += 4
+                }
+                is Response.Ok<*> -> {
+                    val value = response.value
+                    val serializer = Serializable.getSerializer(value.javaClass)
+
+                    bufferSize += serializer.getSerializedObjectSize(value)
                 }
             }
-            is Response.Ok<*> -> {
-                val value = response.value
-                val serializer =
-                    Serializable.getSerializer(value.javaClass)
-                val objectSize = serializer.getSerializedObjectSize(response.value)
+        }
 
-                buildByteArray(objectSize + 5) {
-                    this[0] = TYPE_OK
-                    writeInt(1, objectSize)
+        val buffer = ByteArray(bufferSize + 5)
+        buffer.writeInt(0, bufferSize)
+        buffer[4] = responses.size.toByte()
+
+        var index = 5
+        for(response in responses) {
+            when(response) {
+                Response.Empty -> {
+                    buffer[index++] = TYPE_EMPTY
+                }
+                is Response.Error -> {
+                    buffer[index++] = TYPE_ERROR
+                    buffer.writeInt(index, response.error)
+
+                    index += 4
+                }
+                is Response.Ok<*> -> {
+                    val value = response.value
+                    val serializer = Serializable.getSerializer(value.javaClass)
+                    val objectSize = serializer.getSerializedObjectSize(value)
+
+                    buffer[index++] = TYPE_OK
+
                     serializer.writeObject(
                         value,
-                        ValueWriter(this, 5)
+                        ValueWriter(
+                            buffer,
+                            index
+                        )
                     )
+
+                    index += objectSize
                 }
             }
         }
@@ -129,35 +178,39 @@ object RawContract : Contract {
         output.write(buffer)
     }
 
-    override suspend fun <T : Any> readResponse(
+    override suspend fun readResponses(
         input: Input,
-        valueClass: Class<T>
-    ): Response {
+        valueClasses: Array<Class<*>>
+    ): Array<Response> {
         val header = input.readN(5)
-        val type = header[0]
+        val totalSize = header.getInt(0)
+        val responsesCount = header[4].toInt()
 
-        return if(type == TYPE_EMPTY) {
-            Response.Empty
-        } else {
-            val dataSize = header.getInt(1)
-            if(dataSize <= 0) {
-                throw RuntimeException("dataSize < 0 (dataSize=$dataSize)")
-            }
+        val buffer = input.readN(totalSize)
+        var index = 0
 
-            val data = input.readN(dataSize)
-
+        return Array(responsesCount) { i ->
+            val type = buffer[index++]
             when(type) {
+                TYPE_EMPTY -> Response.Empty
                 TYPE_ERROR -> {
-                    val error = data.getInt(0)
+                    val errorId = buffer.getInt(index)
+                    index += 4
 
-                    Response.Error(error)
+                    Response.error(errorId)
                 }
                 TYPE_OK -> {
-                    val value = Serializable.ofByteArray(data, valueClass)
+                    val serializer = Serializable.getSerializer(valueClasses[i]) as ObjectSerializer<Any>
+
+                    val value = serializer.readObject(ValueReader(
+                        buffer,
+                        index
+                    ))
+                    index += serializer.getSerializedObjectSize(value)
 
                     Response.ok(value)
                 }
-                else -> throw RuntimeException("Invalid type of response ($type)")
+                else -> throw RuntimeException("Invalid response type")
             }
         }
     }
