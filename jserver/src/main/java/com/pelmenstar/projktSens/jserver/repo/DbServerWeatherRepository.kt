@@ -7,9 +7,6 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.core.database.sqlite.transaction
-import com.pelmenstar.projktSens.shared.android.ext.executeInsertSuspend
-import com.pelmenstar.projktSens.shared.android.ext.executeUpdateDeleteSuspend
-import com.pelmenstar.projktSens.shared.android.ext.querySuspend
 import com.pelmenstar.projktSens.shared.serialization.ValidationException
 import com.pelmenstar.projktSens.shared.time.*
 import com.pelmenstar.projktSens.weather.models.*
@@ -21,19 +18,23 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
     WeatherRepository {
     override suspend fun clear() {
         db.compileStatement("DELETE FROM weather").use { statement ->
-            statement.executeUpdateDeleteSuspend()
+            statement.executeUpdateDelete()
         }
     }
 
     override suspend fun putMany(values: Array<WeatherInfo>) {
         db.transaction {
             for (weather in values) {
-                put(weather)
+                putBlocking(weather)
             }
         }
     }
 
     override suspend fun put(weather: WeatherInfo) {
+        putBlocking(weather)
+    }
+
+    private fun putBlocking(weather: WeatherInfo) {
         val temp = UnitValue.getValue(
             weather.temperature,
             ValueUnitsPacked.getTemperatureUnit(weather.units),
@@ -58,7 +59,7 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
         }
 
         db.compileStatement(sql).use { statement ->
-            statement.executeInsertSuspend()
+            statement.executeInsert()
         }
     }
 
@@ -67,9 +68,9 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
             throw ValidationException.invalidValue("date", date)
         }
 
-        return db.querySuspend(createDayQuery(date)).use { c ->
+        return query(createDayQuery(date)) { c ->
             if (c.count == 0) {
-                return null
+                return@query null
             }
 
             DayReport.create(CursorWeatherPropertyIterable(c))
@@ -79,9 +80,9 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
     override suspend fun getDayRangeReport(@ShortDateInt start: Int, @ShortDateInt end: Int): DayRangeReport? {
         val sql = createDayRangeQuery(start, end)
 
-        return db.querySuspend(sql).use { c ->
+        return query(sql) { c ->
             if (c.count == 0) {
-                return null
+                return@query null
             }
 
             DayRangeReport.create(CursorWeatherPropertyIterable(c))
@@ -89,23 +90,23 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
     }
 
     override suspend fun getAvailableDateRange(): ShortDateRange? {
-        db.querySuspend(QUERY_AVAILABLE_DATE_RANGE).use { c ->
+        return query(QUERY_AVAILABLE_DATE_RANGE) { c ->
             c.moveToPosition(0)
             if (c.isNull(0) || c.isNull(1)) {
-                return null
+                return@query null
             }
 
             val minDate = ShortDate.ofEpochSecond(c.getLong(0))
             val maxDate = ShortDate.ofEpochSecond(c.getLong(1))
 
-            return ShortDateRange(minDate, maxDate)
+            ShortDateRange(minDate, maxDate)
         }
     }
 
     override suspend fun getLastWeather(): WeatherInfo? {
-        db.querySuspend(QUERY_LAST_WEATHER).use { c ->
+        return query(QUERY_LAST_WEATHER) { c ->
             if (c.count == 0) {
-                return null
+                return@query null
             }
 
             c.moveToPosition(0)
@@ -115,8 +116,14 @@ class DbServerWeatherRepository private constructor(private val db: SQLiteDataba
             val hum = c.getFloat(2)
             val press = c.getFloat(3)
 
-            return WeatherInfo(ValueUnitsPacked.CELSIUS_MM_OF_MERCURY, dateTime, temp, hum, press)
+            WeatherInfo(ValueUnitsPacked.CELSIUS_MM_OF_MERCURY, dateTime, temp, hum, press)
         }
+    }
+
+    private inline fun<T> query(sql: String, block: (c: Cursor) -> T): T {
+        val cursor = db.rawQueryWithFactory(null, sql, null, null, null)
+
+        return cursor.use(block)
     }
 
     private class OpenHelper(context: Context, name: String?) :
