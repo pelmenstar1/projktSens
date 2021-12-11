@@ -55,7 +55,7 @@ class NetworkDataSource(private val config: ProtoConfig) : WeatherFlowDataSource
                 Request(Commands.GET_NEXT_WEATHER_TIME),
                 Request(Commands.GET_LAST_WEATHER)
             ), arrayOf(
-                Long::class.java,
+                Long::class.javaObjectType,
                 WeatherInfo::class.java
             ))
 
@@ -67,7 +67,7 @@ class NetworkDataSource(private val config: ProtoConfig) : WeatherFlowDataSource
 
             val interval = config.weatherChannelReceiveInterval.toLong()
 
-            val firstWeather = values[0] as WeatherInfo?
+            val firstWeather = values[1] as WeatherInfo?
             emit(firstWeather)
             delay(interval - correction)
 
