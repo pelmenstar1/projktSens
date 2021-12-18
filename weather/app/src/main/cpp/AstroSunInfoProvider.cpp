@@ -95,6 +95,7 @@ uint32x2_t getSunriseSunsetTimeRangeNeon(uint32_t dayOfYear,
 	float32x4_t sinMDM = mq * float32x4_t{D2R, D2R * 2.0f, D2R, D2R * 2.0f};
 	sinMDM = v_sinfq(sinMDM);
 	sinMDM *= float32x4_t{ 1.916f, 0.02f, 1.916f, 0.02f };
+
 	float32x2_t sinMDMsum = { vaddv_f32(vget_low_f32(sinMDM)), vaddv_f32(vget_high_f32(sinMDM)) };
 
 	float32x2_t l = v_align360(m + sinMDMsum + 282.634f);
@@ -123,8 +124,12 @@ uint32x2_t getSunriseSunsetTimeRangeNeon(uint32_t dayOfYear,
 	float32x2_t sinDec = 0.39782f * v_sinf(lRad);
 	float32x2_t cosDec = v_cosf(v_asinf(sinDec));
 
-	float32x2_t sinCosLat = v_sincosf_fast(latRad);
-	float32x2_t cosH = (vfma_f32(vdup_n_f32(COS_ZENITH), -sinDec, vdup_n_f32(sinCosLat[0]))) / (cosDec * sinCosLat[1]);
+	float sinLat;
+	float cosLat;
+
+	sincosf(latRad, &sinLat, &cosLat);
+
+	float32x2_t cosH = (vfma_f32(vdup_n_f32(COS_ZENITH), -sinDec, vdup_n_f32(sinLat))) / (cosDec * cosLat);
 
 	float32x2_t h = {
 		fma(-R2D, acosf(cosH[0]), 360.0f),
@@ -134,9 +139,7 @@ uint32x2_t getSunriseSunsetTimeRangeNeon(uint32_t dayOfYear,
 	float32x2_t hour = vfma_f32(ra, h, vdup_n_f32(HOURS_PER_DEGREE)) +
 		vfma_f32(vdup_n_f32(-6.622f), vdup_n_f32(-0.06571f), t);
 
-	hour = v_align24(hour);
-
-	return vcvt_u32_f32((hour - lnHour) * 3600.0f);
+	return vcvt_u32_f32((v_align24(hour) - lnHour) * 3600.0f);
 }
 
 #elif __x86_64__

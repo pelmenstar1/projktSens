@@ -15,8 +15,6 @@ float32x4_t v_sinfq(float32x4_t x);
 
 float32x2_t v_cosf(float32x2_t x);
 
-float32x2_t v_sincosf_fast(float x);
-
 #endif
 
 #endif //PROJKT_SENS_WEATHER_APP_SRC_MAIN_CPP_VMATH_ARM_H_
