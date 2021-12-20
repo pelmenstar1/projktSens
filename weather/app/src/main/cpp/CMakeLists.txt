@@ -14,7 +14,6 @@ add_library(weather-app
 
         v_sinf_impl.cpp
         v_cosf_impl.cpp
-        v_sincosf_fast_impl.cpp
         v_asinf_impl.cpp
         )
 
