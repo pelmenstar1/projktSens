@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 /**
@@ -33,13 +32,15 @@ public final class Serializable {
      */
     @NotNull
     public static <T> ObjectSerializer<T> getSerializer(@NotNull Class<T> c) {
+        Class<?> aliased = primitiveToWrapper(c);
+
         //noinspection unchecked
-        ObjectSerializer<T> s = (ObjectSerializer<T>) cachedSerializers.get(c);
+        ObjectSerializer<T> s = (ObjectSerializer<T>) cachedSerializers.get(aliased);
 
         if (s == null) {
-            s = getSerializerReflection(c);
+            s = getSerializerReflection(aliased);
 
-            cachedSerializers.put(c, s);
+            cachedSerializers.put(aliased, s);
         }
 
         return s;
@@ -61,7 +62,7 @@ public final class Serializable {
     }
 
     @NotNull
-    private static <T> ObjectSerializer<T> getSerializerReflection(@NotNull Class<T> c) throws SerializerContractException {
+    private static <T> ObjectSerializer<T> getSerializerReflection(@NotNull Class<?> c) throws SerializerContractException {
         Field serializerField;
 
         try {
@@ -96,6 +97,30 @@ public final class Serializable {
         } catch (ClassCastException e) {
             throw SerializerContractException.serializerDoesntExtendObjectSerializer(c);
         }
+    }
+
+    @NotNull
+    private static Class<?> primitiveToWrapper(@NotNull Class<?> c) {
+        if(c.isPrimitive()) {
+            if(c == boolean.class) {
+                return Boolean.class;
+            } else if(c == byte.class) {
+                return Byte.class;
+            } else if(c == short.class) {
+                return Short.class;
+            } else if(c == char.class) {
+                return Character.class;
+            } else if(c == int.class) {
+                return Integer.class;
+            } else if(c == long.class) {
+                return Long.class;
+            } else if(c == float.class) {
+                return Float.class;
+            } else if(c == double.class) {
+                return Double.class;
+            }
+        }
+        return c;
     }
 
     @NotNull
