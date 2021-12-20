@@ -7,6 +7,7 @@ import android.text.InputType
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.GridLayout
 import androidx.annotation.ArrayRes
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
@@ -18,6 +19,7 @@ import com.pelmenstar.projktSens.shared.StringUtils
 import com.pelmenstar.projktSens.shared.android.Preferences
 import com.pelmenstar.projktSens.shared.android.ReadonlyArrayAdapter
 import com.pelmenstar.projktSens.shared.android.ui.EditText
+import com.pelmenstar.projktSens.shared.android.ui.chooseServerHost.ChooseServerHostView
 import com.pelmenstar.projktSens.shared.android.ui.settings.Setting
 import com.pelmenstar.projktSens.shared.android.ui.settings.SettingGroup
 import com.pelmenstar.projktSens.shared.equalsPattern
@@ -35,7 +37,6 @@ val APP_SETTING_GROUPS: Array<out SettingGroup> = arrayOf(
     SettingGroup(
         ServerHostSetting::class.java,
         ServerContractSetting::class.java,
-        ServerPortSetting::class.java,
         WeatherReceiveIntervalSetting::class.java
     ),
     SettingGroup(
@@ -173,112 +174,57 @@ class PressureSetting : ValueUnitSetting() {
 }
 
 class ServerHostSetting : Setting<ServerHostSetting.State>() {
-    class State : IncompleteState {
-        private var _hostBuffer = EmptyArray.CHAR
-        var hostBuffer: CharArray
-            get() = _hostBuffer
-            set(value) {
-                _hostBuffer = value
-
-                val ipInt = InetAddressUtils.parseNumericalIpv4ToInt(value)
-                if (ipInt != InetAddressUtils.IP_ERROR) {
-                    isValid = true
-                    _hostInt = ipInt
-                } else {
-                    isValid = false
-                }
-            }
-
-        private var _hostInt: Int = 0
-        var hostInt: Int
-            get() = _hostInt
-            set(value) {
-                _hostInt = value
-                _hostBuffer = InetAddressUtils.intIpv4ToCharArray(_hostBuffer, value)
-                isValid = value != InetAddressUtils.IP_ERROR
-            }
-
-        constructor(hostBuffer: CharArray) {
-            this.hostBuffer = hostBuffer
-        }
-
-        constructor(ipInt: Int) {
-            hostInt = ipInt
-        }
-
-        internal fun setHost(text: Editable) {
-            val textLength = text.length
-            val buffer = if (_hostBuffer.size == textLength) {
-                _hostBuffer
-            } else {
-                CharArray(textLength)
-            }
-            text.getChars(0, textLength, buffer, 0)
-
-            hostBuffer = buffer
-        }
-
-        override fun equals(other: Any?): Boolean {
-            return equalsPattern(other) { o ->
-                _hostBuffer.contentEquals(o._hostBuffer)
-            }
-        }
-
-        override fun hashCode(): Int {
-            return _hostBuffer.contentHashCode()
-        }
-    }
+    data class State(var address: Int, var port: Int, val contractId: Int)
 
     override val nameId: Int get() = R.string.serverHost
 
     override fun createView(context: Context): View {
-        val invalidAddressStr = context.resources.getString(R.string.invalidInetAddress)
+        return ChooseServerHostView(context).apply {
+            contractId = state.contractId
+            setHost(state.address, state.port)
 
-        return EditText(context) {
-            val initialHost = state.hostBuffer
-            setText(initialHost, 0, initialHost.size)
-            if (!state.isValid) {
-                error = invalidAddressStr
-            }
-
-            addTextChangedListener { text ->
-                if (text != null) {
-                    val state = state
-                    state.setHost(text)
-
-                    if (!state.isValid) {
-                        error = invalidAddressStr
-                    }
-                }
+            onHostChangedByUser = { address, port ->
+                state.address = address
+                state.port = port
             }
         }
     }
 
     override fun saveStateToPrefs(prefs: Preferences) {
-        prefs.setInt(AppPreferences.SERVER_HOST_INT, state.hostInt)
+        prefs.setInt(AppPreferences.SERVER_HOST_INT, state.address)
+        prefs.setInt(AppPreferences.SERVER_PORT, state.port)
     }
 
     override fun saveStateToBundle(outState: Bundle) {
-        outState.putCharArray(BUNDLE_STATE_HOST, state.hostBuffer)
+        outState.putInt(BUNDLE_STATE_ADDRESS, state.address)
+        outState.putInt(BUNDLE_STATE_PORT, state.port)
+        outState.putInt(BUNDLE_STATE_CONTRACT_ID, state.contractId)
     }
 
     override fun loadStateFromPrefs(prefs: Preferences) {
-        state = State(prefs.getInt(AppPreferences.SERVER_HOST_INT))
+        state = State(
+            prefs.getInt(AppPreferences.SERVER_HOST_INT),
+            prefs.getInt(AppPreferences.SERVER_PORT),
+            prefs.getInt(AppPreferences.CONTRACT)
+        )
     }
 
     override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val hostBuffer = bundle.getCharArray(BUNDLE_STATE_HOST)
-        return if (hostBuffer != null) {
-            state = State(hostBuffer)
+        val address = bundle.get(BUNDLE_STATE_ADDRESS) as Int?
+        val port = bundle.get(BUNDLE_STATE_PORT) as Int?
+        val contractId = bundle.get(BUNDLE_STATE_CONTRACT_ID) as Int?
+
+        return if(address != null && port != null && contractId != null) {
+            state = State(address, port, contractId)
 
             true
-        } else {
-            false
-        }
+        } else false
     }
 
     companion object {
-        private const val BUNDLE_STATE_HOST = "ServerHostSetting.State.host"
+        private const val BUNDLE_STATE_ADDRESS = "ServerHostSetting.State.address"
+        private const val BUNDLE_STATE_PORT = "ServerHostSetting.State.port"
+        private const val BUNDLE_STATE_CONTRACT_ID = "ServerHostSetting.State.contractId"
     }
 }
 
@@ -342,106 +288,6 @@ class ServerContractSetting : Setting<ServerContractSetting.State>() {
 
     companion object {
         private const val BUNDLE_STATE_CONTRACT_TYPE = "ServerContractSetting.State.contractType"
-    }
-}
-
-class ServerPortSetting : Setting<ServerPortSetting.State>() {
-    class State(port: Int) : IncompleteState() {
-        var port: Int = 0
-            set(value) {
-                field = value
-                isValid = InetAddressUtils.isValidFreePort(value)
-            }
-
-        init {
-            // if we assign value from constructor like:
-            // var port: Int = port
-            // Custom setter won't be called, that's not OK
-            this.port = port
-        }
-
-        override fun equals(other: Any?): Boolean {
-            return equalsPattern(other) { o ->
-                port == o.port
-            }
-        }
-
-        override fun hashCode(): Int {
-            return port
-        }
-    }
-
-    override val nameId: Int get() = R.string.port
-
-    override fun createView(context: Context): View {
-        val res = context.resources
-        val invalidPortNumberStr = res.getString(R.string.invalidNumberFormat)
-        val portReservedErrorLess = res.getString(R.string.portReservedError_less)
-        val portReservedErrorGreater = res.getString(R.string.portReservedError_greater)
-
-        return EditText(context) {
-            fun setErrorIfInvalidPort(port: Int) {
-                when {
-                    (port < InetAddressUtils.FREE_MIN_PORT) -> {
-                        error = portReservedErrorLess
-                    }
-                    (port > InetAddressUtils.FREE_MAX_PORT) -> {
-                        error = portReservedErrorGreater
-                    }
-                }
-            }
-
-            setText(state.port.toString())
-            setErrorIfInvalidPort(state.port)
-
-            inputType = InputType.TYPE_CLASS_NUMBER
-
-            addTextChangedListener { text ->
-                if (text != null) {
-                    val state = state
-
-                    val port = StringUtils.parsePositiveInt(text)
-                    if (port != -1) {
-                        state.port = port
-
-                        setErrorIfInvalidPort(port)
-                    } else {
-                        error = invalidPortNumberStr
-                        state.isValid = false
-                    }
-                }
-            }
-        }
-    }
-
-    override fun saveStateToPrefs(prefs: Preferences) {
-        prefs.setInt(AppPreferences.SERVER_PORT, state.port)
-    }
-
-    override fun saveStateToBundle(outState: Bundle) {
-        outState.putInt(BUNDLE_PORT, state.port)
-    }
-
-    override fun loadStateFromPrefs(prefs: Preferences) {
-        val port = prefs.getInt(AppPreferences.SERVER_PORT)
-        state = State(port)
-    }
-
-    override fun loadStateFromBundle(bundle: Bundle): Boolean {
-        val port = bundle.get(BUNDLE_PORT)
-
-        return if (port != null) {
-            state = State(port as Int)
-
-            true
-        } else {
-            false
-        }
-    }
-
-
-    companion object {
-        private const val BUNDLE_PORT = "ServerPortSetting.state.port"
     }
 }
 

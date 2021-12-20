@@ -1,6 +1,6 @@
 package com.pelmenstar.projktSens.jserver.di
 
-import com.pelmenstar.projktSens.jserver.Server
+import com.pelmenstar.projktSens.jserver.RepoServer
 import com.pelmenstar.projktSens.jserver.WeatherMonitor
 import com.pelmenstar.projktSens.jserver.logging.LoggerConfig
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
@@ -17,6 +17,6 @@ interface AppComponent {
     fun weatherProvider(): WeatherInfoProvider
     fun loggerConfig(): LoggerConfig
 
-    fun server(): Server
+    fun server(): RepoServer
     fun weatherMonitor(): WeatherMonitor
 }

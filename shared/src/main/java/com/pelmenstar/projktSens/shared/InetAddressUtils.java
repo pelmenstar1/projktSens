@@ -29,6 +29,21 @@ public class InetAddressUtils {
         return b1 | (b2 << 8) | (b3 << 16) | (b4 << 24);
     }
 
+    public static void appendIntIpv4(int value, @NotNull StringBuilder sb) {
+        int b1 = value & 0xff;
+        int b2 = (value >> 8) & 0xff;
+        int b3 = (value >> 16) & 0xff;
+        int b4 = (value >> 24) & 0xff;
+
+        sb.append(b1);
+        sb.append('.');
+        sb.append(b2);
+        sb.append('.');
+        sb.append(b3);
+        sb.append('.');
+        sb.append(b4);
+    }
+
     /**
      * Returns string representation of IPv4 stored in int.
      */

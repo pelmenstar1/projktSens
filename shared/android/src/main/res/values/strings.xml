@@ -2,4 +2,15 @@
 <resources>
     <string name="settings_title">Settings</string>
     <string name="settings_save">Save</string>
+
+    <string name="change">Change</string>
+    <string name="ip_address" translatable="false">IP</string>
+    <string name="server_port">Port</string>
+    <string name="invalid_ip_address">Invalid format</string>
+    <string name="invalid_server_port">Invalid port</string>
+    <string name="unreachable_endpoint">Unreachable endpoint</string>
+    <string name="not_projkt_sens_server">Not Projkt Sens endpoint</string>
+    <string name="is_projkt_sens_server">Valid endpoint</string>
+
+    <string name="ok" translatable="false">OK</string>
 </resources>

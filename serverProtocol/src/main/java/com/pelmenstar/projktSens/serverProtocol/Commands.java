@@ -31,14 +31,17 @@ public final class Commands {
 
     public static final int GET_NEXT_WEATHER_TIME = 5;
 
-    private static final int MAX_COMMAND = GET_NEXT_WEATHER_TIME;
+    public static final int GET_MAGIC_NUMBER = 6;
+
+    private static final int MAX_COMMAND = GET_MAGIC_NUMBER;
 
     private static final @NotNull String @NotNull [] COMMAND_NAMES = new String[]{
             "GET_DAY_REPORT",
             "GET_DAY_RANGE_REPORT",
             "GET_AVAILABLE_DATE_RANGE",
             "GET_LAST_WEATHER",
-            "GET_NEXT_WEATHER_TIME"
+            "GET_NEXT_WEATHER_TIME",
+            "GET_MAGIC_NUMBER"
     };
 
     public static int fromString(@NotNull String commandName) {

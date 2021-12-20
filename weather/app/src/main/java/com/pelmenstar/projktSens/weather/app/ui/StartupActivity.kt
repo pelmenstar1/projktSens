@@ -4,30 +4,54 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import com.pelmenstar.projktSens.shared.android.ui.chooseServerHost.ChooseServerHostDialog
+import com.pelmenstar.projktSens.weather.app.AppPreferences
 import com.pelmenstar.projktSens.weather.app.R
 import com.pelmenstar.projktSens.weather.app.di.AppModule
 import com.pelmenstar.projktSens.weather.app.di.DaggerAppComponent
-import com.pelmenstar.projktSens.weather.app.ui.firstStart.FirstStartActivity
 import com.pelmenstar.projktSens.weather.app.ui.home.HomeActivity
 
-class StartupActivity : Activity() {
+class StartupActivity : AppCompatActivity() {
+    private lateinit var prefs: AppPreferences
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
 
         super.onCreate(savedInstanceState)
 
         val component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
-        val prefs = component.preferences()
+        prefs = component.preferences()
 
         if (prefs.isFirstStart) {
-            val intent = FirstStartActivity.intent(this)
-            startActivityForResult(intent, REQUEST_CODE_FIRST_START)
-            overridePendingTransition(0, 0)
+            startChooseHostDialog()
         } else {
             startHomeActivityAndFinish()
         }
 
         setContentView(View(this))
+    }
+
+    private fun startChooseHostDialog() {
+        ChooseServerHostDialog().also {
+            it.arguments = ChooseServerHostDialog.arguments(
+                0,
+                10001,
+                prefs.contractType,
+                isCancellable = false
+            )
+            it.onChosen = { address, port ->
+                prefs.run {
+                    isFirstStart = false
+                    serverHostInt = address
+                    serverPort = port
+                }
+
+                startHomeActivityAndFinish()
+            }
+
+            it.show(supportFragmentManager, null)
+        }
     }
 
     private fun startHomeActivityAndFinish() {
@@ -37,21 +61,5 @@ class StartupActivity : Activity() {
 
         startActivity(intent)
         overridePendingTransition(0, 0)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(requestCode) {
-            REQUEST_CODE_FIRST_START -> {
-                if (resultCode == RESULT_OK) {
-                    startHomeActivityAndFinish()
-                } else {
-                    finish()
-                }
-            }
-        }
-    }
-
-    companion object {
-        private const val REQUEST_CODE_FIRST_START = 1
     }
 }

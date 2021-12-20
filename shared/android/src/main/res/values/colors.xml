@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="settings_defaultGroupBackground">#2C2B2B</color>
+    <color name="chooseServerHostDialog_validEndpointColor">#4CAF50</color>
+    <color name="chooseServerHostDialog_invalidEndpointColor">#EF2314</color>
 </resources>

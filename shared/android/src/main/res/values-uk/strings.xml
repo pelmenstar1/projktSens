@@ -2,4 +2,12 @@
 <resources>
     <string name="settings_title">Налаштування</string>
     <string name="settings_save">Зберегти</string>
+
+    <string name="change">Змінити</string>
+    <string name="server_port">Порт</string>
+    <string name="invalid_ip_address">Неправильний формат</string>
+    <string name="invalid_server_port">Неправильний порт</string>
+    <string name="unreachable_endpoint">Недійна адреса</string>
+    <string name="not_projkt_sens_server">Недійна адреса</string>
+    <string name="is_projkt_sens_server">Все правильно</string>
 </resources>

@@ -5,7 +5,6 @@ import com.pelmenstar.projktSens.jserver.*
 import com.pelmenstar.projktSens.jserver.logging.AndroidLogDelegate
 import com.pelmenstar.projktSens.jserver.logging.LogLevel
 import com.pelmenstar.projktSens.jserver.logging.LoggerConfig
-import com.pelmenstar.projktSens.jserver.repo.DbServerWeatherRepository
 import com.pelmenstar.projktSens.serverProtocol.ContractType
 import com.pelmenstar.projktSens.serverProtocol.ProtoConfig
 import com.pelmenstar.projktSens.shared.time.ShortDateRange
@@ -75,8 +74,8 @@ open class AppModule(private val context: Context) {
     open fun loggerConfig(): LoggerConfig = loggerConfig
 
     @Provides
-    fun server(): Server {
-        return Server(protoConfig(), loggerConfig(), weatherRepository())
+    fun server(): RepoServer {
+        return RepoServer(protoConfig(), loggerConfig(), weatherRepository())
     }
 
     @Provides

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/chooseServerHost_addressInputContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/ip_address"
+        app:startIconContentDescription="@string/ip_address">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/chooseServerHost_addressInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/chooseServerHost_portInputContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/server_port">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/chooseServerHost_portInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        style="@style/TextAppearance.MaterialComponents.Body1"
+        android:id="@+id/chooseServerHost_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp" />
+
+</LinearLayout>

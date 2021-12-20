@@ -10,7 +10,7 @@ import com.pelmenstar.projktSens.jserver.di.AppModule
 import com.pelmenstar.projktSens.jserver.di.DaggerAppComponent
 
 class ServerService : Service() {
-    private lateinit var server: Server
+    private lateinit var repoServer: RepoServer
     private lateinit var weatherMonitor: WeatherMonitor
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -21,7 +21,7 @@ class ServerService : Service() {
         val component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
         val wm = component.weatherMonitor()
         weatherMonitor = wm
-        server = component.server().apply {
+        repoServer = component.server().apply {
             weatherMonitor = wm
         }
     }
@@ -30,7 +30,7 @@ class ServerService : Service() {
         startForeground(NOTIFICATION_ID, createNotification())
 
         weatherMonitor.start()
-        server.startOnNewThread()
+        repoServer.startOnNewThread()
 
         return START_NOT_STICKY
     }
@@ -41,7 +41,7 @@ class ServerService : Service() {
         stopForeground(true)
 
         weatherMonitor.stop()
-        server.stop()
+        repoServer.stop()
     }
 
     private fun createNotificationChannel() {
