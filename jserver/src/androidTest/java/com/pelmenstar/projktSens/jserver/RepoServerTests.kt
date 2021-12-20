@@ -19,7 +19,7 @@ import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
 //@Ignore
-class ServerTests {
+class RepoServerTests {
     //
     // getAvailableDateRange
     //
@@ -198,7 +198,7 @@ class ServerTests {
         private val context = InstrumentationRegistry.getInstrumentation().context
 
         private lateinit var weatherRepo: WeatherRepository
-        private lateinit var server: Server
+        private lateinit var server: RepoServer
         private lateinit var blockingClient: Client
         private lateinit var asyncClient: Client
 
@@ -212,7 +212,7 @@ class ServerTests {
             asyncClient = Client(protoConfig, false)
 
             weatherRepo = component.weatherRepository()
-            server = component.server().also {
+            server = component.repoServer().also {
                 it.startOnNewThread()
                 Thread.sleep(2000)
             }

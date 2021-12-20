@@ -8,16 +8,15 @@ import com.pelmenstar.projktSens.serverProtocol.ServerAvailabilityProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.runner.RunWith
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
-class ServerAvailProviderTests {
+class RepoServerAvailProviderTests {
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val component = DaggerAppComponent.builder().appModule(TestAppModule(context)).build()
-    private val server = component.server()
+    private val server = component.repoServer()
 
     @Test
     fun isAvailableTest() {
