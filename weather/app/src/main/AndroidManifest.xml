@@ -26,7 +26,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.firstStart.FirstStartActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:exported="true"/>
         <activity
             android:name="com.pelmenstar.projktSens.shared.android.ui.settings.SettingsActivity"
             android:configChanges="orientation|screenSize" />
@@ -42,22 +43,28 @@
         </activity>
         <activity
             android:name=".ui.home.HomeActivity"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:exported="true"/>
         <activity
             android:name=".ui.sunriseSunset.SunriseSunsetCalendarActivity"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:exported="true"/>
         <activity
             android:name=".ui.moon.MoonCalendarActivity"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:exported="true"/>
         <activity
             android:name=".ui.report.DayReportActivity"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:exported="true"/>
         <activity
             android:name=".ui.report.WeekReportActivity"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:exported="true"/>
         <activity
             android:name=".ui.report.MonthReportActivity"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:exported="true"/>
     </application>
 
 </manifest>
