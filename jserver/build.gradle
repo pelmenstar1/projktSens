@@ -17,13 +17,12 @@ android {
         }
     }
 
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    compileSdk compile_sdk_version
 
     defaultConfig {
         applicationId "com.pelmenstar.projktSens.jserver"
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdk min_sdk_version
+        targetSdk compile_sdk_version
         versionCode 1
         versionName "1.0"
 
@@ -59,8 +58,8 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    implementation 'com.google.dagger:dagger:2.39.1'
-    kapt 'com.google.dagger:dagger-compiler:2.39.1'
+    implementation 'com.google.dagger:dagger:2.40.5'
+    kapt 'com.google.dagger:dagger-compiler:2.40.5'
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.0'
