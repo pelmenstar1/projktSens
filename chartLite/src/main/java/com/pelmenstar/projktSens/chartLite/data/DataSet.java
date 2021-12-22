@@ -53,9 +53,6 @@ public final class DataSet extends AppendableToStringBuilder {
     private int circleColor = Color.BLACK;
     private float circleRadius = 8f;
 
-    @ColorInt
-    private int background = Color.TRANSPARENT;
-
     public DataSet(long @NotNull [] entries, @Nullable ValueFormatter formatter) {
         this.entries = entries;
 
@@ -267,15 +264,6 @@ public final class DataSet extends AppendableToStringBuilder {
 
     public void setVisible(boolean enabled) {
         setFlag(FLAG_VISIBLE, enabled);
-    }
-
-    @ColorInt
-    public int getBackground() {
-        return background;
-    }
-
-    public void setBackground(@ColorInt int background) {
-        this.background = background;
     }
 
     public boolean contains(long e) {

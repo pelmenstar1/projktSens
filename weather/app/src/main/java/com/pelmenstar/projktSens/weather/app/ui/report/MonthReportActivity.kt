@@ -138,8 +138,6 @@ class MonthReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SE
         circleColor = color
         setDrawValues(false)
 
-        background = color.withAlpha(50)
-
         return this
     }
 

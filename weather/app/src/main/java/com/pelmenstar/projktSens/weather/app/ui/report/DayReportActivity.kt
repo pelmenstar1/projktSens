@@ -110,7 +110,6 @@ class DayReportActivity : ReportActivityBase<DayReport>(DayReport.SERIALIZER) {
         circleColor = colorPrimary
         color = colorPrimary
 
-        background = colorPrimary.withAlpha(50)
         setDrawValues(false)
 
         return this

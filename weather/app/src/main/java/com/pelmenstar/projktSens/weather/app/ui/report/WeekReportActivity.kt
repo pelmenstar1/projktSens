@@ -167,8 +167,6 @@ class WeekReportActivity : ReportActivityBase<DayRangeReport>(DayRangeReport.SER
         this.color = color
         circleColor = color
 
-        background = color.withAlpha(50)
-
         return this
     }
 

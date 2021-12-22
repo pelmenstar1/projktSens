@@ -124,8 +124,6 @@ public final class LineChartRenderer {
                 boolean drawValues = dataSet.isDrawValuesEnabled();
                 boolean drawCircles = dataSet.isDrawCirclesEnabled();
 
-                drawBackground(c, dataSet, pOffset);
-
                 if (!drawCircles) {
                     valOffset *= 0.5f;
                 }
@@ -175,50 +173,6 @@ public final class LineChartRenderer {
                     pOffset += 2;
                 }
             }
-        }
-    }
-
-    private void drawBackground(@NotNull Canvas c, @NotNull DataSet dataSet, int pOffset) {
-        int background = dataSet.getBackground();
-
-        if(Color.alpha(background) > 0) {
-            long[] entries = dataSet.getEntries();
-            float[] points = computedPoints;
-
-            Path path = backgroundPath;
-            path.rewind();
-
-            float gradientOffset = 20f;
-
-            float firstX = points[pOffset];
-            float firstY = points[pOffset + 1];
-
-            int pEnd = pOffset + 2 * (entries.length - 1);
-
-            float lastX = points[pEnd];
-            float lastY = points[pEnd + 1];
-
-            path.moveTo(firstX, firstY + gradientOffset);
-            path.lineTo(firstX, firstY);
-
-            for(int i = pOffset + 2; i <= pEnd; i += 2) {
-                float x = points[i];
-                float y = points[i + 1];
-
-                path.lineTo(x, y);
-            }
-
-            for(int i = pEnd; i >= pOffset; i -= 2) {
-                float x = points[i];
-                float y = points[i + 1] + gradientOffset;
-
-                path.lineTo(x, y);
-            }
-
-            path.close();
-
-            backgroundPaint.setColor(background);
-            c.drawPath(path, backgroundPaint);
         }
     }
 }
