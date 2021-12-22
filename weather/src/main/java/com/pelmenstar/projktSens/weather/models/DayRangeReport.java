@@ -1,6 +1,7 @@
 package com.pelmenstar.projktSens.weather.models;
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
+import com.pelmenstar.projktSens.shared.Median;
 import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer;
 import com.pelmenstar.projktSens.shared.serialization.Serializable;
@@ -341,24 +342,9 @@ public final class DayRangeReport extends AppendableToStringBuilder {
         float avgHum = humSum * invLength;
         float avgPress = pressSum * invLength;
 
-        Arrays.sort(tempValues);
-        Arrays.sort(humValues);
-        Arrays.sort(pressValues);
-
-        float medianTemp;
-        float medianHum;
-        float medianPress;
-
-        int mid = length / 2;
-        if (mid * 2 == length) {
-            medianTemp = (tempValues[mid] + tempValues[mid + 1]) * 0.5f;
-            medianHum = (humValues[mid] + humValues[mid + 1]) * 0.5f;
-            medianPress = (pressValues[mid] + pressValues[mid + 1]) * 0.5f;
-        } else {
-            medianTemp = tempValues[mid];
-            medianHum = humValues[mid];
-            medianPress = pressValues[mid];
-        }
+        float medianTemp = Median.compute(tempValues);
+        float medianHum = Median.compute(humValues);
+        float medianPress = Median.compute(pressValues);
 
         ParameterStats tempStats = new ParameterStats(
                 new ValueWithDate(minTempDt, minTempValue),

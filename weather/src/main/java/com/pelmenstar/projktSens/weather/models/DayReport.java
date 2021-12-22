@@ -1,6 +1,7 @@
 package com.pelmenstar.projktSens.weather.models;
 
 import com.pelmenstar.projktSens.shared.AppendableToStringBuilder;
+import com.pelmenstar.projktSens.shared.Median;
 import com.pelmenstar.projktSens.shared.StringUtils;
 import com.pelmenstar.projktSens.shared.serialization.ObjectSerializer;
 import com.pelmenstar.projktSens.shared.serialization.Serializable;
@@ -23,6 +24,10 @@ public final class DayReport extends AppendableToStringBuilder {
      * Entry of {@link DayReport}
      */
     public static final class Entry extends AppendableToStringBuilder {
+        private static final int FIELD_TEMPERATURE = 0;
+        private static final int FIELD_HUMIDITY = 1;
+        private static final int FIELD_PRESSURE = 2;
+
         @TimeInt
         public final int time;
 
@@ -35,6 +40,15 @@ public final class DayReport extends AppendableToStringBuilder {
             this.temperature = temp;
             this.humidity = hum;
             this.pressure = press;
+        }
+
+        private float getField(int type) {
+            switch (type) {
+                case FIELD_TEMPERATURE: return temperature;
+                case FIELD_HUMIDITY: return humidity;
+                case FIELD_PRESSURE: return pressure;
+                default: throw new RuntimeException("Invalid field type");
+            }
         }
 
         @Override
@@ -153,9 +167,6 @@ public final class DayReport extends AppendableToStringBuilder {
         float humSum = 0;
         float pressSum = 0;
 
-        float[] tempValues = new float[size];
-        float[] humValues = new float[size];
-        float[] pressValues = new float[size];
         int i = 0;
 
         float minTempValue = Float.MAX_VALUE;
@@ -186,11 +197,7 @@ public final class DayReport extends AppendableToStringBuilder {
             float hum = data.getHumidity();
             float press = UnitValue.getValue(data.getPressure(), pressUnit, ValueUnit.MM_OF_MERCURY);
 
-            tempValues[i] = temp;
-            humValues[i] = hum;
-            pressValues[i] = press;
-
-            entries[i] = new Entry(ShortDateTime.getTime(dateTime), temp, hum, press);
+            entries[i++] = new Entry(ShortDateTime.getTime(dateTime), temp, hum, press);
 
             tempSum += temp;
             humSum += hum;
@@ -225,8 +232,6 @@ public final class DayReport extends AppendableToStringBuilder {
                 maxPressValue = press;
                 maxPressDt = dateTime;
             }
-
-            i++;
         }
 
         float invSize = 1f / size;
@@ -234,24 +239,15 @@ public final class DayReport extends AppendableToStringBuilder {
         float avgHum = humSum * invSize;
         float avgPress = pressSum * invSize;
 
-        Arrays.sort(tempValues);
-        Arrays.sort(humValues);
-        Arrays.sort(pressValues);
-
         float medianTemp;
         float medianHum;
         float medianPress;
 
-        int mid = size / 2;
-        if (mid * 2 == size) {
-            medianTemp = (tempValues[mid] + tempValues[mid + 1]) * 0.5f;
-            medianHum = (humValues[mid] + humValues[mid + 1]) * 0.5f;
-            medianPress = (pressValues[mid] + pressValues[mid + 1]) * 0.5f;
-        } else {
-            medianTemp = tempValues[mid];
-            medianHum = humValues[mid];
-            medianPress = pressValues[mid];
-        }
+        float[] values = new float[entries.length];
+
+        medianTemp = computeMedian(values, entries, Entry.FIELD_TEMPERATURE);
+        medianHum = computeMedian(values, entries, Entry.FIELD_HUMIDITY);
+        medianPress = computeMedian(values, entries, Entry.FIELD_PRESSURE);
 
         ParameterStats tempStats = new ParameterStats(
                 new ValueWithDate(minTempDt, minTempValue),
@@ -278,6 +274,18 @@ public final class DayReport extends AppendableToStringBuilder {
         );
 
         return new DayReport(entries, stats);
+    }
+
+    private static float computeMedian(
+            float[] cachedValues,
+            @NotNull Entry @NotNull [] entries,
+            int field
+    ) {
+        for(int i = 0; i < entries.length; i++) {
+            cachedValues[i] = entries[i].getField(field);
+        }
+
+        return Median.compute(cachedValues);
     }
 
     private static final class Serializer implements ObjectSerializer<DayReport> {
