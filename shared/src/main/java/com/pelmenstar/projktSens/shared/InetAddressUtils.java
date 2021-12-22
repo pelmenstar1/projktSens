@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class InetAddressUtils {
+    private static final char[] TO_STRING_BUFFER = new char[15 /* max possible length of string */];
+
     /**
      * Special IP which signals about some kind of error
      */
@@ -49,19 +51,6 @@ public class InetAddressUtils {
      */
     @NotNull
     public static String intIpv4ToString(int value) {
-        char[] buffer = intIpv4ToCharArray(value);
-        return new String(buffer, 0, buffer.length);
-    }
-
-    /**
-     * Returns representation of IPv4, which is stored in int, as char array.
-     *
-     * @param text  temporary buffer.
-     * @param value IPv4 int
-     * @return If buffer has exact length as needed, it'll be reused and returned,
-     * otherwise, new array will be created.
-     */
-    public static char @NotNull [] intIpv4ToCharArray(char @NotNull [] text, int value) {
         int b1 = value & 0xff;
         int b2 = (value >> 8) & 0xff;
         int b3 = (value >> 16) & 0xff;
@@ -77,12 +66,7 @@ public class InetAddressUtils {
         int b4Index = b3Index + b3Length + 1;
 
         int bufferLength = b4Index + b4Length;
-        char[] buffer;
-        if (bufferLength == text.length) {
-            buffer = text;
-        } else {
-            buffer = new char[bufferLength];
-        }
+        char[] buffer = TO_STRING_BUFFER;
 
         StringUtils.writeByte(buffer, 0, b1);
         buffer[b1Length] = '.';
@@ -92,15 +76,7 @@ public class InetAddressUtils {
         buffer[b3Index + b4Length] = '.';
         StringUtils.writeByte(buffer, b4Index, b4);
 
-        return buffer;
-    }
-
-    /**
-     * Returns representation of IPv4, which is stored in int, as char array.
-     * Always returns new instance of char array without caching.
-     */
-    public static char @NotNull [] intIpv4ToCharArray(int value) {
-        return intIpv4ToCharArray(EmptyArray.CHAR, value);
+        return new String(buffer, 0, bufferLength);
     }
 
     /**
@@ -168,49 +144,6 @@ public class InetAddressUtils {
         return Bytes.withByte(ip, byteIndex, currentByte);
     }
 
-    /**
-     * Parses IPv4 buffer to int
-     *
-     * @return ip stored in int. If buffer has invalid format, returns {@link InetAddressUtils#IP_ERROR}
-     */
-    public static int parseNumericalIpv4ToInt(char @NotNull [] buffer) {
-        int ip = 0;
-        int byteIndex = 0;
-        int currentByte = 0;
-        int strByteStartIndex = 0;
-
-        int maxIdx = buffer.length - 1;
-        for (int i = 0; i < buffer.length; i++) {
-            char c = buffer[i];
-            int d = c - '0';
-
-            if (d >= 0 && d <= 9) {
-                currentByte = (currentByte << 3) + (currentByte << 1) + d;
-
-                if (currentByte > 255) {
-                    return IP_ERROR;
-                }
-            }else if (c == '.') {
-                if (byteIndex == 4 || i == maxIdx || i == strByteStartIndex) {
-                    return IP_ERROR;
-                }
-
-                ip = Bytes.withByte(ip, byteIndex, currentByte);
-                strByteStartIndex = i + 1;
-                byteIndex++;
-
-                currentByte = 0;
-            } else {
-                return IP_ERROR;
-            }
-        }
-
-        if (byteIndex != 3) {
-            return IP_ERROR;
-        }
-
-        return Bytes.withByte(ip, byteIndex, currentByte);
-    }
 
     /**
      * Parses only numerical IP address (like 1.2.3.4).
