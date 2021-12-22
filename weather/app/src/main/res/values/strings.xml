@@ -18,6 +18,7 @@
     <string name="max">Maximum</string>
     <string name="avg">Average</string>
     <string name="median">Median</string>
+    <string name="amplitude">Amplitude</string>
 
     <string name="noData">So empty…</string>
     <string name="errorOccurred">Owwp… Error</string>

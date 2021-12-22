@@ -19,6 +19,7 @@
     <string name="max">Максимум</string>
     <string name="avg">Середнє значення</string>
     <string name="median">Медіана</string>
+    <string name="amplitude">Амплітуда</string>
 
     <string name="noData">Ммм… Так пусто</string>
     <string name="errorOccurred">Упс… Помилка</string>

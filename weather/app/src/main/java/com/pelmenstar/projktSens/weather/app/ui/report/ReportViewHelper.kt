@@ -33,7 +33,8 @@ private class ParameterStatsPrefixStrings(
     @JvmField val min: String,
     @JvmField val max: String,
     @JvmField val avg: String,
-    @JvmField val median: String
+    @JvmField val median: String,
+    @JvmField val amplitude: String
 )
 
 private class ChartViewCreationContext(
@@ -151,6 +152,7 @@ private fun ViewGroup.ParamStatsBlock(
 
         ValueParamView(strings.min, paramStats.min, vpContext)
         ValueParamView(strings.max, paramStats.max, vpContext)
+        ValueParamView(strings.amplitude, paramStats.amplitude, vpContext)
         ValueParamView(strings.avg, paramStats.avg, vpContext)
         ValueParamView(strings.median, paramStats.median, vpContext)
 
@@ -212,7 +214,8 @@ fun createChartView(
         res.getString(R.string.min),
         res.getString(R.string.max),
         res.getString(R.string.avg),
-        res.getString(R.string.median)
+        res.getString(R.string.median),
+        res.getString(R.string.amplitude)
     )
 
     val creationContext = ChartViewCreationContext(

@@ -22,6 +22,7 @@ public final class ParameterStats extends AppendableToStringBuilder {
     public final ValueWithDate max;
     public final float avg;
     public final float median;
+    public final float amplitude;
 
     static {
         SERIALIZER = new Serializer();
@@ -38,6 +39,7 @@ public final class ParameterStats extends AppendableToStringBuilder {
         this.max = max;
         this.avg = avg;
         this.median = median;
+        this.amplitude = Math.abs(max.value - min.value);
     }
 
     @Override
